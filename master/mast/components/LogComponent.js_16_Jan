@@ -1,0 +1,42 @@
+Mast.registerTree('LogTable', {
+
+	extendsFrom: 'UITableComponent',
+	model: {
+
+		column1: {
+			name: 'Activity',
+			className: 'log-activity-column'
+		},
+		column2: {
+			name: 'Date',
+			className: 'log-date-column'
+		},
+		selectedModel: null
+	},
+	
+	template: '.log-template',
+
+// branch properties
+	emptyHTML      : '<div class="loading-spinner"></div>',
+	branchComponent: 'LogRow',
+	branchOutlet   : '.log-outlet',
+
+	collection     : {
+		url: '/logging/listLog',
+		model: Mast.Model.extend({
+			defaults: {
+				highlighted : false,
+				text_message: "Default" ,
+				createdAt   : "Default"
+			},
+			selectedModel: this
+		})
+	},
+
+});
+
+// log row component
+Mast.registerComponent('LogRow', {
+	template: '.log-row-template',
+
+});

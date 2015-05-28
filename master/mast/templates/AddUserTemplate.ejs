@@ -1,0 +1,93 @@
+<div class="add-user-template" style="background-clip: padding-box;border-radius: 7px;box-shadow: 0 1px 5px #b3bac4;margin: 40px 2%;padding: 10px;">
+
+<!-- upgrade header -->
+	<!-- <div class="title-mod">
+		<div class="title-fix">
+ 			<span>You can add users using xls file. Follow the link</span>
+ 			<a class="import-users">
+				<input type ="button" value="Import Users" class="btn btn-primary">
+			</a>
+			<div class="clear"></div>
+		</div>
+	</div> -->
+
+<!-- settings content -->
+	<div class="main-mod ent-form-cont" id="main-mod"> 
+		<!-- company details section -->
+		<form action="/account/register" method="POST" class="new-user-form">
+
+			<div class="center-mod">
+				<h3 class="company-details">New user</h3>
+				<div class="company-name">First Name</div>
+					<input type="text" name="first_name" placeholder="Enter First Name" class="enter_name" style="border: 1px solid @borderGray;
+				margin-bottom:12px;width: 275px;padding: 7px 14px;">
+
+				<div class="company-name">Last Name</div>
+					<input type="text" name="last_name" placeholder="Enter Last Name" class="enter_name" style="border: 1px solid @borderGray;
+				margin-bottom:12px;width: 275px;padding: 7px 14px;"> 
+
+				<div class="company-name">Email</div>
+					<input type="text" name="email" placeholder="Enter Email" class="enter_name" style="border: 1px solid @borderGray;
+				margin-bottom:12px;width: 275px;padding: 7px 14px;">
+
+				<div class="company-name">WorkGroup Name</div>
+					<select name="workgroup" id="list_workgroup" style="border: 1px solid #d7dbdc;margin-bottom: 12px;padding: 10px 15px;width: 305px;">
+					</select>
+
+				
+				<div class="company-name">Role</div>
+				<select name="role" style="border: 1px solid #d7dbdc;margin-bottom: 12px;padding: 10px 15px;width: 305px;">
+					<option value="">Select Role</option>
+					<option value="admin">Is Admin</option>
+					<option value="write">Can Edit</option>
+					<option value="comment">Can Comment</option>
+				</select>
+
+				<div class="company-name"> Password </div>
+				<input type="password" name="password" placeholder="Enter Password" class="enter_name" style="border: 1px solid @borderGray;
+				margin-bottom:12px;width: 275px;padding: 7px 14px;">
+
+				<div class="company-name"> Confirm Password </div>
+				<input type="password" name="c_password" placeholder="Confirm Password" class="enter_name" style="border: 1px solid @borderGray;
+				margin-bottom:12px;width: 275px;padding: 7px 14px;">
+
+				<div class="company-name"> Title </div>
+				<input type="text" name="title" placeholder="Enter Title" class="enter_name" style="border: 1px solid @borderGray;
+				margin-bottom:12px;width: 275px;padding: 7px 14px;">
+
+				<div class="company-name"> Subscription</div>
+				<select id="subscription-drop" name="subscription" style="border: 1px solid #d7dbdc;margin-bottom: 12px;padding: 10px 15px;width: 305px;"></select>
+				<div class="clear"></div>
+
+			</div>  
+		</form>
+		<div class="clear"></div> 
+	</div> 
+
+	<!-- save button -->
+	<div class="footer-mod ent-form-cont">
+		<a class="setting-save-button">
+			<img src="/images/button_save@2x.png" />
+		</a>
+	</div>
+
+	<div class="footer-mod add-subs-cont">
+		<div class="company-name"> No subscription added yet. Please add
+			subscription plan.
+			<a href="#addsubscription" class="add-subscription">
+			Add Subscription
+		</a>
+		</div>
+	</div>
+
+</div>
+
+
+
+
+
+
+
+
+
+

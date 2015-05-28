@@ -1,0 +1,24 @@
+Mast.routes.subscription = function(query,page) {
+// Empty container
+	$("#content").empty();
+	var subscriptionPage = new Mast.components.SubscriptionPage();
+};
+
+Mast.routes.addsubscription = function(query,page) {
+// Empty container
+	$("#content").empty();
+	new Mast.components.AddSubscriptionComponent();
+};
+
+Mast.routes.listsubscription = function(query,page) {
+// Empty container
+	$("#content").empty();
+	new Mast.components.ListSubscriptionPage();
+};
+
+Mast.routes['subscription/updatesubscription'] = function(query, page) {
+	$("#content").empty();
+	var update = new Mast.components.UpdateSubscriptionComponent();
+};
+
+

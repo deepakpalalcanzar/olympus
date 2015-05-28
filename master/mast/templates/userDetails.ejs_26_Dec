@@ -1,0 +1,64 @@
+<!-- details template -->
+<div class="user-details-template account-page-container">
+  <div style="width:100%;background: none repeat scroll 0 0 #dee6f5;color: #636c78;padding: 10px;">
+        <h1>User Detail</h1>
+  </div> 
+  <div style="width:98%;">&nbsp;</div>
+
+  <div class="user-details-container clearfix">
+    
+    <!-- <div class='image-uploader'></div> -->
+ <div class="dir-files action-ent-column mast-critical mast-column-header" style="float:right;cursor:pointer;">
+    <span class="delete-user" data-id="{{id}}">Delete</span>
+    <!--<span class="ent-update">Update</span> -->
+  </div>
+
+    <form action="/account/update" method="POST" class="user-details-form"> 
+      <fieldset>
+        <label for="name">Name</label>
+        <input id="name" name="name" type="text" value="{{name}}" />
+        <label for="title">Job Title</label>
+        <input id="title" name="title" type="text" value="{{title}}" />
+        <label for="emails">Email</label>
+        <input id="email" name="email" type="text" value="{{email}}" />
+        <label for="phone">Phone number</label>
+        <input id="phone" name="phone" placeHolder = "Phone Number" type="text" value="{{phone}}" />
+        
+        <input id="phone" name="user_id" type="hidden" value="{{id}}" />
+
+        {% if(Mast.Session.Account.email!='superadmin@olympus.io'){ %}
+        <div class="company-name">WorkGroup Name</div>
+        <select id = "workgroups_assigned" name="workgroup" style=" border: 1px solid #d7dbdc;margin-bottom: 12px;padding: 10px 15px;width: 305px;">
+        </select>
+
+        <div class="company-name">Role</div>
+            <select id="user_role" name="role" style=" border: 1px solid #d7dbdc;margin-bottom: 12px;padding: 10px 15px;width: 305px;">
+                <option value="">Select Role</option>
+                <option value="admin">Is Admin</option>
+                <option value="write">Can Edit</option>
+                <option value="comment">Can Comment</option>
+            </select>
+            {% }else{ %}
+            <div class="company-name">Profile</div>
+            {% 
+              var sel,sels,selss;
+              if(profile==2){ 
+                sel = 'selected';
+              }else if(profile==3){
+                sels = 'selected';
+              }else if(profile==5){
+                selss = 'selected';
+              }  
+            %}
+            <select name="profile" id="profile" style=" border: 1px solid #d7dbdc;margin-bottom: 12px;padding: 10px 15px;width: 305px;">
+            </select>
+             
+            
+            {% } %}
+
+      </fieldset>
+    </form>
+
+ </div>
+  <div class="user-save-button submit-details">Save</div>
+</div>

@@ -1,0 +1,79 @@
+/*.title-fix span{font-size:25px;}
+.subscription-template .organization-bar div.features-column{width:15%;padding:5px;text-align:center;}
+.subscription-template .organization-bar div span{text-align:center;font-size:15px;}
+.subscription-name{width:15%;float:left;}
+.subscription-name span {text-align:center;}
+*/
+
+.title-fix span{font-size:25px;font-weight:bolder;}
+/*.header-color{	background:#428BCA;	color:#FFFFFF;padding:15px;}*/
+div.enterprises-column{
+	width:30%;
+	text-align:center;
+	border-bottom:1px solid silver;
+	float: left;
+	cursor:pointer;
+	height: 30px;
+}
+
+div.users-column{
+	width:15%;
+	text-align:center;
+	border-bottom:1px solid silver;
+	float: left;
+	cursor:pointer;
+	height: 30px;
+}
+
+div.workgroup-column{
+	width:28%;
+	text-align:center;
+	border-bottom:1px solid silver;
+	float: left;
+	cursor:pointer;
+	height: 30px;
+}
+
+div.impersonate-column{
+	width:27%;
+	text-align:center;
+	border-bottom:1px solid silver;
+	float: left;
+	height: 30px;
+}
+
+
+.enterprises-template .organization-bar div span{text-align:center;font-size:15px;}
+/*.subscription-name{width:20%;float:left;margin-left:15px;}
+.subscription-name span {text-align:center;}*/
+.enterprises-row-template:hover {
+    background: none repeat scroll 0 0 #DEE6F5;
+}
+
+.enterprises-row-template.highlighted {
+   background: linear-gradient(to bottom, #86A7CA 0%, #7697BA 88%) repeat scroll 0 0 rgba(0, 0, 0, 0);
+   color:#FFFFFF;
+}
+
+div.enterprises-template div.dir-files{
+    font: 0.6em "ProzimanovaSemiBold",Helvetica,Arial,sans-serif;
+    padding: 15px 0 !important;
+}
+
+.enterprises-template .organization-bar{color: #636C78;}
+
+.impersonate-option-buttons a{
+	
+}
+.impersonate-option-buttons{
+	background:  @borderGray;
+	border-radius: 2px;
+    padding: 5px;
+    border: 1px solid gray;
+    cursor: pointer;
+    float: left;
+    width: 150px;
+    margin-left: 30%;
+}
+
+/*#636C78*/

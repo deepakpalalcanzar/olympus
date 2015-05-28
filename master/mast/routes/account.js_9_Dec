@@ -1,0 +1,27 @@
+Mast.routes.account = function(query, page) {
+	// Empty container
+	$("#content").empty();
+	Mast.navigate('account/details');
+};
+
+Mast.routes['account/details'] = function(query, page) {
+	$("#content").empty();
+	var account = new Mast.components.AccountSettingsComponent();
+	account.displayAccountDetails();
+	Olympus.ui.actionBar.append();
+	Olympus.ui.actionBar.updateButtonState();
+};
+
+Mast.routes['account/password'] = function(query, page) {
+	$("#content").empty();
+	var account = new Mast.components.AccountSettingsComponent();
+	account.displayAccountPassword();
+	Olympus.ui.actionBar.append();
+	Olympus.ui.actionBar.updateButtonState();
+};
+
+Mast.routes['account/notifications'] = function(query, page) {
+	$("#content").empty();
+	var account = new Mast.components.AccountSettingsComponent();
+	account.displayAccountNotifications();
+};

@@ -1,0 +1,26 @@
+<!-- action bar -->
+<div class="upload-search-template">
+	<div class="main-action-container clearfix">
+		
+		<div class="dir-folder-creation" >
+			{% if (createFolderButton) { %}
+				<a class="create-folder"><div class="button-image"></div></a>		
+			{% } %}
+
+			{% if (uploadFileButton) { %}
+				<a class="upload-file"><div class="button-image"></div></a>
+<!--				<a class="activity-list"><div class="button-image"></div></a>
+				<a class="sharing-list"><div class="button-image"></div></a>
+				<a class="delete-file"><div class="button-image"></div></a>
+				<a class="download-file"><div class="button-image"></div></a> -->
+			{% } %}
+		</div>
+
+		<!-- searchbar -->
+		<div class="searchbar">
+			<input type="text" placeholder="Search Users" name="search"/>
+			<input type="button" name="search-button" value="Search"  class="search-users" style="width: 107px;border-radius: 0px;
+color: #FFF;font-weight: 700;background: #428BCA;"/>
+		</div>
+	</div>
+</div>

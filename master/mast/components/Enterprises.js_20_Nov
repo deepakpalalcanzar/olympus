@@ -1,0 +1,119 @@
+Mast.registerTree('EnterprisesTable', {
+	extendsFrom: 'UITableComponent',
+	model: {
+		column1: {
+			name: 'Enterprises',
+			className: 'enterprises-column'
+		},
+		column2: {
+			name: 'User\'s',
+			className: 'users-column'
+		},
+		column3: {
+			name: 'Work Groups',
+			className: 'workgroup-column'
+		},
+		column4: {
+			name: 'Impersonate',
+			className: 'impersonate-column'
+		},
+		selectedModel: null
+	},
+	
+	template: '.enterprises-template',
+
+// branch properties
+	emptyHTML      : '<div class="loading-spinner"></div>',
+	branchComponent: 'EnterprisesRow',
+	branchOutlet   : '.enterprises-outlet',
+//	collection	   : 'Account',
+
+	collection     : {
+		url: '/enterprises/listEnterprises',
+		model: Mast.Model.extend({
+			defaults: {
+				highlighted 	: false,
+				name        	: "Enterprise Name 1",
+				user   			: '5',
+				workgroup  		: '6' ,
+				is_impersonate 	: 'Deactivated',
+				avatarSrc      	: 'images/icon_profilePicture_default@2x.png',
+				phone_number    : '7894561230',
+				email      		: 'geoff@gtudor.com',
+			},
+			selectedModel: null
+		})
+	},
+
+	bindings: {
+// set highlight to false except for newly selected user
+		selectedModel: function(newModel) {
+			this.collection.invoke('set', 'highlighted', false);
+			newModel.set({highlighted: true});
+		}
+	},
+	loading: function(newModel) {
+			if (newVal) {
+				$('.subscription-template .loading-spinner').show();
+			} else {
+				$('.subscription-template .loading-spinner').hide();
+			}
+	},
+	
+});
+
+
+// user row component
+Mast.registerComponent('EnterprisesRow', {
+
+	template: '.enterprises-row-template',
+
+	bindings: {
+		highlighted: function(newVal) {
+			if (newVal) {
+				this.addHighlight();
+			} else {
+				this.removeHighlight();
+			}
+		}
+	},
+
+	events: {
+		'click .enterprises-column': 'openSidebar',
+		'click .users-column': 'userDetails',
+		'click .workgroup-column': 'workgroupsDetails',
+	},
+
+	// Selects the user that was clicked on. gives the parent the current users model
+	selectUser: function() {
+		this.parent.set({selectedModel: this.model});
+	},
+
+	// Creates an instance of the sidebar with the data of this current users
+	// model.
+	openSidebar: function() {
+		this.parent.set({selectedModel: this.model});
+		this.parent.parent.trigger('openSidebar', this.model);
+	},
+
+	// Add highlight to the User row
+	addHighlight: function() {
+		this.$el.addClass('highlighted');
+	},
+
+	// Remove highlight from the User row
+	removeHighlight: function() {
+		this.$el.removeClass('highlighted');
+	},
+	userDetails: function() {
+		Mast.navigate('#enterprises/enterprisesusers');
+	},
+	workgroupsDetails: function() {
+		Mast.navigate('#enterprises/enterprisesworkgroups');
+	},
+
+});
+
+
+
+

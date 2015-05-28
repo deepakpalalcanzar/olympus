@@ -1,0 +1,63 @@
+	<!-- permission list component -->
+<div class="permission-template">
+
+	<!-- public link stuff -->
+	<div class="sharing-link-container">
+		<div class="public-link-option">
+			<label for="public_link_enabled">Allow public link?</label>
+			<input class="public_link_enabled" name="public_link_enabled" type="checkbox" value="yes">
+		</div>
+		<div class="public-sublinks-option">
+			<label for="public_sublinks_enabled">Allow public link for all files and subfolders?</label>
+			<input type="checkbox" class="public_sublinks_enabled" name="public_sublinks_enabled" value="yes"/>
+		</div>
+		<div class="public-link">
+			<input type="text" value="{{link}}" />
+		</div>
+	</div>
+
+	<span class="access">Who has access</span>
+  <div class="permissionRow-outlet"></div>
+  <div class="sharing-form">
+	<div class="comment-form-fix">
+	  <span class="postComment_title">Share with someone else</span>
+	</div>
+	<div class="comment-form-text permission-form">
+	  <input class="accounts" placeholder="Enter name or email address"></input>
+	</div>
+	<div class="comment-form-fix">
+	  <img class="addSharedUser-button" src="/images/SendInvite_button.png" />
+	</div>
+  </div>
+</div>
+
+
+<!-- permission row template -->
+<div class="permissionRow-template">
+  <div class="sharing-inner-spacing">
+		<div class="comment-user-avatar">
+		  <a class="user-avatar-link">
+		  	<img class="user-avatar" src="/account/avatar/{{owned_by.id}}" />
+		  </a>
+		</div>
+		<div class="comment-container-sharing">
+		  <h6><a>{{owned_by.name}}</a></h6>
+		</div>
+
+		{% if (editable) { %}
+		<div class="detail-container-sharing-x">
+		  <h6 class="clearfix remove-shared-user"><a><img src="/images/CloseIcon.png" /></a></h6>
+		</div>
+
+		<div class="detail-container-sharing">
+		  <h6><a class="permission-edit">{{permission}} <img src="/images/ExpandedArrow.png"/></a></h6>
+		</div>
+		{% } else { %}
+		<div class="detail-container-sharing show-permission">
+		  <h6><span class="permission-show">{{permission}}</span></h6>
+		</div>
+		{% } %}
+		<div class="clear-tab"></div>
+  </div>
+  <div class="comment-border"></div>
+</div>

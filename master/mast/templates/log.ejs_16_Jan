@@ -1,0 +1,23 @@
+<div class="log-template">
+	<div class="organization-bar clearfix main-mod" >
+		<div class="dir-files {{column1.className}} header-color mast-critical"><span>{{column1.name}}</span></div>
+		<div class="dir-files {{column2.className}} header-color mast-critical"><span>{{column2.name}}</span></div>
+		
+	<div class="log-outlet clearfix"  style="width:100%;"></div>
+</div>	
+</div>
+
+<!-- log row template -->
+<div class="log-row-template clearfix" style="width:100%;float:left;">
+	{% if(text_message !=='error_123'){%}
+	<div class="dir-files log-activity-column mast-critical log-column-text">
+		<span>{{text_message}}</span>
+	</div>
+	
+	<div class="dir-files log-date-column mast-critical mast-column-header">
+		<span>{{createdAt}}</span>
+	</div>
+	{% }else{%}
+	 <div class="dir-files" style="font-size:13px;margin-left:50px;">No records found !</div>
+	{% }%}
+</div>
