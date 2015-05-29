@@ -91,6 +91,8 @@ class Configuration {
 			$path = "/var/www";
 		}else if ($distribution_version == '14.04'){
 			$path = "/var/www/html";
+		}else{
+			$path = "/var/www/html";
 		}
 
 		$fileAdapter 			= '';
@@ -477,9 +479,10 @@ class Configuration {
 			$path = "/var/www";
 		}else if ($distribution_version == '14.04'){
 			$path = "/var/www/html";
+		}else{
+			$path = "/var/www/html";
 		}
 
-		
 		if($files['ssl_cert']['name']['0']!='') {
 			foreach($files['ssl_cert']['name'] as $key => $val){
 				if($files['ssl_cert']['name']['0'] != 'gd_bundle.crt'){
@@ -525,6 +528,8 @@ class Configuration {
 		if($distribution_version == '12.04'){
 			$path = "/var/www";
 		}else if ($distribution_version == '14.04'){
+			$path = "/var/www/html";
+		}else{
 			$path = "/var/www/html";
 		}
 
