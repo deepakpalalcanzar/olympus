@@ -42,6 +42,9 @@ module.exports = {
         verificationCode: 'string',
         avatar_fname: 'string',
         avatar_mimetype: 'string',
+        enterprise_fsname: 'string',
+        enterprise_mimetype: 'string',
+        avatar_image: 'string',
 
         isAdmin: {
           type: 'boolean',
@@ -90,32 +93,31 @@ module.exports = {
      * @param {Function} callback
      */
 
-    destroy: function (cb) {
-        var self = this;
-// Flag as deleted
-        this.deleted = true;
-        this.deleteDate = new Date();
-        this.save(function (err) {
-            if (err) return cb(err);
-            deleteUtils.recursiveDelete(self.id, function (err) {
+        destroy: function (cb) {
+            var self = this;
+    // Flag as deleted
+            this.deleted = true;
+            this.deleteDate = new Date();
+            this.save(function (err) {
                 if (err) return cb(err);
-                cb(null, self);
+                deleteUtils.recursiveDelete(self.id, function (err) {
+                    if (err) return cb(err);
+                    cb(null, self);
+                });
             });
-        });
-    },
+        },
 
 /**
  * Override toJSON()
  */
-
-    toJSON: function () {
-        var obj = this.toObject();
-        delete obj.password;
-        delete obj.deleted;
-        delete obj.verified;
-        delete obj.verificationCode;
-        return obj;
-    },
+        toJSON: function () {
+            var obj = this.toObject();
+            delete obj.password;
+            delete obj.deleted;
+            delete obj.verified;
+            delete obj.verificationCode;
+            return obj;
+        },
 
 
     /**
@@ -123,109 +125,70 @@ module.exports = {
      * any workgroups the account is owner of.
      */
 
-    lock: function (lockState, cb) {
-        var self = this;
-// Flag as locked
-        this.isLocked = lockState;
-        this.save(function (err) {
-            if (err) return cb(err);
-            lockUtils.recursiveLock(self.id, lockState, function (err) {
-              if (err) return cb(err);
-              cb(null, self);
+        lock: function (lockState, cb) {
+            var self = this;
+    // Flag as locked
+            this.isLocked = lockState;
+            this.save(function (err) {
+                if (err) return cb(err);
+                lockUtils.recursiveLock(self.id, lockState, function (err) {
+                  if (err) return cb(err);
+                  cb(null, self);
+                });
             });
-        });
-    }
-    
-  },
+        }
+    },
 
   // creates an account, returning a promise if no callback is specified
-  createAccount: function (options, cb) {
+    createAccount: function (options, cb) {
 
-    console.log("@@@@@@@@@@@@@@@@@@@ ACCCCOUNTT MODEL @@@@@@@@@@@@@@@@@@@");
+        var name     = options.name || options.email;
+        var email    = options.email;
+        var password =  options.password || crypto.randomBytes(10).toString('hex');
+        var isAdmin  = options.isAdmin || false;
+        var verificationCode=  crypto.randomBytes(20).toString('hex');
+        var verified    = options.isVerified;
+        var created_by  = options.created_by;
+        var title       = options.title;
+        var is_enterprise = options.is_enterprise;
+        var subscription_id= options.subscription_id;
 
-    var name     = options.name || options.email;
-    var email    = options.email;
-    var password =  options.password || crypto.randomBytes(10).toString('hex');
-    var isAdmin  = options.isAdmin || false;
-    var verificationCode=  crypto.randomBytes(20).toString('hex');
-    var verified    = options.isVerified;
-    var created_by  = options.created_by;
-    var title       = options.title;
-    var is_enterprise = options.is_enterprise;
-    var subscription_id= options.subscription_id;
+        Account.create({
 
-    console.log(name);
-    console.log(email);
-    console.log(password);
-    console.log(isAdmin);
-    console.log(verificationCode);
-    console.log(verified);
-    console.log(created_by);
-    console.log(title);
-    console.log(is_enterprise);
-    console.log(subscription_id);
+            name            : options.name || options.email,
+            email           : options.email,
+            password        : options.password || crypto.randomBytes(10).toString('hex'),
+            isAdmin         : options.isAdmin || false,
+            verificationCode: crypto.randomBytes(20).toString('hex'),
+            verified        : options.isVerified,
+            created_by      : options.created_by,
+            title           : options.title,
+            is_enterprise   : options.is_enterprise,
+            subscription_id :  options.subscription_id,
 
+        }).exec(function foundAccount (err, account) {
 
-
-
-    Account.create({
-
-        name    : options.name || options.email,
-        email   : options.email,
-        password: options.password || crypto.randomBytes(10).toString('hex'),
-        isAdmin : options.isAdmin || false,
-        verificationCode: crypto.randomBytes(20).toString('hex'),
-        verified    : options.isVerified,
-        created_by  : options.created_by,
-        title       : options.title,
-        is_enterprise: options.is_enterprise,
-        subscription_id: options.subscription_id,
-
-    }).exec(function foundAccount (err, account) {
-
-
-        if (err) return cb && cb(err);
-// Now create a workgroup, assigning the new account as an admin
-        if(typeof options.enterprise_name !== 'undefined'){
-            var dirOptions = {
-                name:   options.enterprise_name + '\'s Workgroup',
-                quota:  options.quota
-            };
-        }else{
-            var dirOptions = {
-                name: account.name + '\'s Workgroup',
-                quota: options.quota
-            };
-        }
-
-        Directory.createWorkgroup(dirOptions, account.id, true, function (err, results) {
             if (err) return cb && cb(err);
-            return cb && cb(null, account);
+
+    // Now create a workgroup, assigning the new account as an admin
+            if(typeof options.enterprise_name !== 'undefined'){
+                var dirOptions = {
+                    name:   options.enterprise_name + '\'s Workgroup',
+                    quota:  options.quota
+                };
+            }else{
+                var dirOptions = {
+                    name: account.name + '\'s Workgroup',
+                    quota: options.quota
+                };
+            }
+
+            Directory.createWorkgroup(dirOptions, account.id, true, function (err, results) {
+                if (err) return cb && cb(err);
+                return cb && cb(null, account);
+            });
         });
-
-            /* Now create a logging detail*/
-        // if(typeof options.created_by_name == 'undefined'){
-        //     var msg = 'An account with name '+account.name+' has been registered.';
-        // }else{
-        //     var msg = options.created_by_name+' has created an account for '+account.name+'.';
-        // }
-      
-        // var logOptions = {
-        //     user_id         : options.created_by,
-        //     text_message    : msg,
-        //     activity        : 'add',
-        //     on_user         : account.id,
-        //     ip              : options.ip, 
-        // };
-
-        // Logging.createLog(logOptions, function (err, results) {
-        //     if (err) return cb && cb(err);
-        //   // return cb && cb(null, account);
-        // });
-
-        
-    });
-  },
+    },
 
 
 
@@ -233,21 +196,21 @@ module.exports = {
    * Lifecycle Callbacks
    ****************************************************/
 
-  beforeCreate: function encryptPassword(values, cb) {
-    bcrypt.hash(values.password, 10, function (err, hash) {
-      if (err) return cb(err);
-      values.password = hash;
-      cb();
-    });
-  },
+    beforeCreate: function encryptPassword(values, cb) {
+        bcrypt.hash(values.password, 10, function (err, hash) {
+            if (err) return cb(err);
+            values.password = hash;
+            cb();
+        });
+    },
 
 
-  beforeSave: function encryptPassword(values, cb) {
-    bcrypt.hash(values.password, 10, function (err, hash) {
-      if (err) return cb(err);
-      values.password = hash;
-      cb();
-    });
-  }
+    beforeSave: function encryptPassword(values, cb) {
+        bcrypt.hash(values.password, 10, function (err, hash) {
+            if (err) return cb(err);
+            values.password = hash;
+            cb();
+        });
+    }
 
 };

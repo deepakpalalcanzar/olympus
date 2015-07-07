@@ -90,6 +90,13 @@ var EnterprisesController = {
                             Directory.findOne({
                                 OwnerId: req.param('enterprise_id')
                             }).done(function(er, dir){
+
+                                    //Check users limit if less than users send message
+                                    if(subscription.users_limit < account){
+                                        return res.json({
+                                            type : 'error_users_limit',
+                                        });
+                                    }
                                     
                                     //Checkin quota
                                     if(((subscription.users_limit >= account ) && ((subscription.quota*1000000000) >= dir.size)) || (subscription.users_limit === 'Unlimited')){

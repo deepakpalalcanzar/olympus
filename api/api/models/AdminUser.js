@@ -13,8 +13,15 @@ module.exports = {
             user_id: options.user_id,
             admin_profile_id: options.admin_profile_id
         }).exec(function foundAccount (err, account) {
+            //if (err) return cb && cb(err);   
+            //cb(account); 
+
+
             if (err) return cb && cb(err);   
-            cb(account);   
+            //cb(account);   
+            return cb && cb(null, account);  
+
+
         });
     },
 };

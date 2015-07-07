@@ -96,7 +96,8 @@ module.exports = {
       text_message    : options.text_message,
       action          : options.activity,
       on_user         : options.on_user,
-      ip_address      : options.client_ip,
+      ip_address      : options.ip,
+     
     }).exec(function foundAccount (err, logging) {
       console.log(err);
         if (err) return cb && cb(err);

@@ -125,7 +125,9 @@ module.exports = {
       duration        : options.duration,
       paypal_status   : options.paypal_status,
     }).exec(function foundAccount (err, account) {
+      console.log(err);
         if (err) return cb && cb(err);
+
         return cb && cb(null, account);
     });
   },

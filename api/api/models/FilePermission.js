@@ -14,7 +14,6 @@ module.exports = {
 
     AccountId: 'integer',
     FileId   : 'integer',
-    lastSync : 'datetime',
 
 
     /****************************************************

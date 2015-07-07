@@ -202,25 +202,22 @@ module.exports = {
      */
 
     copy: function (targetId, cb) {
-
-      var self = this;
-
+        
+        var self = this;
       /**
        * Ensure we are not trying to copy the directory into itself
        * or any of it's child directories
        */
-
-      copyUtils.recursiveCheck(this.id, targetId, function (err) {
-        if (err) return cb(err);
-        copyUtils.recursiveCopy(self, targetId, function(err) {
-          if (err) {return cb(err);}
-          Directory.workgroup(targetId, function(err, workgroup) {
-            if (err) {return cb(err);}
-            workgroup.recalculateSize(cb, true);
-          });
+        copyUtils.recursiveCheck(this.id, targetId, function (err) {
+            if (err) return cb(err);
+            copyUtils.recursiveCopy(self, targetId, function(err) {
+                if (err) {return cb(err);}
+                Directory.workgroup(targetId, function(err, workgroup) {
+                    if (err) {return cb(err);}
+                    workgroup.recalculateSize(cb, true);
+                });
+            });
         });
-      });
-
     },
 
 
@@ -233,12 +230,12 @@ module.exports = {
     destroy: function (cb) {
 
       // Flag as deleted
-      this.deleted = true;
-      this.deleteDate = new Date();
+        this.deleted = true;
+        this.deleteDate = new Date();
+        this.save(function (err) {
+            cb(err);
+        });
 
-      this.save(function (err) {
-        cb(err);
-      });
     },
 
     recalculateSize: function(cb, force) {

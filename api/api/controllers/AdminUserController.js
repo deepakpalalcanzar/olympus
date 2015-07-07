@@ -10,7 +10,7 @@ var AdminUserController = {
         AdminUser.createAdminUser(req.body, function(err, adminuser) {
             if (err) return res.json({error: 'Error creating adminuser',type: 'error'});
             return  res.json({
-                        adminuser: {id: adminuser.id,}
+                        adminuser: {id: adminuser.id,email_msg : req.body.email_msg,}
                     });
         });
     },

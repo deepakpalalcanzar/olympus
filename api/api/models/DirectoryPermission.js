@@ -8,11 +8,12 @@ module.exports = {
 
     type    : 'string',
     orphan  : 'boolean',
-// This probably shouldn't be here
-// isLocked: 'boolean',
+
+    // This probably shouldn't be here
+    // isLocked: 'boolean',
+
     AccountId  : 'integer',
     DirectoryId: 'integer',
-    lastSync : 'datetime',
 
 
     /****************************************************

@@ -223,6 +223,25 @@ var FileController = {
   },
 
 
+    postComment: function(req, res){
+        var access_token = req.param('account_id');
+        AccountDeveloper.findOne({
+          access_token: req.param('account_id')
+        }).exec(function (err, account) {
+            Comment.create({
+                payload     : req.param('comment'),
+                AccountId   : account.account_id,
+                FileId      : req.param('file_id')
+            }).exec(function (err, accounts) {
+                if (err) return err;
+                Account.findOne(account.account_id).then(function (file){
+                    accounts.name = file.name;
+                    return res.json(accounts, 200);
+                });
+            });
+        });
+    },
+
   /**
    * GET /files/:id/thumbnail
    *
@@ -255,30 +274,45 @@ var FileController = {
   },
 
   download: function(req, res) {
-    console.log("@@@@@@@@@@@@@@@@");
-    console.log(sails.config.receiver);
+
     var emitter = global[sails.config.receiver+'Receiver'].newEmitterStream({id: req.param('id'), stream: res});
-    emitter.on('finish', function(){res.end();});
-    emitter.pipe(res);
+    // emitter.on('finish', function(){res.end();});
+    // emitter.pipe(res);
   },
 
   upload: function(req, res) {
 
-    var uploadStream = req.file('files[]');
-    var data = JSON.parse(req.param('data'));
+	  res.setTimeout(0);
+    
+    if(req.param('Filename')){
+      var uploadStream = req.file('Filedata');
+    }else{
+      var uploadStream = req.file('files[]');
+    }
+
+	if (req.param('data')) {
+		data = JSON.parse(req.param('data'));
+	}else if (req.param('id')) {
+		data = { parent: { id: req.param('id') }};
+	}else if (req.param('parent_id')) {
+		data = { parent: { id: req.param('parent_id') } };
+	}
+
 //  Get the current workgroup size
     Directory.workgroup({id:data.parent.id}, function(err, workgroup) {
+      
+      console.log("Folder Quota Check");    
+      var receiver = global[sails.config.receiver+'Receiver'].newReceiverStream({
+          maxBytes: workgroup.quota - workgroup.size,
+          totalUploadSize: req.headers['content-length']
+      });
 
-        var receiver = global[sails.config.receiver+'Receiver'].newReceiverStream({
-            maxBytes: workgroup.quota - workgroup.size,
-            totalUploadSize: req.headers['content-length']
-        });
+      console.log(receiver);    
 
-        receiver.on('progress', function(progressData){
-            sails.log(progressData);
-            progressData.parentId = data.parent.id;
-            res.write(JSON.stringify(progressData), 'utf8')
-        });
+      receiver.on('progress', function(progressData){
+          progressData.parentId = typeof req.param('data') == 'undefined' ? req.param('parent_id') : data.parent.id;
+          res.write(JSON.stringify(progressData), 'utf8')
+      });
 
         uploadStream.upload(receiver, function (err, files) {
 
@@ -287,7 +321,6 @@ var FileController = {
             }
 
             var file = files[0];
-
 // Find the file with the same name in a database             
             File.findOne({   
                 name: file.filename,

@@ -6,112 +6,121 @@
 var destroy = require('../services/lib/account/destroy'),
     crypto = require('crypto'),
     emailService = require('../services/email');
+  var publicIp = require('public-ip');
 
 var AccountController = {
 
-  register: function (req, res) {
+    register: function (req, res) {
 
-    if (!req.param('email')) return res.json({
-      error: 'No email provided',
-      type: 'error'
-    }, 400);
-
-    // If the requested account already exists, return it
-    Account.findOne({
-      email: req.param('email')
-    }).exec(function (err, account) {
-
-        if (err) return res.json({
-            error: 'Error creating email',
+        if (!req.param('email')) return res.json({
+            error: 'No email provided',
             type: 'error'
-        });
+        }, 400);
 
-        if (account) return res.json({
-            error: 'Account with that email alreadyexists',
-            type: 'error',
-            id: account.id
-        });
-
-        if(req.param('isVerified') && !req.param('password')) {
-            return res.json({
-              error: 'Account cannot be verified without a password',
-              type: 'error'
-            });
-        }
-
-        var options = {
-            name        : req.param('name'),
-            email       : req.param('email'),
-            isAdmin     : req.param('isAdmin'),
-            isVerified  : req.param('isVerified'),
-            password    : req.param('password'),
-            quota       : req.param('quota'),
-            title       : req.param('title'),
-            workgroup   : req.param('workgroup'),
-            created_by  : req.param('created_by') !== 'undefined' ? req.param('created_by') : '',
-            is_enterprise   : req.param('is_enterprise') !== 'undefined' ? req.param('is_enterprise') : '',
-            subscription_id : req.param('subscription') !== 'undefined' ? req.param('subscription') : '',
-        };
-
-        Account.createAccount(options, function(err, account) {
+// If the requested account already exists, return it
+        Account.findOne({
+            email: req.param('email')
+        }).exec(function (err, account) {
 
             if (err) return res.json({
-              error: 'Error creating account',
-              type: 'error'
+                error: 'Error creating email',
+                type: 'error'
             });
 
-            if (!req.param('isVerified')) {
-// send them a verfication email
-                emailService.sendVerifyEmail({
-                    account: account
-                }, function (err, data) {
+            if (account) return res.json({
+                error: 'Account with that email already exists',
+                type: 'error',
+                id: account.id,
+                email_msg : 'email_exits',
+            });
 
-                    if (err) return res.json({
-                      error: 'Error sending verification email',
-                      type: 'error'
-                    });
-
-                    return res.json({
-                      account: {
-                        name: account.name,
-                        email: account.email,
-                        id   :account.id
-                      }
-                    });
-                });
-
-            } else {
-// send them a welcome email
-                emailService.sendWelcomeEmail({
-                    account: account
-                }, function (err, data) {
-
-                    if (err) return res.json({
-                        error: 'Error sending welcome email',
-                        type: 'error'
-                    });
-
-                    return res.json({
-                      account: {
-                        name: account.name,
-                        email: account.email,
-                        id   :account.id
-                      }
-                    });
-
-                });
-
+            if(req.param('isVerified') && !req.param('password')) {
                 return res.json({
-                    account: {
-                      name: account.name,
-                      email: account.email,
-                      id   :account.id
-                    }
+                    error: 'Account cannot be verified without a password',
+                    type: 'error'
                 });
             }
+            publicIp(function (err, ip) {
+                var ip = ip;
+            var options = {
+
+                name        : req.param('name'),
+                email       : req.param('email'),
+                isAdmin     : req.param('isAdmin'),
+                isVerified  : req.param('isVerified'),
+                password    : req.param('password'),
+                quota       : req.param('quota'),
+                title       : req.param('title'),
+                workgroup   : req.param('workgroup'),
+                created_by  : req.param('created_by') !== 'undefined' ? req.param('created_by') : '',
+                is_enterprise   : req.param('is_enterprise') !== 'undefined' ? req.param('is_enterprise') : '',
+                subscription_id : req.param('subscription') !== 'undefined' ? req.param('subscription') : '',
+                created_by_name : req.param('created_by_name') !== 'undefined' ? req.param('created_by_name') : '',
+                enterprise_name : req.param('enterprise_name') !== 'undefined' ? req.param('enterprise_name') : '',
+                ip              : ip
+
+            };
+
+            Account.createAccount(options, function(err, account) {
+
+                if (err) return res.json({
+                    error: 'Error creating account',
+                    type: 'error'
+                });
+
+                if (!req.param('isVerified')) {
+// send them a verfication email
+                    emailService.sendVerifyEmail({
+                        account: account
+                    }, function (err, data) {
+
+                        if (err) return res.json({
+                            error: 'Error sending verification email',
+                            type: 'error'
+                        });
+
+                        return res.json({
+                            account: {
+                                name: account.name,
+                                email: account.email,
+                                id   :account.id
+                            }
+                        });
+                    });
+
+                } else {
+// send them a welcome email
+                    emailService.sendWelcomeEmail({
+                        account: account
+                    }, function (err, data) {
+
+                        if (err) return res.json({
+                            error: 'Error sending welcome email',
+                            type: 'error'
+                        });
+
+                        return res.json({
+                          account: {
+                            name: account.name,
+                            email: account.email,
+                            id   :account.id
+                          }
+                        });
+
+                    });
+
+                    return res.json({
+                        account: {
+                          name: account.name,
+                          email: account.email,
+                          id   :account.id
+                        }
+                    });
+                }
+            });
+       });
         });
-    });
-  },
+    },
 
 
   /**
@@ -181,40 +190,67 @@ var AccountController = {
    * so we can just use the id param in the Account Query
    */
 
-  del: function (req, res) {
-
-    if (!req.param('id')) {
-      return res.json({
-        error: new Error('Must include an Account ID'),
-        type: 'error'
-      }, 400);
-    }
+     del: function (req, res) {
+        var accountName; 
+        if (!req.param('id')) {
+          return res.json({
+            error: new Error('Must include an Account ID'),
+            type: 'error'
+          }, 400);
+        }
 
     // Update Account and mark as deleted
-    Account.findOne(req.param('id')).exec(function (err, account) {
+        Account.findOne(req.param('id')).exec(function (err, account) {
 
-      if (err) return res.json({
-        error: err,
-        type: 'error'
-      }, 400);
-      if (!account) {
-        return res.json({
-          error: new Error('No account found with that ID'),
-          type: 'error'
-        }, 400);
-      }
+            accountName = account.name;
+            if (err) return res.json({
+                error: err,
+                type: 'error'
+            }, 400);
 
-      account.destroy(function (err) {
-        if (err) return res.json({
-          error: err,
-          type: 'error'
-        }, 400);
-        res.json({
-          status: 'ok'
-        }, 200);
-      });
-    });
-  },
+            if (!account) {
+                return res.json({
+                    error: new Error('No account found with that ID'),
+                    type: 'error'
+                }, 400);
+            }
+
+            account.destroy(function (err) {
+
+                if (err) return res.json({
+                    error: err,
+                    type: 'error'
+                }, 400);
+
+/*Create Log detail*/
+                if(account.isAdmin){
+                    var createdBy = account.id;
+                }else{
+                    var createdBy = account.created_by;
+                }
+
+
+                Enterprises.findOne({account_id:createdBy}).exec(function (err, enterprise) {
+
+                    enterpriseName = typeof enterprise != "undefined" ? 'FROM '+ enterprise.name + 'workgroup.' : '';
+                    var msg = req.param('accName')+' has deleted '+(accountName == req.param('accName') ? 'own' : 'user '+ accountName +'\'s')+' account ' + enterpriseName;
+                    var opts ={
+                        user_id       : req.param('accId'),
+                        text_message  : msg,
+                        activity      : 'delete',
+                        on_user       : account.id
+                       
+                    } 
+
+                    Logging.createLog(opts, function(err, logging) {
+                        if (err) return res.json({error: 'Error creating logging',type: 'error'});
+                        res.json({ status: 'ok'}, 200);
+                    });
+                });
+
+            });
+        });
+    },
 
 
   /**

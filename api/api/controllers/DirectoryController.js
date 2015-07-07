@@ -124,11 +124,6 @@ var DirectoryController = {
 
             Account.createAccount(options, function(err, account) {
 
-            console.log("ahdaskjdhaskjhaskhaskdjhaskdhaskdjashkashdaskjdajkhasjdaskasjkhashdjkhasha");
-            console.log(err);
-            console.log("ahdaskjdhaskjhaskhaskdjhaskdhaskdjashkashdaskjdajkhasjdaskasjkhashdjkhasha");
-            console.log(account);
-
     // send an invite email
                 emailService.sendInviteEmail({
                     accountName: req.session.Account && req.session.Account.name || 'Someone',
@@ -239,10 +234,10 @@ var DirectoryController = {
 
     createWorkgroup: function(req, res){
 
-      var dirOptions = {
-          name : req.param('account_name') + '\'s Workgroup',
-          quota: "1000000000"
-      };
+        var dirOptions = {
+            name : req.param('account_name') + '\'s Workgroup',
+            quota: "1000000000"
+        };
 
       var transOptions = {
           trans_id  : "default",
