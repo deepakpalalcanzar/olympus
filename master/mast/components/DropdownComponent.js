@@ -80,6 +80,7 @@ Mast.registerComponent('UserDropdownComponent', {
 		'click li.password': 'password',
 		'click li.email-notification': 'emailNotification',
 		'click li.upgrade'     : 'upgrade',
+		'click li.settings'    : 'settings',
 		'click li.signout'     : 'signout'
 	},
 
@@ -95,6 +96,10 @@ Mast.registerComponent('UserDropdownComponent', {
 
 	},
 
+	settings: function(){
+
+	},
+	
 	signout: function() {
 
 	},

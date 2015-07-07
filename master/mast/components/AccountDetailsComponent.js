@@ -35,23 +35,47 @@ Mast.registerComponent('AccountDetails', {
 	afterRender: function(){		
 		// Set uploader endpoint.
 		this.children['.image-uploader'].children['.uploader'].set('endpoint','/account/imageUpload');
-		this.$('.profile-pic').attr('src','/account/avatar');
+//		this.$('.profile-pic').attr('src','/account/avatar');
+
+		Mast.Socket.request('/account/getImage', { pic_type: 'profile'}, function(res, err, next) {
+			if(res.avatar == '' && res.avatar == null){
+				$('.user-avatar').attr('src','/account/avatar');			
+				this.$('.profile-pic').attr('src','/account/avatar');
+			}else if(res.avatar !== '' && res.avatar !== null){
+				$('.user-avatar').attr('src', "/images/profile/"+res.avatar);			
+				this.$('.profile-pic').attr('src', "/images/profile/"+res.avatar);
+			}			
+		});
 	},
 
 	updateAccountDetails: function() {
+		
 		var self = this;
-		var payload = this.getPayload();
-		/*Mast.Socket.request('/account/update', payload, function(){
-			alert('Your account has been updated.');
-		});*/
+		
+		if(fileData !== 'undefined'){
 
-                 /*$.get("https://ipinfo.io", function(response) {
-            	 payload.ipadd =response.ip;*/
-            	 Mast.Socket.request('/account/update', payload, function(){
-			alert('Your account has been updated.');
-		    });
-          	/* }, "jsonp");*/
+			var file = fileData[0];
+			var img = cropper.getDataURL();
+			$('.cropped_profile_image').html('');
+			$('.cropped_profile_image').append('<img src="'+img+'">');
 
+			Mast.Socket.request('/account/imageUpload', { name:file.name, type:file.type, size:file.size, binary: img, pic_type : 'profile' }, function(req, res, next) {
+				
+				
+			});
+			
+			alert('Your account has been updated.');
+			$('.user-avatar').attr('src', img);
+
+		}else{
+
+			var payload = this.getPayload();
+			Mast.Socket.request('/account/update', payload, function(){
+				alert('Your account has been updated.');
+			});
+			
+		}
+		// this.afterRender();
 	},
 
 // get account details payload and return that object
@@ -78,10 +102,8 @@ Mast.registerComponent('AccountDetails', {
 
 	deleteAccount: function(){
 		var self = Mast.Session.Account;
-		console.log(self);
 		if(confirm('Are you sure ?')){
 			Mast.Socket.request('/account/delOwnAccount', { id: self.id}, function(res, err){
-				console.log(res);			
 				if(res){
 					window.location = 'auth/logout';
 				}

@@ -1,5 +1,6 @@
-var UUIDGenerator = require('node-uuid');
-var cacheRoute = require('booty-cache');
+var UUIDGenerator 	= require('node-uuid');
+var cacheRoute 		= require('booty-cache');
+var fsx          	= require('fs-extra');  
 
 var AccountController = {
 
@@ -60,11 +61,6 @@ var AccountController = {
 
     searchdate: function(req,res){
 
-
-        console.log('kjshdfshdf2423423');
-    	console.log(req);
-    	console.log('sdjfksjkdfhs131131');
-      
 		var sdate = "'"+req.params.from+"'";
 		var edate = "'"+req.params.to+"'";
 		var action = "'"+ req.params.activity+"'";
@@ -84,11 +80,6 @@ var AccountController = {
 			raw: true
 		}).success(function(accounts) {
                     
-                     console.log('123sql data from logging');
-                     console.log(accounts);
-                     console.log('123 sql data from logging');
-
-			console.log(accounts);
 			if(accounts.length){
 			    res.json(accounts, 200);
 			}else{
@@ -145,15 +136,7 @@ var AccountController = {
 					res.json(accounts);
 				});
         	}
-
     	}
-
-		// Account.findAll({
-		// 	where: ['deleted = 0 AND (email LIKE ? OR name LIKE ?)', "%" + req.params.term + "%", "%" + req.params.term + "%"],
-		// 	limit: 20
-		// }).success(function(accounts) {
-		// 	res.json(accounts);
-		// });
 	},
 
 	register: function(req, res){
@@ -242,6 +225,7 @@ var AccountController = {
 			"LEFT JOIN enterprises ON account.created_by=enterprises.account_id "+
 			"WHERE account.is_enterprise=0 and account.deleted != 1";
 			sql = Sequelize.Utils.format([sql]);
+			
 
 		}else{
 			var sql = "SELECT account.*,subscription.features, adminuser.admin_profile_id, "+
@@ -344,28 +328,19 @@ var AccountController = {
 					uri: 'http://localhost:1337/logging/register/' ,
 					method: 'POST',
 				};
-              console.log('jai234234234');
-             console.log('Your IP address is:', ip);
-
-				/*options.json =  {
-					user_id		: req.session.Account.id,
-					text_message: req.session.Account.name+ ' has updated a user.',
-					activity  	: 'update',
-					on_user		: req.params.id,
-				};*/
-                               options.json =  {
+				
+				options.json =  {
 					user_id		: req.session.Account.id,
 					text_message: 'has updated a user.',
 					activity  	: 'update',
 					on_user		: req.params.id,
-					
 				};
 
 				request(options, function(err, response, body) {
 					if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
 					res.json({ msg: 'User information updated successfully.', type: 'success' }, 200);
 				});
-});
+			});
 
 /*Create logging*/
 						
@@ -684,60 +659,57 @@ var AccountController = {
 	}),
 
 	imageUpload: function(req, res) {
-		async.waterfall([
-			function(callback) {
-				// If this is a request to upload an avatar for the logged-in user, proceed
-				if (!req.param('code') && req.session.Account) {
-					Account.find(req.session.Account.id).done(callback);
-				}
-				// Otherwise check for a valid verification code, and if we have one, use that user
-				else {
-					Account.find({where:{verificationCode: req.param('code')}}).success(function(account){
-						if (account === null) {
-							callback("Trying to upload image, but no account exists!");
-						} else {
-							callback(null,account);
-						}
+
+		binaryData 		= req.param('binary');
+		var filefname  	= req.param('name');
+		var filetype  	= req.param('type');
+		var fsName 		= UUIDGenerator.v1();
+		var picUploadType = req.param('pic_type');
+
+		Account.find(req.session.Account.id).done(function(err, account) {
+
+			if (err) return res.send(err,500);
+			if(account){
+
+				console.log("fsName v fsName fsName fsName fsName fsName");
+				console.log(fsName);
+				
+				var enterpriseName 	= fsName+'.png';
+
+				console.log(enterpriseName);
+
+	 			var base64Data  	= binaryData.replace(/^data:image\/(png|gif|jpeg);base64,/, "");
+	 			base64Data      	+=  base64Data.replace('+', ' ');
+	 			binaryData      	=   new Buffer(base64Data, 'base64').toString('binary');
+
+	 			if(picUploadType === 'enterprise'){
+		 			
+		 			fsx.writeFile("/var/www/html/olympus/master/public/images/enterprises/"+enterpriseName, binaryData, 'binary', function(err){
 					});
-				}
-			},
+			        account.enterprise_fsname     = enterpriseName;
+	                account.enterprise_mimetype   = filetype;
 
-			function (account, callback) {
-
-// Get the uploaded file info
-				var file = req.files.files[0];
-// If it's too big, return an error
-				if (file.size > 5 * (1024 * 1024)) {
-					return callback('toobig');
-				}
-				// If the account doesn't already have an avatar filename, create one
-				if (account.avatar_fname === null) {
-					account.avatar_fname = account.id+'-'+UUIDGenerator.v1();
-				}
-				// Set the mimetype for the image
-				account.avatar_mimetype = file.type;
-				fs.readFile(file.path, function (err,data) {
-					if (err) return res.send(err,500);
-
-					// Upload file to storage container
-					FileAdapter.upload({
-						payload: data,
-						name: account.avatar_fname,
-						contentLength: file.size
-					},function(){
-						account.save().done(function(err){
-							if (err) return res.send(err,500);
-							callback(null,account);
-						});
+	 			} else if(picUploadType === 'profile'){
+	 				
+					fsx.writeFile("/var/www/html/olympus/master/public/images/profile/"+enterpriseName, binaryData, 'binary', function(err){
 					});
-				});
+
+			        account.avatar_image    = enterpriseName;
+	 			}
+
+                account.save().done(function(err) {
+                    if (err) return res.end(err);
+                });
 			}
-		], function(err, result){
-			if (err) {
-				res.json({success:false, error: err});
-			} else {
-				res.json({success:true, url: '/account/avatar/'+result.id});
-			}
+
+		});
+
+	},
+
+	getImage: function(req, res){
+		Account.find(req.session.Account.id).done(function(err, account) {
+			if(err) res.json({success:false, error: err});
+			res.json({ success:true, avatar: account.avatar_image, enterprise: account.is_enterprise });
 		});
 	},
 

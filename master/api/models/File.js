@@ -435,6 +435,7 @@ File = Model.extend({
 				FilePermission.findAll({
 					where:{ FileId:my.id }
 				}).complete(function(e,r) {
+
 					// Destroy all of the models using the query chainer
 					var chainer = new Sequelize.Utils.QueryChainer();
 					_.each(r,function(m) {

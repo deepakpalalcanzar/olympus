@@ -23,6 +23,15 @@ Mast.registerComponent('Uploader',{
 		// initialize fileuploader plugin on input element
 		this.$('input').fileupload({
 			
+
+
+			progress: function(e, data) {
+				if (self.formData) {
+                			data.parentId = self.formData.id
+    				}
+                		Mast.trigger('UPLOAD_PROGRESS', data);
+            		},
+
 			// Assign add event.
 			add: function(e, data) {
 				if (self.parent.get('uploading')) {

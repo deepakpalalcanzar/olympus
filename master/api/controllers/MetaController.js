@@ -6,46 +6,77 @@ var MetaController = {
 	id: 'meta',
 	
 	home: function (req,res) {
-
+		var enterpriseLogo, hideSetting=0; 
 		Account.find({
 			where: { id: req.session.Account.id }
 		}).done(function(err, account) {
 
 			if (err) return res.send(500,err);
-			if(account.isSuperAdmin){
-				res.view('meta/superadmin',{
-					apps: account.created_by,
-					email: account.email,
-				});
-			}else{
 
-				if(req.session.Account.isAdmin === true){
+			Account.find({
+				where: { id : account.created_by }
+			}).done(function(errs, createdBy){
+				
+				if(createdBy){
+					if(createdBy.enterprise_fsname !== null && createdBy.enterprise_fsname !== ''){
+						enterpriseLogo = createdBy.enterprise_fsname;
+					}else{
+						enterpriseLogo = '';
+					}
 
-					res.view('meta/workgroupadmin',{
+					hideSetting= 1;
+
+				}else{
+					enterpriseLogo = account.enterprise_fsname;
+				}
+
+				if(account.isSuperAdmin){
+				
+					res.view('meta/superadmin',{
 						apps: account.created_by,
 						email: account.email,
+						enterprise_logo: enterpriseLogo,
+						avatar: account.avatar_image,
+						setting: hideSetting 
 					});
 
 				}else{
 
-/******profile condition******/
-					var sql = "SELECT au.*,p.* FROM adminuser au JOIN profile p on "+
-					"au.admin_profile_id=p.id WHERE user_id=?";
-					sql = Sequelize.Utils.format([sql, account.id]);
-					sequelize.query(sql, null, {
-						raw: true
-					}).success(function(adminuser) {
-						res.view('meta/home',{
-							apps			: account.created_by,
-							email			: account.email,
-							profile			: adminuser,
+					if(req.session.Account.isAdmin === true){
+
+						res.view('meta/workgroupadmin',{
+							apps: account.created_by,
+							email: account.email,
+							enterprise_logo: enterpriseLogo,
+							avatar: account.avatar_image,
+							setting: hideSetting 
+
 						});
-					}).error(function(e) {
-						throw new Error(e);
-					});
+
+					}else{
+/******profile condition******/
+						var sql = "SELECT au.*,p.* FROM adminuser au JOIN profile p on "+
+						"au.admin_profile_id=p.id WHERE user_id=?";
+						sql = Sequelize.Utils.format([sql, account.id]);
+						sequelize.query(sql, null, {
+							raw: true
+						}).success(function(adminuser) {
+							res.view('meta/home',{
+								apps			: account.created_by,
+								email			: account.email,
+								profile			: adminuser,
+								enterprise_logo: enterpriseLogo,
+								avatar: account.avatar_image,
+								setting: hideSetting 
+
+							});
+						}).error(function(e) {
+							throw new Error(e);
+						});
 /******end profile condition******/
-				}
-			}	
+					}
+				}	
+			});
 		});
 	},
 

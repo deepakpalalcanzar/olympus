@@ -1,10 +1,9 @@
     var mime = require('mime');
     var policy = sails.policies;
 
-
     var DirectoryController = {
 
-// Return information about the directory in question
+        // Return information about the directory in question
         read: function(req, res) {
             Directory.find(req.param('id')).done(function(err, directory) {
                 if(err) res.send(500, err);
@@ -16,7 +15,7 @@
         },
 
         createlogupload:function(req,res){
-/// Create Loggingggggggggggggg
+        // Create Loggingggggggggggggg
             var opts = {
                 uri: 'http://localhost:1337/logging/register/' ,
                 method: 'POST',
@@ -348,109 +347,108 @@
         },
 
 // uploads a file to this directory
-      upload: function(req, res) {
+        upload: function(req, res) {
 
-    // Parse form data from client, if specified
+        // Parse form data from client, if specified
         	var parsedFormData;
         	if (req.param('data')) {
           		parsedFormData = JSON.parse(req.param('data'));
         	}else if (req.param('id')) {
           		parsedFormData = { parent: { id: req.param('id') } };
         	}
-    // API parameters
+
+        // API parameters
         	else if (req.param('parent_id')) {
           		parsedFormData = { parent: { id: req.param('parent_id') } };
     		req.files.files = [req.files.filedata];
           		console.log(req);
         	}
         
-        else return res.send("No parent directory specified!", 500);
-
-        if (!req.files) return res.send("No files uploaded!", 500);
-
-        sails.log.info('Upload:' + req.param('id') + ' [User:' + req.session.Account.id + ']');
-
+            else return res.send("No parent directory specified!", 500);
+            if (!req.files) return res.send("No files uploaded!", 500);
+            sails.log.info('Upload:' + req.param('id') + ' [User:' + req.session.Account.id + ']');
         // The HTTP request was aborted, either on purpose or not.
-        var reqEvents = {
-        	onAbort: function defaultBehavior() { sails.log.warn('Request was aborted, but the dangling file could not be cleaned up.'); }
-        };
-        res.addListener('close', function () {
-        	reqEvents.onAbort();
-        });
+            var reqEvents = {
+        	   onAbort: function defaultBehavior() { sails.log.warn('Request was aborted, but the dangling file could not be cleaned up.'); }
+            };
+    
+            res.addListener('close', function () {
+            	reqEvents.onAbort();
+            });
 
         // Iterate through each uploaded file
-        var fileId = [];
-        async.map(req.files.files, function(file, cb) {
-          console.log("\n\n\n\n\n","Uploading file...","\n\n\n\n");
-          File.upload({
-          	reqEvents: reqEvents,
-            file: file,
-            parentId: parsedFormData.parent.id,
-            replaceId: req.param('replaceFileId'),
-            accountId: req.session.Account.id
-          },cb);
-        },
+            var fileId = [];
+            async.map(req.files.files, function(file, cb) {
+                console.log("\n\n\n\n\n","Uploading file...","\n\n\n\n");
+                File.upload({
+                    reqEvents: reqEvents,
+                    file: file,
+                    parentId: parsedFormData.parent.id,
+                    replaceId: req.param('replaceFileId'),
+                    accountId: req.session.Account.id
+                },cb);
+            },
 
         // And respond
-        function(err, resultSet) {
-          if(err) return res.send(err, 500);
-          var response = {
-            total_count: resultSet.length,
-            entries: resultSet
-          };
-          res.json(response);
-        });
+            function(err, resultSet) {
+                if(err) return res.send(err, 500);
+                var response = {
+                    total_count: resultSet.length,
+                    entries: resultSet
+                };
+                res.json(response);
+            });
 
-      },
+        },
 
-      mv: INodeService.move,
+        mv: INodeService.move,
 
       /*
        * Rename an iNode
        */
-      rename: INodeService.rename,
+        rename: INodeService.rename,
 
       /**
        * Return the set of users who are currently viewing the stream
        * -params-
        *    id  -> the target Directory's unique identifier
        */
-      swarm: INodeService.swarm,
+        swarm: INodeService.swarm,
 
       /**
        * Return the comments
        */
-      activity: INodeService.activity,
+        activity: INodeService.activity,
 
       /**
        * CRUD permissions attached to this inode
        */
-      permissions: INodeService.permissions,
-      addPermission: INodeService.addPermission,
-      updatePermission: INodeService.updatePermission,
-      removePermission: INodeService.removePermission,
+        permissions: INodeService.permissions,
+        addPermission: INodeService.addPermission,
+        updatePermission: INodeService.updatePermission,
+        removePermission: INodeService.removePermission,
 
       /**
        * Mark self as an active user in this directory
        */
-      join: INodeService.join,
+        join: INodeService.join,
 
       /**
        * Remove self as an active user in this directory
        */
-      leave: INodeService.leave,
+        leave: INodeService.leave,
 
       /**
        * Add and remove new comments on this node
        */
-      addComment: INodeService.addComment,
-      removeComment: INodeService.removeComment,
+        addComment: INodeService.addComment,
+        removeComment: INodeService.removeComment,
 
-       assignPermission: INodeService.assignPermission,
+        assignPermission: INodeService.assignPermission,
       /*
        * Delete an iNode
        */
-      'delete': INodeService['delete'],
+        'delete': INodeService['delete'],
 
         subscribe: function(req, res) {
             var id = req.param('id');
@@ -662,6 +660,6 @@
             });
 
         });
-    }
-
+    },
+    
 };_.extend(exports, DirectoryController);

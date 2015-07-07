@@ -3,10 +3,6 @@ var AuthController = {
 // authLogin
 	authLogin: function(req, res) {
 
-		console.log("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ");
-		console.log(req.body);
-		console.log("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ");
-
 // Only allow post requests
 		if(req.method !== 'POST') return res.send(500);
 // Ensure we have an API token
@@ -139,9 +135,11 @@ var AuthController = {
 							/*Check for subscription duration afzal*/
 							var sql = "SELECT id FROM transactiondetails WHERE DATE_FORMAT(DATE_ADD(DATE(createdAt), INTERVAL duration MONTH),'%Y-%m-%d') > CURDATE() AND is_deleted=0 AND account_id=?";          
         					sql = Sequelize.Utils.format([sql,account.id]);
+
         					sequelize.query(sql, null, {
           						raw: true
         					}).success(function(transaction) {
+
           						if(transaction.length){
           							AuthenticationService.session.redirectToOriginalDestination(req, res);
           						}else{

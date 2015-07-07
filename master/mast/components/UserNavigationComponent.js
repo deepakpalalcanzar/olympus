@@ -5,8 +5,31 @@ Mast.registerComponent('UserNavigationComponent', {
 	model: 'UserNavigation',
 	autoRender: false,
 
+
+	beforeRender:function() {
+		Mast.Socket.request('/account/getImage', { pic_type: 'profile'}, function(res, err, next) {
+			if(res.avatar !== '' && res.avatar!== null){
+				$('.user-avatar').attr('src', "/images/profile/"+res.avatar);			
+			}
+		});
+	},
+
 	afterRender: function() {
+
+		var d = this.get('dropdownItems');
 		Olympus.ui.fileSystem.on('cd', this.updateButtonState);
+		Mast.Socket.request('/account/getImage', { pic_type: 'profile'}, function(res, err, next) {
+			if(res){
+				if(res.enterprise!=1){
+					d.splice('2', '1');
+					$('.settings').remove();
+				}
+				if(res.avatar !== '' && res.avatar!== null){
+					$('.user-avatar').attr('src', "/images/profile/"+res.avatar);			
+				}
+			}
+		});
+
 	},
 
 	events: {
@@ -32,6 +55,9 @@ Mast.registerComponent('UserNavigationComponent', {
 		Mast.navigate('#account/notifications');
 	},
 
+	settings: function(){
+		Mast.navigate('#account/settings');
+	},
 	// Sign out of the session
 	signOut: function() {
 		window.location = 'auth/logout';

@@ -115,13 +115,8 @@ Directory = Model.extend({
 		 */
 		checkQuota: function(id, size, cb) {
 
-			console.log("IN WORKGROUP");
-			console.log(id);
-
 			Directory.workgroup(id, function(workgroup) {
 
-				console.log(workgroup);
-				console.log("IN WORKGROUP");
 				if(workgroup.quota === null) {
 					return cb();
 				}

@@ -199,7 +199,6 @@
 
     apiDownload: function(req, res) {
         
-        console.log("!@#$%!@#$%!@#$%!@#$%!@#$%!@#$%!@#$%!@#$%");
         var today = new Date();
         File.find(req.param('id')).success(function(model){
             console.log(model);
@@ -212,20 +211,15 @@
                     access_token: req.headers['authorization'].split(' ')[1]
                 }).done(function(err, result){
 
-                    console.log("%%%%%%%%%%%%%%%%%%%%%% MNBVCXZASDFGHJKLPOIUYTREWQ %%%%%%%%%%%%%%%%%%%%%%");
-                    console.log(result);
                     if (err) {
                         res.send(err);
                     } else {
 // Create a 302 redirect with the file download link in the header.  Also
 // send the URL in the text of the response, in case the client doesn't want
 // to immediately follow the redirect.
-                        console.log("%%%%%%%%%%%%%%%%%%%%%% MNBVCXZASDFGHJKLPOIUYTREWQ %%%%%%%%%%%%%%%%%%%%%%");
-                        console.log(protocol+req.host+"/r/"+result.link_key);
 
                         var protocol = req.connection.encrypted ? 'https://' : 'http://';
                         res.header('Location',protocol+req.host+"/r/"+result.link_key);
-
                         res.send(protocol+req.host+"/r/"+result.link_key, 302);
                     }
                 });

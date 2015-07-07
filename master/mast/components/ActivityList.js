@@ -72,7 +72,6 @@ Mast.registerTree('ActivityList', {
 		// Argument f is the raw jquery event object and we need it to prevent new line characters
 		// form inserting to the textarea on pressEnter.
 		f && f.preventDefault();
-		console.log(f);
 		var commentPayload = this.getCommentPayload();
 
 		// prevent empty comments

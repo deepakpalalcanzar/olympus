@@ -7,14 +7,9 @@ Mast.registerComponent('ActivityComponent',{
 
 // create new current viewers and inode comments components
 	afterRender: function() {
-
-		/*this.viewerList = new Mast.components.ViewerList({
-			model: this.pattern.model
-		});*/
 		this.activityList = new Mast.components.ActivityList({
 			model: this.pattern.model
 		});
-		
 	},
 	
 	show: function(){
@@ -26,8 +21,6 @@ Mast.registerComponent('ActivityComponent',{
 	},
 
 	afterCreate: function() {
-		console.log(this.get('type'));
-
 		if (this.get('type') === 'directory') {
 			this.attach('.quotas-outlet', 'QuotasComponent');
 		}

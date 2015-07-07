@@ -47,6 +47,11 @@ Mast.registerComponent('AccountSettingsComponent',{
 		this.set('selectedTab', 'accountNotifications');
 	},
 
+	displayAccountSettings: function() {
+		this.attach('.account-settings-page', 'SettingsComponent');
+		this.set('selectedTab', 'settings');
+	},
+
 // remove all selected classes from the list elemets.
 	removeSelected: function($el) {
 		this.$('li').removeClass('selected');

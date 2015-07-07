@@ -5,8 +5,6 @@ var SubscriptionController = {
 
 	register: function(req, res){
 
-		console.log(req.params);
-
 		var request = require('request');
 		var options = {
 			uri: 'http://localhost:1337/subscription/register/' ,
@@ -24,41 +22,32 @@ var SubscriptionController = {
 
 		request(options, function(err, response, body) {
 			if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
-//	Resend using the original response statusCode
-//	use the json parsing above as a simple check we got back good stuff
-	      /*Create logging*/
-          var opts = {
-            uri: 'http://localhost:1337/logging/register/' ,
-            method: 'POST',
-          };
-
-         /*opts.json =  {
-            user_id     : req.session.Account.id,
-            text_message: req.session.Account.name+ ' has added a subscription plan named '+req.params.features+'.',
-            activity    : 'add',
-            on_user     : req.session.Account.id,
-          };*/
-       opts.json =  {
-            user_id     : req.session.Account.id,
-            text_message: 'has added a subscription plan named '+req.params.features+'.',
-            activity    : 'add',
-            on_user     : req.session.Account.id
-           
-          };
-
-          request(opts, function(err1, response1, body1) {
-          if(err) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
+            //	Resend using the original response statusCode
+            //	use the json parsing above as a simple check we got back good stuff
+	       /*Create logging*/
+            var opts = {
+                uri: 'http://localhost:1337/logging/register/' ,
+                method: 'POST',
+            };
             
-            res.json(body, response && response.statusCode);
-          });
-        /*Create logging*/
+            opts.json =  {
+                user_id     : req.session.Account.id,
+                text_message: 'has added a subscription plan named '+req.params.features+'.',
+                activity    : 'add',
+                on_user     : req.session.Account.id
+            };
 
+            request(opts, function(err1, response1, body1) {
+                if(err) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
+                res.json(body, response && response.statusCode);
+            });
+            /*Create logging*/
 	    });
 	},
 
 	deleteSubscription: function(req, res){
-      var request = require('request');
-      
+
+        var request = require('request');
         var sql = "UPDATE subscription SET is_active=0 where id = ?";
         sql = Sequelize.Utils.format([sql, req.params.id]);
         sequelize.query(sql, null, {
@@ -66,94 +55,75 @@ var SubscriptionController = {
         }).success(function(dirs) {
         	
           /*Create logging*/
-          Subscription.find({
-              where: { id: req.params.id }
+            Subscription.find({
+                where: { id: req.params.id }
             }).done(function(err, subscription) {
 
-              var opts = {
-                uri: 'http://localhost:1337/logging/register/' ,
-                method: 'POST',
-              };
+                var opts = {
+                    uri: 'http://localhost:1337/logging/register/' ,
+                    method: 'POST',
+                };
 
-            /*opts.json =  {
-              user_id     : req.session.Account.id,
-              text_message: req.session.Account.name+ ' has deleted a subscription plan named '+subscription.features+'.',
-              activity    : 'deleted',
-              on_user     : req.session.Account.id,
-            };*/
+                opts.json =  {
+                    user_id     : req.session.Account.id,
+                    text_message: 'has deleted a subscription plan named '+subscription.features+'.',
+                    activity    : 'deleted',
+                    on_user     : req.session.Account.id
+                };
 
-           opts.json =  {
-              user_id     : req.session.Account.id,
-              text_message: 'has deleted a subscription plan named '+subscription.features+'.',
-              activity    : 'deleted',
-              on_user     : req.session.Account.id
-              
-            };
-
-            request(opts, function(err1, response1, body1) {
-            if(err) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
-            
-              res.json({'success':'1'});
+                request(opts, function(err1, response1, body1) {
+                if(err) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
+                    res.json({'success':'1'});
+                });
             });
-
-        });
-        /*Create logging*/  
-
+            /*Create logging*/  
 		});
-  },
+    },
 
     updateSubscription: function(req, res){
 
 // Look up Account for currently logged-in user
 		var request = require('request');
+
 		var options = {
 			uri: 'http://localhost:1337/subscription/updateSubscription/' ,
 			method: 'POST',
 	    };
 
 	    options.json =  {
-	    	id			       : req.params.id,
-	    	features	     : req.params.features,
-	    	price		       : req.params.price,
-	    	duration 	     : req.params.duration,
-	    	users_limit    : req.params.users_limit,
-	    	quota    	     : req.params.quota,
-	    	is_default     : req.params.is_default,
+	    	id            : req.params.id,
+	    	features      : req.params.features,
+	    	price	      : req.params.price,
+	    	duration      : req.params.duration,
+	    	users_limit   : req.params.users_limit,
+	    	quota    	  : req.params.quota,
+	    	is_default    : req.params.is_default,
 	    };
 
 		request(options, function(err, response, body) {
+
 			if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
-//	Resend using the original response statusCode
-//	use the json parsing above as a simple check we got back good stuff
-	      /*Create logging*/
-          var opts = {
-            uri: 'http://localhost:1337/logging/register/' ,
-            method: 'POST',
-          };
+            //	Resend using the original response statusCode
+            //	use the json parsing above as a simple check we got back good stuff
+	       /*Create logging*/
+            var opts = {
+                uri: 'http://localhost:1337/logging/register/' ,
+                method: 'POST',
+            };
 
-          /*opts.json =  {
-            user_id     : req.session.Account.id,
-            text_message: req.session.Account.name+ ' has updated a subscription plan.',
-            activity    : 'updated',
-            on_user     : req.session.Account.id,
-          };*/
-          opts.json =  {
-            user_id     : req.session.Account.id,
-            text_message: 'has updated a subscription plan.',
-            activity    : 'updated',
-            on_user     : req.session.Account.id
-            
-          };
+            opts.json =  {
+                user_id     : req.session.Account.id,
+                text_message: 'has updated a subscription plan.',
+                activity    : 'updated',
+                on_user     : req.session.Account.id
+            };
 
-          request(opts, function(err1, response1, body1) {
-          if(err) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
-            
-            res.json(body, response && response.statusCode);
-          });
-        /*Create logging*/
-
+            request(opts, function(err1, response1, body1) {
+            if(err) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
+                res.json(body, response && response.statusCode);
+            });
+            /*Create logging*/
 	    });
-
 	},
 
 	getSubscription: function(req, res){
@@ -166,143 +136,146 @@ var SubscriptionController = {
        	});
     },
 
+
     index: function(req,res){
-      req.session.tempId = req.params.id;
-      var sql = "SELECT id,features,price,users_limit,quota,is_default,is_active,duration, "+
+        
+        req.session.tempId = req.params.id;
+        var sql = "SELECT id,features,price,users_limit,quota,is_default,is_active,duration, "+
     "IF(duration>=12,CONCAT(duration/12,'','Y'),CONCAT(duration,'','M')) AS durat from subscription "+
     "WHERE is_active IS NULL";
         sql = Sequelize.Utils.format([sql]);
+        
         sequelize.query(sql, null, {
           raw: true
         }).success(function(subscription) {
-          res.view('subscription/index',{
-                subscription : subscription,
-                temp_id      : req.session.tempId
-              });
+            console.log(subscription);
+            if(subscription.length === 1){
+
+                // res.redirect("https://localhost/subscription/free/1/"+req.session.tempId);
+                res.redirect("https://dev.olympus.io/subscription/free/1/"+req.session.tempId);
+            }else{
+                res.view('subscription/index',{
+                    subscription : subscription,
+                    temp_id      : req.session.tempId
+                });
+
+            }
         });
 
 	},
 
 	free: function(req, res){
-    var request = require('request');
-    var sub_id = req.params.id;
-    var temp_id = req.params.temp;
+
+        var request = require('request');
+        var sub_id = req.params.id;
+        var temp_id = req.params.temp;
 
 // req.session.tempId  use this as tempaccount id 
-     var sql = "SELECT * from tempaccount where id = ?";
-             sql = Sequelize.Utils.format([sql,temp_id]);
-             sequelize.query(sql, null, {
-             raw: true
-           }).success(function(account) {
-               // res.json(account);
-
-        var options = {
-        uri: 'http://localhost:1337/account/register/' ,
-        method: 'POST',
-          };
-
-        options.json =  {
-          name             : account[0].name,
-          email            : account[0].email,
-          isVerified       : true,
-          isAdmin          : account[0].is_enterprise=='1'?true:false,
-          password         : account[0].password,
-          created_by       : '',
-          is_enterprise    : account[0].is_enterprise,
-          subscription     : sub_id,
-        };
-
-    request(options, function(err, response, body) {
-      if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
-//        Resend using the original response statusCode
-//        use the json parsing above as a simple check we got back good stuff
-         //res.json(body, response && response.statusCode);
-
-         //save data to transactiondetails table
-          Subscription.find({
-            where: { id: sub_id }
-            }).done(function(err, subscription) {
-               // Save to transactionDetails table
-              var tran_options = {
-                uri: 'http://localhost:1337/transactiondetails/register/' ,
+        var sql = "SELECT * from tempaccount where id = ?";
+        sql = Sequelize.Utils.format([sql,temp_id]);
+        sequelize.query(sql, null, {
+            raw: true
+        }).success(function(account) {
+            
+            var options = {
+                uri: 'http://localhost:1337/account/register/' ,
                 method: 'POST',
-              };
-
-            var created_date = new Date();  
-            tran_options.json =  {
-              trans_id        : 'Free',
-              account_id      : body.account.id,
-              created_date    : created_date,
-              users_limit     : subscription.users_limit,
-              quota           : subscription.quota,
-              plan_name       : subscription.features,
-              price           : subscription.price,
-              duration        : subscription.duration,
-              paypal_status   : '',
-          };
-
-            request(tran_options, function(err1, response1, body1) {
-              if(err1) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
-            //        Resend using the original response statusCode
-            //        use the json parsing above as a simple check we got back good stuff
-                    //res.json(body, response && response.statusCode);
-
-
-                      /* Check is enterprise save data to enterprise table*/
-        if(account[0].is_enterprise == '1'){
-         
-            var ent_options = {
-                uri: 'http://localhost:1337/enterprises/register/' ,
-                method: 'POST',
-              };
-            ent_options.json =  {
-                account_id              : body.account.id,
-                enterprises_name        : account[0].name,
-                error                   : '',
             };
 
-            request(ent_options, function(err11, response11, body11) {
-            if(err11) return res.json({ error: err11.message, type: 'error' }, response11 && response11.statusCode);
-    
-            //res.json(body11, response11 && response11.statusCode);
+            options.json =  {
+                name             : account[0].name,
+                email            : account[0].email,
+                isVerified       : true,
+                isAdmin          : account[0].is_enterprise=='1'?true:false,
+                password         : account[0].password,
+                created_by       : '',
+                is_enterprise    : account[0].is_enterprise,
+                subscription     : sub_id,
+                
+            };
 
-              /* Redirect to dashboard code */
-
-                Account.find({
-                  where: {
-                  email: account[0].email,
-                  }
-                }).done(function(err, account) {
-                  if (err) return res.send(500,err);
-                  AuthenticationService.session.link(req, account);
-                  res.redirect('/#dashboard');
-                });
-            });
-        }else{
-        /*End checking*/
-
-         /* Redirect to dashboard code */
-
-         Account.find({
-            where: {
-              email: account[0].email,
+            if(account[0].is_enterprise == '1'){
+                options.json.enterprise_name =account[0].enterprise_name
             }
-          }).done(function(err, account) {
-            if (err) return res.send(500,err);
-            AuthenticationService.session.link(req, account);
-            res.redirect('/#dashboard');
-          });
-        }
 
-      });
+            request(options, function(err, response, body) {
+                
+                if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
+                //  Resend using the original response statusCode
+                //  Use the json parsing above as a simple check we got back good stuff
+                //  Save data to transactiondetails table
+                Subscription.find({
+                    where: { id: sub_id }
+                }).done(function(err, subscription) {
+                    // Save to transactionDetails table
+                    var tran_options = {
+                        uri: 'http://localhost:1337/transactiondetails/register/' ,
+                        method: 'POST',
+                    };
 
-      });
-            // end transaction history
+                    var created_date = new Date();  
+                    tran_options.json =  {
+                        trans_id        : 'Free',
+                        account_id      : body.account.id,
+                        created_date    : created_date,
+                        users_limit     : subscription.users_limit,
+                        quota           : subscription.quota,
+                        plan_name       : subscription.features,
+                        price           : subscription.price,
+                        duration        : subscription.duration,
+                        paypal_status   : '',
+                    };
 
-   });
+                    request(tran_options, function(err1, response1, body1) {
+                        if(err1) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
+                        //  Resend using the original response statusCode
+                        //  Use the json parsing above as a simple check we got back good stuff
+                        /* Check is enterprise save data to enterprise table*/
+                        if(account[0].is_enterprise == '1'){
+         
+                            var ent_options = {
+                                uri: 'http://localhost:1337/enterprises/register/' ,
+                                method: 'POST',
+                            };
 
-    });
-  },
+                            ent_options.json =  {
+                                account_id              : body.account.id,
+                                enterprises_name        : account[0].name,
+                                error                   : '',
+                            };
+
+                            request(ent_options, function(err11, response11, body11) {
+
+                                if(err11) return res.json({ error: err11.message, type: 'error' }, response11 && response11.statusCode);
+                                    /* Redirect to dashboard code */
+
+                                Account.find({
+                                    where: { email: account[0].email, }
+                                }).done(function(err, account) {
+                                    if (err) return res.send(500,err);
+                                    AuthenticationService.session.link(req, account);
+                                    res.redirect('/');
+                                });
+                            });
+
+                        }else{
+
+                        /*End checking*/
+                        /* Redirect to dashboard code */
+
+                            Account.find({
+                                where: { email: account[0].email,}
+                            }).done(function(err, account) {
+                                if (err) return res.send(500,err);
+                                AuthenticationService.session.link(req, account);
+                                res.redirect('/');
+                            });
+                        }
+                    });
+                }); // end transaction history
+            });
+        });
+    },
 
 	paid: function(req, res){
 
@@ -363,9 +336,7 @@ var SubscriptionController = {
     var request = require('request');
     var paypal_sdk = require('paypal-rest-sdk');
 
-    console.log('*****form datass****');
-    console.log(req.body);
-    console.log('*****closes****');
+
     var sub_id = req.body.sub_id;
     var temp_id = req.body.temp;
     var sub_name = req.body.sub_name;

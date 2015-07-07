@@ -8,10 +8,11 @@ var ProfileController = {
 	By the user who have a permission of superadmin
 */
 	create: function(req, res){
-         var request = require('request');
+        
+        var request = require('request');
 
 		Profile.createProfile({
-            
+
             name			: req.params.profile_name,
             user_managment	: req.params.user_managment,
             enterprises_management	: req.params.enterprises_management,
@@ -24,45 +25,35 @@ var ProfileController = {
             admin_id			: req.session.Account.id
 
         }, function(err, results) {
+
 			if (err) return res.send( err);
+            /*Create logging*/
+            var opts = {
+                uri: 'http://localhost:1337/logging/register/' ,
+                method: 'POST',
+            };
 
+            opts.json =  {
+                user_id     : req.session.Account.id,
+                text_message: 'has created a profile named '+req.params.profile_name+'.',
+                activity    : 'created',
+                on_user     : req.session.Account.id,
+            };
 
-			/*Create logging*/
-          var opts = {
-            uri: 'http://localhost:1337/logging/register/' ,
-            method: 'POST',
-          };
-
-          /*opts.json =  {
-            user_id     : req.session.Account.id,
-            text_message: req.session.Account.name+ ' has created a profile named '+req.params.profile_name+'.',
-            activity    : 'created',
-            on_user     : req.session.Account.id,
-          };*/
-
-         opts.json =  {
-            user_id     : req.session.Account.id,
-            text_message: 'has created a profile named '+req.params.profile_name+'.',
-            activity    : 'created',
-            on_user     : req.session.Account.id,
-          };
-
-          request(opts, function(err1, response1, body1) {
-          if(err) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
-            
-            res.send(200);
-          });
-        /*Create logging*/ 
-
+            request(opts, function(err1, response1, body1) {
+                if(err) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
+                res.send(200);
+            });
+            /*Create logging*/ 
         });
-
 	},
 
-    deleteProfile: function(req, res){
-        var request = require('request');
 
+    deleteProfile: function(req, res){
+
+        var request = require('request');
         AdminUser.find({
-                where : [ 'admin_profile_id='+ req.params.profile_id ],
+            where : [ 'admin_profile_id='+ req.params.profile_id ],
         }).success(function(adminUser){
             if(adminUser === null){
                 Profile.find({
@@ -79,13 +70,7 @@ var ProfileController = {
                             method: 'POST',
                         };
 
-                        /*opts.json =  {
-                            user_id     : req.session.Account.id,
-                            text_message: req.session.Account.name+ ' has deleted a profile named '+profile.name+'.',
-                            activity    : 'deleted',
-                            on_user     : req.session.Account.id,
-                        };*/
-                      opts.json =  {
+                        opts.json =  {
                             user_id     : req.session.Account.id,
                             text_message: 'has deleted a profile named '+profile.name+'.',
                             activity    : 'deleted',
@@ -112,7 +97,6 @@ var ProfileController = {
     
     listProfile: function(req, res){
         Profile.findAll().success(function(accounts) {
-            console.log(accounts);
             res.json(accounts, 200);
         });
     },
@@ -145,30 +129,22 @@ var ProfileController = {
 //  use the json parsing above as a simple check we got back good stuff
           
           /*Create logging*/
-          var opts = {
-            uri: 'http://localhost:1337/logging/register/' ,
-            method: 'POST',
-          };
+            var opts = {
+                uri: 'http://localhost:1337/logging/register/' ,
+                method: 'POST',
+            };
 
-          /*opts.json =  {
-            user_id     : req.session.Account.id,
-            text_message: req.session.Account.name+ ' has updated a profile.',
-            activity    : 'updated',
-            on_user     : req.session.Account.id,
-          };*/
+            opts.json =  {
+                user_id     : req.session.Account.id,
+                text_message: 'has updated a profile.',
+                activity    : 'updated',
+                on_user     : req.session.Account.id,
+            };
 
-          opts.json =  {
-            user_id     : req.session.Account.id,
-            text_message: 'has updated a profile.',
-            activity    : 'updated',
-            on_user     : req.session.Account.id,
-          };
-
-          request(opts, function(err1, response1, body1) {
-          if(err) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
-            
-            res.json(body, response && response.statusCode);
-          });
+            request(opts, function(err1, response1, body1) {
+                if(err) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
+                res.json(body, response && response.statusCode);
+            });
         /*Create logging*/  
         
         });
@@ -209,32 +185,32 @@ var ProfileController = {
             where: { id: req.params.subscription }
             }).done(function(err, subscription) {
                // Save to transactionDetails table
-              var tran_options = {
-                uri: 'http://localhost:1337/transactiondetails/register/' ,
-                method: 'POST',
-              };
+                var tran_options = {
+                    uri: 'http://localhost:1337/transactiondetails/register/' ,
+                    method: 'POST',
+                };
 
-            var created_date = new Date();  
-            tran_options.json =  {
-              trans_id        : (req.session.Account.isSuperAdmin === 1)?'superadmin':'workgroupadmin',
-              account_id      : typeof(body.account) === 'undefined' ? body.id : body.account.id,
-              created_date    : created_date,
-              users_limit     : subscription.users_limit,
-              quota           : subscription.quota,
-              plan_name       : subscription.features,
-              price           : subscription.price,
-              duration        : subscription.duration,
-              paypal_status   : '',
-          };
+                var created_date = new Date();  
+                tran_options.json =  {
+                    trans_id        : (req.session.Account.isSuperAdmin === 1)?'superadmin':'workgroupadmin',
+                    account_id      : typeof(body.account) === 'undefined' ? body.id : body.account.id,
+                    created_date    : created_date,
+                    users_limit     : subscription.users_limit,
+                    quota           : subscription.quota,
+                    plan_name       : subscription.features,
+                    price           : subscription.price,
+                    duration        : subscription.duration,
+                    paypal_status   : '',
+                };
 
-            request(tran_options, function(err1, response1, body1) {
-            if(err1) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
-            //        Resend using the original response statusCode
-            //        use the json parsing above as a simple check we got back good stuff
-                    res.json(body, response && response.statusCode);
+                request(tran_options, function(err1, response1, body1) {
+                if(err1) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
+                //        Resend using the original response statusCode
+                //        use the json parsing above as a simple check we got back good stuff
+                        res.json(body, response && response.statusCode);
+                    });
+
                 });
-
-            });
             // end transaction history
 
         });
@@ -249,28 +225,25 @@ var ProfileController = {
         sequelize.query(sql, null, {
           raw: true
         }).success(function(transaction) {
-            
             //Check user has subscribed any plan or not
             if(transaction.length){
-                var sql = "SELECT COUNT(id) AS total FROM account WHERE created_by=? ";
-                sql = Sequelize.Utils.format([sql,req.session.Account.id]);
-                sequelize.query(sql, null, {
-                raw: true
-                }).success(function(acc) {
-                    console.log('**from acc**');
-                    console.log(acc[0].total);
-                    if(acc[0].total >= transaction[0].users_limit){
-                        return res.json({error:true});
-                    }else{
-                        return res.json({error:false});
-                    }  
-                });
+                var sql =   "SELECT COUNT(id) AS total FROM account WHERE created_by=? ";
+                sql     =   Sequelize.Utils.format([sql,req.session.Account.id]);
+                            sequelize.query(sql, null, {
+                                raw: true
+                            }).success(function(acc) {
+                                if(acc[0].total >= transaction[0].users_limit){
+                                    return res.json({error:true});
+                                }else{
+                                    return res.json({error:false});
+                                }  
+                            });
+
             }else{
                 res.json({
                    not_subscriber: true,
                 });
             } 
-            
         });
     },
     //End checking
@@ -321,7 +294,6 @@ var ProfileController = {
 
         var request = require('request');
         var sql11 = "SELECT account_id FROM accountdeveloper WHERE access_token=?";
-
         sql11 = Sequelize.Utils.format([sql11, req.param('access_token')]);
 
         sequelize.query(sql11, null, {
@@ -329,6 +301,7 @@ var ProfileController = {
         }).success(function(accountDev) {
             
             if(accountDev.length){
+
                 Account.find({
                     where: { id: accountDev[0].account_id }
                 }).done(function(err, account) {
@@ -359,21 +332,23 @@ var ProfileController = {
                             return res.json({error:body.error});
                         }
 
-                        console.log("!@#$%^&*()(*&^%$#@!%^%*&&**&@*#");
-                            console.log(req.param('subscription'));
-                        console.log("!@#$%^&*()(*&^%$#@!%^%*&&**&@*#");
+                        req.body.id         = req.param('workgroup');
+                        req.body.owned_by   = body.account.id;
+                        req.body.permission = 'comment';
 
-//save data to transactiondetails table
+                        // ProfileController.assignPermission(req, function(err, permission){
+                        //     console.log("GOt the response");
+                        //     console.log(err);
+                        //     console.log(res);
+                        //     console.log("!!!!!!!!!!!!!!!!!!! GOt the response !!!!!!!!!!!!!!!!!!!");
+                        // });
+                        
+// save data to transactiondetails table
                         Subscription.find({
                             where: { id: req.param('subscription') }
                         }).done(function(err, subscription) {
 
 // Save to transactionDetails table
-
-                            console.log("!@#$$#@!@#$!@#$!@#$!@#$!@#$!@#$!@#$!@#$");
-                            console.log(subscription);
-                            console.log("!@#$$#@!@#$!@#$!@#$!@#$!@#$!@#$!@#$!@#$");
-
                             var tran_options = {
                                 uri: 'http://localhost:1337/transactiondetails/register/',
                                 method: 'POST',
@@ -395,7 +370,10 @@ var ProfileController = {
 
                             request(tran_options, function(err1, response1, body1) {
                                 if(err1) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
-                                res.json(body, response && response.statusCode);
+                                ProfileController.assignPermission(req, res, function(err, resp){
+                                    res.json(body, response && response.statusCode);
+                                });                                
+                                
                             });
 
                         }); // end transaction history

@@ -15,11 +15,11 @@ Mast.registerModel('UserNavigation', {
 					name	: 'Change Password',
 					iconSrc	: '/images/icon_dropdown_download.png'
 				},
-				// {
-				// 	method	: 'notifications',
-				// 	name	: 'Email Notification',
-				// 	iconSrc	: '/images/icon_dropdown_download.png'
-				// },
+				{
+					method	: 'settings',
+					name	: 'Settings',
+					iconSrc	: '/images/icon_dropdown_download.png'
+				},
 				{
 					method	: 'subscription',
 					name	: 'Subscription',

@@ -62,13 +62,7 @@ exports.rename = function(req, res, cb) {
 									method: 'POST',
 	    						};
 
-	    						/*options.json =  {
-	    							user_id		: req.session.Account.id,
-	    							text_message: req.session.Account.name+ ' has renamed a directory from '+ prvName + ' to '+ model.name +'.',
-	    							activity  	: 'rename',
-	    							on_user		: req.session.Account.id,
-	    						};*/
-                                               options.json =  {
+								options.json =  {
 	    							user_id		: req.session.Account.id,
 	    							text_message: 'has renamed a directory from '+ prvName + ' to '+ model.name +'.',
 	    							activity  	: 'rename',
@@ -89,14 +83,8 @@ exports.rename = function(req, res, cb) {
 										method: 'POST',
 	    							};
 
-	    							/*options.json =  {
-	    								user_id		: req.session.Account.id,
-	    								text_message: req.session.Account.name+ ' has renamed a file from '+ prvName + ' to '+ model.name +' located in '+dirModel.name+'.',
-	    								activity  	: 'rename',
-	    								on_user		: req.session.Account.id,
-	    							};*/
 
-                                                           options.json =  {
+                                    options.json =  {
 	    								user_id		: req.session.Account.id,
 	    								text_message: 'has renamed a file from '+ prvName + ' to '+ model.name +' located in '+dirModel.name+'.',
 	    								activity  	: 'rename',
@@ -274,10 +262,11 @@ exports.move = function(req, res, cb) {
 
 },
 
-/**
+/**`
  * Delete the specified inode
  */
 exports['delete'] = function(req, res, cb) {
+
 	var request = require('request');
 
 	var inodeId = req.param('replaceFileId') || req.param('id');
@@ -294,6 +283,7 @@ exports['delete'] = function(req, res, cb) {
       		raw: true
     	});
     }
+
 	// Make sure the user has sufficient permissions for the delete
 	var sourcePermissionClass = (req.param('controller') == "directory" && !req.param('replaceFileId')) ? DirectoryPermission : FilePermission;
 
@@ -312,19 +302,25 @@ exports['delete'] = function(req, res, cb) {
 	sourcePermissionClass.find({
 		where: sourceCriteria
 	}).success(function(model) {
+
 		if(model === null) {
+			
 			return res.json({
 				status: 'error',
 				error: 'PERM_DENIED'
 			}, 500);
+
 		} else {
+
 			INodeService.destroy({
+
 				id: inodeId,
 				model: INodeModel,
 				replaceFileId: req.param('replaceFileId'),
 				accountId   	: req.session.Account.id,
 				accountName   	: req.session.Account.name,
-                                ipadd           : req.param('ipadd'),
+                ipadd           : req.param('ipadd'),
+
 			}, function afterDestroy(err) {
 
 				// Respond and broadcast activity to all sockets subscribed
@@ -363,13 +359,7 @@ exports.destroy = function(options, cb) {
 				method: 'POST',
 	    	};
 
-	    	/*opts.json =  {
-	    		user_id		: options.accountId,
-	    		text_message: options.accountName+ ' has deleted a directory named '+directory.name+'.',
-	    		activity  	: 'delete',
-	    		on_user		: options.accountId,
-	    	};*/
-                 opts.json =  {
+			opts.json =  {
 	    		user_id		: options.accountId,
 	    		text_message: 'has deleted a directory named '+directory.name+'.',
 	    		activity  	: 'delete',
@@ -399,12 +389,6 @@ exports.destroy = function(options, cb) {
 					method: 'POST',
 	    		};
 
-	    		/*opts.json =  {
-	    			user_id		: options.accountId,
-	    			text_message: options.accountName+ ' has deleted a file named '+file.name+' located in '+dirModel.name,
-	    			activity  	: 'delete',
-	    			on_user		: options.accountId,
-	    		};*/
                 opts.json =  {
 	    			user_id		: options.accountId,
 	    			text_message: 'has deleted a file named '+file.name+' located in '+dirModel.name,
@@ -427,6 +411,26 @@ exports.destroy = function(options, cb) {
 
 	function remove() {
 		options.model.find(options.id).error(cb).success(function(inode) {
+
+
+			DeletedList.create({
+	            name      	: 'test',
+    	        type        : '1',
+        	    deleted_id  : '1',
+            	createdAt 	: 'alsdasklal'
+	        }).exec(function foundAccount (err, account) {
+	
+	        	console.log("err err err errerr errerr err errerr errerr");
+		        	console.log(err);
+		        	console.log(account);
+	        	console.log("err err err errerr errerr err errerr errerr");
+	
+	        });
+
+			console.log("INSIDE remove function INSIDE INSIDE INSIDE INSIDE INSIDE INSIDE");
+				console.log(inode);
+			console.log("INSIDE remove function INSIDE INSIDE INSIDE INSIDE INSIDE INSIDE");
+
 			inode.rm(function(err) {
 				if (err) return cb(err);
 				SocketService.broadcast('ITEM_TRASH', options.model.roomName(options.id), {
@@ -434,6 +438,7 @@ exports.destroy = function(options, cb) {
 				});
 				cb();
 			});
+			
 		});
 	}
 };
@@ -498,12 +503,9 @@ exports.permissions = function(req, res) {
  */
 exports.addPermission = function(req, res) {
 
-	sails.log("######################################");
-	sails.log.info('AddPermission:' + req.param('id') + ' [User:' + req.session.Account.id + ']');
-	sails.log("######################################");
-var request = require('request');
+	var request = require('request');
 	var inodeId = req.param('id');
-	var INodeModel = (req.param('controller') == "directory") ? Directory : File;
+	var INodeModel = ((req.param('controller') == "directory") || (req.param('controller') == "profile")) ? Directory : File;
 
 // And broadcast activity to all sockets subscribed
 	var subscribers = INodeModel.roomName(inodeId);
@@ -524,6 +526,7 @@ var request = require('request');
 
 		// If we've been given the email address of a user, attempt to look the up
 		if(req.param('email')) {
+			
 			Account.find({
 				where: {
 					email: req.param('email')
@@ -538,35 +541,35 @@ var request = require('request');
 				// Otherwise, create an account using this email, and create a verification
 				// code for them.  Then grant permissions to this new user
 				else {
-					var verificationCode = UUIDGenerator.v1();
-					var password = new Array(8);
+
+					var verificationCode 	= UUIDGenerator.v1();
+					var password 			= new Array(8);
 					UUIDGenerator.v1(null, password, 0);
 					password = UUIDGenerator.unparse(password);
+
 					Account.create({
+						
 						name: req.param('email'),
 						email: req.param('email'),
 						password: password,
 						verified: false,
 						verificationCode: verificationCode
+
 					}).success(function(newAccount) {
 
-var options = {
+						var options = {
 							uri: 'http://localhost:1337/directory/createWorkgroup/' ,
 							method: 'POST',
 						};
 
 						options.json =  {
-			    				account_name : newAccount.name,
-			    				account_id   : newAccount.id
-			    			};
-
-				    		console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-				    		console.log(options);
+		    				account_name : newAccount.name,
+		    				account_id   : newAccount.id
+			    		};
+				    		
 						request(options, function(err, response, body) {
 							if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode); 			      			// res.send(200);
-							
-
-			    			});
+			    		});
 						callback(null, inode, newAccount);
 					});
 				}
@@ -621,26 +624,27 @@ var options = {
 				// Send an email to the user we granted permissions to.  If they're a new
 				// user, send them the verification link.  Otherwise, just send them an update.
 				var options = {
-					accountName: req.session.Account.name,
+					accountName: req.session.Account === undefined ? req.param('name') : req.session.Account.name,
 					account: account,
 					inode: inode,
 					host: req.header('host'),
 					port: req.port,
 					controller: req.param('controller')
 				};
+
 				EmailService.sendInviteEmail(options);
 
 				// Create a response function--we're not quite ready with the response object yet though...
-				var respond = function(response) {
-						SocketService.broadcast('COLLAB_ADD_COLLABORATOR', subscribers, apiObj);
-						SocketService.broadcast('COLLAB_ADD_COLLABORATOR', "Account_" + account.id, response);
-						res.json(response);
-					};
+				var respond = 	function(response) {
+									SocketService.broadcast('COLLAB_ADD_COLLABORATOR', subscribers, apiObj);
+									SocketService.broadcast('COLLAB_ADD_COLLABORATOR', "Account_" + account.id, response);
+									res.json(response);
+								};
 
 				// If it's a directory that was shared, count up the children that the new user
 				// can see, and add it to the response object so that the directory icon has an
 				// expand arrow in the UI if necessary
-				if(req.param('controller') == 'directory') {
+				if(req.param('controller') == 'directory' || req.param('controller') == 'profile') {
 					async.auto({
 						files: function(cb, rs) {
 							File.whoseParentIs({
@@ -868,15 +872,10 @@ exports.addComment = function(req, res) {
 					uri: 'http://localhost:1337/logging/register/' ,
 					method: 'POST',
 	    		};
-	    		var name = req.param('controller') == 'directory' ? 'directory ' : 'file ';
-	    		/*options.json =  {
-	    			user_id		: req.session.Account.id,
-	    			text_message: req.session.Account.name+ ' has commented on a '+name+mod.name,
-	    			activity  	: 'comment',
-	    			on_user		: req.session.Account.id,
-	    		};*/
 
-                    options.json =  {
+	    		var name = req.param('controller') == 'directory' ? 'directory ' : 'file ';
+
+                options.json =  {
 	    			user_id		: req.session.Account.id,
 	    			text_message: 'has commented on a '+name+mod.name,
 	    			activity  	: 'comment',
@@ -949,21 +948,17 @@ exports.activity = function(req, res, cb) {
 
 exports.version= function(req, res, cb){
 
-	console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-		console.log(req);
-	console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
 	Version.find({
 		where: ['FileId = '+ req.param('id')]
 	}).success(function(ver){
+
 		if(ver.parent_id != '0'){
+
 			var sql = "SELECT v.*, f.*,a.id AS acc_id,a.name AS acc_name FROM version v INNER JOIN file f ON v.FileId = f.id "+
 				" LEFT JOIN account a ON v.AccountId=a.id "+
 				"WHERE (f.deleted IS NULL OR f.deleted=0) AND v.parent_id=?";
 			sql = Sequelize.Utils.format([sql, ver.parent_id]);
-			console.log('**query**');
-			console.log(sql);
-			console.log('**query closed**');
+
 			sequelize.query(sql, null, {
 				raw: true
 			}).success(function(models) {
@@ -971,7 +966,9 @@ exports.version= function(req, res, cb){
 			}).error(function(e) {
 				throw new Error(e);
 			});
+
 		}
+
 	});
 
 };

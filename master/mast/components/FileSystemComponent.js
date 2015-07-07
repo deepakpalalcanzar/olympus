@@ -76,13 +76,6 @@ Mast.registerTree('FileSystem',{
 		self.set('loading', true);
 		this.collection.fetch({
 			success: function (collection, res) {
-
-				console.log("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP");
-				console.log(collection);
-				console.log('PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP');
-				console.log(res);
-				console.log('PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP');
-
 				self.set('loading', false);
 				// $('.fileSystem-template .loading-spinner').remove();
 				collection.reset(_.map(res, Mast.models.INode.prototype.marshal));
@@ -141,7 +134,7 @@ Mast.registerTree('FileSystem',{
 
 
 		'~ITEM_ORPHANED': function(event) {
-			console.log("ITEM_ORPHANED: "+event.source.id);
+			// console.log("ITEM_ORPHANED: "+event.source.id);
 			if (!this.collection.get(event.source.id)) {
 				var marshaledData = new Mast.models.INode().marshal(event.source);
 				this.collection.add(marshaledData);
@@ -152,7 +145,7 @@ Mast.registerTree('FileSystem',{
 		},
 
 		'~ITEM_DEORPHANED': function(event) {
-			console.log("ITEM_DEORPHANED: "+event.source.id);
+			// console.log("ITEM_DEORPHANED: "+event.source.id);
 			if (this.collection.get(event.source.id)) {
 				this.collection.remove(event.source.id);
 			}
@@ -162,7 +155,7 @@ Mast.registerTree('FileSystem',{
 			if (event && event.source && event.source.parent &&
 				event.source.parent.id === null) {
 
-				console.log(event.source.parent.id ,"+++++ ITEM_CREATE ");
+				// console.log(event.source.parent.id ,"+++++ ITEM_CREATE ");
 
 				var newDir		= event.source;
 		

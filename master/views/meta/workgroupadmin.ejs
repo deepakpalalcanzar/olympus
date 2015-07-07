@@ -9,10 +9,14 @@
 		<script type="text/javascript" src="/js/moment.js"></script>
 		<script type="text/javascript" src="/js/fillout.js"></script>
 		<script type="text/javascript" src="/js/jquery.imagesloaded.min.js"></script>
+		<script type="text/javascript" src="/js/cropbox.js"></script>
+
 
 		<!-- Good ol' css -->
 		<link rel="stylesheet" type="text/css" media="all" href="/stylesheets/reset.css"/>
 		<link rel="stylesheet" type="text/css" media="all" href="/stylesheets/layout.css"/>
+		
+		<link rel="stylesheet" type="text/css" media="all" href="/stylesheets/style.css"/>
 
 		<!-- Apple web capable -->
 		<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0" />
@@ -22,10 +26,39 @@
 
 		<style>
 
+			#mydiv {  
+				position: fixed;
+				top: 0px;
+				left: 0px;
+				min-height: 100%;
+				min-width: 100%;
+				background-image: url("/images/loading.gif");
+				background-position:center center;
+				background-repeat:no-repeat;
+				background-color: grey;
+				z-index: 500 !important;
+				opacity: 0.8;
+				overflow: hidden;
+			}
+
+			.ajax-loader {
+			    position: absolute;
+			    left: 36%;
+			    top: 50%;
+			    margin-left: -32px; 
+			    margin-top: -32px; 
+			    display: block;     
+			}
+
 		</style>
 
 	</head>
 	<body>
+		<div id="mydiv">
+		<p style="color: #EFEFEF; padding-top: 63px; font: 1.5em ProzimanovaRegular, Helvetica, Ariel, sans-serif" class="ajax-loader">
+  <b>Please wait while we are processing your request.</b></p>
+
+		</div>
 
 		<!-- main content -->
 		<div class="wrapper portal-only">
@@ -35,7 +68,13 @@
 
 					<!-- logo and main navigation -->
 					<div id="main-nav">
+					
+						<% if(enterprise_logo != '' && enterprise_logo != null){ %>
+						<a href="#" class="logo-link"><img class="main-logo" src="/images/enterprises/<%= enterprise_logo %>" alt="Olympus" /></a>
+						<% }else{ %>
 						<a href="#" class="logo-link"><img class="main-logo" src="/images/Branding_12.png" alt="Olympus" /></a>
+						<%	} %>
+
 						<ul class="clearfix">
 
 							<li>
@@ -64,14 +103,18 @@
 								</a>
 							</li>
 							
-							<li class="last-item">
+							<% if(setting == 0){ %>
+								
+
+							<!-- <li class="last-item">
 								<a href="#settings" title="settings">
 								<div class="main-nav-div">
 									<img class="main-nav-imgs" src="/images/Top-Nav_SettingsIcon@2x.png"/>
 									<span class="main-nav-span">Settings</span>
 								</div>
 								</a>
-							</li>
+							</li> -->
+							<% } %>
 
 							<li class="last-item">
 								<a href="#log" title="View Log" style="width:auto">
@@ -165,4 +208,12 @@
 		<!-- Template library -->
 		<%- rigging.templateLibrary %>
 	</body>
+
+
+	<script>
+	$(window).load(function(){
+		$("#mydiv").hide();
+	});
+
+</script>
 </html>
