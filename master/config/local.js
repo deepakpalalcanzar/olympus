@@ -1,12 +1,12 @@
 module.exports = {
-  hostName: 'dev.olympus.io',
+  hostName: 'hostname',
   protocol: 'https://',
   s3: {
-    API_KEY: 'AKIAIUPRTVZFV3GJR6DA',
-    API_SECRET: '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',
+    API_KEY: 'AWS_ACCESS_KEY_ID',
+    API_SECRET: 'AWS_SECRET_ACCESS_KEY',
   },
   MYSQL: {
-    PASS: 'refico',
-    DB: 'olympus'
+    PASS: 'password',
+    DB: 'databasename'
   }
 }
