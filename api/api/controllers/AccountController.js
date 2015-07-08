@@ -5,8 +5,8 @@
 
 var destroy = require('../services/lib/account/destroy'),
     crypto = require('crypto'),
-    emailService = require('../services/email');
-  var publicIp = require('public-ip');
+    emailService = require('../services/email'),
+    publicIp = require('public-ip');
 
 var AccountController = {
 
@@ -57,7 +57,7 @@ var AccountController = {
                 subscription_id : req.param('subscription') !== 'undefined' ? req.param('subscription') : '',
                 created_by_name : req.param('created_by_name') !== 'undefined' ? req.param('created_by_name') : '',
                 enterprise_name : req.param('enterprise_name') !== 'undefined' ? req.param('enterprise_name') : '',
-                ip              : ip
+                ip              : ''
 
             };
 
@@ -138,47 +138,47 @@ var AccountController = {
    * @param {String} password
    */
 
-  update: function (req, res) {
+    update: function (req, res) {
 
-    if (!req.param('id')) {
-      return res.send({
-        error: new Error('Must include an Account ID').message,
-        type: 'error'
-      }, 400);
-    }
+        if (!req.param('id')) {
+          return res.send({
+            error: new Error('Must include an Account ID').message,
+            type: 'error'
+          }, 400);
+        }
 
-    // Look up Account for currently logged-in user
-    Account.findOne(req.param('id')).then(function (account) {
+        // Look up Account for currently logged-in user
+        Account.findOne(req.param('id')).then(function (account) {
 
-      // Make sure an Account exists with that ID
-      if (!account) return res.json({
-        error: 'No Account found with that ID',
-        type: 'error'
-      }, 400);
+            // Make sure an Account exists with that ID
+            if (!account) return res.json({
+                error: 'No Account found with that ID',
+                type: 'error'
+            }, 400);
 
-      // Update Model Values
-      if (req.param('email')) account.email = req.param('email');
-      if (req.param('name')) account.name = req.param('name');
-      if (req.param('phone')) account.phone = req.param('phone');
-      if (req.param('title')) account.title = req.param('title');
-      if (req.param('password')) account.password = req.param('password');
+            // Update Model Values
+            if (req.param('email')) account.email = req.param('email');
+            if (req.param('name')) account.name = req.param('name');
+            if (req.param('phone')) account.phone = req.param('phone');
+            if (req.param('title')) account.title = req.param('title');
+            if (req.param('password')) account.password = req.param('password');
 
-      // Save the Account, returning a 200 response
-      account.save(function (err) {
-        if (err) return res.json({
-          error: err.message,
-          type: 'error'
+            // Save the Account, returning a 200 response
+            account.save(function (err) {
+                if (err) return res.json({
+                    error: err.message,
+                    type: 'error'
+                });
+                return res.json(account, 200);
+            });
+
+        }).fail(function (err) {
+            return res.json({
+                error: err.message,
+                type: 'error'
+            }, 500);
         });
-        return res.json(account, 200);
-      });
-
-    }).fail(function (err) {
-      return res.json({
-        error: err.message,
-        type: 'error'
-      }, 500);
-    });
-  },
+    },
 
 
   /**
@@ -190,13 +190,14 @@ var AccountController = {
    * so we can just use the id param in the Account Query
    */
 
-     del: function (req, res) {
+    del: function (req, res) {
+    
         var accountName; 
         if (!req.param('id')) {
-          return res.json({
-            error: new Error('Must include an Account ID'),
-            type: 'error'
-          }, 400);
+            return res.json({
+                error: new Error('Must include an Account ID'),
+                type: 'error'
+            }, 400);
         }
 
     // Update Account and mark as deleted
@@ -205,13 +206,13 @@ var AccountController = {
             accountName = account.name;
             if (err) return res.json({
                 error: err,
-                type: 'error'
+                type : 'error'
             }, 400);
 
             if (!account) {
                 return res.json({
                     error: new Error('No account found with that ID'),
-                    type: 'error'
+                    type : 'error'
                 }, 400);
             }
 
@@ -219,7 +220,7 @@ var AccountController = {
 
                 if (err) return res.json({
                     error: err,
-                    type: 'error'
+                    type : 'error'
                 }, 400);
 
 /*Create Log detail*/
@@ -239,7 +240,6 @@ var AccountController = {
                         text_message  : msg,
                         activity      : 'delete',
                         on_user       : account.id
-                       
                     } 
 
                     Logging.createLog(opts, function(err, logging) {
@@ -247,7 +247,6 @@ var AccountController = {
                         res.json({ status: 'ok'}, 200);
                     });
                 });
-
             });
         });
     },
@@ -263,43 +262,41 @@ var AccountController = {
    * so we can just use the id param in the Account Query
    */
 
-  lock: function (req, res) {
+    lock: function (req, res) {
 
-    if (!req.param('id')) {
-      return res.json({
-        error: new Error('Must include an Account ID'),
-        type: 'error'
-      }, 400);
-    }
+        if (!req.param('id')) {
+          return res.json({
+            error: new Error('Must include an Account ID'),
+            type: 'error'
+          }, 400);
+        }
 
     // Update Account and mark as locked or unlocked depending on input
-    Account.findOne(req.param('id')).exec(function (err, account) {
-      if (err) return res.json({
-        error: err,
-        type: 'error'
-      }, 400);
-      if (!account) {
-        return res.json({
-          error: new Error('No account found with that ID'),
-          type: 'error'
-        }, 400);
-      }
+        Account.findOne(req.param('id')).exec(function (err, account) {
+            
+            if (err) return res.json({
+                error: err,
+                type: 'error'
+            }, 400);
+
+            if (!account) {
+                return res.json({
+                    error: new Error('No account found with that ID'),
+                    type: 'error'
+                }, 400);
+            }
 
 // !! will cast the variable to a boolean
-      account.lock( !! req.param('lock'), function (err) {
+            account.lock( !! req.param('lock'), function (err) {
+                
+                if (err) return res.json({
+                    error: err,
+                    type: 'error'
+                }, 400);
 
-        if (err) return res.json({
-          error: err,
-          type: 'error'
-        }, 400);
-
-        res.json(account, 200);
-
-      });
-    });
-
-  }
-
+                res.json(account, 200);
+            });
+        });
+    }
 };
-
 module.exports = AccountController;

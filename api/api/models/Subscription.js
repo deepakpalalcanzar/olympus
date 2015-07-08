@@ -50,55 +50,46 @@ module.exports = {
 
         if(options.is_default == '1'){
 
-            Subscription.update(
-                { is_default: '1' },
-                { is_default: '0'}, function(err, users) {
-
-// Error handling
-            if (err) {  
-              return console.log(err);
+            Subscription.update({ is_default: '1' }, { is_default: '0'}, function(err, users) {
+            // Error handling
+                if (err) {  
+                    return console.log(err);
             // Updated users successfully!
-            } else {
-                Subscription.create({
-                features: options.features,
-                price: options.price,
-                duration: options.duration,
-                users_limit: options.users_limit,
-                quota: options.quota,
-                is_default: options.is_default,
-                is_active       : null
-                
-              }).exec(function foundAccount (err, account) {
-                  if (err) return cb && cb(err);   
-                  cb(account);   
-              });
-            }
-          });
+                } else {
+
+                    Subscription.create({
+
+                        features    : options.features,
+                        price       : options.price,
+                        duration    : options.duration,
+                        users_limit : options.users_limit,
+                        quota       : options.quota,
+                        is_default  : options.is_default,
+                        is_active   : null
+
+                    }).exec(function foundAccount (err, account) {
+
+                        if (err) return cb && cb(err);   
+                        cb(account);   
+
+                    });
+                }
+            });
 
       }else{
 
             Subscription.create({
-
                 features    : options.features,
                 price       : options.price,
                 duration    : options.duration,
                 users_limit : options.users_limit,
-                quota           : options.quota,
-                is_default      : options.is_default,
-                is_active       : null
-
+                quota       : options.quota,
+                is_default  : options.is_default,
+                is_active   : null
             }).exec(function foundAccount (err, account) {
                 if (err) return cb && cb(err);   
                 cb(account);   
             });
       }
-
-    },
-
-    getSubscription: function(options, cb){
-        
-                
     }
-
-
 };

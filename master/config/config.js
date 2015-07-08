@@ -16,14 +16,12 @@ module.exports = {
 		// Which adapter to use
 		adapter: 's3',
 
-	s3: {
-		
-		accessKeyId: 'AWS_ACCESS_KEY_ID',
-		secretAccessKey: 'AWS_SECRET_ACCESS_KEY',
-		bucket: 'AWS_BUCKET',
-		region: 'AWS_REGION'
-	},
-
+		s3: {
+			accessKeyId: 'AWS_ACCESS_KEY_ID',
+			secretAccessKey: 'AWS_SECRET_ACCESS_KEY',
+			bucket: 'AWS_BUCKET',
+			region: 'AWS_REGION'
+		},
 
 		// OpenStack Swift API credentials
 		swift: {
