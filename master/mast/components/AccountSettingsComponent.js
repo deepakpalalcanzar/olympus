@@ -1,7 +1,9 @@
 Mast.registerComponent('AccountSettingsComponent',{
 
 	model: {
-		selectedTab: 'accountDetails'
+		selectedTab 	 : 'accountDetails',
+		showSubscription : false,
+		showSetting 	 : false
 	},
 
 	template: 	'.account-settings-template',
@@ -29,6 +31,16 @@ Mast.registerComponent('AccountSettingsComponent',{
 			}
 		}
 	},
+
+	afterRender: function(){
+		if(Mast.Session.Account.isAdmin && Mast.Session.Account.isSuperAdmin === 0){
+			this.set('showSetting', true);
+			this.set('showSubscription', true);
+		}else if (Mast.Session.Account.isEnterprise === 0){
+			this.set('showSubscription', true);
+		}
+	},
+
 
 // attach account details component to the account settings page region
 	displayAccountDetails: function() {

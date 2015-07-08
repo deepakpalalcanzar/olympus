@@ -20,7 +20,7 @@ Mast.registerTree('SubscriptionTable', {
 			className: 'sub-users-column'
 		},
 		column5: {
-			name: 'Quota Limit',
+			name: 'Quota (GB)',
 			className: 'quota-column'
 		},
 		column6: {
@@ -76,28 +76,15 @@ Mast.registerTree('SubscriptionTable', {
 		var item = this.collection.get(id);
 		if(typeof item !== 'undefined'){
 			if(confirm('Are you sure you want to delete?')){
-				
-                              /*Mast.Socket.request('/subscription/deleteSubscription', { id: id}, function(res, err){
-					if(res.error_msg){
-						alert(res.error_msg);		
-					}else if(res.success){
-						self.remove(id);
-					}
-				});*/
-                         /* $.get("https://ipinfo.io", function(response) {
-            	          var ipadd =response.ip;*/
-            	          if(confirm('Are you sure you want to delete?')){
-				Mast.Socket.request('/subscription/deleteSubscription', { id: id}, function(res, err){
-					if(res.error_msg){
-						alert(res.error_msg);		
-					}else if(res.success){
-						self.remove(id);
-					}
-				});
-			}
-          	
-			/*}, "jsonp");*/
-
+				if(confirm('Are you sure you want to delete?')){
+					Mast.Socket.request('/subscription/deleteSubscription', { id: id}, function(res, err){
+						if(res.error_msg){
+							alert(res.error_msg);		
+						}else if(res.success){
+							self.remove(id);
+						}
+					});
+				}
 			}
 		}
 	},
@@ -106,6 +93,7 @@ Mast.registerTree('SubscriptionTable', {
 
 // user row component
 Mast.registerComponent('SubscriptionRow', {
+	
 	template: '.subscription-row-template',
 	events: {
 		'click .action-edit': 'editSubscription',

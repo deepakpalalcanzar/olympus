@@ -1,12 +1,16 @@
 Mast.registerComponent('DropdownActionRow',{
 
 	template: '.dropdownAction-template',
+    
     events: {
         'click'	: 'triggerCallerAction'
     },
+
     afterCreate: function() {
         this.$el.disableSelection();
     },
+
+
 
 // Using the reference to the `caller` in the parent,
 // trigger the appropriate method in the `caller`

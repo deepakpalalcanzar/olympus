@@ -90,20 +90,24 @@ exports.File.mini = exports.File;
 
 // Account
 var Account = function(model) {
-		return {
-			id: model.id,
-			name: model.name,
-			email: model.email,
-			login: model.login,
-			phone: model.phone || '',
-			title: model.title || '',
-			// avatar: '/images/' + model.id + '.png',
-			avatar: getAvatarImage(model.id),
-			isAdmin: model.isAdmin,
-			type: 'account',
-			isSuperAdmin:model.isSuperAdmin, // check for superadmin
-		};
+	
+	console.log("API SERVICES MODEL");
+	console.log(model);
+
+	return {
+		id 		: model.id,
+		name 	: model.name,
+		email 	: model.email,
+		login 	: model.login,
+		phone 	: model.phone || '',
+		title 	: model.title || '',
+		avatar 	: getAvatarImage(model.id),
+		isAdmin : model.isAdmin,
+		type 	: 'account',
+		isSuperAdmin : model.isSuperAdmin, // check for superadmin
+		isEnterprise : model.is_enterprise, // check for superadmin
 	};
+};
 exports.Account = apiTransform(Account);
 exports.Account.mini = exports.Account;
 

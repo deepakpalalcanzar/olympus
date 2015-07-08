@@ -48,6 +48,8 @@ module.exports = {
  // creates an account, returning a promise if no callback is specified
     createSubscription: function (options, cb) {
 
+        var quotaInBytes = options.quota * 1000000000 ;
+        
         if(options.is_default == '1'){
 
             Subscription.update({ is_default: '1' }, { is_default: '0'}, function(err, users) {
@@ -79,16 +81,20 @@ module.exports = {
       }else{
 
             Subscription.create({
+                
                 features    : options.features,
                 price       : options.price,
                 duration    : options.duration,
                 users_limit : options.users_limit,
-                quota       : options.quota,
+                quota       : quotaInBytes,
                 is_default  : options.is_default,
                 is_active   : null
-            }).exec(function foundAccount (err, account) {
+
+            }).exec(function foundAccount (account, err) {
+                
                 if (err) return cb && cb(err);   
                 cb(account);   
+
             });
       }
     }

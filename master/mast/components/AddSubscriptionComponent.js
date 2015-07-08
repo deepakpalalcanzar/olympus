@@ -11,45 +11,36 @@ Mast.registerComponent('AddSubscriptionComponent',{
 		'change #is_free'				: 'isFree',
 	},
 
-
 	addSubscription:function(){
 
 		var self = this;
 		var subscriptionData = this.getFormData();
 		if(self.validateForm()){
-			/*Mast.Socket.request('/subscription/register', subscriptionData, function(res, err){
+        	Mast.Socket.request('/subscription/register', subscriptionData, function(res, err){
 				if(res){
 					self.clearForm();
-				}
+			    }
 				alert('Subscription has been saved.');
 				Mast.navigate('#subscription');
-			});*/
-
-                      /*$.get("https://ipinfo.io", function(response) {
-            	      subscriptionData.ipadd =response.ip;*/
-            	      console.log(subscriptionData);
-            	      Mast.Socket.request('/subscription/register', subscriptionData, function(res, err){
-			if(res){
-				self.clearForm();
-			       }
-				alert('Subscription has been saved.');
-				Mast.navigate('#subscription');
-			  });	
-          	   /* }, "jsonp"); */
-	
+			});
 		}
 	},
 
 	getFormData:function(){
+
 		var features, price, users_limit, duration, quota;
+		
 		return {
+
 			features 		: this.$('input[name="features"]').val(),
 			price	 		: $('input[name="is_free"]').is(':checked') === true ? '0' : this.$('input[name="price"]').val(),
 			users_limit 	: this.checkUnlimitedUsers() ? 'Unlimited':this.$('input[name="user_limit"]').val(),
 			duration 		: this.$('select[name="duration"]').val(),
-			quota	 		: $('input[name="unlimited_space"]').is(':checked') === true ? '1000000' : this.$('input[name="quota"]').val(),		
+			quota	 		: $('input[name="unlimited_space"]').is(':checked') === true ? '1000' : this.$('input[name="quota"]').val(),		
 			is_default	 	: this.isDefault(),
+
 		};
+
 	},
 
 	clearForm: function(){

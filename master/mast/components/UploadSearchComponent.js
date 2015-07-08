@@ -18,13 +18,9 @@ Mast.registerComponent('UploadSearchComponent',{
 	},
 
 	afterRender: function() {
-
 		Olympus.ui.fileSystem.on('cd', this.updateButtonState);
-		
 // Create new autocomplete for use with the textarea. Do this only if this olympus app
 // is not a private deployment.
-        
-
 	},
 
 	afterCreate: function () {
@@ -136,16 +132,20 @@ Mast.registerComponent('UploadSearchComponent',{
 		if (window.location.hash !== '') {
 			this.set('createFolderButton', false);
 		} else {
-			var pwd = Olympus.ui.fileSystem.pwd;
-			var state = {
+
+			var pwd 	= Olympus.ui.fileSystem.pwd;
+			var state 	= {
 				// If no directory is active, the "upload file button" is always disabled if no directory is active
 				// If they have *write* or *admin* privileges on pwd(), the button will appear
 				uploadFileButton: pwd.canWrite(),
 
 				// If no directory is active, then the current user MUST BE AN ADMIN to see this button
 				// If they have *write* or *admin* privileges on pwd(), the button will appear
-				createFolderButton: pwd.canWrite() || _.isUndefined(Olympus.ui.fileSystem.pwd.get('id')) && Mast.Session.Account.isAdmin
+
+				// createFolderButton: pwd.canWrite() || _.isUndefined(Olympus.ui.fileSystem.pwd.get('id')) && Mast.Session.Account.isAdmin 
+				createFolderButton: pwd.canWrite() 
 			};
+
 			this.set(state);
 		}
 	},

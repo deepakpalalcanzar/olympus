@@ -6,6 +6,7 @@ var SubscriptionController = {
 	register: function(req, res){
 
 		var request = require('request');
+
 		var options = {
 			uri: 'http://localhost:1337/subscription/register/' ,
 			method: 'POST',
@@ -127,11 +128,15 @@ var SubscriptionController = {
 	},
 
 	getSubscription: function(req, res){
+
 		var sql = "SELECT * FROM subscription WHERE is_active IS NULL";
+
         sql = Sequelize.Utils.format([sql]);
         sequelize.query(sql, null, {
         	raw: true
        	}).success(function(dirs) {
+
+
         	res.json(dirs, 200);
        	});
     },
@@ -629,22 +634,28 @@ impersonate: function(req, res){
   },
 
  listSubscription:function(req, res){
-    var sql = "SELECT id,features,price,users_limit,quota,is_default,is_active,duration, "+
-    "IF(duration>=12,CONCAT(duration/12,'','Y'),CONCAT(duration,'','M')) AS durat from subscription "+
+    
+    var sql = "SELECT id, features, price, users_limit, IF(quota/1000000000 = '1000', 'Unlimited', quota/1000000000) as quota, is_default, is_active, duration, "+
+    "IF(duration >= 12,CONCAT(duration/12,'','Y'),CONCAT(duration,'','M')) AS durat from subscription "+
     "WHERE is_active IS NULL";
-        sql = Sequelize.Utils.format([sql]);
-        sequelize.query(sql, null, {
+    sql = Sequelize.Utils.format([sql]);
+
+    console.log("Printing SQL STATMENT");
+    console.log(sql);
+
+    sequelize.query(sql, null, {
           raw: true
-        }).success(function(dirs) {
-          if(dirs.length){ // check for no records exists
+    }).success(function(dirs) {
+        if(dirs.length){ // check for no records exists
             res.json(dirs, 200);
-          }else{
+        }else{
             res.json({
               features: 'error_123',
               notFound : true,  
             });
-          }
-        });
+        }
+    });
+
   },
 
   upgradePayment: function(req, res){

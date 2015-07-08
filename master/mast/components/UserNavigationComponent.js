@@ -2,7 +2,7 @@ Mast.registerComponent('UserNavigationComponent', {
 
 	template: '.user-nav-template',
 	outlet  : '#user-nav-outlet',
-	model: 'UserNavigation',
+	model	: 'UserNavigation',
 	autoRender: false,
 
 
@@ -14,26 +14,35 @@ Mast.registerComponent('UserNavigationComponent', {
 		});
 	},
 
-	afterRender: function() {
+	afterRender: function() {	
 
-		var d = this.get('dropdownItems');
+		var self = this;
 		Olympus.ui.fileSystem.on('cd', this.updateButtonState);
 		Mast.Socket.request('/account/getImage', { pic_type: 'profile'}, function(res, err, next) {
 			if(res){
-				if(res.enterprise!=1){
-					d.splice('2', '1');
-					$('.settings').remove();
-				}
 				if(res.avatar !== '' && res.avatar!== null){
 					$('.user-avatar').attr('src', "/images/profile/"+res.avatar);			
 				}
+				if(self.get('showMenus')){
+					self.updateNavDropDown();
+				}
 			}
 		});
-
 	},
 
 	events: {
 		'click .dropdown-button': 'showDropdown'
+	},
+
+
+	updateNavDropDown: function(){
+		this.set('showMenus', false);
+		var d = this.get('dropdownItems');
+		if(Mast.Session.Account.isAdmin && Mast.Session.Account.isSuperAdmin === 1){
+			d.splice('2', '2');
+		}else if (Mast.Session.Account.isEnterprise === 0){
+			d.splice('2', '1');
+		}
 	},
 
 	// create global dropdown instance and place it at the drop down button

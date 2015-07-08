@@ -8,12 +8,13 @@ var destroy = require('../services/lib/account/destroy'),
 var SubscriptionController = {
 
     register: function (req, res) {
-        Subscription.createSubscription(req.body, function(err, subscription) {
+        Subscription.createSubscription(req.body, true, function(err, subscription) {
             if (err) return res.json({error: 'Error creating subscription',type: 'error'});
             return  res.json({
                         subscription: {id: subscription.id,}
                     });
         });
+        
     },
 
     updateSubscription: function (req, res) {
@@ -38,9 +39,9 @@ var SubscriptionController = {
             if (req.param('features')) subscription.features         = req.param('features');
             if (req.param('price')) subscription.price               = req.param('price');
             if (req.param('users_limit')) subscription.users_limit   = req.param('users_limit');
-            if (req.param('quota')) subscription.quota               = req.param('quota');
+            if (req.param('quota')) subscription.quota               = req.param('quota') * 1000000000 ;
             if (req.param('is_default')) subscription.is_default     = req.param('is_default');
-	    if (req.param('duration')) subscription.duration     = req.param('duration');
+            if (req.param('duration')) subscription.duration     = req.param('duration');
 
 // Save the Account, returning a 200 response
             subscription.save(function (err) {

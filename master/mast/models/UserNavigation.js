@@ -9,6 +9,7 @@ Mast.registerModel('UserNavigation', {
 					method	: 'viewProfile',
 					name	: 'View Profile',
 					iconSrc	: '/images/icon_dropdown_download.png'
+
 				},
 				{
 					method	: 'password',
@@ -31,7 +32,11 @@ Mast.registerModel('UserNavigation', {
 					iconSrc	: '/images/icon_dropdown_comment.png'
 				},
 				
-			]
+			],
+
+			showMenus : true
+
+			
 			
 		};
 	}

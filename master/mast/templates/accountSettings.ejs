@@ -10,13 +10,18 @@
             <a href="#account/password" class="account-password"> Change Password </a>
         </li>
 
-        <li class="settings">
-            <a href="#account/settings" class="account-notifications"> Settings</a>
-        </li>
+        {% if (showSetting) { %}
+            <li class="settings">
+                <a href="#account/settings" class="account-notifications"> Settings</a>
+            </li>
+        {% } %}
+        
+        {% if (showSubscription) { %}
+            <li class="accountSubscription">
+                <a href="#account/subscription" class="account-subscription"> Subscription Plan </a>
+            </li> 
+        {% } %}
 
-        <li class="accountSubscription">
-            <a href="#account/subscription" class="account-subscription"> Subscription Plan </a>
-        </li>  
     </ul>
     
     <div class="account-settings-page"></div>

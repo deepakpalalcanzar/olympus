@@ -140,7 +140,7 @@ exports.session = {
 					}
 					// If the account is valid, load it into the session
 					Account.find(model.account_id).success(function(account){
-                                          	if (account !== null) {
+                            if (account !== null) {
 							req.api_authenticated = true;
 							req.session.Account = APIService.Account(account);
 							return callback(true);

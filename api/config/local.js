@@ -3,15 +3,18 @@
  */
 
 module.exports = {
+
 	s3: {
-	  API_KEY   : 'AWS_ACCESS_KEY_ID',
-    API_SECRET: 'AWS_SECRET_ACCESS_KEY',
-    BUCKET    : 'AWS_BUCKET'
+		API_KEY   : 'AWS_ACCESS_KEY_ID',
+    	API_SECRET: 'AWS_SECRET_ACCESS_KEY',
+        BUCKET    : 'AWS_BUCKET'
 	},
 	
 	MYSQL: {
-		PASS: 'password',
-		DB: 'databaseName'
+		PASS: 'refico',
+		DB: 'installer'
   	},
+
   	receiver: 'Disk'
+    
 };
