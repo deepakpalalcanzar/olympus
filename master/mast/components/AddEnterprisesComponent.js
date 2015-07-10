@@ -4,22 +4,18 @@ Mast.registerComponent('AddEnterprisesComponent',{
 	outlet: '#content',
 	events:{
 		'click .add-enterprises': 'addEnterprise',
+		'blur  .email'			: 'checkForEmail',
 	},
 	
 	addEnterprise: function(){
 
 		var self = this;
 		var entData = this.getFormData();
-	
 	  	Mast.Socket.request('/enterprises/getQuota', {sub_id:entData.subscription}, function(reso, erro){
-
 			entData.quota = ""+ reso[0].quota +"";
-			
 			if(reso){
 				if(self.validateForm()){
-
 					Mast.Socket.request('/enterprises/register', entData, function(res, err){
-
 						if(res){
 
 							if(res.id && res.error){
@@ -45,7 +41,7 @@ Mast.registerComponent('AddEnterprisesComponent',{
                             Mast.Socket.request('/enterprises/create', data, function(response, error){
 								if(response){
 									self.clearForm();
-									alert('Data has been saved.');
+									alert('Account created successfully.');
 									Mast.navigate('enterprises');
 								}
 							});	
@@ -75,17 +71,37 @@ Mast.registerComponent('AddEnterprisesComponent',{
 	},
 
 	validateForm: function(){
+
+		$(".enterprise_name .error_span").remove();
+		$(".owner_name .error_span").remove();
+		$(".password .error_span").remove()
+		$(".confirmPassword .error_span").remove()
+
+    	$(".enterpriseName").css({ "border" : "1px solid #d7dbdc" });
+    	$(".ownerName").css({ "border" : "1px solid #d7dbdc" });
+    	$(".enter_password").css({ "border" : "1px solid #d7dbdc" });
+    	$(".confirm_password").css({ "border" : "1px solid #d7dbdc" });
+
 		if (this.$('input[name="enterprises_name"]').val() === '') {
-			alert('Please enter enterprise name !');
+			$(".enterprise_name").append("<span class='error_span'> Please enter a enterprise name. </span>");
+    		$(".enterpriseName").css({ "border" : "1px solid red" });
 			return false;
-		}else if(this.$('input[name="email"]').val() ===''){
-			alert('Please enter email !');
+		}else if(this.$('input[name="owner_name"]').val() ===''){
+			$(".owner_name").append("<span class='error_span'> Please enter a owner name. </span>");
+    		$(".ownerName").css({ "border" : "1px solid red" });
 			return false;
 		}else if(this.$('input[name="password"]').val() ===''){
-			alert('Please enter password !');
-			return false;
+			if($(".password").attr('style') !== 'display: none;'){
+				$(".password").append("<span class='error_span'> Please enter a password. </span>");
+	    		$(".enter_password").css({ "border" : "1px solid red" });
+				return false;
+			}
 		}else if(!this.isValidPassword()){
-			alert('Password and confirm password did not match !');
+			if($(".confirmPassword").attr('style') !== 'display: none;'){
+				$(".confirmPassword").append("<span class='error_span'> Confirm password does not match. </span>");
+	    		$(".confirm_password").css({ "border" : "1px solid red" });
+				return false;
+			}
 			return false;
 		}else{
 			return true;
@@ -118,8 +134,6 @@ Mast.registerComponent('AddEnterprisesComponent',{
 		// This code seems to be called twice, so we'll do an unbind to make sure that
 		// we don't bind the click event to the button more than once
 		$('.addSharedUser-button').unbind('click');
-
-		// var lock =  { id : '12' };
 		Mast.Socket.request('/subscription/getSubscription', null, function(res, err){
 			if(res){
 				var options;
@@ -160,5 +174,33 @@ Mast.registerComponent('AddEnterprisesComponent',{
 			callback(accounts);
 		});
 	},
+
+	checkForEmail: function(){
+		$(".user_email .error_span").remove();
+		var email = this.$('input[name="email"]').val();
+		var filter = /^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
+    
+    	if (filter.test(email)) {
+
+    		$(".email").css({ "border" : "1px solid #d7dbdc" });
+    		var data = { email :  email }
+			Mast.Socket.request('/account/checkEmail', data, function(response, error){
+				if(response.msg === "email_exists"){
+					$(".password").hide();					
+					$(".confirmPassword").hide();					
+				}else if (response.msg === "no_record"){
+					$(".password").show();					
+					$(".confirmPassword").show();	
+				}
+			});	
+
+    	}else {
+
+    		$(".user_email").append("<span class='error_span'> Email entered is not valid. </span>");
+    		$(".email").css({ "border" : "1px solid red" });
+
+    	}
+
+	}
 
 });

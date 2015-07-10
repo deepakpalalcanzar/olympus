@@ -35,11 +35,9 @@ var AccountController = {
 	},
 
     createuploadlog: function(req,res){
-
         var request = require('request');
-           
         /*Create logging*/
-       var opts = {
+       	var opts = {
             uri: 'http://localhost:1337/logging/register/' ,
             method: 'POST',
         };
@@ -48,15 +46,12 @@ var AccountController = {
             text_message: 'has Uploaded a File '+req.params.name,
             activity    : 'Uploaded',
             on_user     : req.session.Account.id,
-           
-            
         };
 
         request(opts, function(err1) {
           
         });
         /*Create logging*/ 
-
     },
 
     searchdate: function(req,res){
@@ -71,11 +66,8 @@ var AccountController = {
         }else{
           var sql = "SELECT l.text_message, l.ip_address, DATE_FORMAT( l.createdAt, '%b %d %Y %h:%i %p' ) AS created_at, a.name FROM `logging` l INNER JOIN account a ON l.user_id = a.id where l.user_id="+ req.session.Account.id +" And l.action = "+ action +" And l.createdAt between "+ sdate +" and "+ edate +" ORDER BY l.id DESC ";	
         }
-		// var sql = "SELECT  * from logging where createdAt between "+ sdate +" and "+ edate +" ";
-	    // var sql = " SELECT l.text_message, l.ip_address, DATE_FORMAT( l.createdAt, '%b %d %Y %h:%i %p' ) AS created_at, a.name FROM logging AS l INNER JOIN account AS a ON l.user_id = a.id WHERE l.createdAt BETWEEN '2015-03-21' AND '2015-03-22' " ;
-		sql = Sequelize.Utils.format([sql]);
-	    console.log(sql);	
 
+		sql = Sequelize.Utils.format([sql]);
 	    sequelize.query(sql, null, {
 			raw: true
 		}).success(function(accounts) {
@@ -147,9 +139,7 @@ var AccountController = {
 			method: 'POST',
 	    };
 
-
 	    options.json =  {
-
 	    	name		: req.params.name,
 	    	email		: req.params.email,
 	    	isVerified  : true,
@@ -159,7 +149,6 @@ var AccountController = {
 	    	workgroup   : req.params.workgroup,
 	    	title    	: req.params.title,
 	    	subscription: req.params.subscription,
-
 	    };
 
 		request(options, function(err, response, body) {
@@ -265,36 +254,19 @@ var AccountController = {
 				res.json(directory, 200);
 	        });
 
-
 		}else{
 
 			Account.findAll({
 				where: ['id='+req.session.Account.id],
 			}).success(function(accounts) {
-
-
-			var sql = "SELECT account.*,subscription.features, adminuser.admin_profile_id, "+
+				var sql = "SELECT account.*,subscription.features, adminuser.admin_profile_id, "+
 						"adminuser.id as adminuser_id , enterprises.name as enterprise_name, enterprises.id as enterprises_id FROM account "+
 						"LEFT JOIN subscription ON account.subscription_id=subscription.id "+
 						"LEFT JOIN adminuser ON account.id=adminuser.user_id "+
 						"LEFT JOIN enterprises ON account.created_by=enterprises.account_id "+
 						"WHERE account.is_enterprise=0 and account.deleted != 1 and account.created_by=?";
 
-			sql = Sequelize.Utils.format([sql, userId]);
-				// if(accounts.created_by == null){
-			 //        Directory.findAll({ 
-			 //        	where : [ '((deleted = 0 OR deleted IS NULL) and (OwnerId ='+req.session.Account.id+'))'],
-			 //        }).success(function(directory){
-				// 		res.json(directory, 200);
-			 //        });
-				// }else{
-			 //        Directory.findAll({ 
-			 //        	where : [ 'deleted != 1 and OwnerId = '+owner_id ],
-			 //        }).success(function(directory){
-				// 		res.json(directory, 200);
-			 //        });
-				// }
-
+				sql = Sequelize.Utils.format([sql, userId]);
 			});
 		}
     },
@@ -308,9 +280,9 @@ var AccountController = {
        	sequelize.query(sql, null, {
         	raw: true
        	}).success(function(directory) {
-		res.json(directory, 200);
+			res.json(directory, 200);
        	}).error(function(e) {
-		throw new Error(e);
+			throw new Error(e);
        	});
     },
 
@@ -392,17 +364,12 @@ var AccountController = {
 			method: 'POST',
 	    };
 
-	    /*options.json =  {
-	    	id		: req.param('id'),
-	    	accId 	: req.session.Account.id, //for logging
-	    	accName : req.session.Account.name, //for logging
-	    };*/
 		options.json =  {
-			    	id		: req.param('id'),
-			    	accId 	: req.session.Account.id, //for logging
-			    	accName : req.session.Account.name, //for logging
-				ipadd :   req.param('ipadd'),
-			    };
+			id		: req.param('id'),
+			accId 	: req.session.Account.id, //for logging
+			accName : req.session.Account.name, //for logging
+			ipadd  	:   req.param('ipadd'),
+		};
 		
 		request(options, function(err, response, body) {
 			if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
@@ -416,7 +383,7 @@ var AccountController = {
     deletePermission: function(req, res){
 
     	var request = require('request');
-	var sql = "Delete FROM directorypermission where AccountId =? and DirectoryId = ?";
+		var sql = "Delete FROM directorypermission where AccountId =? and DirectoryId = ?";
        	sql = Sequelize.Utils.format([sql, req.param('user_id'), req.param('workgroup_id')]);
 
        	sequelize.query(sql, null, {
@@ -429,19 +396,11 @@ var AccountController = {
 			method: 'POST',
 	    	};
 
-	    	/*options.json =  {
-		    	user_id		: req.session.Account.id,
-		    	text_message    : req.session.Account.name+ ' has deleted '+req.param('workgroup_name')+' from '+req.param('user_name')+'\'s account.',
-		    	activity  	: 'delete',
-		    	on_user		: req.param('user_id'),
-	    	};*/
-
-                options.json =  {
+			options.json =  {
 		    	user_id		: req.session.Account.id,
 		    	text_message: 'has deleted '+req.param('workgroup_name')+' from '+req.param('user_name')+'\'s account.',
 		    	activity  	: 'delete',
 		    	on_user		: req.param('user_id'),
-		    	
 	    	};
 
 			request(options, function(err, response, body) {
@@ -517,19 +476,12 @@ var AccountController = {
 					uri: 'http://localhost:1337/logging/register/' ,
 					method: 'POST',
 	    		};
-
-	    		/*options.json =  {
-	    			user_id		: req.session.Account.id,
-	    			text_message: req.session.Account.name+ ' has changed own password.',
-	    			activity  	: 'change',
-	    			on_user		: req.session.Account.id,
-	    		};*/
-                       options.json =  {
+				
+				options.json =  {
 	    			user_id		: req.session.Account.id,
 	    			text_message: 'has changed own password.',
 	    			activity  	: 'change',
 	    			on_user		: req.session.Account.id,
-	    			
 	    		};
 
 				request(options, function(err, response, body) {
@@ -560,18 +512,11 @@ var AccountController = {
 					method: 'POST',
 		    	};
 
-	    		/*options.json =  {
-	    			user_id		: req.session.Account.id,
-	    			text_message: req.session.Account.name+ ' has changed '+model.name+'\'s password.',
-	    			activity  	: 'change',
-	    			on_user		: req.param('id'),
-	    		};*/
-             options.json =  {
-	    			user_id		: req.session.Account.id,
-	    			text_message: 'has changed '+model.name+'\'s password.',
-	    			activity  	: 'change',
-	    			on_user		: req.param('id'),
-	    			
+				options.json =  {
+					user_id		: req.session.Account.id,
+					text_message: 'has changed '+model.name+'\'s password.',
+					activity  	: 'change',
+					on_user		: req.param('id'),
 	    		};
 
 				request(options, function(err, response, body) {
@@ -606,13 +551,7 @@ var AccountController = {
 					method: 'POST',
 	    		};
 
-	    		/*options.json =  {
-	    			user_id		: req.session.Account.id,
-	    			text_message: model.name+ ' has updated own account.',
-	    			activity  	: 'update',
-	    			on_user		: req.session.Account.id,
-	    		};*/
-                     options.json =  {
+				options.json =  {
 	    			user_id		: req.session.Account.id,
 	    			text_message: 'has updated own account.',
 	    			activity  	: 'update',
@@ -681,12 +620,7 @@ var AccountController = {
 			if (err) return res.send(err,500);
 			if(account){
 
-				console.log("fsName v fsName fsName fsName fsName fsName");
-				console.log(fsName);
-				
 				var enterpriseName 	= fsName+'.png';
-
-				console.log(enterpriseName);
 
 	 			var base64Data  	= binaryData.replace(/^data:image\/(png|gif|jpeg);base64,/, "");
 	 			base64Data      	+=  base64Data.replace('+', ' ');
@@ -752,6 +686,23 @@ var AccountController = {
 
 	    });
 	},
+
+/*
+	This fucntion is called from the #addEnterprise and #reports to check 
+	if email exist
+*/ 
+
+	checkEmail: function(req, res){
+		Account.find({
+			where : [ 'email ="'+req.param('email')+'"' ],
+		}).success(function(account) {
+			if(account === null){
+				return res.json({ msg: "no_record", type: "success" });
+			}else{
+				return res.json({ msg: "email_exists", type: "success" });
+			}
+    	});
+	}
 
 };
 _.extend(exports, AccountController);

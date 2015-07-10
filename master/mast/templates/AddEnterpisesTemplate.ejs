@@ -17,47 +17,32 @@
 		<form action="" method="POST" class="new-user-form">
 			<div class="center-mod">
 				<!-- <h3 class="company-details">New Enterprise</h3> -->
-				<div class="company-name">Enterprise Name</div>
-					<input type="text" name="enterprises_name" placeholder="Enter First Name" class="enter_name" style="border: 1px solid @borderGray;
-				margin-bottom:12px;width: 275px;padding: 7px 14px;">
-
-				<div class="company-name">Owner Name</div>
-				<input type="text" name="owner_name" placeholder="Enter Owner Name" class="enter_name" style="border: 1px solid @borderGray;
-				margin-bottom:12px;width: 275px;padding: 7px 14px;">
-
-				<div class="permission-form">
-				<div class="company-name">Email</div>
-					<input type="text" name="email" placeholder="Enter Email" class="enter_name accounts" style="border: 1px solid @borderGray;
-				margin-bottom:12px;width: 275px;padding: 7px 14px;">
+				<div class="enterprise_name">
+					<div class="company-name"> Enterprise Name </div>
+					<input type="text" name="enterprises_name" placeholder="Enter First Name" class="enter_name enterpriseName" style="border: 1px solid @borderGray;margin-bottom:12px;width: 275px;padding: 7px 14px;">
 				</div>
 
-				<div class="company-name"> Password </div>
-				<input type="password" name="password" placeholder="Enter Password" class="enter_name" style="border: 1px solid @borderGray;
-				margin-bottom:12px;width: 275px;padding: 7px 14px;">
+				<div class="owner_name">
+					<div class="company-name"> Owner Name </div>
+					<input type="text" name="owner_name" placeholder="Enter Owner Name" class="enter_name ownerName" style="border: 1px solid @borderGray;margin-bottom:12px;width: 275px;padding: 7px 14px;">
+				</div>
 
-				<div class="company-name"> Confirm Password </div>
-				<input type="password" name="c_password" placeholder="Confirm Password" class="enter_name" style="border: 1px solid @borderGray;
-				margin-bottom:12px;width: 275px;padding: 7px 14px;">
+				<div class="permission-form user_email">
+					<div class="company-name"> Email </div>
+					<input type="text" name="email" placeholder="Enter Email" class="enter_name email" style="border: 1px solid @borderGray;margin-bottom:12px;width: 275px;padding: 7px 14px;">
+				</div>
 
+				<div class="password">
+					<div class="company-name"> Password </div>
+					<input type="password" name="password" placeholder="Enter Password" class="enter_name enter_password" style="border: 1px solid @borderGray;margin-bottom:12px;width: 275px;padding: 7px 14px;">
+				</div>
 
-				<!-- <div class="company-name"> Title </div>
-				<input type="text" name="title" placeholder="Enter Title" class="enter_name" style="border: 1px solid @borderGray;
-				margin-bottom:12px;width: 275px;padding: 7px 14px;"> -->
+				<div class="confirmPassword">
+					<div class="company-name"> Confirm Password </div>
+					<input type="password" name="c_password" placeholder="Confirm Password" class="enter_name confirm_password" style="border: 1px solid @borderGray;margin-bottom:12px;width: 275px;padding: 7px 14px;">
+				</div>	
 
-				<!-- <div class="company-name"> Maximum Number Of Users </div>
-				<input type="text" name="user" placeholder="Maximum Number Of Users" class="enter_name" style="border: 1px solid @borderGray;
-				margin-bottom:12px;width: 275px;padding: 7px 14px;">
-
-				<div class="company-name"> Maximum Number Of Workgroups </div>
-				<input type="text" name="workgroup" placeholder="Maximum Number Of Workgroups" class="enter_name" style="border: 1px solid @borderGray;
-				margin-bottom:12px;width: 275px;padding: 7px 14px;"> -->
-
-				<!-- <div class="company-name"> Quota (GB) </div>
-				<input type="text" name="quota" placeholder="Enter Quota in GB" class="enter_name" style="border: 1px solid @borderGray;
-				margin-bottom:12px;width: 275px;padding: 7px 14px;">
-				<div class="clear"></div> -->
-
-				<div class="company-name"> Subscription</div>
+				<div class="company-name"> Subscription </div>
 				<select id="subscription-drop" name="subscription" style="border: 1px solid #d7dbdc;margin-bottom: 12px;padding: 10px 15px;width: 305px;"></select>
 				<div class="clear"></div>
 
