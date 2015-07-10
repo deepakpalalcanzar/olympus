@@ -6,23 +6,18 @@ var TempAccountController = {
 	register: function(req, res){
 
         var request = require('request');
-    
-        console.log("*******************************************");
-            console.log(req);
-        console.log("*******************************************");
-    
         var options = {
-    		uri: 'http://localhost:1337/tempaccount/register/' ,
+    		uri   : 'http://localhost:1337/tempaccount/register/' ,
     		method: 'POST',
         };
 
-
-        options.json =  {
-        	name            : req.param('name'),
+        options.json = {
+        	name            : req.param('first_name')+' '+req.param('last_name'),
         	email           : req.param('email'),
         	password        : req.param('password'),
             is_enterprise   : req.param('user_type'),
-        	enterprise_name : req.param('enterprise_name')
+            enterprise_name : req.param('enterprise_name'),
+        	ip_address : req.param('ip_address')
         };
 
 		request(options, function(err, response, body) {

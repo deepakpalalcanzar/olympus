@@ -17,6 +17,7 @@ var AuthController = {
 					email: req.param('email')
 				}
 			}).done(function(err, account) {
+
 				if (err) return res.send(500,err);
 
 				if(!AuthenticationService.checkPassword(req.param('password'), account.password)) {
@@ -27,22 +28,26 @@ var AuthController = {
 				// Let's generate an access token
 				var today = new Date();
 				var code = AuthenticationService.randString(15);
+
 				AccountDeveloper.create({
-					api_key: req.param('api_key'),
-					account_id: account.id,
-					code: code,
-					access_token: AuthenticationService.randString(15),
-					refresh_token: AuthenticationService.randString(15),
-					code_expires: new Date(today.getTime() + 1000 * 30), // code expires in 30 seconds
-					access_expires: new Date(today.getTime() + 1000 * 60 * 60), // access token expires in one hour
-					refresh_expires: new Date(today.getTime() + 1000 * 60 * 60 * 24 * 14) // refresh token expires in 14 days
+
+					api_key 		: req.param('api_key'),
+					account_id 		: account.id,
+					code 			: code,
+					access_token 	: AuthenticationService.randString(15),
+					refresh_token 	: AuthenticationService.randString(15),
+					code_expires 	: new Date(today.getTime() + 1000 * 30), // code expires in 30 seconds
+					access_expires 	: new Date(today.getTime() + 1000 * 60 * 60), // access token expires in one hour
+					refresh_expires : new Date(today.getTime() + 1000 * 60 * 60 * 24 * 14) // refresh token expires in 14 days
+
 				}).done(function done (err, accountDev) {
 					if(err) res.send(500);
 					res.json({
 						access_token: accountDev.access_token,
 						expires_in: 3600,
 						token_type: "bearer",
-						refresh_token: accountDev.refresh_token
+						refresh_token: accountDev.refresh_token,
+						is_enterprise: account.is_enterprise
 					});
 				});
 			});

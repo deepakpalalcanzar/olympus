@@ -8,120 +8,84 @@ var RedirectController = {
     redirect: function (req, res) {
 
 
-      console.log("Testing if i am bale to reach here.");
+        console.log("Testing if i am bale to reach here.");
 // hack the session bro
-    var _session = {
-        authenticated: true,
-        Account: req.session.Account
-    };
+        var _session = {
+            authenticated: true,
+            Account: req.session.Account
+        };
 
 // Strip original headers of host and connection status
-    var headers = req.headers;
-    delete headers.host;
-    delete headers.connection;
+        var headers = req.headers;
+        delete headers.host;
+        delete headers.connection;
 
 // Build options for request
-    var options = {
-        uri: 'http://localhost:1337' + req.path,
-        method: req.method,
-        headers: headers
-    };
+        var options = {
+            uri: 'http://localhost:1337' + req.path,
+            method: req.method,
+            headers: headers
+        };
 
-    if(req.method === 'POST' && req.url == '/files/content') { 
+        if(req.method === 'POST' && req.url == '/files/content') { 
 
-        options.uri += "?_session="+JSON.stringify(_session);
-        var proxyReq = req.pipe(request.post(options));
-        proxyReq.on('data', function(data) {
-            try {
-      		    console.log(data);
-            	data = JSON.parse(data.toString('utf8'));
-            }
-            catch(e) {
-                data = {error: 'unknown error'};
-            }
+            options.uri += "?_session="+JSON.stringify(_session);
+            var proxyReq = req.pipe(request.post(options));
+            proxyReq.on('data', function(data) {
+
+                try {
+                	data = JSON.parse(data.toString('utf8'));
+                }
+                catch(e) {
+                    data = {error: 'unknown error'};
+                }
           
-            if (data.error) {return res.json(data, 500);}
-            if (data.origParams) {return afterUpload(data);}
+                if (data.error) {return res.json(data, 500);}
+                if (data.origParams) {return afterUpload(data);}
 // Get dir subscribers
-            var subscribers = Directory.roomName(data.parentId);
+                var subscribers = Directory.roomName(data.parentId);
 
 // Broadcast a message to everyone watching this INode to update
 // accordingly.
-            SocketService.broadcast('UPLOAD_PROGRESS', subscribers, {
-                id: data.parentId,
-                filename: data.name,
-                percent: data.percent
+                SocketService.broadcast('UPLOAD_PROGRESS', subscribers, {
+                    id: data.parentId,
+                    filename: data.name,
+                    percent: data.percent
+                });
             });
-        });
         
-        proxyReq.on('error', function(err) {
-            return res.send(500);
-        });
-        
-        return;
-    }
-    else if(req.url.match(/^\/file\/download\//) || req.url.match(/^\/file\/open\//)) {
-
-        File.find(req.param('id')).success(function (fileModel) {
-// If we have a file model to work with...
-        if (fileModel) {
-            
-// If the "open" param isn't set, force the file to download
-            if (!req.url.match(/^\/file\/open\//)) {
-                res.setHeader('Content-disposition', 'attachment; filename=\"' + fileModel.name + '\"');
-            }
-
-          // set content-type header
-            res.setHeader('Content-Type', fileModel.mimetype);
-            options.uri = "http://localhost:1337/file/download/"+fileModel.fsName+"?_session="+JSON.stringify(_session);
-            var proxyReq = request.get(options).pipe(res);
-            
-            proxyReq.on('error', function(err) {res.send(err, 500)});
-
-        }
-
- ///////// new line
-//             var sql = "SELECT * FROM file WHERE id=?";          
-//             sql = Sequelize.Utils.format([sql, req.param('id')]);
-//             sequelize.query(sql, null, {
-//                 raw: true
-//             }).success(function(dirs) {
-//                 var obj = dirs;
-//                 var filename  = obj[0].name;
-// /// Create Loggingggggggggggggg
-//                 var opts = {
-//                     uri: 'http://localhost:1337/logging/register/' ,
-//                     method: 'POST',
-//                 };
-          
-//                 opts.json =  {
-//                     user_id     : req.session.Account.id,
-//                     text_message: 'has downloaded '+filename+'.',
-//                     activity    : 'downloaded',
-//                     on_user     : req.session.Account.id,
-//                 };
-
-//                 request(opts, function(err1, response1, body1) {
-//                     if(err1) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
-//                     res.send(200);
-//                 });
-
-// /// Create Loggingggggggggggggg
-//                 // res.json(dirs, 200);
-//             });
-////////////// new line
-        }).error(function(err){res.send(err, 500);});
-        
+            proxyReq.on('error', function(err) {
+                return res.send(500);
+            });
             return;
         }
-    // Set Body payload if this is a POST or PUT request
-    else if(req.method === 'POST' || req.method === 'PUT' || req.method === 'DELETE') {
+        else if(req.url.match(/^\/file\/download\//) || req.url.match(/^\/file\/open\//)) {
 
-      var body = req.body || {};
-      body._session = _session;
-      options.body = JSON.stringify(body);
-      
-    }
+            File.find(req.param('id')).success(function (fileModel) {
+// If we have a file model to work with...
+                if (fileModel) {
+// If the "open" param isn't set, force the file to download
+                    if (!req.url.match(/^\/file\/open\//)) {
+                        res.setHeader('Content-disposition', 'attachment; filename=\"' + fileModel.name + '\"');
+                    }
+
+          // set content-type header
+                    res.setHeader('Content-Type', fileModel.mimetype);
+                    options.uri = "http://localhost:1337/file/download/"+fileModel.fsName+"?_session="+JSON.stringify(_session);
+                    var proxyReq = request.get(options).pipe(res);
+            
+                    proxyReq.on('error', function(err) {res.send(err, 500)});
+                }
+
+            }).error(function(err){res.send(err, 500);});
+                return;
+            }
+    // Set Body payload if this is a POST or PUT request
+            else if(req.method === 'POST' || req.method === 'PUT' || req.method === 'DELETE') {
+                var body = req.body || {};
+                body._session = _session;
+                options.body = JSON.stringify(body);
+            }
 
     // Make a request to the new API
     request(options, after);

@@ -13,7 +13,7 @@ exports.sendWelcomeEmail = function (options, cb) {
   mandrill('/messages/send', {
     message: {
       "subject": "Welcome to Olympus",
-      "from_email": "info@balderdash.co",
+      "from_email": "info@olympus.co",
       "from_name": "Olympus",
       "to": [{
         "email": account.email,

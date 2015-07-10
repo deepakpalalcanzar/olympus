@@ -265,25 +265,35 @@ var AccountController = {
 				res.json(directory, 200);
 	        });
 
+
 		}else{
 
 			Account.findAll({
 				where: ['id='+req.session.Account.id],
 			}).success(function(accounts) {
 
-				if(accounts.created_by == null){
-			        Directory.findAll({ 
-			        	where : [ '((deleted = 0 OR deleted IS NULL) and (OwnerId ='+req.session.Account.id+'))'],
-			        }).success(function(directory){
-						res.json(directory, 200);
-			        });
-				}else{
-			        Directory.findAll({ 
-			        	where : [ 'deleted != 1 and OwnerId = '+owner_id ],
-			        }).success(function(directory){
-						res.json(directory, 200);
-			        });
-				}
+
+			var sql = "SELECT account.*,subscription.features, adminuser.admin_profile_id, "+
+						"adminuser.id as adminuser_id , enterprises.name as enterprise_name, enterprises.id as enterprises_id FROM account "+
+						"LEFT JOIN subscription ON account.subscription_id=subscription.id "+
+						"LEFT JOIN adminuser ON account.id=adminuser.user_id "+
+						"LEFT JOIN enterprises ON account.created_by=enterprises.account_id "+
+						"WHERE account.is_enterprise=0 and account.deleted != 1 and account.created_by=?";
+
+			sql = Sequelize.Utils.format([sql, userId]);
+				// if(accounts.created_by == null){
+			 //        Directory.findAll({ 
+			 //        	where : [ '((deleted = 0 OR deleted IS NULL) and (OwnerId ='+req.session.Account.id+'))'],
+			 //        }).success(function(directory){
+				// 		res.json(directory, 200);
+			 //        });
+				// }else{
+			 //        Directory.findAll({ 
+			 //        	where : [ 'deleted != 1 and OwnerId = '+owner_id ],
+			 //        }).success(function(directory){
+				// 		res.json(directory, 200);
+			 //        });
+				// }
 
 			});
 		}

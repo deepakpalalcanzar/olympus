@@ -413,23 +413,23 @@ exports.destroy = function(options, cb) {
 		options.model.find(options.id).error(cb).success(function(inode) {
 
 
-			DeletedList.create({
-	            name      	: 'test',
-    	        type        : '1',
-        	    deleted_id  : '1',
-            	createdAt 	: 'alsdasklal'
-	        }).exec(function foundAccount (err, account) {
+			// DeletedList.create({
+	  //           name      	: 'test',
+   //  	        type        : '1',
+   //      	    deleted_id  : '1',
+   //          	createdAt 	: 'alsdasklal'
+	  //       }).exec(function foundAccount (err, account) {
 	
-	        	console.log("err err err errerr errerr err errerr errerr");
-		        	console.log(err);
-		        	console.log(account);
-	        	console.log("err err err errerr errerr err errerr errerr");
+	  //       	console.log("err err err errerr errerr err errerr errerr");
+		 //        	console.log(err);
+		 //        	console.log(account);
+	  //       	console.log("err err err errerr errerr err errerr errerr");
 	
-	        });
+	  //       });
 
-			console.log("INSIDE remove function INSIDE INSIDE INSIDE INSIDE INSIDE INSIDE");
-				console.log(inode);
-			console.log("INSIDE remove function INSIDE INSIDE INSIDE INSIDE INSIDE INSIDE");
+			// console.log("INSIDE remove function INSIDE INSIDE INSIDE INSIDE INSIDE INSIDE");
+			// 	console.log(inode);
+			// console.log("INSIDE remove function INSIDE INSIDE INSIDE INSIDE INSIDE INSIDE");
 
 			inode.rm(function(err) {
 				if (err) return cb(err);

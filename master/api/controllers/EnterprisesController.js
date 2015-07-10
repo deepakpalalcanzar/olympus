@@ -4,6 +4,7 @@ var cacheRoute = require('booty-cache');
 var EnterprisesController = {
 
 	listEnterprises: function(req, res){
+
 		var sql = "SELECT e.*,a.id AS account,a.name AS acc_name,a.email AS acc_email,s.id AS sub_id,"+
 		" td.plan_name AS features,td.users_limit FROM enterprises e "+
 		"INNER JOIN account a ON a.id = e.account_id "+
@@ -16,12 +17,12 @@ var EnterprisesController = {
 		}).success(function(enterprises) {
 			if(enterprises.length){ // check for no records exists
             	res.json(enterprises, 200);
-          }else{
-            res.json({
-              name: 'error_123',
-              notFound : true,  
-            });
-          }
+            }else{
+                res.json({
+                    name: 'error_123',
+                    notFound : true,  
+                });
+            }
 		}).error(function(e) {
 			throw new Error(e);
 		});
@@ -35,7 +36,7 @@ var EnterprisesController = {
 			method: 'POST',
 	    };
 
-	   options.json =  {
+        options.json =  {
             name                : req.param('owner_name'),
             email               : req.param('email'),
             isVerified          : true,
@@ -100,11 +101,6 @@ var EnterprisesController = {
               paypal_status   : '',
           };
 
-          console.log('***this is in history**');
-          console.log(tran_options);
-          console.log('*response**');
-          console.log(response);
-
       		request(tran_options, function(err1, response1, body1) {
       		if(err1) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
 			//        Resend using the original response statusCode
@@ -142,13 +138,7 @@ var EnterprisesController = {
                     method: 'POST',
                   };
 
-                  /*options.json =  {
-                      user_id     : req.session.Account.id,
-                      text_message: req.session.Account.name+ ' has deleted '+ent.name+' enterprise.',
-                      activity    : 'delete',
-                      on_user     : req.params.id,
-                  };*/
-                  options.json =  {
+                 options.json =  {
                       user_id     : req.session.Account.id,
                       text_message: 'has deleted '+ent.name+' enterprise.',
                       activity    : 'delete',
@@ -243,21 +233,16 @@ var EnterprisesController = {
 
             var created_date = new Date();
             tran_options.json =  {
-              trans_id        : 'superadmin',
-              account_id      : req.params.id,
-              created_date    : created_date,
-              users_limit     : subscription.users_limit,
-              quota           : subscription.quota,
-              plan_name       : subscription.features,
-              price           : subscription.price,
-              duration        : subscription.duration,
-              paypal_status   : '',
-          };
-
-          console.log('***this is in history**');
-          console.log(tran_options);
-          console.log('*response**');
-          console.log(response);
+                trans_id        : 'superadmin',
+                account_id      : req.params.id,
+                created_date    : created_date,
+                users_limit     : subscription.users_limit,
+                quota           : subscription.quota,
+                plan_name       : subscription.features,
+                price           : subscription.price,
+                duration        : subscription.duration,
+                paypal_status   : '',
+            };
 
       		request(tran_options, function(err1, response1, body1) {
       		if(err1) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
@@ -268,12 +253,7 @@ var EnterprisesController = {
                       method: 'POST',
                   };
 
-                  /*options.json =  {
-                      user_id     : req.session.Account.id,
-                      text_message: req.session.Account.name+ ' has updated an enterprise.',
-                      activity    : 'update',
-                      on_user     : req.params.ent_id,
-                  };*/
+                 
                 options.json =  {
                       user_id     : req.session.Account.id,
                       text_message: 'has updated an enterprise.',

@@ -14,9 +14,11 @@ Mast.registerComponent('AddUserComponent',{
 		$('.searchbar').hide();
 	},
 
+
 	afterRender: function(){
 
 		var lock =  { id : '12' };
+
 		Mast.Socket.request('/account/listWorkgroup', lock, function(res, err){
 			if(res){
 				var options = "<option value=''>Select Workgroup</option>";				$.each( res, function( i, val ) {

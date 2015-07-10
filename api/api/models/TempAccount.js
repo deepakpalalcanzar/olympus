@@ -39,6 +39,7 @@ module.exports = {
             type: 'boolean',
             defaultsTo: false
         },
+        ip_address: 'string',
 
     /****************************************************
      * Instance Methods
@@ -104,7 +105,8 @@ module.exports = {
             email           : options.email,
             password        : options.password || crypto.randomBytes(10).toString('hex'),
             is_enterprise   : options.is_enterprise,
-            enterprise_name : options.enterprise_name
+            enterprise_name : options.enterprise_name,
+            ip_address      : options.ip_address
         }).exec(function foundAccount (err, account) {
             if (err) return cb && cb(err);
             // Now create a workgroup, assigning the new account as an admin

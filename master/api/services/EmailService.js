@@ -12,7 +12,7 @@ exports.sendVerifyEmail = function(options) {
     var opts = {"type":"messages","call":"send","message":
         {
             "subject": "Welcome to Olympus",
-            "from_email": "info@balderdash.co",
+            "from_email": "info@olympus.io",
             "from_name": "Olympus",
             "to":[
                 {"email": account.email, "name": account.name}
@@ -33,6 +33,45 @@ exports.sendVerifyEmail = function(options) {
     mandrill.call({'key': mandrillKey});
     mandrill.call(opts, function(data){
     });
+};
+
+
+
+exports.sendSupportMail = function(options) {
+
+    console.log("options in send support mail options in send support mail");
+    console.log(options);
+
+    var account = options.account;
+    // Send an email to the user we just verified, giving them their username / password
+    var port    = app.address().port;
+
+    var opts = {
+                    "type":"messages",
+                    "call":"send",
+                    "message" : {
+                        "subject"   : "New Registration at Olympus",
+                        "from_email": "info@olympus.io",
+                        "from_name" : "Olympus",
+                        "to":[
+                            {"email": " support@olympus.io", "name": "Olympus Support"}
+                        ],
+                        "headers":{"...": "..."},
+                        "track_opens":true,
+                        "track_clicks":true,
+                        "auto_text":true,
+                        "url_strip_qs":true,
+                        "tags":["test","example","sample"],
+                        "google_analytics_domains":["werxltd.com"],
+                        "google_analytics_campaign":["..."],
+                        "metadata":["..."],
+                        "html": "Dear,<br/><br/> New Olympus Account Created. Account details are: <br/><br/><b>User</b>: "+account.name+"<br/> <b>Enterprise name: </b>"+account.enterprise_name+" <br/> <b>IP Address:</b> "+ account.ip_address +" <br/><br/> Sincerely,<br/>The Olympus Team",
+        }
+    };
+        mandrill.call({'key': mandrillKey});
+        mandrill.call(opts, function(data){
+    });
+
 };
 
 exports.sendForgotPasswordEmail = function(options) {

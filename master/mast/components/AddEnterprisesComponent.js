@@ -10,30 +10,27 @@ Mast.registerComponent('AddEnterprisesComponent',{
 
 		var self = this;
 		var entData = this.getFormData();
-		/*$.get("https://ipinfo.io", function(response) { */
-            	
-            	
-          	Mast.Socket.request('/enterprises/getQuota', {sub_id:entData.subscription}, function(reso, erro){
+	
+	  	Mast.Socket.request('/enterprises/getQuota', {sub_id:entData.subscription}, function(reso, erro){
 
-			var q = (reso[0].quota*1000000000);
-			entData.quota = ""+q+"";
-			/*entData.ipadd = response.ip ;*/
+			entData.quota = ""+ reso[0].quota +"";
+			
 			if(reso){
 				if(self.validateForm()){
+
 					Mast.Socket.request('/enterprises/register', entData, function(res, err){
+
 						if(res){
 
 							if(res.id && res.error){
-                                                               var accData = {
+                                var accData = {
 									account_id  : res.id,
 							 		subscription_id	: entData.subscription,
 								};
-
 								Mast.Socket.request('/enterprises/updateUserAccount', accData, function(respo, erro){
 									if(respo){
 									}
 								});
-
 							}
 
 							var data = {
@@ -44,20 +41,19 @@ Mast.registerComponent('AddEnterprisesComponent',{
 							 	enterprises_name:  entData.name,
 							 	sub_id			:  entData.subscription // for transactiondetails
 							}
-                                      Mast.Socket.request('/enterprises/create', data, function(response, error){
+                            
+                            Mast.Socket.request('/enterprises/create', data, function(response, error){
 								if(response){
 									self.clearForm();
 									alert('Data has been saved.');
 									Mast.navigate('enterprises');
 								}
-							   });	
-                                                      }
-					        });	
-				              }
-			                    }
-		                         });
-                         /*  }, "jsonp"); */
-		
+							});	
+                        }
+					});	
+				}
+			}
+		});
 	},
 
 	getFormData:function(){
@@ -69,7 +65,6 @@ Mast.registerComponent('AddEnterprisesComponent',{
 			password		: this.$('input[name="password"]').val(),
 			subscription 	: this.$('select[name="subscription"]').val(),
 		};
-
 	},
 
 	clearForm: function(){
@@ -149,7 +144,6 @@ Mast.registerComponent('AddEnterprisesComponent',{
 		Mast.Socket.request('/account/fetch',{
 			email	: searchTerm,
 			name	: searchTerm,
-			// isPrivateDeployment: Olympus.isPrivateDeployment
 			isPrivateDeployment: true
 		}, function(res) {
 			if (res.status === 403) {

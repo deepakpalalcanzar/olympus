@@ -56,6 +56,7 @@ module.exports = {
           defaultsTo: false
         },
 
+        
         deleteDate: 'datetime',
         isLocked: {
           type: 'boolean',
@@ -165,6 +166,7 @@ module.exports = {
             title           : options.title,
             is_enterprise   : options.is_enterprise,
             subscription_id :  options.subscription_id,
+            
 
         }).exec(function foundAccount (err, account) {
 

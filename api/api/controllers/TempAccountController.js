@@ -44,8 +44,9 @@ var TempAccountController = {
                 password          : req.param('password'),
                 is_enterprise     : req.param('is_enterprise'),
                 enterprise_name   : req.param('enterprise_name'),
+                ip_address        : req.param('ip_address'),
             };
-
+            
             TempAccount.createAccount(options, function(err, account) {
 
                 if (err) return res.json({

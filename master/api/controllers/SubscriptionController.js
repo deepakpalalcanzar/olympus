@@ -157,7 +157,7 @@ var SubscriptionController = {
             if(subscription.length === 1){
 
                 // res.redirect("https://localhost/subscription/free/1/"+req.session.tempId);
-                res.redirect("https://dev.olympus.io/subscription/free/1/"+req.session.tempId);
+                res.redirect("/subscription/free/1/"+req.session.tempId);
             }else{
                 res.view('subscription/index',{
                     subscription : subscription,
@@ -250,6 +250,13 @@ var SubscriptionController = {
                             };
 
                             request(ent_options, function(err11, response11, body11) {
+
+                                console.log("printing host and account information.");
+                                console.log(account);
+
+                                EmailService.sendSupportMail({
+                                    account: account[0]
+                                });
 
                                 if(err11) return res.json({ error: err11.message, type: 'error' }, response11 && response11.statusCode);
                                     /* Redirect to dashboard code */
