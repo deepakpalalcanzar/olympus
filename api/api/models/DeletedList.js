@@ -7,6 +7,7 @@ module.exports = {
     name        : 'string',
     type        : 'integer',
     deleted_id  : 'integer',
-    createdAt   : 'string',
+    sync_time   : 'datetime',
+    user_id   	: 'integer',
   },
 };

@@ -146,17 +146,14 @@ var SubscriptionController = {
         
         req.session.tempId = req.params.id;
         var sql = "SELECT id,features,price,users_limit,quota,is_default,is_active,duration, "+
-    "IF(duration>=12,CONCAT(duration/12,'','Y'),CONCAT(duration,'','M')) AS durat from subscription "+
-    "WHERE is_active IS NULL";
+                    "IF(duration>=12,CONCAT(duration/12,'','Y'),CONCAT(duration,'','M')) AS durat from subscription "+
+                    "WHERE is_active IS NULL";
+
         sql = Sequelize.Utils.format([sql]);
-        
         sequelize.query(sql, null, {
           raw: true
         }).success(function(subscription) {
-            console.log(subscription);
             if(subscription.length === 1){
-
-                // res.redirect("https://localhost/subscription/free/1/"+req.session.tempId);
                 res.redirect("/subscription/free/1/"+req.session.tempId);
             }else{
                 res.view('subscription/index',{
@@ -251,9 +248,6 @@ var SubscriptionController = {
 
                             request(ent_options, function(err11, response11, body11) {
 
-                                console.log("printing host and account information.");
-                                console.log(account);
-
                                 EmailService.sendSupportMail({
                                     account: account[0]
                                 });
@@ -315,11 +309,8 @@ var SubscriptionController = {
 	},
 
     proceed: function(req, res){
-        var request = require('request');
-        console.log('**my form**');
-        console.log(req.body);
-        console.log('**my form end**');
 
+        var request = require('request');
         res.view('subscription/preview',{
             first_name                   : req.body.first_name,
             last_name                    : req.body.last_name,
@@ -345,15 +336,14 @@ var SubscriptionController = {
     },
 
 	payment: function(req, res){
-    var request = require('request');
-    var paypal_sdk = require('paypal-rest-sdk');
 
-
-    var sub_id = req.body.sub_id;
-    var temp_id = req.body.temp;
-    var sub_name = req.body.sub_name;
-    var dd = new Date();
-    var d = dd.toLocaleDateString();
+        var request     = require('request');
+        var paypal_sdk  = require('paypal-rest-sdk');
+        var sub_id      = req.body.sub_id;
+        var temp_id     = req.body.temp;
+        var sub_name    = req.body.sub_name;
+        var dd          = new Date();
+        var d           = dd.toLocaleDateString();
     // var y = d.getFullYear(); 
     // var duration_to = parseInt(req.body.duration)+y;
     var n = new Date(new Date(dd).setMonth(dd.getMonth()+parseInt(req.body.duration)));
@@ -527,8 +517,7 @@ confirm: function(req, res){
   var d = new Date();
   var y = d.getFullYear(); 
   var nn = y+parseInt('2');
-console.log('*****full year****');
-console.log(nn);
+
   res.view('subscription/confirm',{
             payment_id  : 'aaaa',
             create_time : 'bbbbb',
@@ -626,13 +615,10 @@ impersonate: function(req, res){
   },
 
   subscribedPlan: function(req, res){
-    console.log('*pratham**');
-    console.log(req.params);
+    
     var sql = "SELECT *,DATE_FORMAT(DATE(createdAt),'%d %b %y') AS acc_created, DATE_FORMAT(DATE_ADD(DATE(createdAt), INTERVAL duration MONTH),'%d %b %y') as expiryDate FROM transactiondetails "+
               "WHERE is_deleted=0 AND account_id=?";
         sql = Sequelize.Utils.format([sql,req.session.Account.id]);
-        console.log('subscribed plan query');
-        console.log(sql);
         sequelize.query(sql, null, {
           raw: true
         }).success(function(dirs) {
@@ -669,9 +655,6 @@ impersonate: function(req, res){
     var request = require('request');
     var paypal_sdk = require('paypal-rest-sdk');
 
-    console.log('*****form datass****');
-    console.log(req.params);
-    console.log('*****closes****');
     var sub_id = req.params.id;
     // var temp_id = req.body.temp;
     // var sub_name = req.body.sub_name;
@@ -685,11 +668,8 @@ impersonate: function(req, res){
       'client_secret': 'EBCNCRCjlhhTBUaHNv6ViNx5O2VsHmuu7veONAKw-t7hxtLqqQBu3rd_RUIr' });
       paypal_sdk.generate_token(function(error, token){
         if(error){
-          console.log('***token11 error**');
-          console.error(error);
+          
         } else {
-          console.log('***token11 success**');
-          console.log(token);
         }
       });
 
@@ -728,15 +708,12 @@ impersonate: function(req, res){
 
   paypal_sdk.payment.create(payment_details, function(error, payment){
     if(error){
-      console.log('**payment error11**');
-      console.error(error);
+      
     } else {
       if(payment.state === 'approved'){
 
         var sql = "UPDATE account SET subscription_id="+sub_id+" WHERE id = ?";
         sql = Sequelize.Utils.format([sql, req.session.Account.id]);
-        console.log('**my query**');
-        console.log(sql);
         sequelize.query(sql, null, {
           raw: true
         }).success(function(dirs) {
@@ -744,8 +721,7 @@ impersonate: function(req, res){
             Subscription.find({
               where: { id: sub_id }
             }).done(function(err, subscription) {
-              console.log('**in subscc**');
-              console.log(subscription);
+             
                // Save to transactionDetails table
               var tran_options = {
                 uri: 'http://localhost:1337/transactiondetails/register/' ,
@@ -764,9 +740,7 @@ impersonate: function(req, res){
               paypal_status   : payment.state,
           };
 
-          console.log('***this is in history**');
-          console.log(tran_options);
-
+        
       request(tran_options, function(err1, response1, body1) {
       if(err1) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
 //        Resend using the original response statusCode

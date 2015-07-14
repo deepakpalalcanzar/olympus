@@ -178,7 +178,6 @@ var AccountController = {
 		Account.findAll({
 			where: ['deleted = 0 AND created_by = '+ req.session.Account.id],
 		}).success(function(accounts) {
-			console.log(accounts);
 			res.json(accounts, 200);
 		});
 	},
@@ -188,7 +187,6 @@ var AccountController = {
 		Account.findAll({
 			where: ['deleted = 0 AND created_by = '+ req.params.id],
 		}).success(function(accounts) {
-			console.log(accounts);
 			res.json(accounts, 200);
 		});
 
@@ -245,30 +243,77 @@ var AccountController = {
 	},
 
 	listWorkgroup: function(req, res){
+		console.log("List Workgroup");
+		var response = [];
+		Directory.findAll({
+			where: [' deleted != 1 AND OwnerId = '+ req.session.Account.id],
+		}).success(function(directory) {
 
-		if(req.session.Account.isSuperAdmin === 1){
+			directory.forEach(function(dir)  {
 
-	        Directory.findAll({ 
-	        	where : [ '(deleted = 0 OR deleted IS NULL)'],
-	        }).success(function(directory){
-				res.json(directory, 200);
-	        });
+				Directory.findAll({
+					where: [' deleted != 1 AND DirectoryId = '+ dir.id],
+				}).success(function(subdir) {
+					
+					console.log(subdir);
+					console.log();
 
-		}else{
 
-			Account.findAll({
-				where: ['id='+req.session.Account.id],
-			}).success(function(accounts) {
-				var sql = "SELECT account.*,subscription.features, adminuser.admin_profile_id, "+
+
+				});
+
+				console.log("account account account account account account");
+				console.log(directory);
+
+			});
+		});
+
+/*		var sql = "Select * from directory where OwnerId=?";
+		sql 	= Sequelize.Utils.format([sql, req.session.Account.id]);
+		console.log(sql);
+
+		sequelize.query(sql, null, {
+			raw: true
+		}).success(function(accounts) {
+
+
+			console.log("newuser newuser newuser newuser newuser newuser newuser");
+			console.log(accounts);
+			accounts.forEach(function(account)  {
+				console.log("account account account account account account");
+				console.log(account);
+			});
+
+
+
+
+
+
+		});
+*/
+		// if(req.session.Account.isSuperAdmin === 1){
+
+	 //        Directory.findAll({ 
+	 //        	where : [ '(deleted = 0 OR deleted IS NULL)'],
+	 //        }).success(function(directory){
+		// 		res.json(directory, 200);
+	 //        });
+
+		// }else{
+
+		// 	Account.findAll({
+		// 		where: ['id='+req.session.Account.id],
+		// 	}).success(function(accounts) {
+				/*var sql = "SELECT account.*,subscription.features, adminuser.admin_profile_id, "+
 						"adminuser.id as adminuser_id , enterprises.name as enterprise_name, enterprises.id as enterprises_id FROM account "+
 						"LEFT JOIN subscription ON account.subscription_id=subscription.id "+
 						"LEFT JOIN adminuser ON account.id=adminuser.user_id "+
 						"LEFT JOIN enterprises ON account.created_by=enterprises.account_id "+
 						"WHERE account.is_enterprise=0 and account.deleted != 1 and account.created_by=?";
 
-				sql = Sequelize.Utils.format([sql, userId]);
-			});
-		}
+				sql = Sequelize.Utils.format([sql, userId]);*/
+		// 	});
+		// }
     },
 
 /*

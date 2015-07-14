@@ -160,11 +160,13 @@ exports.move = function(req, res, cb) {
 	}
 
 	async.auto({
+
 		getSourcePermissions: function(cb) {
 			sourcePermissionClass.find({
 				where: sourceCriteria
 			}).success(_.unprefix(cb));
 		},
+
 		getDestPermissions: function(cb) {
 			DirectoryPermission.find({
 				where: {
@@ -174,6 +176,7 @@ exports.move = function(req, res, cb) {
 				}
 			}).success(_.unprefix(cb));
 		}
+		
 	}, function(err, response) {
 		if(response.getSourcePermissions === null) {
 			if (!cb) {
@@ -398,7 +401,7 @@ exports.destroy = function(options, cb) {
 	    		};
 
 				request(opts, function(err, response, body) {
-					if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
+					// if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
 	      			
 	      			Directory.updateParentDirectorySizes(file.DirectoryId, -file.size, remove);
 	    		});
@@ -410,37 +413,34 @@ exports.destroy = function(options, cb) {
 	}
 
 	function remove() {
+
 		options.model.find(options.id).error(cb).success(function(inode) {
-
-
-			// DeletedList.create({
-	  //           name      	: 'test',
-   //  	        type        : '1',
-   //      	    deleted_id  : '1',
-   //          	createdAt 	: 'alsdasklal'
-	  //       }).exec(function foundAccount (err, account) {
-	
-	  //       	console.log("err err err errerr errerr err errerr errerr");
-		 //        	console.log(err);
-		 //        	console.log(account);
-	  //       	console.log("err err err errerr errerr err errerr errerr");
-	
-	  //       });
-
-			// console.log("INSIDE remove function INSIDE INSIDE INSIDE INSIDE INSIDE INSIDE");
-			// 	console.log(inode);
-			// console.log("INSIDE remove function INSIDE INSIDE INSIDE INSIDE INSIDE INSIDE");
-
-			inode.rm(function(err) {
-				if (err) return cb(err);
-				SocketService.broadcast('ITEM_TRASH', options.model.roomName(options.id), {
-					id: options.id
-				});
-				cb();
-			});
 			
+			var dt 			= new Date();
+			var datetime 	= dt.getFullYear() + "-" + (dt.getMonth()+1)  + "-"  + dt.getDate() + "  " + dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
+			var type 		= inode.__factory.name === 'File' ? '1' : '2' ;
+			var sql 		= "Insert into deletedlist ( name, type, deleted_id, createdAt, updatedAt, user_id ) VALUES ( '"+ inode.name +"', '"+ type +"', '"+ inode.id +"', '"+ datetime +"', '"+ datetime +"',  '"+ options.accountId +"')";
+			sql 			= Sequelize.Utils.format([sql]);
+			
+			sequelize.query(sql, null, {
+				raw: true
+			}).success(function(models) {
+
+				inode.rm(function(err) {
+					if (err) return cb(err);
+					SocketService.broadcast('ITEM_TRASH', options.model.roomName(options.id), {
+						id: options.id
+					});
+					cb();
+				});
+
+			}).error(function(e) {
+				throw new Error(e);
+			});
+
 		});
 	}
+
 };
 
 /*

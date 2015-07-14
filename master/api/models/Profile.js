@@ -16,7 +16,7 @@ Profile = Model.extend({
 	classMethods : {
 
 		createProfile: function (options, cb) {
-			console.log(options);
+
 			Profile.create({
 				name 			: options.name,
 				user_managment 	: options.user_managment,
@@ -28,6 +28,7 @@ Profile = Model.extend({
 				superadmins 		: options.manage_superadmin,
 				manage_admin_user 	: options.manage_admin_user,
 				admin_id 			: options.admin_id	
+
 			}).done(function (err, versionResult){
 				return cb();
 			});

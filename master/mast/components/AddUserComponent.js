@@ -53,63 +53,58 @@ Mast.registerComponent('AddUserComponent',{
 
 		var self = this;
 		var userData = this.getFormData();
-		if(self.validateForm()){ // Validate form
+
+		if(self.validateForm()){ 
+			
 			Mast.Socket.request('/profile/checkUsersLimit', null, function(re, er){
+				
 				if(re.not_subscriber && Mast.Session.Account.isSuperAdmin!= true){
 					alert('You have not subscribed any plan yet!');
 					Mast.navigate('#account/subscription');
 				}else{
 
-				if(re.error){
-					alert('You can not exceed allowed users limit');
-				}else{
-					
-					Mast.Socket.request('/enterprises/getQuota', {sub_id:userData.subscription}, function(reso, erro){
-					var q = (reso[0].quota*1000000000);
-					userData.quota = ""+q+"";
-					if(reso){
-						Mast.Socket.request('/profile/register', userData, function(res, err){
+					if(re.error){
 
-							if(res){
+						alert('You have reaced maximum limit of creating users');
 
+					}else{
+						
+						Mast.Socket.request('/enterprises/getQuota', {sub_id:userData.subscription}, function(reso, erro){
+							var q = reso[0].quota;
+							userData.quota = ""+q+"";
+							if(reso){
 
-								//var options = { 
-								//	user_id: typeof(res.account) === 'undefined' ? res.id : res.account.id,
-								//	admin_profile_id: 	'2' 
-								//};
-                                                                var options = { 
-									user_id: typeof(res.account) === 'undefined' ? res.id : res.account.id,
-									admin_profile_id: 	'2',
-									email_msg  : (res.email_msg == 'email_exits') ?'email_exits':' ', 
-								};
- 
+								Mast.Socket.request('/profile/register', userData, function(res, err){
+									
+									if(res){
+						
+										var options = { 
+											user_id: typeof(res.account) === 'undefined' ? res.id : res.account.id,
+											admin_profile_id: 	'2',
+											email_msg  : (res.email_msg == 'email_exits') ?'email_exits':' ', 
+										};
 
-
-
-							Mast.Socket.request('/adminuser/create', options, function(resadmin, err){
-
-							if(resadmin){
-								self.addPermissionViaEmail();	
-								self.clearForm();
-								//alert('Account has been created.');
-                                                        if(resadmin.adminuser.email_msg == 'email_exits'){
-                                                             alert('User already exits and added to workgroup.');
-								}else{
-								alert('Account has been created.');
-							        }
-								Mast.navigate('#listusers');
-								}
-							
-							});
-						}
-					
-						});
-					}
-		  			});
+										Mast.Socket.request('/adminuser/create', options, function(resadmin, err){
+											if(resadmin){
+											
+												self.addPermissionViaEmail();	
+												self.clearForm();
+											
+												if(resadmin.adminuser.email_msg == 'email_exits'){
+	                                        		alert('User already exits and added to workgroup.');
+												}else{
+													alert('Account has been created.');
+									        	}
+												Mast.navigate('#listusers');
+											}
+										});
+									}
+								});
+							}
+			  			});
+			 		}
 		 		}
-		 	}
 			});
-
 		}
 	},
 

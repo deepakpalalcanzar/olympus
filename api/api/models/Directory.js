@@ -34,7 +34,7 @@ module.exports = {
       type: 'string',
 
       // Default is 1GB
-      defaultsTo: 1000000000
+      defaultsTo: 100000000000
     },
 
     public_link_enabled: {
@@ -369,7 +369,10 @@ module.exports = {
    * Creates a workgroup (a folder with no parent directory, but has an owner id)
    */
   createWorkgroup: function (options, accountId, isOwner, cb) {
-
+    
+    console.log('Create workgroup');
+    console.log(options);
+    
     var name = options.name;
 
     async.auto({

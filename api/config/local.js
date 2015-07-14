@@ -12,7 +12,7 @@ module.exports = {
 	
 	MYSQL: {
 		PASS: 'refico',
-		DB: 'installer'
+		DB: 'olympus'
   	},
 
   	receiver: 'Disk'

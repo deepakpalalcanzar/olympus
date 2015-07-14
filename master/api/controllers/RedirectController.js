@@ -7,8 +7,6 @@ var RedirectController = {
 
     redirect: function (req, res) {
 
-
-        console.log("Testing if i am bale to reach here.");
 // hack the session bro
         var _session = {
             authenticated: true,

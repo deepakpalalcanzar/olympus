@@ -7,6 +7,6 @@ module.exports = {
   },
   MYSQL: {
     PASS: 'refico',
-    DB: 'installler'
+    DB: 'olympus'
   }
 }

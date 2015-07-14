@@ -12,6 +12,7 @@ var AccountController = {
 
     register: function (req, res) {
 
+
         if (!req.param('email')) return res.json({
             error: 'No email provided',
             type: 'error'
@@ -60,6 +61,9 @@ var AccountController = {
                 ip              : ''
 
             };
+            
+            console.log("options options options options options");
+            console.log(options);
 
             Account.createAccount(options, function(err, account) {
 

@@ -63,7 +63,7 @@ _.extend(module.exports,{
 							options.accountId && basicSet.push(options.accountId);
 							basicSet = Sequelize.Utils.format(basicSet);
 
-				console.log(basicSet);
+				
 
 				sequelize.query(basicSet,File).done(cb);
 			}

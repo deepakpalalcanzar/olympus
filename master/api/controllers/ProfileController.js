@@ -218,31 +218,33 @@ var ProfileController = {
 
     assignPermission: INodeService.addPermission,
 
-    //check for users limit
-    checkUsersLimit: function(req, res){
+//check for users limit
+
+    checkUsersLimit: function(req, rest){
+     
+        var user_id = (typeof req.session === "undefined") ?  req.id :  req.session.Account.id;
         var sql = "SELECT users_limit FROM transactiondetails WHERE is_deleted!=1 AND account_id=? ";
-        sql = Sequelize.Utils.format([sql,req.session.Account.id]);
+        sql = Sequelize.Utils.format([sql, user_id]);
         sequelize.query(sql, null, {
-          raw: true
+            raw: true
         }).success(function(transaction) {
             //Check user has subscribed any plan or not
             if(transaction.length){
+
                 var sql =   "SELECT COUNT(id) AS total FROM account WHERE created_by=? ";
-                sql     =   Sequelize.Utils.format([sql,req.session.Account.id]);
-                            sequelize.query(sql, null, {
-                                raw: true
-                            }).success(function(acc) {
-                                if(acc[0].total >= transaction[0].users_limit){
-                                    return res.json({error:true});
-                                }else{
-                                    return res.json({error:false});
-                                }  
-                            });
+                sql     =   Sequelize.Utils.format([sql, user_id]);
+                sequelize.query(sql, null, {
+                    raw: true
+                }).success(function(acc) {
+                    if(acc[0].total >= transaction[0].users_limit){
+                        return rest.json({ error:true, msg : 'You have reaced maximum limit of creating users.' });
+                    }else{
+                        return rest.json({error:false});
+                    }  
+                });
 
             }else{
-                res.json({
-                   not_subscriber: true,
-                });
+                rest.json({ not_subscriber: true });
             } 
         });
     },
@@ -250,6 +252,7 @@ var ProfileController = {
 
     //check for workgroup limit
     checkWorkgroupLimit: function(req, res){
+
         var sql = "SELECT workgroup_limit FROM transactiondetails WHERE is_deleted!=1 AND account_id=? ";
         sql = Sequelize.Utils.format([sql,req.session.Account.id]);
         sequelize.query(sql, null, {
@@ -293,9 +296,10 @@ var ProfileController = {
     apiRegister: function(req, res){
 
         var request = require('request');
-        var sql11 = "SELECT account_id FROM accountdeveloper WHERE access_token=?";
-        sql11 = Sequelize.Utils.format([sql11, req.param('access_token')]);
-
+        
+        var sql11   = "SELECT account_id FROM accountdeveloper WHERE access_token=?";
+        sql11       = Sequelize.Utils.format([sql11, req.param('access_token')]);
+        
         sequelize.query(sql11, null, {
             raw: true
         }).success(function(accountDev) {
@@ -306,81 +310,99 @@ var ProfileController = {
                     where: { id: accountDev[0].account_id }
                 }).done(function(err, account) {
 
-                    var options = {
-                        uri: 'http://localhost:1337/account/register/' ,
-                        method: 'POST',
-                    };
+                   var sql = "SELECT users_limit FROM transactiondetails WHERE is_deleted!=1 AND account_id=? ";
+                    sql = Sequelize.Utils.format([sql, accountDev[0].account_id]);
+                    sequelize.query(sql, null, {
+                        raw: true
+                    }).success(function(transaction) {
+                        //Check user has subscribed any plan or not
+                        if(transaction.length){
 
-                    options.json =  {
-                        name            : req.param('name'),
-                        email           : req.param('email'),
-                        isVerified      : true,
-                        isAdmin         : false,
-                        password        : req.param('password'),
-                        created_by      : account.id,
-                        workgroup       : req.param('workgroup'),
-                        title           : req.param('title'),
-                        subscription    : req.param('subscription'),
-                        created_by_name : account.name,//for logging
-                    };
+                            var sql =   "SELECT COUNT(id) AS total FROM account WHERE deleted != 1 and created_by=? ";
+                            sql     =   Sequelize.Utils.format([sql, accountDev[0].account_id]);
+                            
+                            sequelize.query(sql, null, {
+                                raw: true
+                            }).success(function(acc) {
 
-                    request(options, function(err, response, body) {
-        
-                        if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
+                                if(acc[0].total >= transaction[0].users_limit){
 
-                        if(body.type == 'error'){
-                            return res.json({error:body.error});
-                        }
+                                    return res.json({ error: true, msg : 'You have reached maximum limit of creating users.' });
 
-                        req.body.id         = req.param('workgroup');
-                        req.body.owned_by   = body.account.id;
-                        req.body.permission = 'comment';
+                                }else{
+                                            
+                                    Subscription.find({
+                                        where: { id: req.param('subscription') }
+                                    }).done(function(err, subscription) {
+                    
+                                        var options = {
+                                            uri: 'http://localhost:1337/account/register/' ,
+                                            method: 'POST'
+                                        };
 
-                        // ProfileController.assignPermission(req, function(err, permission){
-                        //     console.log("GOt the response");
-                        //     console.log(err);
-                        //     console.log(res);
-                        //     console.log("!!!!!!!!!!!!!!!!!!! GOt the response !!!!!!!!!!!!!!!!!!!");
-                        // });
-                        
-// save data to transactiondetails table
-                        Subscription.find({
-                            where: { id: req.param('subscription') }
-                        }).done(function(err, subscription) {
+                                        options.json =  {
+                                            name            : req.param('name'),
+                                            email           : req.param('email'),
+                                            isVerified      : true,
+                                            isAdmin         : false,
+                                            password        : req.param('password'),
+                                            created_by      : account.id,
+                                            workgroup       : req.param('workgroup'),
+                                            title           : req.param('title'),
+                                            subscription    : req.param('subscription'),
+                                            created_by_name : account.name,
+                                            quota           : subscription.quota
+                                        };
 
-// Save to transactionDetails table
-                            var tran_options = {
-                                uri: 'http://localhost:1337/transactiondetails/register/',
-                                method: 'POST',
-                            };
+                                        request(options, function(err, response, body) {
+                                    
+                                            if(err) return res.json({ error: true, msg: err.message }, response && response.statusCode);
+                                            if(body.type == 'error'){
 
-                            var created_date = new Date();  
+                                                return res.json({ error: true, msg: body.error });
+                                            }
 
-                            tran_options.json =  {
-                                trans_id        : (account.isSuperAdmin === 1)?'superadmin':'workgroupadmin',
-                                account_id      : body.account.id,
-                                created_date    : created_date,
-                                users_limit     : subscription.users_limit,
-                                quota           : subscription.quota,
-                                plan_name       : subscription.features,
-                                price           : subscription.price,
-                                duration        : subscription.duration,
-                                paypal_status   : '',
-                            };
+                                            req.body.id         = req.param('workgroup');
+                                            req.body.owned_by   = body.account.id;
+                                            req.body.permission = 'comment';
 
-                            request(tran_options, function(err1, response1, body1) {
-                                if(err1) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
-                                ProfileController.assignPermission(req, res, function(err, resp){
-                                    res.json(body, response && response.statusCode);
-                                });                                
-                                
+                                            // Save to transactionDetails table
+                                            var tran_options = {
+                                                uri: 'http://localhost:1337/transactiondetails/register/',
+                                                method: 'POST',
+                                            };
+
+                                            var created_date = new Date();  
+
+                                            tran_options.json =  {
+                                                trans_id        : (account.isSuperAdmin === 1)?'superadmin':'workgroupadmin',
+                                                account_id      : body.account.id,
+                                                created_date    : created_date,
+                                                users_limit     : subscription.users_limit,
+                                                quota           : subscription.quota,
+                                                plan_name       : subscription.features,
+                                                price           : subscription.price,
+                                                duration        : subscription.duration,
+                                                paypal_status   : '',
+                                            };
+
+                                            request(tran_options, function(err1, response1, body1) {
+                                                if(err1) return res.json({ error: true, msg: err1.message }, response1 && response1.statusCode);
+                                                ProfileController.assignPermission(req, res, function(err, resp){
+                                                    res.json(body, response && response.statusCode);
+                                                });                                
+                                            });
+                                        }); // end transaction history
+                                    });
+                                }  
                             });
-
-                        }); // end transaction history
+                        }else{
+                            res.json({ error: true, msg: 'not subscribed' });
+                        } 
                     });
                 });
             }else{
-                res.json({ notAuth: 'not autorized'});
+                res.json({ error: true, msg: 'not autorized'});
             }
         });        
     },

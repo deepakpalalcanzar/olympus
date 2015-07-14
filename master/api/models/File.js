@@ -34,7 +34,6 @@ File = Model.extend({
 		*/
 		upload: function (options, cb) {
 
-			console.log(options);
 			// define cleanup behavior for onAbort event
 			var uploadedFile, uploadBufferComplete = false;
 			

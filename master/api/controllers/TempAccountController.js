@@ -178,13 +178,11 @@ var TempAccountController = {
 
         var accessToken = req.param('access_token');
         var lastSync    = req.param('lastsync');
-
         var datetime = new Date();
         var lastCall = datetime.getFullYear()+'-'+(datetime.getMonth() + 1)+'-'+datetime.getDate()+' '+datetime.getHours()+':'+datetime.getMinutes()+':'+datetime.getSeconds();
-
         var sql = "SELECT account_id from accountdeveloper where access_token =?";
-        sql = Sequelize.Utils.format([sql, accessToken]);
 
+        sql = Sequelize.Utils.format([sql, accessToken]);
         sequelize.query(sql, null, {
             raw: true
         }).success(function(accounts) {
@@ -193,41 +191,23 @@ var TempAccountController = {
             var sql, sqlFile;
 
             if(lastSync === '0'){
-                sql = "SELECT d.* from directory d JOIN directorypermission dp ON d.id = dp.DirectoryId where (d.deleted = 1) and dp.AccountId =?";
+                sql = "SELECT * from deletedlist where user_id = ?";
                 sql = Sequelize.Utils.format([sql, accounts[0].account_id]);
             }else{
-                sql = "SELECT d.* from directory d JOIN directorypermission dp ON d.id = dp.DirectoryId where (d.deleted = 1) and dp.AccountId =? and d.createdAt>?";
+                sql = "SELECT d.* from directory d JOIN directorypermission dp ON d.id = dp.DirectoryId where (d.deleted = 1) and dp.AccountId =? and d.sync_time >?";
                 sql = Sequelize.Utils.format([sql, accounts[0].account_id, lastSync]);
             }
 
             sequelize.query(sql, null, {
                 raw: true
             }).success(function(dirs) {
-
+                
                 if(dirs.length > 0){
                     response['0'] = dirs;
                 }
 
-                if(lastSync === '0'){
-                    sqlFile = "SELECT f.* from file f JOIN filepermission fp ON f.id = fp.FileId where (f.deleted = 1) and fp.AccountId=?";
-                    sqlFile     = Sequelize.Utils.format([sqlFile, accounts[0].account_id]);
-                }else{
-                    sqlFile = "SELECT f.* from file f JOIN filepermission fp ON f.id = fp.FileId where (f.deleted = 1) and fp.AccountId=? and f.createdAt>?";
-                    sqlFile = Sequelize.Utils.format([sqlFile, accounts[0].account_id, lastSync]);
-                }
-
-                sequelize.query(sqlFile, null, {
-                    raw: true
-                }).success(function(files) {
-                                  
-                    if(files.length > 0){
-                        response['1'] = files;
-                    }
-
-                    response['2'] = lastCall;
-                    res.json(response);
-                });
             });
+
         });
 
     },
