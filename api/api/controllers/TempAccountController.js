@@ -39,7 +39,8 @@ var TempAccountController = {
             }
 
             var options = {
-                name              : req.param('name'),
+                first_name      : req.param('first_name'),
+                last_name       : req.param('last_name'),
                 email             : req.param('email'),
                 password          : req.param('password'),
                 is_enterprise     : req.param('is_enterprise'),

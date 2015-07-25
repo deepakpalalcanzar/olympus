@@ -143,19 +143,16 @@ module.exports = {
   // creates an account, returning a promise if no callback is specified
     createAccount: function (options, cb) {
 
-        console.log('######################## Create Users #######################');
-        console.log(options);
-
-        var name     = options.name || options.email;
-        var email    = options.email;
-        var password =  options.password || crypto.randomBytes(10).toString('hex');
-        var isAdmin  = options.isAdmin || false;
-        var verificationCode=  crypto.randomBytes(20).toString('hex');
-        var verified    = options.isVerified;
-        var created_by  = options.created_by;
-        var title       = options.title;
-        var is_enterprise = options.is_enterprise;
-        var subscription_id= options.subscription_id;
+        var name                = options.name || options.email;
+        var email               = options.email;
+        var password            = options.password || crypto.randomBytes(10).toString('hex');
+        var isAdmin             = options.isAdmin || false;
+        var verificationCode    = crypto.randomBytes(20).toString('hex');
+        var verified            = options.isVerified;
+        var created_by          = options.created_by;
+        var title               = options.title;
+        var is_enterprise       = options.is_enterprise;
+        var subscription_id     = options.subscription_id;
 
         Account.create({
 

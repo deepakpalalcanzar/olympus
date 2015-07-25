@@ -28,17 +28,22 @@ module.exports = {
             required: true
         },
 
-        name: {
-            type: 'string',
-            minLength: 3,
-            maxLength: 25,
-            required: true
-        },
+
+        first_name : 'string',
+        last_name  : 'string',
+
+        // name: {
+        //     type: 'string',
+        //     minLength: 3,
+        //     maxLength: 25,
+        //     required: true
+        // },
 
         is_enterprise: {
             type: 'boolean',
             defaultsTo: false
         },
+        
         ip_address: 'string',
 
     /****************************************************

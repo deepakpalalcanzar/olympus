@@ -62,9 +62,6 @@ var AccountController = {
 
             };
             
-            console.log("options options options options options");
-            console.log(options);
-
             Account.createAccount(options, function(err, account) {
 
                 if (err) return res.json({
