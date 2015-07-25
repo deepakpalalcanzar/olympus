@@ -6,12 +6,22 @@ Mast.registerComponent('AddUserComponent',{
 	outlet: '#content',
 	events:{
 		'click .setting-save-button': 'addUser',
+		// 'blur  .user-email'				: 'checkForEmail'
+	},	
+
+	model : {
+		superadmin : false,
 	},
+	
 	collection	: 'Account',
 
 	init: function(){
+
 		var lock =  { id : '12' };
 		$('.searchbar').hide();
+		if(Mast.Session.Account.isSuperAdmin){
+			this.model.set('superadmin', true);
+		}
 	},
 
 
@@ -52,32 +62,22 @@ Mast.registerComponent('AddUserComponent',{
 	addUser:function(){
 
 		var self = this;
-		var userData = this.getFormData();
-
+		var userData = this.getFormData();	
 		if(self.validateForm()){ 
-			
 			Mast.Socket.request('/profile/checkUsersLimit', null, function(re, er){
-				
 				if(re.not_subscriber && Mast.Session.Account.isSuperAdmin!= true){
 					alert('You have not subscribed any plan yet!');
 					Mast.navigate('#account/subscription');
 				}else{
-
 					if(re.error){
-
 						alert('You have reaced maximum limit of creating users');
-
 					}else{
-						
 						Mast.Socket.request('/enterprises/getQuota', {sub_id:userData.subscription}, function(reso, erro){
 							var q = reso[0].quota;
 							userData.quota = ""+q+"";
 							if(reso){
-
 								Mast.Socket.request('/profile/register', userData, function(res, err){
-									
 									if(res){
-						
 										var options = { 
 											user_id: typeof(res.account) === 'undefined' ? res.id : res.account.id,
 											admin_profile_id: 	'2',
@@ -86,10 +86,12 @@ Mast.registerComponent('AddUserComponent',{
 
 										Mast.Socket.request('/adminuser/create', options, function(resadmin, err){
 											if(resadmin){
-											
-												self.addPermissionViaEmail();	
+												
+												if(!Mast.Session.Account.isSuperAdmin && this.$('select[name="workgroup"]').val()!=''){
+													self.addPermissionViaEmail();	
+												}
+
 												self.clearForm();
-											
 												if(resadmin.adminuser.email_msg == 'email_exits'){
 	                                        		alert('User already exits and added to workgroup.');
 												}else{
@@ -109,14 +111,12 @@ Mast.registerComponent('AddUserComponent',{
 	},
 
 	getFormData:function(){
-
 		var name, first_name, last_name, userName, email, title,
 			workgroup, role, password, quota;
 
 		first_name 	= this.$('input[name="first_name"]').val();
 		last_name	= this.$('input[name="last_name"]').val();
 		userName 	= first_name+' '+last_name;
-
 		return {
 			name 	 : userName,
 			email	 : this.$('input[name="email"]').val(),
@@ -129,7 +129,6 @@ Mast.registerComponent('AddUserComponent',{
 	},
 
 	clearForm: function(){
-
 		this.$('input[name="first_name"]').val('');
 		this.$('input[name="last_name"]').val('');
 		this.$('input[name="email"]').val('');
@@ -138,36 +137,110 @@ Mast.registerComponent('AddUserComponent',{
 		this.$('input[name="password"]').val('');
 		this.$('input[name="title"]').val('');
 		this.$('input[name="quota"]').val('');
-
 	},
 
 	validateForm: function(){
+
+		this.clearFormCSS();
+		var email = this.$('input[name="email"]').val();
 		if (this.$('input[name="first_name"]').val() === '') {
-			alert('Please enter first name !');
+			$(".userFirstName").append("<span class='error_span'> Please enter your first name. </span>");
+    		$(".user-first-name").css({ "border" : "1px solid red" });
 			return false;
-		}else if(this.$('input[name="last_name"]').val() ===''){
-			alert('Please enter last name !');
-			return false;
-		}else if(this.$('input[name="email"]').val() ===''){
-			alert('Please enter email !');
-			return false;
-		}else if(this.$('select[name="workgroup"]').val() !=='' && this.$('select[name="role"]').val() ===''){
-			alert('Please select role !');
-			return false;
-		}else if(this.$('input[name="password"]').val() ===''){
-			alert('Please enter password !');
-			return false;
-		}else if(this.$('select[name="subscription"]').val() ===''){
-			alert('Please select subscription !');
-			return false;
-		}else if(!this.isValidPassword()){
-			alert('Password and confirm password did not match !');
-			return false;
-		}else{
-			return true;
 		}
+		
+		if(email===''){
+			$(".userEmail").append("<span class='error_span'> Please enter your email. </span>");
+    		$(".user-email").css({ "border" : "1px solid red" });
+			return false;
+		}
+
+		var re = /^(([^<>()\[\]\\.,;:\s@\"]+(\.[^<>()\[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+		if (re.test(email) === false) {
+			$(".userEmail").append("<span class='error_span'> Email entered is not valid. </span>");
+    		$(".user-email").css({ "border" : "1px solid red" });
+    		return false;
+		}
+
+
+		if(this.$('input[name="password"]').val() ===''){
+			// if($(".userPassword").attr('style') !== 'display: none;'){
+				$(".userPassword").append("<span class='error_span'> Please enter your password. </span>");
+    			$(".user-password").css({ "border" : "1px solid red" });
+				return false;
+			// }
+		}
+
+		if(!this.isValidPassword()){
+			// if($(".userConfirmPassword").attr('style') !== 'display: none;'){	
+				$(".userConfirmPassword").append("<span class='error_span'> Confirm password does not match. </span>");
+				$(".user-confirm-password").css({ "border" : "1px solid red" });
+				return false;
+			// }
+		}
+
+		if(!this.get('superadmin')){
+			if(this.$('select[name="workgroup"]').val() !=='' && this.$('select[name="role"]').val() ===''){
+				$(".userRole").append("<span class='error_span'> Please assign workgroup role for user. </span>");
+				$(".user-role").css({ "border" : "1px solid red" });
+				return false;
+			}
+		}
+
+		if(this.$('select[name="subscription"]').val() ===''){
+			$(".userSubscripton").append("<span class='error_span'> Confirm password does not match. </span>");
+			$(".user-subscription").css({ "border" : "1px solid red" });
+			return false;
+		}
+		
+		return true;
+
 	},
 
+	clearFormCSS : function(){
+
+		$(".userFirstName .error_span").remove();
+		$(".userEmail .error_span").remove();
+		$(".userPassword .error_span").remove();
+		$(".userConfirmPassword .error_span").remove();
+		$(".userRole .error_span").remove();
+		$(".userSubscripton .error_span").remove();
+
+		$(".user-first-name").css({ "border" : "1px solid #d7dbdc" });
+    	$(".user-email").css({ "border" : "1px solid #d7dbdc" });
+    	$(".user-password").css({ "border" : "1px solid #d7dbdc" });
+    	$(".user-confirm-password").css({ "border" : "1px solid #d7dbdc" });
+    	$(".user-role").css({ "border" : "1px solid #d7dbdc" });
+    	$(".user-subscription").css({ "border" : "1px solid #d7dbdc" });
+
+	},
+
+	// checkForEmail: function(){
+
+	// 	$(".userEmail .error_span").remove();
+	// 	var email = this.$('input[name="email"]').val();
+	// 	var filter = /^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
+
+ //    	if (filter.test(email)) {
+ //    		$(".user-email").css({ "border" : "1px solid #d7dbdc" });
+ //    		var data = { email :  email }
+	// 		Mast.Socket.request('/account/checkEmail', data, function(response, error){
+	// 			if(response.msg === "email_exists"){
+	// 				$(".userPassword").hide();					
+	// 				$(".userConfirmPassword").hide();					
+	// 			}else if (response.msg === "no_record"){
+	// 				$(".userPassword").show();					
+	// 				$(".userConfirmPassword").show();	
+	// 			}
+	// 		});	
+ //    	}else {
+
+	// 		$(".userPassword").show();					
+	// 		$(".userConfirmPassword").show();	
+ //    		$(".userEmail").append("<span class='error_span'> Email entered is not valid. </span>");
+ //    		$(".user-email").css({ "border" : "1px solid red" });
+ //    	}
+	// },
 
 	isValidPassword: function() {
 		var password, checkPassword;
@@ -204,7 +277,6 @@ Mast.registerComponent('AddUserComponent',{
 // Send a request to add permission for this user, who may or may not exist.
 // If they don't exist, they'll be added
 		else {
-			console.log("WORKED!",emails);
 			Mast.Socket.request('/directory/addPermission',{
 				id: workgroup,
 				email: emails,

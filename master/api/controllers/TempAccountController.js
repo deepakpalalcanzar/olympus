@@ -12,12 +12,13 @@ var TempAccountController = {
         };
 
         options.json = {
-        	name            : req.param('first_name')+' '+req.param('last_name'),
+        	first_name      : req.param('first_name'),
+            last_name       : req.param('last_name'),
         	email           : req.param('email'),
         	password        : req.param('password'),
             is_enterprise   : req.param('user_type'),
             enterprise_name : req.param('enterprise_name'),
-        	ip_address : req.param('ip_address')
+        	ip_address      : req.param('ip_address')
         };
 
 		request(options, function(err, response, body) {
@@ -59,8 +60,9 @@ var TempAccountController = {
 
     // For getting number of shared on dashboard
     sharedDirectory: function(req, res){
+        
         var sql = "SELECT * FROM directorypermission WHERE AccountId=? ";
-        sql = Sequelize.Utils.format([sql,req.session.Account.id]);
+        sql = Sequelize.Utils.format([sql, req.session.Account.id]);
         sequelize.query(sql, null, {
             raw: true
         }).success(function(dirs) {
@@ -178,11 +180,12 @@ var TempAccountController = {
 
         var accessToken = req.param('access_token');
         var lastSync    = req.param('lastsync');
-        var datetime = new Date();
-        var lastCall = datetime.getFullYear()+'-'+(datetime.getMonth() + 1)+'-'+datetime.getDate()+' '+datetime.getHours()+':'+datetime.getMinutes()+':'+datetime.getSeconds();
+        var datetime    = new Date();
+        var lastCall    = datetime.getFullYear()+'-'+(datetime.getMonth() + 1)+'-'+datetime.getDate()+' '+datetime.getHours()+':'+datetime.getMinutes()+':'+datetime.getSeconds();
+        
         var sql = "SELECT account_id from accountdeveloper where access_token =?";
-
         sql = Sequelize.Utils.format([sql, accessToken]);
+
         sequelize.query(sql, null, {
             raw: true
         }).success(function(accounts) {
@@ -191,27 +194,29 @@ var TempAccountController = {
             var sql, sqlFile;
 
             if(lastSync === '0'){
-                sql = "SELECT * from deletedlist where user_id = ?";
+                sql = "SELECT * from deletedlist where account_id = ?";
                 sql = Sequelize.Utils.format([sql, accounts[0].account_id]);
             }else{
-                sql = "SELECT d.* from directory d JOIN directorypermission dp ON d.id = dp.DirectoryId where (d.deleted = 1) and dp.AccountId =? and d.sync_time >?";
+                sql = "SELECT * from deletedlist where account_id = ? and createdAt > ?";
                 sql = Sequelize.Utils.format([sql, accounts[0].account_id, lastSync]);
             }
 
             sequelize.query(sql, null, {
                 raw: true
-            }).success(function(dirs) {
-                
-                if(dirs.length > 0){
-                    response['0'] = dirs;
+            }).success(function(deletedlist) {
+
+                if(deletedlist.length > 0){
+                    response['0'] = deletedlist;
                 }
+                
+                response['1'] = lastCall;
+                res.json(response);
 
             });
 
         });
 
     },
-
 
 
 };_.extend(exports, TempAccountController);

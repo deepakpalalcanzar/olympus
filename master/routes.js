@@ -383,6 +383,11 @@ module.exports = {
     action: 'dataSyncing'
   },
 
+  '/tempaccount/listDeletedItems/:access_token/:lastsync': {
+    controller: 'tempaccount',
+    action: 'listDeletedItems'
+  },
+
   // iNode Routes
 
 
@@ -432,6 +437,11 @@ module.exports = {
   '/files/content': {
     controller: 'directory',
     action: 'upload'
+  },
+
+  '/file/createComment': {
+    controller: 'file',
+    action: 'createComment'
   },
 
   '/files/:id': {

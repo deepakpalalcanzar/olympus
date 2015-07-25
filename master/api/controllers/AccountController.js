@@ -242,55 +242,24 @@ var AccountController = {
 
 	},
 
+
 	listWorkgroup: function(req, res){
-		console.log("List Workgroup");
-		var response = [];
-		Directory.findAll({
-			where: [' deleted != 1 AND OwnerId = '+ req.session.Account.id],
-		}).success(function(directory) {
 
-			directory.forEach(function(dir)  {
+		if(req.session.Account.isSuperAdmin){
+			var sql = "SELECT dir.id, dir.name FROM directory dir JOIN directorypermission dp ON dir.id = dp.DirectoryId";
+			sql 	= Sequelize.Utils.format([sql]);
+		}else{
+			var sql = "SELECT dir.id, dir.name FROM directory dir JOIN directorypermission dp ON dir.id = dp.DirectoryId  where dp.AccountId =? and dp.type='admin'";
+			sql 	= Sequelize.Utils.format([sql, req.session.Account.id]);
+		}
 
-				Directory.findAll({
-					where: [' deleted != 1 AND DirectoryId = '+ dir.id],
-				}).success(function(subdir) {
-					
-					console.log(subdir);
-					console.log();
-
-
-
-				});
-
-				console.log("account account account account account account");
-				console.log(directory);
-
-			});
-		});
-
-/*		var sql = "Select * from directory where OwnerId=?";
-		sql 	= Sequelize.Utils.format([sql, req.session.Account.id]);
-		console.log(sql);
 
 		sequelize.query(sql, null, {
 			raw: true
-		}).success(function(accounts) {
-
-
-			console.log("newuser newuser newuser newuser newuser newuser newuser");
-			console.log(accounts);
-			accounts.forEach(function(account)  {
-				console.log("account account account account account account");
-				console.log(account);
-			});
-
-
-
-
-
-
+		}).success(function(directory) {
+			res.json(directory, 200);
 		});
-*/
+
 		// if(req.session.Account.isSuperAdmin === 1){
 
 	 //        Directory.findAll({ 
@@ -315,6 +284,16 @@ var AccountController = {
 		// 	});
 		// }
     },
+
+    getNestedWorkgroups: function(req, res){
+    	Directory.findAll({
+			where: [' deleted != 1 AND DirectoryId = '+ dir.id],
+		}).success(function(subdir) {
+			console.log(subdir);
+			console.log();
+		});
+    },
+
 
 /*
 	This function is used get the list of all workgroups of any individual users
@@ -413,7 +392,7 @@ var AccountController = {
 			id		: req.param('id'),
 			accId 	: req.session.Account.id, //for logging
 			accName : req.session.Account.name, //for logging
-			ipadd  	:   req.param('ipadd'),
+			ipadd  	: req.param('ipadd'),
 		};
 		
 		request(options, function(err, response, body) {

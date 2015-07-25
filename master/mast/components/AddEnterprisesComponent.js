@@ -83,26 +83,35 @@ Mast.registerComponent('AddEnterprisesComponent',{
     	$(".confirm_password").css({ "border" : "1px solid #d7dbdc" });
 
 		if (this.$('input[name="enterprises_name"]').val() === '') {
+
 			$(".enterprise_name").append("<span class='error_span'> Please enter a enterprise name. </span>");
     		$(".enterpriseName").css({ "border" : "1px solid red" });
 			return false;
-		}else if(this.$('input[name="owner_name"]').val() ===''){
+
+		}else if(this.$('input[name="owner_name"]').val() === ''){
+
 			$(".owner_name").append("<span class='error_span'> Please enter a owner name. </span>");
     		$(".ownerName").css({ "border" : "1px solid red" });
 			return false;
-		}else if(this.$('input[name="password"]').val() ===''){
+
+		}else if(this.$('input[name="password"]').val() === ''){
+			
 			if($(".password").attr('style') !== 'display: none;'){
 				$(".password").append("<span class='error_span'> Please enter a password. </span>");
 	    		$(".enter_password").css({ "border" : "1px solid red" });
 				return false;
 			}
+
 		}else if(!this.isValidPassword()){
+
 			if($(".confirmPassword").attr('style') !== 'display: none;'){
 				$(".confirmPassword").append("<span class='error_span'> Confirm password does not match. </span>");
 	    		$(".confirm_password").css({ "border" : "1px solid red" });
 				return false;
 			}
+
 			return false;
+
 		}else{
 			return true;
 		}

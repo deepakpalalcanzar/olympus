@@ -265,6 +265,50 @@ exports.move = function(req, res, cb) {
 
 },
 
+
+/**
+	Create new records entry in the table
+	Whenever someone try to delete the file and directory
+*/
+exports.deletedFileInfo = function(options, cb) {
+
+	var dt 		= new Date();
+	var datetime= dt.getFullYear()+"-"+(dt.getMonth()+1)+"-"+dt.getDate()+" "+dt.getHours()+":"+dt.getMinutes()+":"+dt.getSeconds();
+
+	if(options.model.name == "Directory"){
+
+		DirectoryPermission.findAll({
+			where: {  DirectoryId : options.id  } 
+		}).success(function(directorypermission) {
+			directorypermission.forEach(function(dirpermission)  {
+				var sql 	= "Insert into deletedlist ( type, deleted_id, createdAt, updatedAt, user_id, account_id ) VALUES ( '"+ 2 +"', '"+ dirpermission.DirectoryId +"', '"+ datetime +"', '"+ datetime +"',  '"+ options.accountId +"', '"+ dirpermission.AccountId +"')";
+				sql 		= Sequelize.Utils.format([sql]);
+				sequelize.query( sql, null, { raw: true } );
+			});
+		}).error(function(err) {
+			throw new Error(err);
+		});
+
+
+	}else if(options.model.name == "File"){
+
+		FilePermission.findAll({
+			where: {  FileId : options.id  } 
+		}).success(function(filepermission) {	
+			filepermission.forEach(function(filepermission)  {
+				var sql 	= "Insert into deletedlist ( type, deleted_id, createdAt, updatedAt, user_id, account_id ) VALUES ( '"+ 1 +"', '"+ filepermission.FileId +"', '"+ datetime +"', '"+ datetime +"',  '"+ options.accountId +"', '"+ filepermission.AccountId +"')";
+				sql 		= Sequelize.Utils.format([sql]);
+				console.log(sql);
+				sequelize.query( sql, null, { raw: true } );
+			});
+		}).error(function(err) {
+			throw new Error(err);
+		});
+	}
+
+}
+
+
 /**`
  * Delete the specified inode
  */
@@ -276,6 +320,14 @@ exports['delete'] = function(req, res, cb) {
 	sails.log.info('Delete:' + inodeId + ' [User:' + req.session.Account.id + ']');
 	var INodeModel = (req.param('controller') == "directory" && !req.param('replaceFileId')) ? Directory : File;
 	INodeModel.identity = (req.param('controller') == "directory" && !req.param('replaceFileId')) ? "directory" : "file";
+
+	INodeService.deletedFileInfo({
+		id 		: inodeId,
+		model 	: INodeModel,
+		replaceFileId: req.param('replaceFileId'),
+		accountId   	: req.session.Account.id,
+		accountName   	: req.session.Account.name,
+	});
 
 	var subscribers = INodeModel.roomName(inodeId);
 
@@ -413,31 +465,14 @@ exports.destroy = function(options, cb) {
 	}
 
 	function remove() {
-
 		options.model.find(options.id).error(cb).success(function(inode) {
-			
-			var dt 			= new Date();
-			var datetime 	= dt.getFullYear() + "-" + (dt.getMonth()+1)  + "-"  + dt.getDate() + "  " + dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
-			var type 		= inode.__factory.name === 'File' ? '1' : '2' ;
-			var sql 		= "Insert into deletedlist ( name, type, deleted_id, createdAt, updatedAt, user_id ) VALUES ( '"+ inode.name +"', '"+ type +"', '"+ inode.id +"', '"+ datetime +"', '"+ datetime +"',  '"+ options.accountId +"')";
-			sql 			= Sequelize.Utils.format([sql]);
-			
-			sequelize.query(sql, null, {
-				raw: true
-			}).success(function(models) {
-
-				inode.rm(function(err) {
-					if (err) return cb(err);
-					SocketService.broadcast('ITEM_TRASH', options.model.roomName(options.id), {
-						id: options.id
-					});
-					cb();
+			inode.rm(function(err) {
+				if (err) return cb(err);
+				SocketService.broadcast('ITEM_TRASH', options.model.roomName(options.id), {
+					id: options.id
 				});
-
-			}).error(function(e) {
-				throw new Error(e);
+				cb();
 			});
-
 		});
 	}
 

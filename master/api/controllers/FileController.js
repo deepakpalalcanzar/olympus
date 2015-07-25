@@ -454,12 +454,18 @@
     createComment: function(req, res){
 
         var request = require('request');
+        
+        console.log("a;sldalsdjkaskjlasjklasdjklsadjkl");
+            console.log(req);
+        console.log("a;sldalsdjkaskjlasjklasdjklsadjkl");
+
         var options = {
-            uri: 'http://localhost:1337/file/postComment/' ,
+            uri: 'http://localhost:1337/file/postComment/',
             method: 'POST',
         };
 
         var access_token = req.param('account_id');
+
         options.json =  {
             file_id     : req.param('file_id'),
             comment     : req.param('comment'),

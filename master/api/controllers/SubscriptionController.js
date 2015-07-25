@@ -174,21 +174,24 @@ var SubscriptionController = {
 
 // req.session.tempId  use this as tempaccount id 
         var sql = "SELECT * from tempaccount where id = ?";
+        console.log(sql);
+
+
         sql = Sequelize.Utils.format([sql,temp_id]);
         sequelize.query(sql, null, {
             raw: true
         }).success(function(account) {
-            
+
             var options = {
                 uri: 'http://localhost:1337/account/register/' ,
                 method: 'POST',
             };
 
             options.json =  {
-                name             : account[0].name,
+                name             : account[0].first_name+' '+account[0].last_name,
                 email            : account[0].email,
                 isVerified       : true,
-                isAdmin          : account[0].is_enterprise=='1'?true:false,
+                isAdmin          : account[0].is_enterprise== '1' ? true : false,
                 password         : account[0].password,
                 created_by       : '',
                 is_enterprise    : account[0].is_enterprise,

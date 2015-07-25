@@ -66,4 +66,5 @@ var ShareController = {
       });
     });
   }
+
 };

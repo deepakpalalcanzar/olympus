@@ -154,6 +154,7 @@ var ProfileController = {
     register: function(req, res){
 
         var request = require('request');
+        
         var options = {
             uri: 'http://localhost:1337/account/register/' ,
             method: 'POST',
@@ -181,10 +182,11 @@ var ProfileController = {
             //res.json(body, response && response.statusCode);
 
           //save data to transactiondetails table
-          Subscription.find({
-            where: { id: req.params.subscription }
+            Subscription.find({
+                where: { id: req.params.subscription }
             }).done(function(err, subscription) {
-               // Save to transactionDetails table
+                
+                // Save to transactionDetails table
                 var tran_options = {
                     uri: 'http://localhost:1337/transactiondetails/register/' ,
                     method: 'POST',
@@ -231,7 +233,7 @@ var ProfileController = {
             //Check user has subscribed any plan or not
             if(transaction.length){
 
-                var sql =   "SELECT COUNT(id) AS total FROM account WHERE created_by=? ";
+                var sql =   "SELECT COUNT(id) AS total FROM account WHERE deleted!=1 and created_by=? ";
                 sql     =   Sequelize.Utils.format([sql, user_id]);
                 sequelize.query(sql, null, {
                     raw: true

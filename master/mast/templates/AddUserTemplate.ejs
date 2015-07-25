@@ -18,47 +18,61 @@
 
 			<div class="center-mod">
 				<h3 class="company-details">New user</h3>
-				<div class="company-name">First Name</div>
-					<input type="text" name="first_name" placeholder="Enter First Name" class="enter_name" style="border: 1px solid @borderGray;
-				margin-bottom:12px;width: 275px;padding: 7px 14px;">
 
-				<div class="company-name">Last Name</div>
-					<input type="text" name="last_name" placeholder="Enter Last Name" class="enter_name" style="border: 1px solid @borderGray;
-				margin-bottom:12px;width: 275px;padding: 7px 14px;"> 
+				<div class="userFirstName">
+					<div class="company-name">First Name</div>
+					<input type="text" name="first_name" placeholder="Enter First Name" class="new-user-fields user-first-name">
+				</div>	
 
-				<div class="company-name">Email</div>
-					<input type="text" name="email" placeholder="Enter Email" class="enter_name" style="border: 1px solid @borderGray;
-				margin-bottom:12px;width: 275px;padding: 7px 14px;">
 
-				<div class="company-name">WorkGroup Name</div>
-					<select name="workgroup" id="list_workgroup" style="border: 1px solid #d7dbdc;margin-bottom: 12px;padding: 10px 15px;width: 305px;">
-					</select>
+				<div class="userLastName">
+					<div class="company-name">Last Name</div>
+					<input type="text" name="last_name" placeholder="Enter Last Name" class="new-user-fields user-last-name"> 
+				</div>	
 
+				<div class="userEmail">
+					<div class="company-name">Email</div>
+					<input type="text" name="email" placeholder="Enter Email" class="new-user-fields user-email">
+				</div>	
+
+				{% if (!superadmin) { %}
+					<div class="userWorkgroup">
+						<div class="company-name">WorkGroup Name</div>
+						<select name="workgroup" id="list_workgroup" class='new-user-select user-workgroup'></select>
+					</div>	
+
+					<div class="userRole">
+						<div class="company-name">Role</div>
+						<select name="role" class="new-user-select user-role">
+							<option value="">Select Role</option>
+							<option value="admin">Is Admin</option>
+							<option value="write">Can Edit</option>
+							<option value="comment">Can Comment</option>
+						</select>	
+					</div>	
+
+				{% } %}	
 				
-				<div class="company-name">Role</div>
-				<select name="role" style="border: 1px solid #d7dbdc;margin-bottom: 12px;padding: 10px 15px;width: 305px;">
-					<option value="">Select Role</option>
-					<option value="admin">Is Admin</option>
-					<option value="write">Can Edit</option>
-					<option value="comment">Can Comment</option>
-				</select>
+				<div class="userPassword">
+					<div class="company-name"> Password </div>
+					<input type="password" name="password" placeholder="Enter Password" class="new-user-fields user-password">
+				</div>	
 
-				<div class="company-name"> Password </div>
-				<input type="password" name="password" placeholder="Enter Password" class="enter_name" style="border: 1px solid @borderGray;
-				margin-bottom:12px;width: 275px;padding: 7px 14px;">
+				<div class="userConfirmPassword">
+					<div class="company-name"> Confirm Password </div>
+					<input type="password" name="c_password" placeholder="Confirm Password" class="new-user-fields user-confirm-password">
+				</div>
 
-				<div class="company-name"> Confirm Password </div>
-				<input type="password" name="c_password" placeholder="Confirm Password" class="enter_name" style="border: 1px solid @borderGray;
-				margin-bottom:12px;width: 275px;padding: 7px 14px;">
+				<div class="userTitle">
+					<div class="company-name"> Title </div>
+					<input type="text" name="title" placeholder="Enter Title" class="new-user-fields user-title">
+				</div>	
 
-				<div class="company-name"> Title </div>
-				<input type="text" name="title" placeholder="Enter Title" class="enter_name" style="border: 1px solid @borderGray;
-				margin-bottom:12px;width: 275px;padding: 7px 14px;">
-
-				<div class="company-name"> Subscription</div>
-				<select id="subscription-drop" name="subscription" style="border: 1px solid #d7dbdc;margin-bottom: 12px;padding: 10px 15px;width: 305px;"></select>
-				<div class="clear"></div>
-
+				<div class="userSubscripton">
+					<div class="company-name"> Subscription</div>
+					<select id="subscription-drop" name="subscription" class="new-user-select user-subscription"></select>
+					<div class="clear"></div>
+				</div>	
 			</div>  
 		</form>
 		<div class="clear"></div> 

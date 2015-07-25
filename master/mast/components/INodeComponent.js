@@ -32,16 +32,15 @@ Mast.components.INodeComponent = Mast.Tree.extend({
         var self = this;
 
 
-	Mast.on('UPLOAD_PROGRESS', function(data) {
-        	console.log("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}");
+		Mast.on('UPLOAD_PROGRESS', function(data) {
 	        if (data.files[0].name == self.model.get('name') && self.model.get('parent') && self.model.get('parent').id == data.parentId) {
-                self.$('.information-stats').hide();
-                self.$('.progress-bar').show();
-                progress = Math.round((data.loaded/data.total*100)) + '%';
-                self.$('.bar').css('width', progress);
-                self.$('.progress .number').html(progress);
-            }
-        });
+	            self.$('.information-stats').hide();
+	            self.$('.progress-bar').show();
+	            progress = Math.round((data.loaded/data.total*100)) + '%';
+	            self.$('.bar').css('width', progress);
+	            self.$('.progress .number').html(progress);
+	        }
+		});
 
         Mast.on('NEW_UPLOADING_CHILD', function(data) {
             if (data.id == self.model.id) {

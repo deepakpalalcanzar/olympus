@@ -91,9 +91,6 @@ exports.File.mini = exports.File;
 // Account
 var Account = function(model) {
 	
-	console.log("API SERVICES MODEL");
-	console.log(model);
-
 	return {
 		id 		: model.id,
 		name 	: model.name,
