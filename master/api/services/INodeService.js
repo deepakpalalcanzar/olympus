@@ -267,6 +267,7 @@ exports.move = function(req, res, cb) {
 
 
 /**
+	@alcanzar
 	Create new records entry in the table
 	Whenever someone try to delete the file and directory
 */
@@ -314,12 +315,22 @@ exports.deletedFileInfo = function(options, cb) {
  */
 exports['delete'] = function(req, res, cb) {
 
-	var request = require('request');
+	console.log("req reqreq req req req req req req req req req");
+	console.log(req);
 
-	var inodeId = req.param('replaceFileId') || req.param('id');
+	var request 		= require('request');
+	var inodeId 		= req.param('replaceFileId') || req.param('id');
+	var INodeModel;	
+	
+	if(req.param('controller') == "account"){
+		var INodeModel 		= Directory;
+		INodeModel.identity = "directory";
+	}else{
+		var INodeModel 		= (req.param('controller') == "directory" && !req.param('replaceFileId')) ? Directory : File;
+		INodeModel.identity = (req.param('controller') == "directory" && !req.param('replaceFileId')) ? "directory" : "file";
+	}
+
 	sails.log.info('Delete:' + inodeId + ' [User:' + req.session.Account.id + ']');
-	var INodeModel = (req.param('controller') == "directory" && !req.param('replaceFileId')) ? Directory : File;
-	INodeModel.identity = (req.param('controller') == "directory" && !req.param('replaceFileId')) ? "directory" : "file";
 
 	INodeService.deletedFileInfo({
 		id 		: inodeId,

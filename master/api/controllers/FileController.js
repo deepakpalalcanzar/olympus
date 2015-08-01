@@ -455,10 +455,6 @@
 
         var request = require('request');
         
-        console.log("a;sldalsdjkaskjlasjklasdjklsadjkl");
-            console.log(req);
-        console.log("a;sldalsdjkaskjlasjklasdjklsadjkl");
-
         var options = {
             uri: 'http://localhost:1337/file/postComment/',
             method: 'POST',

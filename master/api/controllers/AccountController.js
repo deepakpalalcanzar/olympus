@@ -682,19 +682,26 @@ var AccountController = {
 	},
 
 	delOwnAccount: function(req, res){
+
 		var request = require('request');
+
 		var options = {
 			uri: 'http://localhost:1337/account/del/' ,
 			method: 'POST',
 	    };
+
 	    options.json =  {
 	    	id		: req.params.id,
 	    	accId 	: req.session.Account.id, //for logging
 	    	accName : req.session.Account.name, //for logging
 	    };
-		request(options, function(err, response, body) {
-			if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
 
+		request(options, function(err, response, body) {
+
+			req.params.id = '122121212122';
+			AccountController.delete(req, res, true);	
+
+			if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
 			if(req.session.Account.isAdmin === true){
 				var sql = "UPDATE enterprises SET is_active=0 where account_id = ?";
         			sql = Sequelize.Utils.format([sql, req.params.id]);
@@ -703,13 +710,13 @@ var AccountController = {
        			}).success(function(dirs) {
        				res.json(body, response && response.statusCode);
        			});
-
 			}else{
 	      		res.json(body, response && response.statusCode);
 	      	}
-
 	    });
 	},
+
+	'delete' : INodeService["delete"],
 
 /*
 	This fucntion is called from the #addEnterprise and #reports to check 

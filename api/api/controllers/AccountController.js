@@ -205,6 +205,7 @@ var AccountController = {
         Account.findOne(req.param('id')).exec(function (err, account) {
 
             accountName = account.name;
+            
             if (err) return res.json({
                 error: err,
                 type : 'error'

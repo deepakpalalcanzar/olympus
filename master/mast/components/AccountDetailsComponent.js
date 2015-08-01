@@ -101,6 +101,7 @@ Mast.registerComponent('AccountDetails', {
 	},
 
 	deleteAccount: function(){
+
 		var self = Mast.Session.Account;
 		if(confirm('Are you sure ?')){
 			Mast.Socket.request('/account/delOwnAccount', { id: self.id}, function(res, err){
@@ -109,6 +110,7 @@ Mast.registerComponent('AccountDetails', {
 				}
 			});
 		}
+		
 	},
 
 });
