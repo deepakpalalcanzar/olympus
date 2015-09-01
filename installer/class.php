@@ -578,10 +578,10 @@ class Configuration {
                                 
                                 
                                $logo=str_replace("uploads/", "", $postData['logoimg']);
-                                
+                                $date=  date("Y-m-d H:i:s");
 				$query="INSERT INTO theme SET header_background='#$postData[HeaderColor]',footer_background='#$postData[FooterColor]'
 				,body_background='#$postData[BodyColor]',navigation_color='#$postData[NavigationBarColor]',font_color='#$postData[FontColor]'
-				,font_family='$postData[FontFamily]' ";
+				,font_family='$postData[FontFamily]',createdAt='$date',updatedAt='$date',account_id='1' ";
 				if (mysql_query($query)) {
                                         chmod ("installer/logo_crop/uploads/$logo", 0777);
                                         $source= 'logo_crop/uploads/'.$logo;
