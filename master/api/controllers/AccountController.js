@@ -1,18 +1,19 @@
 var UUIDGenerator 	= require('node-uuid');
 var cacheRoute 		= require('booty-cache');
-var fsx          	= require('fs-extra');  
+var fsx          	= require('fs-extra'); 
+
 
 var AccountController = {
 
 	'delete': function (req, res) {
-// Find the account to "delete"
-// TODO: Modify Account Queries to skip 'deleted' accounts
-// TODO: Setup a cron job to remove deleted accounts after X time has passed
-// TODO: Add a config variable for deletion pending period.
+		// Find the account to "delete"
+		// TODO: Modify Account Queries to skip 'deleted' accounts
+		// TODO: Setup a cron job to remove deleted accounts after X time has passed
+		// TODO: Add a config variable for deletion pending period.
     	Account.find(req.param('id')).done(function (err, account) {
-// Go ahead and return if we have an error.
+		// Go ahead and return if we have an error.
       	if (err) return res.json(APIService.Error(err));
-// Update the account to be marked deleted.
+			// Update the account to be marked deleted.
       		account.updateAttributes({deleted:true}).done(function (err) {
         		return res.json(err ? APIService.Error(err) : APIService.Account.mini(account));
       		});
@@ -35,17 +36,20 @@ var AccountController = {
 	},
 
     createuploadlog: function(req,res){
+
         var request = require('request');
         /*Create logging*/
        	var opts = {
             uri: 'http://localhost:1337/logging/register/' ,
             method: 'POST',
         };
+
         opts.json =  {
             user_id     : req.session.Account.id,
             text_message: 'has Uploaded a File '+req.params.name,
             activity    : 'Uploaded',
             on_user     : req.session.Account.id,
+            ip     		: req.session.Account.ip
         };
 
         request(opts, function(err1) {
@@ -194,9 +198,8 @@ var AccountController = {
 
 
 	listUsers: function(req, res){
-
+		
 		var userId;
-
 		if ((typeof req.param('id') != 'undefined') && (typeof req.param('isAdmin') != 'undefined')) {
 			userId = req.param('id');
      	}else{
@@ -253,36 +256,12 @@ var AccountController = {
 			sql 	= Sequelize.Utils.format([sql, req.session.Account.id]);
 		}
 
-
 		sequelize.query(sql, null, {
 			raw: true
 		}).success(function(directory) {
 			res.json(directory, 200);
 		});
 
-		// if(req.session.Account.isSuperAdmin === 1){
-
-	 //        Directory.findAll({ 
-	 //        	where : [ '(deleted = 0 OR deleted IS NULL)'],
-	 //        }).success(function(directory){
-		// 		res.json(directory, 200);
-	 //        });
-
-		// }else{
-
-		// 	Account.findAll({
-		// 		where: ['id='+req.session.Account.id],
-		// 	}).success(function(accounts) {
-				/*var sql = "SELECT account.*,subscription.features, adminuser.admin_profile_id, "+
-						"adminuser.id as adminuser_id , enterprises.name as enterprise_name, enterprises.id as enterprises_id FROM account "+
-						"LEFT JOIN subscription ON account.subscription_id=subscription.id "+
-						"LEFT JOIN adminuser ON account.id=adminuser.user_id "+
-						"LEFT JOIN enterprises ON account.created_by=enterprises.account_id "+
-						"WHERE account.is_enterprise=0 and account.deleted != 1 and account.created_by=?";
-
-				sql = Sequelize.Utils.format([sql, userId]);*/
-		// 	});
-		// }
     },
 
     getNestedWorkgroups: function(req, res){
@@ -313,23 +292,21 @@ var AccountController = {
     updateUserData: function(req, res){
 
     	var request = require('request');
-       var myip = require('myip');
-// Look up Account for currently logged-in user
+		// Look up Account for currently logged-in user
 		Account.find(req.param('id')).done(function(err, account) {
 	
 			if (err) return res.send(err,500);
-// Save new data in app and session db
+			// Save new data in app and session db
 			if (req.param('email')) account.email = req.param('email');
 			if (req.param('name')) 	account.name  = req.param('name');
 			if (req.param('phone')) account.phone = req.param('phone');
 			if (req.param('title')) account.title = req.param('title');
-// Save the Account, returning a 200 response
+			// Save the Account, returning a 200 response
 			account.save().done(function(err) {
 
 				if (err) return res.send( err);
 
-/*Create logging*/
- myip(function (err, ip) {
+				/*Create logging*/
 				var options = {
 					uri: 'http://localhost:1337/logging/register/' ,
 					method: 'POST',
@@ -340,28 +317,23 @@ var AccountController = {
 					text_message: 'has updated a user.',
 					activity  	: 'update',
 					on_user		: req.params.id,
+					ip			: req.session.Account.ip
 				};
 
 				request(options, function(err, response, body) {
 					if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
 					res.json({ msg: 'User information updated successfully.', type: 'success' }, 200);
 				});
-			});
-
-/*Create logging*/
-						
+				/*Create logging*/
 			});
     	});
     },
 
-/* 
-	@By Alcanzar
-*/
+/* @By Alcanzar */
 
 	lockAccount: function(req, res){
 
 		var request = require('request');
-
 		var options = {
 			uri: 'http://localhost:1337/account/lock/' ,
 			method: 'POST',
@@ -374,8 +346,8 @@ var AccountController = {
 
 		request(options, function(err, response, body) {
 			if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
-//	Resend using the original response statusCode
-//	Use the json parsing above as a simple check we got back good stuff
+			//	Resend using the original response statusCode
+			//	Use the json parsing above as a simple check we got back good stuff
 	      	res.json(body, response && response.statusCode);
 	    });
 	},
@@ -393,6 +365,7 @@ var AccountController = {
 			accId 	: req.session.Account.id, //for logging
 			accName : req.session.Account.name, //for logging
 			ipadd  	: req.param('ipadd'),
+			ip  	: req.session.Account.ip
 		};
 		
 		request(options, function(err, response, body) {
@@ -414,10 +387,10 @@ var AccountController = {
         	raw: true
        	}).success(function(dirs) {
 
-/*Create logging*/
-		var options = {
-			uri: 'http://localhost:1337/logging/register/' ,
-			method: 'POST',
+			/*Create logging*/
+			var options = {
+				uri: 'http://localhost:1337/logging/register/' ,
+				method: 'POST',
 	    	};
 
 			options.json =  {
@@ -425,29 +398,33 @@ var AccountController = {
 		    	text_message: 'has deleted '+req.param('workgroup_name')+' from '+req.param('user_name')+'\'s account.',
 		    	activity  	: 'delete',
 		    	on_user		: req.param('user_id'),
+		    	id			: req.session.Account.ip
 	    	};
 
 			request(options, function(err, response, body) {
-			if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
-	      		// res.send(200);
+				if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
 	    	});
-/*Create logging*/
+
+			/*Create logging*/
 
        		File.findAll({
        			where : [ 'DirectoryId='+ req.param('workgroup_id') ],
        		}).success(function(files){
        			if(files!=null){
+
 	       			files.forEach(function(applicant)  {
-					var sql3 = "Delete FROM filepermission where FileId = ? and AccountId =?";
+					
+						var sql3 = "Delete FROM filepermission where FileId = ? and AccountId =?";
 	       				sql3 = Sequelize.Utils.format([sql3, applicant.id, req.param('user_id')]);
+
 				       	sequelize.query(sql3, null, {
 				        	raw: true
 				       	}).success(function(dirs) {
 
-/*Create logging*/
-						var options = {
-							uri: 'http://localhost:1337/logging/register/' ,
-							method: 'POST',
+							/*Create logging*/
+							var options = {
+								uri: 'http://localhost:1337/logging/register/' ,
+								method: 'POST',
 	    					};
 
 	    					options.json =  {
@@ -455,19 +432,19 @@ var AccountController = {
 	    						text_message: req.session.Account.name+ ' has deleted file'+applicant.name+' located in '+ req.param('workgroup_name') + ' from '+req.param('user_name')+'\'s account.',
 	    						activity  	: 'delete',
 	    						on_user		: req.param('user_id'),
+	    						ip			: req.session.Account.ip
 	    					};
 
 							request(options, function(err, response, body) {
 								if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
-	      							res.json(body, response && response.statusCode);
+	      						res.json(body, response && response.statusCode);
 	    					});
-/*Create logging*/
-
+						/*Create logging*/
 						});	
 	       			});
 	       		}
        		}).error(function(e) {
-					throw new Error(e);
+				throw new Error(e);
        		});
        	});
     },
@@ -478,6 +455,7 @@ var AccountController = {
 	* @param {} prometheus => new password
 */
 	changePassword: function(req, res) {
+
 		var request = require('request');
 
 		var newPassword = req.param('prometheus');
@@ -486,12 +464,15 @@ var AccountController = {
 		console.log('oldPassword / oldPrometheus :: ', oldPassword);
 // Look up Account for currently logged-in user
 		Account.find(req.session.Account.id).done(function(err, model) {
+
 			if (err) return res.send(err,500);
 			if (!AuthenticationService.checkPassword(oldPassword,model.password)) return res.send(500);
 // Save new password
 			model.password = AuthenticationService.hashPassword(newPassword);
 			console.log('Saving account :: ', model);
+
 			model.save().done(function(err) {
+
 				if (err) return res.send(err,500);
 				console.log('Saved account :: ', model);
 
@@ -506,14 +487,14 @@ var AccountController = {
 	    			text_message: 'has changed own password.',
 	    			activity  	: 'change',
 	    			on_user		: req.session.Account.id,
+	    			ip			: req.session.Account.ip
 	    		};
 
 				request(options, function(err, response, body) {
 					if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
-	      				res.send(200);
-	    			});
+	      			res.send(200);
+	    		});
 	    		/*End logging*/
-				
 			});
 		});
 	},
@@ -525,12 +506,12 @@ var AccountController = {
 // Look up Account for currently logged-in user
 		Account.find(req.param('id')).done(function(err, model) {
 			if (err) return res.send(err,500);
-// Save new password
+			// Save new password
 			model.password = AuthenticationService.hashPassword(newPassword);
 			model.save().done(function(err) {
 
 				if (err) return res.send(err,500);
-/*Create logging*/
+				/*Create logging*/
 				var options = {
 					uri: 'http://localhost:1337/logging/register/' ,
 					method: 'POST',
@@ -541,19 +522,21 @@ var AccountController = {
 					text_message: 'has changed '+model.name+'\'s password.',
 					activity  	: 'change',
 					on_user		: req.param('id'),
+					ip 			: req.session.Account.ip
 	    		};
 
 				request(options, function(err, response, body) {
 					if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
 					res.json({ msg: 'Password updated succcessfully.', type: 'success' }, 200);
 	    		});
-/*End logging*/
+				/*End logging*/
 
 			});
 		});
 	},
 
 	update: function(req, res) {
+
 		var request = require('request');
 
 // Look up Account for currently logged-in user
@@ -579,14 +562,14 @@ var AccountController = {
 	    			user_id		: req.session.Account.id,
 	    			text_message: 'has updated own account.',
 	    			activity  	: 'update',
-	    			on_user		: req.session.Account.id
-	    		
+	    			on_user		: req.session.Account.id,
+	    			ip 			: req.session.Account.ip		
 	    		};
 
 				request(options, function(err, response, body) {
 					if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
-	      				res.send(200);
-	    			});
+	      			res.send(200);
+	    		});
 	    		/*End logging*/
 
 			});
@@ -652,14 +635,14 @@ var AccountController = {
 
 	 			if(picUploadType === 'enterprise'){
 		 			
-		 			fsx.writeFile("/var/www/html/olympus/master/public/images/enterprises/"+enterpriseName, binaryData, 'binary', function(err){
+		 			fsx.writeFile("/var/www/html/olympus/olympus-web/master/public/images/enterprises/"+enterpriseName, binaryData, 'binary', function(err){
 					});
 			        account.enterprise_fsname     = enterpriseName;
 	                account.enterprise_mimetype   = filetype;
 
 	 			} else if(picUploadType === 'profile'){
 	 				
-					fsx.writeFile("/var/www/html/olympus/master/public/images/profile/"+enterpriseName, binaryData, 'binary', function(err){
+					fsx.writeFile("/var/www/html/olympus/olympus-web/master/public/images/profile/"+enterpriseName, binaryData, 'binary', function(err){
 					});
 
 			        account.avatar_image    = enterpriseName;
@@ -685,7 +668,18 @@ var AccountController = {
 
 		var request = require('request');
 
-		var options = {
+		var sql = "Select id from directory where deleted is null and ownerId = ?";
+		sql = Sequelize.Utils.format([sql, req.params.id]);
+		sequelize.query(sql, null, {
+			raw: true
+		}).success(function(dirs) {
+			console.log("adskl;sakdl;aslk;da;sldk;alskd;alskd;alkskda;lsdk");
+			console.log(dirs);
+		});
+
+
+
+/*		var options = {
 			uri: 'http://localhost:1337/account/del/' ,
 			method: 'POST',
 	    };
@@ -697,10 +691,6 @@ var AccountController = {
 	    };
 
 		request(options, function(err, response, body) {
-
-			req.params.id = '122121212122';
-			AccountController.delete(req, res, true);	
-
 			if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
 			if(req.session.Account.isAdmin === true){
 				var sql = "UPDATE enterprises SET is_active=0 where account_id = ?";
@@ -714,7 +704,7 @@ var AccountController = {
 	      		res.json(body, response && response.statusCode);
 	      	}
 	    });
-	},
+*/	},
 
 	'delete' : INodeService["delete"],
 

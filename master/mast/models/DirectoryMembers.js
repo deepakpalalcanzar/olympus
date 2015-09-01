@@ -17,11 +17,15 @@ Mast.models.DirectoryMembers = Mast.Collection.extend({
 	fetchMembers: function (thisDir,cb) {
 		var self = this;
 //		setTimeout(function(){
+
 			Mast.Socket.request('/directory/ls',{
 				id: thisDir.get('id')
 			}, function(res) {
 				
+				console.log(res);
+
 				if (_.isArray(res)) {
+
 					self.reset(_.map(res, function(i) {
 						return _.extend({},Mast.models.INode.prototype.marshal(i),{
 							depth: thisDir.get('depth')+1,

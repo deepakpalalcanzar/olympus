@@ -19,6 +19,7 @@ Mast.registerComponent('AccountSettingsComponent',{
 	bindings: {
 		// set the selected tab arrow to this el.
 		selectedTab: function(newVal) {
+
 			this.removeSelected();
 			if (newVal === 'accountDetails') {
 				this.$('li.accountDetails').addClass('selected');
@@ -28,7 +29,10 @@ Mast.registerComponent('AccountSettingsComponent',{
 				this.$('li.accountNotifications').addClass('selected');
 			}else if (newVal === 'accountSubscription') {
 				this.$('li.accountSubscription').addClass('selected');
+			}else if (newVal === 'accountAppearance') {
+				this.$('li.accountAppearance').addClass('selected');
 			}
+			
 		}
 	},
 
@@ -62,6 +66,11 @@ Mast.registerComponent('AccountSettingsComponent',{
 	displayAccountSettings: function() {
 		this.attach('.account-settings-page', 'SettingsComponent');
 		this.set('selectedTab', 'settings');
+	},
+
+	displayAppearance: function() {
+		this.attach('.account-settings-page', 'AppearanceComponent');
+		this.set('selectedTab', 'accountAppearance');
 	},
 
 // remove all selected classes from the list elemets.

@@ -26,7 +26,8 @@
                 text_message: 'has uploaded '+req.session.Account.name+'.',
                 activity    : 'uploaded',
                 on_user     : req.session.Account.id,
-                client_ip   : req.params.ip
+                client_ip   : req.params.ip,
+                ip          : req.session.Account.ip
             };
 
 
@@ -237,6 +238,7 @@
                       text_message: 'has created a ' +results.newDirectory.name+ ' directory.',
                       activity    : 'create',
                       on_user     : req.session.Account.id,
+                      ip          : req.session.Account.ip
                     };
 
                     request(options, function(err, response, body) {
@@ -333,6 +335,7 @@
                             text_message: 'has created a sub directory named ' +results.newDirectory.name+ ' inside root '+dirModel.name+' directory.',
                             activity    : 'create',
                             on_user     : req.session.Account.id,
+                            ip          : req.session.Account.ip
                         };
 
                         request(options, function(err, response, body) {

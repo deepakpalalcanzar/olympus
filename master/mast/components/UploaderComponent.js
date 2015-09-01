@@ -23,14 +23,12 @@ Mast.registerComponent('Uploader',{
 		// initialize fileuploader plugin on input element
 		this.$('input').fileupload({
 			
-
-
 			progress: function(e, data) {
 				if (self.formData) {
-                			data.parentId = self.formData.id
-    				}
-                		Mast.trigger('UPLOAD_PROGRESS', data);
-            		},
+                	data.parentId = self.formData.id
+    			}
+                Mast.trigger('UPLOAD_PROGRESS', data);
+            },
 
 			// Assign add event.
 			add: function(e, data) {
@@ -40,7 +38,6 @@ Mast.registerComponent('Uploader',{
 
 				// Save collection of files in component
 				self.files = data.files;
-				
 				// Trigger add file event to parent
 				self.parent.trigger('addFile', self.files);
 				
@@ -56,7 +53,7 @@ Mast.registerComponent('Uploader',{
 			},
 
 			error: function(err) {
-				console.log(err);
+				
 				var msg;
 				try {
 					msg = JSON.parse(err.responseText).error;
@@ -72,7 +69,7 @@ Mast.registerComponent('Uploader',{
 					//fsx.unlink('/var/www/olympus/api/files/'+file.extra.fsName);
 					//alert('File you are trying to uplaod already exists.');
 				}else{
-					alert('Sorry, an error occurred.  Please try again.');
+					alert('Sorry, an error occurred. Please try again.');
 				}
 
 				Mast._uploadingFiles--;
@@ -99,6 +96,7 @@ Mast.registerComponent('Uploader',{
 		var encodedFormData = {
 			data: JSON.stringify(formData)
 		};
+
 // Because of weird stringification requirement of blueimp, add id to top level (so built-in auth works)
 		if (formData && formData.id) {
 			encodedFormData.id = formData.id;
@@ -112,8 +110,7 @@ Mast.registerComponent('Uploader',{
 				formData: encodedFormData
 			});
 		}
-
-		console.log(formData);
+		
 		if (formData) {
         	Mast.trigger('NEW_UPLOADING_CHILD', {
             	files: this.files,
@@ -126,23 +123,21 @@ Mast.registerComponent('Uploader',{
 	afterUpload: function (e,data) {
 		
 		Mast._uploadingFiles--;
+		
 		if (Mast._uploadingFiles <= 0) {
 			window.onbeforeunload = undefined;
 		}
+
 		this.parent.trigger('uploadComplete',data.result);
-            var filename = data.result.entries.name;
-          
-             Mast.Socket.request('/account/createuploadlog',{name:filename}, function(res, err){
+        var filename = data.result.entries.name;
+        
+        Mast.Socket.request('/account/createuploadlog',{name:filename}, function(res, err){
 			if(res){
 				Mast.navigate('#');
 			}
-			
-		  }); 
-
-
-                var newtest = data.result;
-
-                
-
+		}); 
+		
+		var newtest = data.result;
 	}
+
 });

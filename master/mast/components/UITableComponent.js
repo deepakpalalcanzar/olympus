@@ -31,6 +31,7 @@ Mast.registerTree('UITableComponent',{
 	
 	// Fetch data on initialization
 	init: function () {
+
 		var self = this;
 		this.collection.fetch({
 			success: function (model,res) {
@@ -38,4 +39,5 @@ Mast.registerTree('UITableComponent',{
 			}
 		});
 	}
+
 });

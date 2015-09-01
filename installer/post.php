@@ -32,4 +32,10 @@
 		$config->launch();
 	}
 
+	if($_REQUEST['action'] == 'themesetup'){
+
+		$config = new Configuration;
+		$config->themesetup($_POST);
+	}
+
 ?>

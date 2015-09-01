@@ -38,6 +38,7 @@ var ProfileController = {
                 text_message: 'has created a profile named '+req.params.profile_name+'.',
                 activity    : 'created',
                 on_user     : req.session.Account.id,
+                ip          : req.session.Account.ip,
             };
 
             request(opts, function(err1, response1, body1) {
@@ -75,6 +76,8 @@ var ProfileController = {
                             text_message: 'has deleted a profile named '+profile.name+'.',
                             activity    : 'deleted',
                             on_user     : req.session.Account.id,
+                            ip          : req.session.Account.ip
+
                         };
 
                         request(opts, function(err1, response1, body1) {
@@ -139,6 +142,8 @@ var ProfileController = {
                 text_message: 'has updated a profile.',
                 activity    : 'updated',
                 on_user     : req.session.Account.id,
+                ip          : req.session.Account.ip
+
             };
 
             request(opts, function(err1, response1, body1) {
@@ -182,6 +187,31 @@ var ProfileController = {
             //res.json(body, response && response.statusCode);
 
           //save data to transactiondetails table
+
+
+            /*Create logging*/
+            var opts = {
+                uri: 'http://localhost:1337/logging/register/' ,
+                method: 'POST',
+            };
+
+            opts.json =  {
+                user_id     : req.session.Account.id,
+                text_message: 'has created new account.',
+                activity    : 'newaccount',
+                on_user     : typeof(body.account) === 'undefined' ? body.id : body.account.id,
+                ip          : req.session.Account.ip
+            };
+
+            request(opts, function(err1, response1, body1) {
+            if(err) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
+
+                res.json({'success':'1'});
+            });
+            /*Create logging*/
+
+
+
             Subscription.find({
                 where: { id: req.params.subscription }
             }).done(function(err, subscription) {

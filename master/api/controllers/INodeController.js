@@ -43,15 +43,6 @@ _.extend(module.exports,{
 			orphanFiles: function(cb){
 				var options = {accountId: req.session.Account.id};
 				
-				/*console.log("SELECT p.type AS permission, f.id AS pk, f.* "+
-							"FROM file f "+
-							"INNER JOIN filepermission p ON p.FileId=f.id "+
-							"INNER JOIN account a ON a.id=p.AccountId "+
-							"WHERE f.id IN (select max(fileId) from version GROUP BY parent_id)"+
-							"(p.type='read' OR p.type='comment' OR p.type='write' OR p.type='admin')"+
-							"AND a.id=? "+
-							"AND (f.DirectoryId is NULL OR p.orphan = true)");*/
-
 				var basicSet = ["SELECT p.type AS permission, f.id AS pk, f.* "+
 							"FROM file f "+
 							"INNER JOIN filepermission p ON p.FileId=f.id "+

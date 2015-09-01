@@ -44,6 +44,7 @@ Mast.registerTree('FileSystem',{
 				$('.fileSystem-template .loading-spinner').hide();
 			}
 		}
+		
 	},
 	
 	computePath	: function() {return '/';},
@@ -72,7 +73,6 @@ Mast.registerTree('FileSystem',{
 
 		var self = this;
 		this.pwd = this;
-
 		self.set('loading', true);
 		this.collection.fetch({
 			success: function (collection, res) {

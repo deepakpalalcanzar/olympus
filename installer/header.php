@@ -50,6 +50,13 @@
     		margin: 0 auto;
 		    width: 450px !important;
 		}
+                
+                div.template-template {
+    		background: none repeat scroll 0 0 #f0f0f0;
+    		border-radius: 8px;
+    		margin: 0 auto;
+		    width: 1291px !important;
+		}
 
 		div.login-template div.login-box-head {
 		    color: #636c78;

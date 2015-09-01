@@ -58,6 +58,7 @@ var AuthController = {
 	// Login to an Account
 	login: function(req, res) {
 
+		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 // When the form is visited, remember where the user was trying to go so she can be
 // redirected back.  This may get overridden later if an API key is present in the request.
 		if(req.method === 'GET') {

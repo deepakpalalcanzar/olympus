@@ -184,16 +184,16 @@ Mast.registerTree('PermissionList',{
 
 		// Create new autocomplete for use with the textarea. Do this only if this olympus app
 		// is not a private deployment.
-        if (!Olympus.isPrivateDeployment) {
-    		self.$('input.accounts').autocomplete({
-    			source: self.searchAccounts,
-    			autoFocus: true,
-    			appendTo: self.$('.permission-form'),
+      //   if (!Olympus.isPrivateDeployment) {
+    		// self.$('input.accounts').autocomplete({
+    		// 	source: self.searchAccounts,
+    		// 	autoFocus: true,
+    		// 	appendTo: self.$('.permission-form'),
 
-    			// item in autocomplete dropdown is selected
-    			select: self.addPermission
-    		});
-        }
+    		// 	// item in autocomplete dropdown is selected
+    		// 	select: self.addPermission
+    		// });
+      //   }
 
 		// This code seems to be called twice, so we'll do an unbind to make sure that
 		// we don't bind the click event to the button more than once
@@ -237,7 +237,6 @@ Mast.registerTree('PermissionList',{
 			console.log('User with email '+ui.item.account.email+' already has permissions...');
 			return;
 		}
-		console.log(ui);
 		var self = this;
 
 // Clear text area to avoid submitting this twice
@@ -294,12 +293,17 @@ Mast.registerTree('PermissionList',{
 		// Send a request to add permission for this user, who may or may not exist.
 		// If they don't exist, they'll be added
 		else {
-			console.log("WORKED!",emails);
+			
+			// console.log("WORKED!",emails);
+			// console.log(self.get('type'));
+
 			Mast.Socket.request('/'+self.get('type')+'/addPermission',{
 				id: self.get('id'),
 				email: emails,
 				permission: 'comment',
 				type: 'permission'
+			}, function( res ){
+				alert(" An email has been sent to '" + emails + "' inviting them to view this item.");
 			});
 		}
 		e.preventDefault();

@@ -35,6 +35,8 @@ var RedirectController = {
                 	data = JSON.parse(data.toString('utf8'));
                 }
                 catch(e) {
+
+                    console.log(e);
                     data = {error: 'unknown error'};
                 }
           
@@ -42,6 +44,8 @@ var RedirectController = {
                 if (data.origParams) {return afterUpload(data);}
 // Get dir subscribers
                 var subscribers = Directory.roomName(data.parentId);
+                
+                console.log(subscribers);
 
 // Broadcast a message to everyone watching this INode to update
 // accordingly.
@@ -71,8 +75,8 @@ var RedirectController = {
                     res.setHeader('Content-Type', fileModel.mimetype);
                     options.uri = "http://localhost:1337/file/download/"+fileModel.fsName+"?_session="+JSON.stringify(_session);
                     var proxyReq = request.get(options).pipe(res);
-            
                     proxyReq.on('error', function(err) {res.send(err, 500)});
+
                 }
 
             }).error(function(err){res.send(err, 500);});
@@ -174,18 +178,18 @@ var RedirectController = {
 
     // Build options for request
     var options = {
-      uri: 'http://localhost:1337' + req.path,
-      method: req.method,
-      headers: headers
+        uri: 'http://localhost:1337' + req.path,
+        method: req.method,
+        headers: headers
     };
 
     options.json =  {
-      folderId: req.param('folderId'),
-      quota: req.param('quota'),
-      _session : {
-        authenticated: true,
-        Account: req.session.Account
-      }
+        folderId: req.param('folderId'),
+        quota: req.param('quota'),
+        _session : {
+            authenticated: true,
+            Account: req.session.Account
+        }
     }
 
     // Make a request to the new API

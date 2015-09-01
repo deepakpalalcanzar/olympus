@@ -477,6 +477,18 @@
 
     },
 
+    size: function(req, res){
+
+        var sql = "SELECT (quota-size) as remainingQuota FROM directory WHERE id=?";
+        sql = Sequelize.Utils.format([sql,req.params.workgroup_id]);
+        sequelize.query(sql, null, {
+            raw: true
+        }).success(function(fileSize) {
+            res.json(fileSize, 200);
+        });
+
+    },
+
     enablePublicLink: INodeService.enablePublicLink
 
 };_.extend(exports,FileController);

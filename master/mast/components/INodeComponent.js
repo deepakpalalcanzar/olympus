@@ -29,9 +29,8 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 	},
 	
     init: function() {
+
         var self = this;
-
-
 		Mast.on('UPLOAD_PROGRESS', function(data) {
 	        if (data.files[0].name == self.model.get('name') && self.model.get('parent') && self.model.get('parent').id == data.parentId) {
 	            self.$('.information-stats').hide();
@@ -384,6 +383,7 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 	// After rendering, disable text selection
 	// and allow the user to set a new directory name
 	afterRender: function() {
+
 		var self = this;
 		// this.$el.disableSelection();
         if (this.model.get('uploading')) {
@@ -514,6 +514,7 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 	
 	// Select this iNode, join the conversation, and open the sidebar
 	select: function(e) {
+
 		e.stopPropagation();
 		e.stopImmediatePropagation();
 
@@ -676,32 +677,19 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 
 		// only change inode model directory name if user enters one
 		else {
-			/*Mast.Socket.request('/'+this.get('type')+'/rename',{
-				id: this.get('id'),
+			
+			var type =	this.get('type');
+		    var typeid = this.get('id')
+			
+			Mast.Socket.request('/'+type+'/rename',{
+				id: typeid,
 				name: inodeName
 			}, function(response){
 				if (response === 403) {
 					self.cancel();
 					alert('Permission denied. You do not have sufficient permissions to rename this item.');
 				}
-			});*/
-
-                            var type =	this.get('type');
-		            var typeid = this.get('id')
-					//$.get("https://ipinfo.io", function(response) {
-            	    	//var ipadd = response.ip ;
-                        Mast.Socket.request('/'+type+'/rename',{
-							id: typeid,
-							name: inodeName
-							//ipadd : ipadd,
-			      		}, function(response){
-							if (response === 403) {
-					self.cancel();
-					alert('Permission denied. You do not have sufficient permissions to rename this item.');
-				}
-			      });
-                             // }, "jsonp");
-
+			});
 		}
 	},
 	
@@ -811,7 +799,7 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 
 		console.log(this.get('id'));
 		var url = "/file/open/"+this.get('id')+"/"+this.get('name');
-// Open this url in a new tab. Older browsers fall back to opening a new window.
+		// Open this url in a new tab. Older browsers fall back to opening a new window.
 		//alert(url);
 		window.open(url, '_blank');
 		window.focus();
@@ -845,17 +833,6 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 
 	'delete': function() {
 		var self = this;
-		/*Mast.Socket.request('/'+this.get('type')+'/delete',{
-			id: this.get('id')
-		}, function(response){
-			if (response===403) {
-				alert('Permission denied. You do not have sufficient permissions to delete this item.');
-			} else {
-				self.parent.collection.fetchMembers(self.parent,function(){
-				});
-			}
-		});*/
-
              var id = this.get('id');
              var type =this.get('type');
          

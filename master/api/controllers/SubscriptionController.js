@@ -6,7 +6,6 @@ var SubscriptionController = {
 	register: function(req, res){
 
 		var request = require('request');
-
 		var options = {
 			uri: 'http://localhost:1337/subscription/register/' ,
 			method: 'POST',
@@ -22,6 +21,7 @@ var SubscriptionController = {
 	    };
 
 		request(options, function(err, response, body) {
+
 			if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
             //	Resend using the original response statusCode
             //	use the json parsing above as a simple check we got back good stuff
@@ -35,7 +35,8 @@ var SubscriptionController = {
                 user_id     : req.session.Account.id,
                 text_message: 'has added a subscription plan named '+req.params.features+'.',
                 activity    : 'add',
-                on_user     : req.session.Account.id
+                on_user     : req.session.Account.id,
+                ip          : req.session.Account.ip
             };
 
             request(opts, function(err1, response1, body1) {
@@ -49,8 +50,9 @@ var SubscriptionController = {
 	deleteSubscription: function(req, res){
 
         var request = require('request');
-        var sql = "UPDATE subscription SET is_active=0 where id = ?";
-        sql = Sequelize.Utils.format([sql, req.params.id]);
+        var sql     = "UPDATE subscription SET is_active=0 where id = ?";
+        sql         = Sequelize.Utils.format([sql, req.params.id]);
+
         sequelize.query(sql, null, {
         	raw: true
         }).success(function(dirs) {
@@ -69,7 +71,8 @@ var SubscriptionController = {
                     user_id     : req.session.Account.id,
                     text_message: 'has deleted a subscription plan named '+subscription.features+'.',
                     activity    : 'deleted',
-                    on_user     : req.session.Account.id
+                    on_user     : req.session.Account.id,
+                    ip          : req.session.Account.ip
                 };
 
                 request(opts, function(err1, response1, body1) {
@@ -116,27 +119,23 @@ var SubscriptionController = {
                 user_id     : req.session.Account.id,
                 text_message: 'has updated a subscription plan.',
                 activity    : 'updated',
-                on_user     : req.session.Account.id
+                on_user     : req.session.Account.id,
+                ip          : req.session.Account.ip
             };
 
             request(opts, function(err1, response1, body1) {
             if(err) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
                 res.json(body, response && response.statusCode);
-            });
-            /*Create logging*/
+            }); /*Create logging*/
 	    });
 	},
 
 	getSubscription: function(req, res){
-
 		var sql = "SELECT * FROM subscription WHERE is_active IS NULL";
-
         sql = Sequelize.Utils.format([sql]);
         sequelize.query(sql, null, {
         	raw: true
        	}).success(function(dirs) {
-
-
         	res.json(dirs, 200);
        	});
     },
@@ -151,7 +150,7 @@ var SubscriptionController = {
 
         sql = Sequelize.Utils.format([sql]);
         sequelize.query(sql, null, {
-          raw: true
+            raw: true
         }).success(function(subscription) {
             if(subscription.length === 1){
                 res.redirect("/subscription/free/1/"+req.session.tempId);
@@ -160,24 +159,20 @@ var SubscriptionController = {
                     subscription : subscription,
                     temp_id      : req.session.tempId
                 });
-
             }
         });
-
 	},
 
 	free: function(req, res){
 
         var request = require('request');
-        var sub_id = req.params.id;
+        var sub_id  = req.params.id;
         var temp_id = req.params.temp;
 
 // req.session.tempId  use this as tempaccount id 
         var sql = "SELECT * from tempaccount where id = ?";
-        console.log(sql);
+        sql     = Sequelize.Utils.format([sql,temp_id]);
 
-
-        sql = Sequelize.Utils.format([sql,temp_id]);
         sequelize.query(sql, null, {
             raw: true
         }).success(function(account) {
@@ -196,7 +191,6 @@ var SubscriptionController = {
                 created_by       : '',
                 is_enterprise    : account[0].is_enterprise,
                 subscription     : sub_id,
-                
             };
 
             if(account[0].is_enterprise == '1'){
@@ -209,6 +203,7 @@ var SubscriptionController = {
                 //  Resend using the original response statusCode
                 //  Use the json parsing above as a simple check we got back good stuff
                 //  Save data to transactiondetails table
+
                 Subscription.find({
                     where: { id: sub_id }
                 }).done(function(err, subscription) {
@@ -291,21 +286,23 @@ var SubscriptionController = {
 		Subscription.findAll({
 			where: { id: req.params.id }
 		}).done(function(err, subscription) {
-        TempAccount.findAll({
-            where: { id: req.params.temp }
-          }).done(function(error, tempaccount) {
-          res.view('subscription/paid',{
-            id              : req.params.id,
-            amount          : subscription[0].price,
-            temp            : req.params.temp,
-            f_name          : tempaccount[0].name.split(' ').slice(0, -1).join(' '),
-            l_name          : tempaccount[0].name.split(' ').slice(-1).join(' '),
-            email           : tempaccount[0].email,
-            duration        : subscription[0].duration,
-            is_enterprise   : tempaccount[0].is_enterprise,
-            sub_name        : subscription[0].features,
-          });
-        });
+
+            TempAccount.findAll({
+                where: { id: req.params.temp }
+            }).done(function(error, tempaccount) {
+                
+                res.view('subscription/paid',{
+                    id              : req.params.id,
+                    amount          : subscription[0].price,
+                    temp            : req.params.temp,
+                    f_name          : tempaccount[0].name.split(' ').slice(0, -1).join(' '),
+                    l_name          : tempaccount[0].name.split(' ').slice(-1).join(' '),
+                    email           : tempaccount[0].email,
+                    duration        : subscription[0].duration,
+                    is_enterprise   : tempaccount[0].is_enterprise,
+                    sub_name        : subscription[0].features,
+                });
+            });
 
 		});
 
@@ -349,125 +346,128 @@ var SubscriptionController = {
         var d           = dd.toLocaleDateString();
     // var y = d.getFullYear(); 
     // var duration_to = parseInt(req.body.duration)+y;
-    var n = new Date(new Date(dd).setMonth(dd.getMonth()+parseInt(req.body.duration)));
-    var duration_to = n.toLocaleDateString();
+        var n = new Date(new Date(dd).setMonth(dd.getMonth()+parseInt(req.body.duration)));
+        var duration_to = n.toLocaleDateString();
+        paypal_sdk.configure({
+            'host': 'api.sandbox.paypal.com',
+            'client_id': 'Acp-phDclj-YRVsO7Id0BPSqvV3KkjqwkMbGxgA1fY2kIJVsWztWmB19XJlI',
+            'client_secret': 'EBCNCRCjlhhTBUaHNv6ViNx5O2VsHmuu7veONAKw-t7hxtLqqQBu3rd_RUIr' 
+        });
+            
+        paypal_sdk.generate_token(function(error, token){
+            if(error){
+                console.log('***token11 error**');
+                console.error(error);
+            } else {
+                console.log('***token11 success**');
+                console.log(token);
+            }
+        });
 
-      paypal_sdk.configure({
-      'host': 'api.sandbox.paypal.com',
-      'client_id': 'Acp-phDclj-YRVsO7Id0BPSqvV3KkjqwkMbGxgA1fY2kIJVsWztWmB19XJlI',
-      'client_secret': 'EBCNCRCjlhhTBUaHNv6ViNx5O2VsHmuu7veONAKw-t7hxtLqqQBu3rd_RUIr' });
-      paypal_sdk.generate_token(function(error, token){
-        if(error){
-          console.log('***token11 error**');
-          console.error(error);
-        } else {
-          console.log('***token11 success**');
-          console.log(token);
-        }
-      });
-
-      var payment_details = {
-        "intent": "sale",
-        "payer": {
-        "payment_method": "credit_card",
-        "funding_instruments": [{
-        "credit_card": {
-        "type": req.body.card_type,
-        "number": req.body.customer_credit_card_number,
-        "expire_month": req.body.cc_expiration_month,
-        "expire_year": req.body.cc_expiration_year,
-        "cvv2": req.body.cc_cvv2_number,
-        "first_name": req.body.first_name,
-        "last_name": req.body.last_name,
-        "billing_address": {
-          "line1": req.body.address,
-          "city": req.body.city,
-          "state": req.body.state,
-          "postal_code": req.body.customer_zip,
-          "country_code": req.body.country_code }}}]},
-  "transactions": [{
-    "amount": {
-      "total": req.body.amount,
-      "currency": "USD",
-      "details": {
-        "subtotal": req.body.amount,
-        "tax": "0.00",
-        "shipping": "0.00"}},
-    "description": "This is the payment transaction description." }]};
-
-  paypal_sdk.payment.create(payment_details, function(error, payment){
-    if(error){
-      console.log('**payment error11**');
-      console.error(error);
-    } else {
-      if(payment.state === 'approved'){
-        
-      // req.session.tempId  use this as tempaccount id 
-     var sql = "SELECT * from tempaccount where id = ?";
-             sql = Sequelize.Utils.format([sql,temp_id]);
-             sequelize.query(sql, null, {
-             raw: true
-           }).success(function(account) {
-               // res.json(account);
-
-               var options = {
-                uri: 'http://localhost:1337/account/register/' ,
-                method: 'POST',
-              };
-
-        options.json =  {
-          name            : account[0].name,
-          email           : account[0].email,
-          isVerified      : true,
-          isAdmin         : account[0].is_enterprise=='1'?true:false,
-          password        : account[0].password,
-          created_by      : '',
-          is_enterprise   : account[0].is_enterprise,
-          subscription    : sub_id,
+        var payment_details = {
+            "intent": "sale",
+            "payer": {
+            "payment_method": "credit_card",
+                "funding_instruments": [{
+                    "credit_card": {
+                        "type"          : req.body.card_type,
+                        "number"        : req.body.customer_credit_card_number,
+                        "expire_month"  : req.body.cc_expiration_month,
+                        "expire_year"   : req.body.cc_expiration_year,
+                        "cvv2"          : req.body.cc_cvv2_number,
+                        "first_name"    : req.body.first_name,
+                        "last_name"     : req.body.last_name,
+                        "billing_address": {
+                            "line1"         : req.body.address,
+                            "city"          : req.body.city,
+                            "state"         : req.body.state,
+                            "postal_code"   : req.body.customer_zip,
+                            "country_code"  : req.body.country_code 
+                        }
+                    }
+                }]
+            },
+            "transactions": [{
+                "amount": {
+                    "total"     : req.body.amount,
+                    "currency"  : "USD",
+                    "details"   : {
+                        "subtotal"  : req.body.amount,
+                        "tax"       : "0.00",
+                        "shipping"  : "0.00"
+                    }
+                },
+                "description": "This is the payment transaction description." 
+            }]
         };
 
-        console.log('****this is options****');
-        console.log(options.json);
-        console.log('****closed options****');
+        paypal_sdk.payment.create(payment_details, function(error, payment){
+        
+            if(error){
+                console.log('**payment error11**');
+                console.error(error);
+            } else {
 
-    request(options, function(err, response, body) {
-      if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
-//        Resend using the original response statusCode
-//        use the json parsing above as a simple check we got back good stuff
-         //res.json(body, response && response.statusCode);
+                if(payment.state === 'approved'){
+                
+                    var sql = "SELECT * from tempaccount where id = ?";
+                    sql = Sequelize.Utils.format([sql,temp_id]);
+                    sequelize.query(sql, null, {
+                        raw: true
+                    }).success(function(account) {
+                        
+                        var options = {
+                            uri: 'http://localhost:1337/account/register/' ,
+                            method: 'POST',
+                        };
 
-         Subscription.find({
-            where: { id: sub_id }
-            }).done(function(err, subscription) {
-               // Save to transactionDetails table
-              var tran_options = {
-                uri: 'http://localhost:1337/transactiondetails/register/' ,
-                method: 'POST',
-              };
+                        options.json =  {
+                            name            : account[0].name,
+                            email           : account[0].email,
+                            isVerified      : true,
+                            isAdmin         : account[0].is_enterprise=='1'?true:false,
+                            password        : account[0].password,
+                            created_by      : '',
+                            is_enterprise   : account[0].is_enterprise,
+                            subscription    : sub_id,
+                        };
 
-            tran_options.json =  {
-              trans_id        : payment.id,
-              account_id      : body.account.id,
-              created_date    : payment.create_time,
-              users_limit     : subscription.users_limit,
-              quota           : subscription.quota,
-              plan_name       : subscription.features,
-              price           : subscription.price,
-              duration        : subscription.duration,
-              paypal_status   : payment.state,
-          };
+                        console.log('****this is options****');
+                        console.log(options.json);
+                        console.log('****closed options****');
 
-          console.log('***this is in history again**');
-          console.log(tran_options);
-          console.log('*response**');
-          console.log(response);
+                        request(options, function(err, response, body) {
+                            if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
+                            //  Resend using the original response statusCode
+                            //  Use the json parsing above as a simple check we got back good stuff
+                            //  res.json(body, response && response.statusCode);
+                            Subscription.find({
+                                where: { id: sub_id }
+                            }).done(function(err, subscription) {
+                                // Save to transactionDetails table
+                                var tran_options = {
+                                    uri: 'http://localhost:1337/transactiondetails/register/' ,
+                                    method: 'POST',
+                                };
 
-      request(tran_options, function(err1, response1, body1) {
-      if(err1) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
-//        Resend using the original response statusCode
-//        use the json parsing above as a simple check we got back good stuff
-         //res.json(body1, response1 && response1.statusCode);
-        });
+                                tran_options.json =  {
+                                    trans_id        : payment.id,
+                                    account_id      : body.account.id,
+                                    created_date    : payment.create_time,
+                                    users_limit     : subscription.users_limit,
+                                    quota           : subscription.quota,
+                                    plan_name       : subscription.features,
+                                    price           : subscription.price,
+                                    duration        : subscription.duration,
+                                    paypal_status   : payment.state,
+                                };
+
+                                request(tran_options, function(err1, response1, body1) {
+                                    if(err1) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
+                                    // Resend using the original response statusCode
+                                    // use the json parsing above as a simple check we got back good stuff
+                                    //res.json(body1, response1 && response1.statusCode);
+                                });
 
       // end transaction history
 
@@ -598,6 +598,8 @@ impersonate: function(req, res){
             text_message: 'has downloaded a file named '+fileModel.name+' from shared link.',
             activity    : 'download',
             on_user     : req.session.Account.id,
+            ip          : req.session.Account.ip,
+
           };
 
           request(opts, function(err, response, body) {
@@ -756,10 +758,11 @@ impersonate: function(req, res){
             };
 
             options.json =  {
-              user_id     : req.session.Account.id,
-              text_message: 'has upgraded own subscription plan.',
-              activity    : 'upgrade',
-              on_user     : req.session.Account.id,
+                user_id     : req.session.Account.id,
+                text_message: 'has upgraded own subscription plan.',
+                activity    : 'upgrade',
+                on_user     : req.session.Account.id,
+                ip          : req.session.Account.ip,
             };
 
           request(options, function(err21, response21, body21) {
@@ -837,6 +840,8 @@ impersonate: function(req, res){
               text_message: 'has upgraded own subscription plan.',
               activity    : 'upgrade',
               on_user     : req.session.Account.id,
+                ip          : req.session.Account.ip
+
             };
 
           request(options, function(err21, response21, body21) {

@@ -20,18 +20,18 @@ class Configuration {
 
 	function saveDataBase($postData){
 
-
-
 		if(!empty($postData)){
-// connect to the mysql database server.			
+			// connect to the mysql database server.
+
 			$con = mysql_connect($postData['database_hostname'], $postData['username'], $postData["password"]);
-// Check connection
+			// Check connection
+
 			if($con === FALSE){
-				$_SESSION['msg'] = "Unable to connect database.";
-				echo "<script>window.location = 'http://"+$_SERVER['HTTP_HOST']+"/olympus/installer/index.php';</script>";
+				 $_SESSION['msg'] = "Unable to connect database.";
+				 header("Location:index.php");
 			}else{
 
-// If we couldn't, then it either doesn't exist, or we can't see it.
+		    // If we couldn't, then it either doesn't exist, or we can't see it.
 				$query="CREATE DATABASE IF NOT EXISTS $postData[database_name]";
 				if (mysql_query($query)) {
 					$_SESSION['databaseName'] = $postData['database_name'];
@@ -45,7 +45,7 @@ class Configuration {
 				} else {
 					$_SESSION['msg'] = "Error in creating database.";
 					$url = "http://".$_SESSION['serverName']."/olympus/installer/index.php";
-					echo '<script>window.location.href="'.$url.'"</script>';
+					//echo '<script>window.location.href="'.$url.'"</script>';
 
 				}
   			}
@@ -516,7 +516,7 @@ class Configuration {
 		}
 
 		echo exec('$path/olympus/installer/lift_olympus.sh');
-		$url = "http://".$_SESSION['serverName']."/olympus/installer/preview.php";
+		$url = "http://".$_SESSION['serverName']."/olympus/installer/theme_setup.php";
 		echo '<script>window.location.href="'.$url.'"</script>';
 
 	}
@@ -538,7 +538,62 @@ class Configuration {
 		echo "<script>window.location = 'https://"+$_SESSION['serverName']+"'</script>";
 	}
 
+	function themesetup($postData){
+		
+		//$con = mysql_connect('localhost', 'root', 'root');
+			$con = mysql_connect($_SESSION['hostname'], $_SESSION['username'], $_SESSION["password"]);
+			// Check connection
+
+			if($con === FALSE){
+				$_SESSION['msg'] = "Unable to connect database.";
+				header("Location:index.php");
+			}else{
+				
+                            $logo=str_replace("uploads/", "", $postData['logoimg']);
+                            
+				$db_selected = mysql_select_db($_SESSION['databaseName'], $con);
+				//$db_selected = mysql_select_db('olympus', $con);
+
+                                if(mysql_num_rows(mysql_query("SHOW TABLES LIKE 'theme'"))!=1) {
+                                    $_SESSION['msg'] =  "Table does not exist";
+                                    header("Location:theme_setup.php");
+                                }
+                                
+                                
+                               $logo=str_replace("uploads/", "", $postData['logoimg']);
+                                
+				$query="INSERT INTO theme SET header_background='#$postData[HeaderColor]',footer_background='#$postData[FooterColor]'
+				,body_background='#$postData[BodyColor]',navigation_color='#$postData[NavigationBarColor]',font_color='#$postData[FontColor]'
+				,font_family='$postData[FontFamily]' ";
+				if (mysql_query($query)) {
+                                        chmod ("installer/logo_crop/uploads/$logo", 0777);
+                                        $source= 'logo_crop/uploads/'.$logo;
+                                        $destination= '../master/public/images/enterprises/'.$logo;
+                                        copy($source, $destination);
+				}
+                                $query_logo="UPDATE account SET avatar_image='$logo' WHERE isSuperAdmin='1' ";
+                                $result_logo= mysql_query($query_logo);
+                                
+                                if($result_logo){
+//                                   
+                                    $files = glob('logo_crop/uploads/*'); // get all file names
+                                    foreach($files as $file){ // iterate files
+                                      if(is_file($file))
+                                        unlink($file); // delete file
+                                    }
+                                    
+                                    $files = glob('logo_crop/uploads/big/*'); // get all file names
+                                    foreach($files as $file){ // iterate files
+                                      if(is_file($file))
+                                        unlink($file); // delete file
+                                    }
+                                    
+                                }
+                                
+				$url = "http://".$_SESSION['serverName']."/olympus/installer/preview.php";
+				echo '<script>window.location.href="'.$url.'"</script>';
+		}
+	}
 
 }
-
 ?>

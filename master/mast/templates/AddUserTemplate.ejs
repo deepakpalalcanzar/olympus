@@ -20,29 +20,29 @@
 				<h3 class="company-details">New user</h3>
 
 				<div class="userFirstName">
-					<div class="company-name">First Name</div>
+					<div class="company-name"><label> First Name </label></div>
 					<input type="text" name="first_name" placeholder="Enter First Name" class="new-user-fields user-first-name">
 				</div>	
 
 
 				<div class="userLastName">
-					<div class="company-name">Last Name</div>
+					<div class="company-name"><label> Last Name </label></div>
 					<input type="text" name="last_name" placeholder="Enter Last Name" class="new-user-fields user-last-name"> 
 				</div>	
 
 				<div class="userEmail">
-					<div class="company-name">Email</div>
+					<div class="company-name"><label> Email </label></div>
 					<input type="text" name="email" placeholder="Enter Email" class="new-user-fields user-email">
 				</div>	
 
 				{% if (!superadmin) { %}
 					<div class="userWorkgroup">
-						<div class="company-name">WorkGroup Name</div>
+						<div class="company-name"><label>WorkGroup Name</label></div>
 						<select name="workgroup" id="list_workgroup" class='new-user-select user-workgroup'></select>
 					</div>	
 
 					<div class="userRole">
-						<div class="company-name">Role</div>
+						<div class="company-name"><label>Role</label></div>
 						<select name="role" class="new-user-select user-role">
 							<option value="">Select Role</option>
 							<option value="admin">Is Admin</option>
@@ -54,22 +54,22 @@
 				{% } %}	
 				
 				<div class="userPassword">
-					<div class="company-name"> Password </div>
+					<div class="company-name"> <label> Password </label> </div>
 					<input type="password" name="password" placeholder="Enter Password" class="new-user-fields user-password">
 				</div>	
 
 				<div class="userConfirmPassword">
-					<div class="company-name"> Confirm Password </div>
+					<div class="company-name"> <label> Confirm Password </label></div>
 					<input type="password" name="c_password" placeholder="Confirm Password" class="new-user-fields user-confirm-password">
 				</div>
 
 				<div class="userTitle">
-					<div class="company-name"> Title </div>
+					<div class="company-name"><label> Title </label> </div>
 					<input type="text" name="title" placeholder="Enter Title" class="new-user-fields user-title">
 				</div>	
 
 				<div class="userSubscripton">
-					<div class="company-name"> Subscription</div>
+					<div class="company-name"> <label>Subscription</label></div>
 					<select id="subscription-drop" name="subscription" class="new-user-select user-subscription"></select>
 					<div class="clear"></div>
 				</div>	

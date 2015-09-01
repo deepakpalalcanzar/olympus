@@ -25,3 +25,10 @@ Mast.routes.index = function(query, page) {
 Mast.routes.overview = function(query, page) {
 	Mast.navigate('#');
 };
+
+Mast.routes.thumbnail = function(query, page) {
+	$("#content").empty();
+	// Olympus.ui.fileSystem.append();
+	var thumbnail = new Mast.components.ThumbnailComponent();
+};
+

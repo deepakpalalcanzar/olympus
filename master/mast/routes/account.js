@@ -20,6 +20,12 @@ Mast.routes['account/password'] = function(query, page) {
 	Olympus.ui.actionBar.updateButtonState();
 };
 
+Mast.routes['account/appearance'] = function(query, page) {
+	$("#content").empty();
+	var account = new Mast.components.AccountSettingsComponent();
+	account.displayAppearance();
+};
+
 Mast.routes['account/notifications'] = function(query, page) {
 	$("#content").empty();
 	var account = new Mast.components.AccountSettingsComponent();

@@ -12,9 +12,19 @@ Mast.registerComponent('UploadSearchComponent',{
 	autoRender: false,
 	
 	events: {
-		'click .create-folder': 'createFolderOrWorkgroup',
-		'click .upload-file'  : 'createUploadDialog',
-		'click .search-users'  : 'searchUsers',
+		'click .create-folder'	: 'createFolderOrWorkgroup',
+		'click .upload-file'  	: 'createUploadDialog',
+		'click .search-users'  	: 'searchUsers',
+		'click .thumbnail'  	: 'thumbnailView',
+		'click .detail-list'  	: 'dafaultView'
+	},
+
+	dafaultView: function(){
+		Mast.navigate('#');
+	},
+
+	thumbnailView: function(){
+		Mast.navigate('thumbnail');
 	},
 
 	afterRender: function() {

@@ -6,7 +6,6 @@ echo exec("lsb_release -i | cut -f2"); ?>
 <html>
 	<?php include "header.php"; ?>
 <body>
-
 	<header>&nbsp;</header>
 	<div class="container center_div">
 		<div class="col-lg-12">&nbsp;</div>

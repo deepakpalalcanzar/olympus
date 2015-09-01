@@ -79,38 +79,36 @@ var EnterprisesController = {
 	      //res.json(body, response && response.statusCode);
 
 	      //save data to transactiondetails table
-	      Subscription.find({
-            where: { id: req.params.sub_id }
+            Subscription.find({
+                where: { id: req.params.sub_id }
             }).done(function(err, subscription) {
                // Save to transactionDetails table
-              var tran_options = {
-                uri: 'http://localhost:1337/transactiondetails/register/' ,
-                method: 'POST',
-              };
+                var tran_options = {
+                    uri: 'http://localhost:1337/transactiondetails/register/' ,
+                    method: 'POST',
+                };
 
-            var created_date = new Date();  
-            tran_options.json =  {
-              trans_id        : 'superadmin',
-              account_id      : req.params.account_id,
-              created_date    : created_date,
-              users_limit     : subscription.users_limit,
-              quota           : subscription.quota,
-              plan_name       : subscription.features,
-              price           : subscription.price,
-              duration        : subscription.duration,
-              paypal_status   : '',
-          };
+                var created_date = new Date();  
+                tran_options.json =  {
+                    trans_id        : 'superadmin',
+                    account_id      : req.params.account_id,
+                    created_date    : created_date,
+                    users_limit     : subscription.users_limit,
+                    quota           : subscription.quota,
+                    plan_name       : subscription.features,
+                    price           : subscription.price,
+                    duration        : subscription.duration,
+                    paypal_status   : '',
+                };
 
-      		request(tran_options, function(err1, response1, body1) {
-      		if(err1) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
-			//        Resend using the original response statusCode
-			//        use the json parsing above as a simple check we got back good stuff
+      		    request(tran_options, function(err1, response1, body1) {
+      		    if(err1) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
+			        // Resend using the original response statusCode
+			        //  use the json parsing above as a simple check we got back good stuff
          			res.json(body1, response1 && response1.statusCode);
         		});
-
       		});
 			// end transaction history
-
 	    });
 	},
 
@@ -142,8 +140,8 @@ var EnterprisesController = {
                       user_id     : req.session.Account.id,
                       text_message: 'has deleted '+ent.name+' enterprise.',
                       activity    : 'delete',
-                      on_user     : req.params.id
-                     
+                      on_user     : req.params.id,
+                      ip          : req.session.Account.ip
                   };
 
                   request(options, function(err, response, body) {
@@ -210,72 +208,66 @@ var EnterprisesController = {
 
 		request(options, function(err, response, body) {
 			if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
-//	Resend using the original response statusCode
-//	use the json parsing above as a simple check we got back good stuff
-	      //res.json(body, response && response.statusCode);
+            //	Resend using the original response statusCode
+            //	use the json parsing above as a simple check we got back good stuff
+	        //res.json(body, response && response.statusCode);
+            //Check for users_limit upgradation of subscription
+            if(body.type === 'error_users_limit'){
+                return res.json({ type : 'error',
+                    error:'Subscription plan can not be changed as enterprise has created more users than you want to assign !',
+                });
+            }
 
-        //Check for users_limit upgradation of subscription
-        if(body.type === 'error_users_limit'){
-          return res.json({ type : 'error',
-              error:'Subscription plan can not be changed as enterprise has created more users than you want to assign !',
-             });
-        }
-
-	      //save data to transactiondetails table
-	      Subscription.find({
-            where: { id: req.params.subscription }
+	        // save data to transactiondetails table
+            Subscription.find({
+                where: { id: req.params.subscription }
             }).done(function(err, subscription) {
-               // Save to transactionDetails table
-              var tran_options = {
-                uri: 'http://localhost:1337/transactiondetails/register/' ,
-                method: 'POST',
-              };
 
-            var created_date = new Date();
-            tran_options.json =  {
-                trans_id        : 'superadmin',
-                account_id      : req.params.id,
-                created_date    : created_date,
-                users_limit     : subscription.users_limit,
-                quota           : subscription.quota,
-                plan_name       : subscription.features,
-                price           : subscription.price,
-                duration        : subscription.duration,
-                paypal_status   : '',
-            };
+                // Save to transactionDetails table
+                var tran_options = {
+                    uri: 'http://localhost:1337/transactiondetails/register/' ,
+                    method: 'POST',
+                };
 
-      		request(tran_options, function(err1, response1, body1) {
-      		if(err1) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
-			         
-                  /*Create logging*/
-                  var options = {
-                      uri: 'http://localhost:1337/logging/register/' ,
-                      method: 'POST',
-                  };
+                var created_date = new Date();
+                tran_options.json =  {
+                    trans_id        : 'superadmin',
+                    account_id      : req.params.id,
+                    created_date    : created_date,
+                    users_limit     : subscription.users_limit,
+                    quota           : subscription.quota,
+                    plan_name       : subscription.features,
+                    price           : subscription.price,
+                    duration        : subscription.duration,
+                    paypal_status   : '',
+                };
 
+          		request(tran_options, function(err1, response1, body1) {
+
+          		    if(err1) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
+
+                    /*Create logging*/
+                    var options = {
+                        uri: 'http://localhost:1337/logging/register/' ,
+                        method: 'POST',
+                    };
                  
-                options.json =  {
-                      user_id     : req.session.Account.id,
-                      text_message: 'has updated an enterprise.',
-                      activity    : 'update',
-                      on_user     : req.params.ent_id
-                     
-                  };
+                    options.json =  {
+                        user_id     : req.session.Account.id,
+                        text_message: 'has updated an enterprise.',
+                        activity    : 'update',
+                        on_user     : req.params.ent_id,
+                        ip          : req.session.Account.ip
+                    };
 
-                  request(options, function(err, response, body) {
-                  if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
-                      
-                      res.json(body1, response1 && response1.statusCode);
-                  });
-                  /*End logging*/ 
-         			
-        		});
-
-      		});
-			// end transaction history
-
+                    request(options, function(err, response, body) {
+                        if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
+                        res.json(body1, response1 && response1.statusCode);
+                    });
+                    /*End logging*/ 
+        	    });
+            }); // end transaction history
 	    });
    	}
-
 };
 _.extend(exports, EnterprisesController);

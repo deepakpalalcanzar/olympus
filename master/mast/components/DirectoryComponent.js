@@ -19,6 +19,10 @@ Mast.registerTree('DirectoryComponent',{
 		var self = this;
 		this.set('state','loading');
 		this.collection.reset();
+
+		console.log("this.collection this.collection this.collection");
+		console.log(this.collection);
+
 		this.collection.fetchMembers(this,function(){
 			self.set('state','expanded');
 			self.$el.find('.shared_peop').not(":first").hide();// hide numbershared for files

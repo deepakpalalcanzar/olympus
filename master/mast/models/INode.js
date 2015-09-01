@@ -12,6 +12,7 @@ Mast.models.INode = Mast.Model.extend({
 	defaults: function() {
 		return {
 			type        : 'directory',
+			id        	: '',
 			name        : 'New Folder',
 			mimetype    : '',
 			mimeClass   : '',

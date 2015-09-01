@@ -88,26 +88,14 @@ Mast.registerTree('EnterprisesTable', {
 		if(typeof item !== 'undefined'){
 			if(confirm('Are you sure ?')){
 				
-                               /*Mast.Socket.request('/enterprises/deleteEnterprises', { id: id}, function(res, err){
-					if(res.error_msg){
-						alert(res.error_msg);		
-					}else if(res.success){
-						self.remove(id);
-					}
-				});*/
-
-                             /* $.get("https://ipinfo.io", function(response) {
-                              var ipadd = response.ip; */
-                              Mast.Socket.request('/enterprises/deleteEnterprises', { id: id}, function(res, err){
+				Mast.Socket.request('/enterprises/deleteEnterprises', { id: id}, function(res, err){
 					if(res.error_msg){
 						alert(res.error_msg);		
 					}else if(res.success){
 						self.remove(id);
 					}
 				});
-          	
-			   /* }, "jsonp"); */
-
+				
 			}
 		}
 	},

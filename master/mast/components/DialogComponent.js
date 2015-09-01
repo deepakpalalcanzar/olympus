@@ -39,12 +39,29 @@ Mast.registerComponent('DialogComponent', {
 	},
 
 	init: function(){
+
+		console.log("this.model this.model this.model this.model");
+		console.log(this.model);
+		console.log(Olympus.ui.fileSystem);
+		console.log(Olympus.ui.fileSystem.pwd.collection._byCid.c15.id);
+		console.log("this.model this.model this.model this.model");
 		var self = this;
+
 		this.on('addFile',function(files){
-			self.set('enabled',true);
-			self.setInputValue(files);
-		});
+			var parentId = typeof Olympus.ui.fileSystem.pwd.get('id') !== 'undefined' ? Olympus.ui.fileSystem.pwd.get('id') : Olympus.ui.fileSystem.pwd.collection._byCid.c15.id;
+			console.log(parentId);
+			Mast.Socket.request('/file/size', { size: files[0].size, workgroup_id: parentId}, function(res, err){
+				if((res[0].remainingQuota - files[0].size) > 0){
+					self.set('enabled',true);
+					self.setInputValue(files);
+				}else{
+					alert("Your file upload exceeded then your quota limit.");
+				}
+			});
+		}); 
+
 		this.on('uploadComplete',this.afterUpload);
+
 	},
 
 	events: {
@@ -76,7 +93,8 @@ Mast.registerComponent('DialogComponent', {
 // Begin uploading: Fire submit event in file uploader and pass in data
 	submit: function () {
 
-		var parentId = Olympus.ui.fileSystem.pwd.get('id');
+		// var parentId = Olympus.ui.fileSystem.pwd.get('id');
+		var parentId = typeof Olympus.ui.fileSystem.pwd.get('id') !== 'undefined' ? Olympus.ui.fileSystem.pwd.get('id') : Olympus.ui.fileSystem.pwd.collection._byCid.c15.id;
 		this.$('.loading-spinner').show();
 		this.$('.loading-spinner').css({"position": "relative", "left":"0px", "top" : "-165px"});
 //Trigger a submit event and pass useful data to the uploader.
@@ -95,7 +113,7 @@ Mast.registerComponent('DialogComponent', {
 // After the entire upload process is complete, we change the upload status.
 	afterUpload: function () {
 		//this.set('uploading', false);
-this.$('.loading-spinner').hide();
+		this.$('.loading-spinner').hide();
 		this.closeDialog();
 	},
 

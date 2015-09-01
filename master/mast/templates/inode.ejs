@@ -4,13 +4,19 @@
 			<div class="inode-content pushover">
 				<div class="inode-info-container clearfix">
 					<div class="expand-close-arrow {{type}} {% if (!num_children) { %} empty {% } %}"></div>
-					
-					<div class="{% if (!num_children) { %} empty {% } %} {{type}}-img {% if (mimeClass) { %}{{mimeClass}}{% } %} {% if ( !parent || !parent.id ) { %} orphan {% } %}"></div>
+
+					{%  if ( name.match(/jpg/g) || name.match(/jpeg/g) ||  name.match(/png/g) || name.match(/gif/g) || name.match(/JPEG/g) || name.match(/JPG/g) || name.match(/PNG/g) || name.match(/GIF/g)) { %}
+						<div class="file-img" style="height:38px;width: 52px; background: url('https://localhost/file/open/{{ id }}/{{ name }}') center center no-repeat; background-size: 100%;"></div>
+					{% } else { %}	
+
+					<div class="{% if (!num_children) { %} empty {% } %} {{type}}-img {% if (mimeClass) { %} {{ mimeClass }}{% } %} {% if ( !parent || !parent.id ) { %} orphan {% } %}"></div>
+
+					{% } %}	
 					
 					<!-- {% if (editing) { %}<input class="inode-name-input" type="text" value="{{name}}" placeholder="Name your new folder" autofocus="autofocus"/> -->
 					<!-- {% } else { %}<span class="inode-name">{{name}}</span>{% } %} -->
 
-					<span class="inode-name"> {{ name }} </span>
+					<span class="inode-name"> {{ name }}  </span>
 					<input class="inode-name-input" type="text" value="{{ name }}" placeholder="Name your new folder" autofocus="autofocus"/> 					
 					<div class="dropdown-button" title="Click here to view options"></div>
 					
