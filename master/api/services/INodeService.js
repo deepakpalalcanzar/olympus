@@ -68,6 +68,8 @@ exports.rename = function(req, res, cb) {
 	    							activity  	: 'rename',
 	    							on_user		: req.session.Account.id,
 	    							client_ip   : req.param('ipadd'),
+									ip   		: req.session.Account.ip
+
 	    						};
 
 								request(options, function(err, response, body) {
@@ -90,6 +92,8 @@ exports.rename = function(req, res, cb) {
 	    								activity  	: 'rename',
 	    								on_user		: req.session.Account.id,
 	    								client_ip   : req.param('ipadd'),
+										ip   		: req.session.Account.ip
+
 	    							};
 
 
@@ -310,16 +314,14 @@ exports.deletedFileInfo = function(options, cb) {
 }
 
 
-/**`
- * Delete the specified inode
- */
+/**
+	* Delete the specified inode
+*/
+
 exports['delete'] = function(req, res, cb) {
 
-	console.log("req reqreq req req req req req req req req req");
-	console.log(req);
-
-	var request 		= require('request');
-	var inodeId 		= req.param('replaceFileId') || req.param('id');
+	var request 	= require('request');
+	var inodeId 	= req.param('replaceFileId') || req.param('id');
 	var INodeModel;	
 	
 	if(req.param('controller') == "account"){
@@ -333,11 +335,13 @@ exports['delete'] = function(req, res, cb) {
 	sails.log.info('Delete:' + inodeId + ' [User:' + req.session.Account.id + ']');
 
 	INodeService.deletedFileInfo({
-		id 		: inodeId,
-		model 	: INodeModel,
-		replaceFileId: req.param('replaceFileId'),
+
+		id 				: inodeId,
+		model 			: INodeModel,
+		replaceFileId 	: req.param('replaceFileId'),
 		accountId   	: req.session.Account.id,
 		accountName   	: req.session.Account.name,
+
 	});
 
 	var subscribers = INodeModel.roomName(inodeId);
@@ -386,6 +390,7 @@ exports['delete'] = function(req, res, cb) {
 				accountId   	: req.session.Account.id,
 				accountName   	: req.session.Account.name,
                 ipadd           : req.param('ipadd'),
+                ip          	: req.session.Account.ip
 
 			}, function afterDestroy(err) {
 
@@ -430,7 +435,8 @@ exports.destroy = function(options, cb) {
 	    		text_message: 'has deleted a directory named '+directory.name+'.',
 	    		activity  	: 'delete',
 	    		on_user		: options.accountId,
-	    		client_ip   :  options.ipadd,
+	    		client_ip   : options.ipadd,
+	    		ip   		: options.ip
 	    	};
 
 			request(opts, function(err, response, body) {
@@ -461,6 +467,7 @@ exports.destroy = function(options, cb) {
 	    			activity  	: 'delete',
 	    			on_user		: options.accountId,
 	    			client_ip   : options.ipadd,
+	    			ip   		: options.ip
 	    		};
 
 				request(opts, function(err, response, body) {
@@ -551,7 +558,12 @@ exports.addPermission = function(req, res) {
 
 	var request = require('request');
 	var inodeId = req.param('id');
+
+	console.log(req);
+
 	var INodeModel = ((req.param('controller') == "directory") || (req.param('controller') == "profile")) ? Directory : File;
+
+	console.log(INodeModel);
 
 // And broadcast activity to all sockets subscribed
 	var subscribers = INodeModel.roomName(inodeId);
@@ -574,11 +586,9 @@ exports.addPermission = function(req, res) {
 		if(req.param('email')) {
 			
 			Account.find({
-				where: {
-					email: req.param('email')
-				}
+				where: { email: req.param('email') }
 			}).success(function(account) {
-
+				console.log("CREATING NEW ACCOUNT");
 				// If we find them, move on to the next step (granting the permission)
 				if(account) {
 					callback(null, inode, account);
@@ -594,14 +604,15 @@ exports.addPermission = function(req, res) {
 					password = UUIDGenerator.unparse(password);
 
 					Account.create({
-						
 						name: req.param('email'),
 						email: req.param('email'),
 						password: password,
 						verified: false,
 						verificationCode: verificationCode
-
 					}).success(function(newAccount) {
+
+						console.log("ACCOUNT CREATED");
+						console.log(newAccount);
 
 						var options = {
 							uri: 'http://localhost:1337/directory/createWorkgroup/' ,
@@ -624,6 +635,7 @@ exports.addPermission = function(req, res) {
 
 		// If we were sent the ID of an existing user, look them up and continue
 		else {
+
 			sails.log.debug('checking id of existing user');
 			sails.log.info('checking owed_by.id: ', req.param('owned_by').id);
 			Account.find(req.param('owned_by').id).done(function(err, account) {
@@ -641,6 +653,7 @@ exports.addPermission = function(req, res) {
 
 
 	function(inode, account, callback) {
+
 		// Permit this account
 		Account.permit(req.param('permission'), inode, account.id, function(err, permission, alreadyExists, isOrphan) {
 
@@ -653,6 +666,7 @@ exports.addPermission = function(req, res) {
 
 			// Respond and broadcast to client(s)
 			else {
+
 				var apiObj = (req.param('controller') == "directory") ? APIService.Directory.mini(inode) : APIService.File.mini(inode);
 				_.extend(apiObj, {
 					id: inodeId,
@@ -666,6 +680,7 @@ exports.addPermission = function(req, res) {
 					type: 'permission',
 					nodeType: req.param('controller')
 				});
+
 
 				// Send an email to the user we granted permissions to.  If they're a new
 				// user, send them the verification link.  Otherwise, just send them an update.
@@ -691,6 +706,7 @@ exports.addPermission = function(req, res) {
 				// can see, and add it to the response object so that the directory icon has an
 				// expand arrow in the UI if necessary
 				if(req.param('controller') == 'directory' || req.param('controller') == 'profile') {
+
 					async.auto({
 						files: function(cb, rs) {
 							File.whoseParentIs({
@@ -927,6 +943,7 @@ exports.addComment = function(req, res) {
 	    			activity  	: 'comment',
 	    			on_user		: req.session.Account.id,
 	    			client_ip   :  req.param('ipadd'),
+					ip   		: req.session.Account.ip
 	    		};
 
 				request(options, function(err, response, body) {
@@ -970,7 +987,7 @@ exports.removeComment = function(req, res) {
 // Return the comments
 exports.activity = function(req, res, cb) {
 
-	var sql = "SELECT *,c.id AS id, a.name AS AccountName, " + ((req.param('controller') == 'directory') ? "c.FileId " : "c.DirectoryId ") + "AS ItemId " + "FROM comment c " + "LEFT OUTER JOIN " + "account a " + "ON c.AccountId=a.id " + "WHERE " + ((req.param('controller') == 'directory') ? "c.DirectoryId=?" : "c.FileId=?");
+	var sql = "SELECT *,c.id AS id, a.avatar_image AS avatar, a.name AS AccountName, " + ((req.param('controller') == 'directory') ? "c.FileId " : "c.DirectoryId ") + "AS ItemId " + "FROM comment c " + "LEFT OUTER JOIN " + "account a " + "ON c.AccountId=a.id " + "WHERE " + ((req.param('controller') == 'directory') ? "c.DirectoryId=?" : "c.FileId=?");
 	sql = Sequelize.Utils.format([sql, req.param('id')]);
 	sequelize.query(sql, Comment).success(function(comments) {
 

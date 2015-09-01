@@ -129,6 +129,8 @@ exports.Permission.mini = exports.Permission;
 
 
 var Activity = function(model) { // Activity
+		console.log("model model model model model model");
+		console.log(model);
 
 		return {
 			id: model.id,
@@ -143,8 +145,9 @@ var Activity = function(model) { // Activity
 				id: model.accountId,
 				name: model.AccountName,
 				login: model.AccountLogin,
-				// avatar: '/images/' + model.AccountId + '.png',
-				avatar: getAvatarImage(model.AccountId),
+				// avatar: '/images/profile/'+model.avatar_image,
+				avatar: '/images/' + model.AccountId + '.png',
+				// avatar: getAvatarImage(model.AccountId),
 				type: 'account'
 			},
 			created_at: model.createdAt,
@@ -153,7 +156,8 @@ var Activity = function(model) { // Activity
 				name: model.AccountName,
 				login: model.AccountLogin,
 				// avatar: '/images/' + model.AccountId + '.png',
-				avatar: getAvatarImage(model.AccountId),
+				avatar: '/images/profile/'+model.avatar_image,
+				// avatar: getAvatarImage(model.AccountId),
 				type: 'account'
 			},
 			type: 'comment'
