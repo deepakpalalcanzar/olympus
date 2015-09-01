@@ -578,8 +578,12 @@ class Configuration {
                                 
                                 
                                $logo=str_replace("uploads/", "", $postData['logoimg']);
+<<<<<<< HEAD
                                 
                                $date=  date("Y-m-d H:i:s");
+=======
+                                $date=  date("Y-m-d H:i:s");
+>>>>>>> e0daf896113dce7be99514e9a26949c963dabade
 				$query="INSERT INTO theme SET header_background='#$postData[HeaderColor]',footer_background='#$postData[FooterColor]'
 				,body_background='#$postData[BodyColor]',navigation_color='#$postData[NavigationBarColor]',font_color='#$postData[FontColor]'
 				,font_family='$postData[FontFamily]',createdAt='$date',updatedAt='$date',account_id='1' ";

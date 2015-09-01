@@ -367,8 +367,7 @@ workgroup: function(id, cb) {
           name: name,
           isWorkgroup: true,
           OwnerId: isOwner ? accountId : undefined,
-          // quota: options.quota || undefined
-          quota: '10000000000000'
+          quota: options.quota || undefined
         }).done(cb);
       }],
 
