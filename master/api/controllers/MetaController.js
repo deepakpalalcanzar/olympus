@@ -33,27 +33,54 @@ var MetaController = {
 				}
 
 				if(account.isSuperAdmin){
-				
-					res.view('meta/superadmin',{
-						apps 			: account.created_by,
-						email 			: account.email,
-						enterprise_logo : enterpriseLogo,
-						avatar 			: account.avatar_image,
-						setting 		: hideSetting 
+
+					Theme.find({
+						where : { account_id: req.session.Account.id  }
+					}).done(function(err, theme){
+						if(theme === null){
+
+							res.view('meta/superadmin',{
+								apps 			: account.created_by,
+								email 			: account.email,
+								enterprise_logo : enterpriseLogo,
+								avatar 			: account.avatar_image,
+								setting 		: hideSetting,
+								header_color 	 : '#FFFFFF',
+								navigation_color : '#4f7ba9',
+								body_background  : '#f9f9f9',
+								footer_background: '#f9f9f9',
+								font_family 	 : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif',
+								font_color 	 	 : '#547aa4'
+ 
+							});
+
+						}else{
+
+							res.view('meta/superadmin',{
+								apps 			: account.created_by,
+								email 			: account.email,
+								enterprise_logo : enterpriseLogo,
+								avatar 			: account.avatar_image,
+								setting 		: hideSetting,
+								header_color 	 : theme.header_background 	!== '' ? theme.header_background : '#FFFFFF',
+								navigation_color : theme.navigation_color 	!== '' ? theme.navigation_color : '#4f7ba9',
+								body_background  : theme.body_background 	!== '' ? theme.body_background : '#f9f9f9',
+								footer_background: theme.footer_background 	!== '' ? theme.footer_background : '#f9f9f9',
+								font_family 	 : theme.font_family 		!== '' ? theme.font_family : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif',
+								font_color 	 	 : theme.font_color 		!== '' ? theme.font_color : '#547aa4'
+ 
+							});
+
+						}
 					});
 
 				}else{
 
 					if(req.session.Account.isAdmin === true){
 
-						console.log("account.created_by");
-						console.log(account.created_by);
-
 						Theme.find({
 							where : { account_id: req.session.Account.id  }
 						}).done(function(err, theme){
-
-							console.log()
 
 							if(theme === null){
 
@@ -102,9 +129,7 @@ var MetaController = {
 							Theme.find({
 								where : { account_id: account.created_by  }
 							}).done(function(err, theme){
-								console.log("aslkdjaslkdjkasdklasljkdskjl");
-								console.log(theme);
-								console.log(account.created_by);
+								
 								if(theme === null){
 
 									res.view('meta/home',{
@@ -140,20 +165,7 @@ var MetaController = {
 									});
 								}
 							});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	
 							// res.view('meta/home',{
 							// 	apps			: account.created_by,
 							// 	email			: account.email,
@@ -163,6 +175,7 @@ var MetaController = {
 							// 	setting: hideSetting 
 
 							// });
+	
 						}).error(function(e) {
 							throw new Error(e);
 						});

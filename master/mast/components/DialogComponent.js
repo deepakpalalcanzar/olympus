@@ -40,16 +40,9 @@ Mast.registerComponent('DialogComponent', {
 
 	init: function(){
 
-		console.log("this.model this.model this.model this.model");
-		console.log(this.model);
-		console.log(Olympus.ui.fileSystem);
-		console.log(Olympus.ui.fileSystem.pwd.collection._byCid.c15.id);
-		console.log("this.model this.model this.model this.model");
 		var self = this;
-
 		this.on('addFile',function(files){
 			var parentId = typeof Olympus.ui.fileSystem.pwd.get('id') !== 'undefined' ? Olympus.ui.fileSystem.pwd.get('id') : Olympus.ui.fileSystem.pwd.collection._byCid.c15.id;
-			console.log(parentId);
 			Mast.Socket.request('/file/size', { size: files[0].size, workgroup_id: parentId}, function(res, err){
 				if((res[0].remainingQuota - files[0].size) > 0){
 					self.set('enabled',true);

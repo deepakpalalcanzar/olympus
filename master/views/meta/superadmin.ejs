@@ -23,10 +23,81 @@
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 
 		<!-- <meta content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" /> -->
+<script>
 
-		<style>
 
-		</style>
+	$(document).on('click', '.olympusHeader', function(){
+		$('.olympusHeader').colpick({
+			flat: true,
+			layout:'hex',
+			submit: 0,
+			onChange:function(hsb,hex,rgb,el,bySetColor) {
+				$("#topbar").css({ 'background-color' : "#"+hex });
+				$("#main-nav li a").css({ 
+					background: "#"+hex,
+					border: "#"+hex				
+				});
+			}
+		});
+	});
+
+	$(document).on('click', '.olympusBody', function(){
+		$('.olympusBody').colpick({
+			flat: true,
+			layout:'hex',
+			submit: 0,
+			onChange:function(hsb,hex,rgb,el,bySetColor) {
+				$("#content").css({ 'background-color' : "#"+hex });
+				$("#content > div").css({ 'background' : "#"+hex });
+				$(".wrapper").css({ 'background-color' : "#"+hex });
+				$('.listusers-outlet, .log-outlet, .dropdownActions-outlet').css({'background' : "#"+hex });
+			}
+		});
+	});
+
+	$(document).on('click', '.olympusFooter', function(){
+		$('.olympusFooter').colpick({
+			flat: true,
+			layout:'hex',
+			submit: 0,
+			onChange:function(hsb,hex,rgb,el,bySetColor) {
+				
+				$("#footer").css({ 'background-color' : "#"+hex });
+			}
+		});
+	});
+
+	$(document).on('click', '.olympusNav', function(){		
+		$('.olympusNav').colpick({
+			flat: true,
+			layout:'hex',
+			submit: 0,
+			onChange:function(hsb,hex,rgb,el,bySetColor) {
+				$(".upload-search-template").css({ 'background' : "#"+hex });
+			}
+		});
+	});	
+
+	$(document).on('click', '.olympusFont', function(){		
+		$('.olympusFont').colpick({
+			flat: true,
+			layout:'hex',
+			submit: 0,
+			onChange:function(hsb,hex,rgb,el,bySetColor) {
+
+				$(".inode-name").removeAttr("style");
+
+				$('body').css({ 'color' : "#"+hex });	
+				$('a').css({ 'color' : "#"+hex });	
+				$('p, label, span').css({ 'color' : "#"+hex });
+				$('h1, h2, h3, h4, h5, h6').css({ 'color' : "#"+hex });
+			}
+		});
+	});	
+
+
+
+</script>
 
 	</head>
 	<body>
@@ -34,18 +105,28 @@
 		<!-- main content -->
 		<div class="wrapper portal-only">
 			<!-- top section with navigation and search -->
+			<% if(header_color !== 'undefined') { %>
+			<div id="topbar" style="background-color:<%= header_color %>">
+			<% }else{ %>
 			<div id="topbar">
+			<% } %>	
 				<div id="top-nav" class="clearfix">
 
 					<!-- logo and main navigation -->
 					<div id="main-nav">
+						
+						<% if(enterprise_logo != '' && enterprise_logo != null){ %>
+						<a href="#" class="logo-link"><img class="main-logo" src="/images/enterprises/<%= enterprise_logo %>" alt="Olympus" /></a>
+						<% }else{ %>
 						<a href="#" class="logo-link"><img class="main-logo" src="/images/Branding_12.png" alt="Olympus" /></a>
+						<%	} %>
+
 						<ul class="clearfix">
 
 						<% if(email != 'superadmin@olympus.io'){ %>
 
 							<li>
-								<a href="#" title="overview">
+								<a href="#" title="overview" style="background-color:<%=header_color %>;border:1px solid <%=header_color %>">
 									<div class="main-nav-div">
 										<img class="main-nav-imgs" src="/images/Top-Nav_OverviewIcon@2x.png"/>
 										<span class="main-nav-span">Overview</span>
@@ -64,7 +145,7 @@
 								</li>
 							
 								<li>
-									<a href="#reports" title="reports">
+									<a href="#reports" title="reports" style="background-color:<%=header_color %>;border:1px solid <%=header_color %>">
 										<div class="main-nav-div">
 											<img class="main-nav-imgs" src="/images/Top-Nav_ReportsIcon@2x.png"/>
 											<span class="main-nav-span">Add User</span>
@@ -75,7 +156,7 @@
 							<% } %>							
 						
 							<li class="last-item">
-								<a href="#settings" title="settings">
+								<a href="#settings" title="settings" style="background-color:<%=header_color %>;border:1px solid <%=header_color %>">
 									<div class="main-nav-div">
 										<img class="main-nav-imgs" src="/images/Top-Nav_SettingsIcon@2x.png"/>
 										<span class="main-nav-span">Settings</span>
@@ -86,7 +167,7 @@
 						<% }else{ %>
 
 							<li class="last-item">
-								<a href="#enterprises" title="enterprises" style="width:auto">
+								<a href="#enterprises" title="enterprises" style="background-color:<%=header_color %>;border:1px solid <%=header_color %>;width:auto;">
 									<div class="main-nav-div">
 										<img class="main-nav-imgs" src="/images/enterprises.png"/>
 										<span class="main-nav-span">Enterprises</span>
@@ -95,7 +176,7 @@
 							</li> 
 
 							<li class="last-item">
-								<a href="#listusers" title="users"  style="width:auto">
+								<a href="#listusers" title="users"  style="background-color:<%=header_color %>;border:1px solid <%=header_color %>;width:auto;">
 									<div class="main-nav-div">
 										<img class="main-nav-imgs" src="/images/user_small.png"/>
 										<span class="main-nav-span">List Users</span>
@@ -104,7 +185,7 @@
 							</li> 
 
 							<li class="last-item">
-								<a href="#subscription" title="subscription plan"  style="width:auto">
+								<a href="#subscription" title="subscription plan"   style="background-color:<%=header_color %>;border:1px solid <%=header_color %>;width:auto;">
 									<div class="main-nav-div">
 <img class="main-nav-imgs" 
 src="/images/subscription_menu.png"/>
@@ -114,7 +195,7 @@ src="/images/subscription_menu.png"/>
 							</li>
 
 							<li class="last-item">
-								<a href="#profile" title="Create profile"  style="width:auto">
+								<a href="#profile" title="Create profile"  style="background-color:<%=header_color %>;border:1px solid <%=header_color %>;width:auto;">
 									<div class="main-nav-div">
 										<img class="main-nav-imgs" src="/images/manage_admin_profiles_small.png"/>
 										<span class="main-nav-span">Manage Admin Profiles</span>
@@ -123,7 +204,7 @@ src="/images/subscription_menu.png"/>
 							</li> 
 
 							<li class="last-item">
-								<a href="#adminUser" title="Manage Admin User"  style="width:auto">
+								<a href="#adminUser" title="Manage Admin User"  style="background-color:<%=header_color %>;border:1px solid <%=header_color %>;width:auto;">
 									<div class="main-nav-div">
 										<img class="main-nav-imgs" src="/images/manage_admin_users_small.png"/>
 										<span class="main-nav-span">Manage Admin Users</span>
@@ -132,7 +213,7 @@ src="/images/subscription_menu.png"/>
 							</li> 
 
 							<li class="last-item">
-								<a href="#log" title="View Log"  style="width:auto">
+								<a href="#log" title="View Log"  style="background-color:<%=header_color %>;border:1px solid <%=header_color %>;width:auto;">
 									<div class="main-nav-div">
 										<img class="main-nav-imgs" src="/images/manage_admin_users_small.png"/>
 										<span class="main-nav-span">View Log</span>
@@ -149,12 +230,12 @@ src="/images/subscription_menu.png"/>
 				</div>
 			</div>
 
-			<div id="content"></div>
+			<div id="content" style="background-color:<%= body_background %>"></div>
 			<div class="push"></div>
 		</div>
 
 		<!-- footer -->
-		<div id="footer" class="portal-only clearfix">
+		<div id="footer" class="portal-only clearfix" style="background-color:<%= footer_background %>">
 			<div id="copyright-info">
 				<img id="footer-logo" class="footer-logo-class" src="/images/Branding_12.png" />
 				<span class="copyright-info"><%= sails.config.organization.copyright %></span>
@@ -220,4 +301,38 @@ src="/images/subscription_menu.png"/>
 		<!-- Template library -->
 		<%- rigging.templateLibrary %>
 	</body>
+
+	
+<% if(navigation_color!=='#4f7ba9'){ %>
+<script type="text/javascript">
+	$('.upload-search-template').css({ 
+		'background' : "<%=navigation_color %>" 
+	});	
+</script>
+<% } %>
+
+<% if(body_background!=='#f9f9f9'){ %>
+<script type="text/javascript">
+	$('.listusers-outlet, .log-outlet, .dropdownActions-outlet').css({'background' : "<%=body_background %>"});	
+</script>
+<% } %>
+
+<% if(font_color!=='#547aa4'){ %>
+	
+<script type="text/javascript">
+	$('body').css({ 'color' : "<%=font_color %>" });	
+	$('a').css({ 'color' : "<%=font_color %>" });	
+	$('p, label, span').css({ 'color' : "<%=font_color %>" });
+	$('h1, h2, h3, h4, h5, h6').css({ 'color' : "<%=font_color %>" });
+</script>		
+<%	} %>
+
+
+<% if(font_family !== 'ProzimanovaRegular, Helvetica, Ariel, sans-serif'){ %>
+	
+<script type="text/javascript">
+	$("body, p, a, h1, h2, h3, h4, h5, h6, label, span").css({ 'font-family' : "<%=font_family %>" });
+</script>		
+
+<%	} %>
 </html>
