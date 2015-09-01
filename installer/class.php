@@ -358,11 +358,12 @@ class Configuration {
 													verified: true, \n
 													verificationCode: null, \n
 													avatar_fname: null, \n
-													avatar_mimetype: null \n
+													avatar_mimetype: null, \n
+													enterprise_fsname: null \n
 												}).done(function done (err, account) { \n
 													if (err) throw err;
 													console.log('ACCOUNT CREATE:', account); \n
-// Now create a workgroup, assigning the new account as an admin \n
+ // Now create a workgroup, assigning the new account as an admin \n
 													Directory.createWorkgroup({ name: 'Sample Workgroup' }, account.id, true, function(err, results) { \n
 														if (err) throw err; \n
 														console.log('DIRECTOR CREATE WORKGROUP RESULTS:', results); \n
@@ -553,6 +554,22 @@ class Configuration {
                             
 				$db_selected = mysql_select_db($_SESSION['databaseName'], $con);
 				//$db_selected = mysql_select_db('olympus', $con);
+                                
+                                $SQL_CREATE_TABLE="CREATE TABLE IF NOT EXISTS `theme` (
+                                            `id` int(11) NOT NULL AUTO_INCREMENT,
+                                            `header_background` varchar(10) NOT NULL,
+                                            `footer_background` varchar(10) NOT NULL,
+                                            `body_background` varchar(10) NOT NULL,
+                                            `navigation_color` varchar(10) NOT NULL,
+                                            `font_family` varchar(100) NOT NULL,
+                                            `font_color` varchar(10) NOT NULL,
+                                            `createdAt` datetime DEFAULT NULL,
+                                            `updatedAt` datetime DEFAULT NULL,
+                                            `account_id` varchar(255) DEFAULT NULL,
+                                            PRIMARY KEY (`id`)
+                                          ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=0 ;";
+                                $RESULT_CREATE_TABLE= mysql_query($SQL_CREATE_TABLE);
+                                
 
                                 if(mysql_num_rows(mysql_query("SHOW TABLES LIKE 'theme'"))!=1) {
                                     $_SESSION['msg'] =  "Table does not exist";
@@ -571,7 +588,7 @@ class Configuration {
                                         $destination= '../master/public/images/enterprises/'.$logo;
                                         copy($source, $destination);
 				}
-                                $query_logo="UPDATE account SET avatar_image='$logo' WHERE isSuperAdmin='1' ";
+                                $query_logo="UPDATE account SET enterprise_fsname='$logo' WHERE isSuperAdmin='1'";
                                 $result_logo= mysql_query($query_logo);
                                 
                                 if($result_logo){
@@ -587,7 +604,6 @@ class Configuration {
                                       if(is_file($file))
                                         unlink($file); // delete file
                                     }
-                                    
                                 }
                                 
 				$url = "http://".$_SESSION['serverName']."/olympus/installer/preview.php";
