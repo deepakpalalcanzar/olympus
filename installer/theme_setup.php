@@ -448,7 +448,7 @@
                         <br/>
                         <select style="width: 140px; height: 30px;" name="FontFamily" onchange="SetFontFamily(this.value);" class="login-input-field">
                             <option value=""> Select </option>
-                            <option value="'ProzimanovaRegular, Helvetica, Ariel, sans-serif'"> ProzimanovaRegular, Helvetica, Ariel, sans-serif </option>
+                            <option value="ProzimanovaRegular, Helvetica, Ariel, sans-serif" selected > ProzimanovaRegular, Helvetica, Ariel, sans-serif </option>
                             <option value="Georgia, serif"> Georgia, serif </option>
                             <option value="Palatino Linotype, Book Antiqua, Palatino, serif"> "Palatino Linotype", "Book Antiqua", Palatino, serif </option>
                             <option value="Times New Roman, Times, serif"> "Times New Roman", Times, serif </option>
