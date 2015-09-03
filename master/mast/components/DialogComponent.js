@@ -48,7 +48,7 @@ Mast.registerComponent('DialogComponent', {
 					self.set('enabled',true);
 					self.setInputValue(files);
 				// }else{
-					alert("Your file upload exceeded then your quota limit.");
+					// alert("Your file upload exceeded then your quota limit.");
 				// }
 			// });
 		}); 
