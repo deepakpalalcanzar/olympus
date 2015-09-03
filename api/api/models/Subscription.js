@@ -65,7 +65,7 @@ module.exports = {
                         price       : options.price,
                         duration    : options.duration,
                         users_limit : options.users_limit,
-                        quota       : options.quota,
+                        quota       : quotaInBytes,
                         is_default  : options.is_default,
                         is_active   : null
 
