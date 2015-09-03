@@ -42,15 +42,15 @@ Mast.registerComponent('DialogComponent', {
 
 		var self = this;
 		this.on('addFile',function(files){
-			var parentId = typeof Olympus.ui.fileSystem.pwd.get('id') !== 'undefined' ? Olympus.ui.fileSystem.pwd.get('id') : Olympus.ui.fileSystem.pwd.collection._byCid.c15.id;
-			Mast.Socket.request('/file/size', { size: files[0].size, workgroup_id: parentId}, function(res, err){
-				if((res[0].remainingQuota - files[0].size) > 0){
+			var parentId = Olympus.ui.fileSystem.pwd.get('id');
+			// Mast.Socket.request('/file/size', { size: files[0].size, workgroup_id: parentId}, function(res, err){
+				// if((res[0].remainingQuota - files[0].size) > 0){
 					self.set('enabled',true);
 					self.setInputValue(files);
-				}else{
+				// }else{
 					alert("Your file upload exceeded then your quota limit.");
-				}
-			});
+				// }
+			// });
 		}); 
 
 		this.on('uploadComplete',this.afterUpload);
@@ -87,7 +87,7 @@ Mast.registerComponent('DialogComponent', {
 	submit: function () {
 
 		// var parentId = Olympus.ui.fileSystem.pwd.get('id');
-		var parentId = typeof Olympus.ui.fileSystem.pwd.get('id') !== 'undefined' ? Olympus.ui.fileSystem.pwd.get('id') : Olympus.ui.fileSystem.pwd.collection._byCid.c15.id;
+		var parentId = Olympus.ui.fileSystem.pwd.get('id');
 		this.$('.loading-spinner').show();
 		this.$('.loading-spinner').css({"position": "relative", "left":"0px", "top" : "-165px"});
 //Trigger a submit event and pass useful data to the uploader.

@@ -440,7 +440,7 @@
                     </div>
                     <div class="col-lg-6 Step" id="Step5" >
                             Font Color: 
-                        <input type="text" style="width: 140px;" class="login-input-field color {styleElement:'FontColor'}"  onchange="SetFontColor(this.value);" value="7AD7FF" name="FontColor">
+                        <input type="text" style="width: 140px;" class="login-input-field color {styleElement:'FontColor'}"  onchange="SetFontColor(this.value);" value="547aa4" name="FontColor">
                         <input type="hidden"  id='logoimg' name="logoimg">
                     </div>
 
@@ -448,17 +448,19 @@
                         <br/>
                         <select style="width: 140px; height: 30px;" name="FontFamily" onchange="SetFontFamily(this.value);" class="login-input-field">
                             <option value=""> Select </option>
+                            <option value="'ProzimanovaRegular, Helvetica, Ariel, sans-serif'"> ProzimanovaRegular, Helvetica, Ariel, sans-serif </option>
                             <option value="Georgia, serif"> Georgia, serif </option>
                             <option value="Palatino Linotype, Book Antiqua, Palatino, serif"> "Palatino Linotype", "Book Antiqua", Palatino, serif </option>
                             <option value="Times New Roman, Times, serif"> "Times New Roman", Times, serif </option>
                             <option value="Arial, Helvetica, sans-serif"> Arial, Helvetica, sans-serif </option>
                             <option value="Arial Black, Gadget, sans-serif"> "Arial Black", Gadget, sans-serif </option>
                             <option value="Comic Sans MS, cursive, sans-serif"> "Comic Sans MS", cursive, sans-serif </option>
-                            <option value="Impact, Charcoal, sans-serif" selected > Impact, Charcoal, sans-serif </option>
+                            <option value="Impact, Charcoal, sans-serif"> Impact, Charcoal, sans-serif </option>
                             <option value="Lucida Sans Unicode, Lucida Grande, sans-serif"> "Lucida Sans Unicode", "Lucida Grande", sans-serif </option>
                             <option value="Tahoma, Geneva, sans-serif"> Tahoma, Geneva, sans-serif </option>
                             <option value="Trebuchet MS, Helvetica, sans-serif"> "Trebuchet MS", Helvetica, sans-serif </option>
                             <option value="Courier New, Courier, monospace"> "Courier New", Courier, monospace </option>
+                            <option value="Lucida Console , Monaco, monospace"> "Lucida Console", Monaco, monospace </option>
                             <option value="Lucida Console , Monaco, monospace"> "Lucida Console", Monaco, monospace </option>
 
                         </select>

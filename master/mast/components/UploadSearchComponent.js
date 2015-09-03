@@ -15,17 +15,17 @@ Mast.registerComponent('UploadSearchComponent',{
 		'click .create-folder'	: 'createFolderOrWorkgroup',
 		'click .upload-file'  	: 'createUploadDialog',
 		'click .search-users'  	: 'searchUsers',
-		'click .thumbnail'  	: 'thumbnailView',
+		// 'click .thumbnail'  	: 'thumbnailView',
 		'click .detail-list'  	: 'dafaultView'
 	},
 
 	dafaultView: function(){
 		Mast.navigate('#');
 	},
-
+/*
 	thumbnailView: function(){
 		Mast.navigate('thumbnail');
-	},
+	},*/
 
 	afterRender: function() {
 		Olympus.ui.fileSystem.on('cd', this.updateButtonState);
