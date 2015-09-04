@@ -414,7 +414,7 @@
                         
                             Header Color: 
 
-                        <input type="text" style="width: 140px;" class="login-input-field color {styleElement:'topbar'}" onchange="SetAtagColor(this.value);" value="FFFFFF" id='HeaderColorID' name="HeaderColor">
+                        <input type="text" style="width: 140px;" class="login-input-field color {styleElement:'topbar'}" onchange="SetAtagColor(this.value);" value="ffffff" id='HeaderColorID' name="HeaderColor">
 
                                         <!--<input type="button" class="next-button" onclick="EventStep(2);" value="NEXT" src="img/next_btn.png"> -->
 
@@ -423,19 +423,19 @@
                     <div class="col-lg-6 Step" id="Step2">
                             Footer Color: 
 
-                        <input type="text" style="width: 140px;" class="login-input-field color {styleElement:'footerdiv'}" value="FFFFFF" name="FooterColor">
+                        <input type="text" style="width: 140px;" class="login-input-field color {styleElement:'footerdiv'}" value="f9f9f9" name="FooterColor">
                                         <!--<input type="button" class="next-button" onclick="EventStep(3);" value="NEXT" src="img/next_btn.png"> -->
                     </div>	
 
                     <div class="col-lg-6 Step" id="Step3" >
                             Body Color: 
-                        <input type="text" style="width: 140px;" class="login-input-field color {styleElement:'Bodydiv'}" value="FFFFFF" name="BodyColor">
+                        <input type="text" style="width: 140px;" class="login-input-field color {styleElement:'Bodydiv'}" value="f9f9f9" name="BodyColor">
                                         <!--<input type="button" class="next-button" onclick="EventStep(4);" value="NEXT" src="img/next_btn.png"> -->
                     </div>	
 
                     <div class="col-lg-6 Step" id="Step4">
                             Navigation Bar Color: 
-                        <input type="text" style="width: 140px;" class="login-input-field color {styleElement:'NavigationBar'}" value="004675" name="NavigationBarColor">
+                        <input type="text" style="width: 140px;" class="login-input-field color {styleElement:'NavigationBar'}" value="4f7ba9" name="NavigationBarColor">
                                         <!--<input type="button" class="next-button" onclick="EventStep(5);" value="NEXT" src="img/next_btn.png"> -->
                     </div>
                     <div class="col-lg-6 Step" id="Step5" >
