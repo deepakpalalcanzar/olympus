@@ -55,11 +55,11 @@
 					</table>
 				</form>
 	<!-- footer section -->
-				<div class="login-box-footer clearfix">
-					<a href='<?php echo "https://".$_SESSION['serverName']."/post.php?action=launch" ?>' class="signinbutton">
+				<!-- <div class="login-box-footer clearfix">
+					<a href='<?php //echo "https://".$_SESSION['serverName']."/post.php?action=launch" ?>' class="signinbutton">
 						Jump to olympus 
 					</a>
-				</div>
+				</div> -->
 			</div>
 	  	</div>
 	</div>
