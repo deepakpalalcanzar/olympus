@@ -23,7 +23,6 @@ var MetaController = {
 				
 				if(createdBy){
 					if(createdBy.enterprise_fsname !== null && createdBy.enterprise_fsname !== '' ){
-						
 						if(createdBy.isSuperAdmin !== 1){
 							enterpriseLogo = createdBy.enterprise_fsname;
 						}else{
@@ -31,7 +30,12 @@ var MetaController = {
 						}
 
 					}else{
-						enterpriseLogo = '';
+
+						if(account.enterprise_fsname !== null && account.enterprise_fsname !== ''){
+							enterpriseLogo = account.enterprise_fsname;
+						}else{
+							enterpriseLogo = '';
+						}
 					}
 					hideSetting= 1;
 				}else{
