@@ -31,6 +31,7 @@ Mast.models.INode = Mast.Model.extend({
 			editing     : false,
 			workgroup   : false,
 			public_link_enabled	: true,
+			url	: null,
 
 			dropdownItems: [{
 				method : 'comment',

@@ -37,7 +37,7 @@ Mast.registerComponent('AccountSettingsComponent',{
 	},
 
 	afterRender: function(){
-		if(Mast.Session.Account.isAdmin && Mast.Session.Account.isSuperAdmin === 0){
+		if(Mast.Session.Account.isAdmin && (Mast.Session.Account.isSuperAdmin === 1 || Mast.Session.Account.isSuperAdmin === null)){
 			this.set('showSetting', true);
 			this.set('showSubscription', true);
 		}else if (Mast.Session.Account.isEnterprise === 0){
@@ -48,27 +48,32 @@ Mast.registerComponent('AccountSettingsComponent',{
 
 // attach account details component to the account settings page region
 	displayAccountDetails: function() {
+		$('.upload-file').hide();
 		this.attach('.account-settings-page', 'AccountDetails');
 		this.set('selectedTab', 'accountDetails');
 	},
 
 // attach account password component to the account settings page region
 	displayAccountPassword: function() {
+		$('.upload-file').hide();
 		this.attach('.account-settings-page', 'ChangePassword');
 		this.set('selectedTab', 'accountPassword');
 	},
 
 	displayAccountNotifications: function() {
+		$('.upload-file').hide();
 		this.attach('.account-settings-page', 'EmailNotifications');
 		this.set('selectedTab', 'accountNotifications');
 	},
 
 	displayAccountSettings: function() {
+		$('.upload-file').hide();
 		this.attach('.account-settings-page', 'SettingsComponent');
 		this.set('selectedTab', 'settings');
 	},
 
 	displayAppearance: function() {
+		$('.upload-file').hide();
 		this.attach('.account-settings-page', 'AppearanceComponent');
 		this.set('selectedTab', 'accountAppearance');
 	},
@@ -79,6 +84,7 @@ Mast.registerComponent('AccountSettingsComponent',{
 	},
 
 	displaySubscribedPlan: function() {
+		$('.upload-file').hide();
 		this.attach('.account-settings-page', 'SubscriptionNotifications');
 		this.set('selectedTab', 'accountSubscription');
 	},

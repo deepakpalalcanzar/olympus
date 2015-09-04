@@ -67,6 +67,12 @@ Mast.registerComponent('UserNavigationComponent', {
 	settings: function(){
 		Mast.navigate('#account/settings');
 	},
+
+	// appearance: function(){
+	// 	Mast.navigate('#account/appearance');
+	// },
+
+
 	// Sign out of the session
 	signOut: function() {
 		window.location = 'auth/logout';

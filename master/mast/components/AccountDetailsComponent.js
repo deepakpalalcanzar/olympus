@@ -19,7 +19,10 @@ Mast.registerComponent('AccountDetails', {
 		'.image-uploader': 'ImageUploaderComponent'
 	},
 
+
 	afterCreate: function () {
+		$('.upload-file').hide();
+
 		// On tablet, hide the upload logo option
 		if (Mast.isTouch) {
 			this.$('.change-profile-pic').remove();

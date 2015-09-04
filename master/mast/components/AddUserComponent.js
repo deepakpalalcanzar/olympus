@@ -19,6 +19,8 @@ Mast.registerComponent('AddUserComponent',{
 
 		var lock =  { id : '12' };
 		$('.searchbar').hide();
+		$('.upload-file').hide();
+
 		if(Mast.Session.Account.isSuperAdmin){
 			this.model.set('superadmin', true);
 		}

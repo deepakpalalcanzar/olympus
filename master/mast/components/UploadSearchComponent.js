@@ -22,18 +22,22 @@ Mast.registerComponent('UploadSearchComponent',{
 	dafaultView: function(){
 		Mast.navigate('#');
 	},
+
 /*
 	thumbnailView: function(){
 		Mast.navigate('thumbnail');
 	},*/
 
 	afterRender: function() {
+		
+		console.log(this);
 		Olympus.ui.fileSystem.on('cd', this.updateButtonState);
 // Create new autocomplete for use with the textarea. Do this only if this olympus app
 // is not a private deployment.
 	},
 
 	afterCreate: function () {
+		console.log(window.location.pathname);
 		this.$el.disableSelection();
 	},
 

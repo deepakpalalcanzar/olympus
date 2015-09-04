@@ -30,6 +30,7 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 	
     init: function() {
 
+    	this.set({ url : window.location });
         var self = this;
 		Mast.on('UPLOAD_PROGRESS', function(data) {
 	        if (data.files[0].name == self.model.get('name') && self.model.get('parent') && self.model.get('parent').id == data.parentId) {
@@ -137,7 +138,6 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 			}
 			else {
 				arrow.removeClass('expanded');
-
 				// Close (and deselect) all children
 				this.collection.reset();
 			}
@@ -776,9 +776,6 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 		e.stopPropagation();*/
 
                 var curid = this.get('id');
-
-        	// $.get("https://ipinfo.io", function(response) {
-            	//var ipadd =response.ip;
 				var url = "/file/download/"+curid;
 		        var iframe;
 		        iframe = document.getElementById("hiddenDownloader");
@@ -797,10 +794,8 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 
 	open : function(e) {
 
-		console.log(this.get('id'));
 		var url = "/file/open/"+this.get('id')+"/"+this.get('name');
 		// Open this url in a new tab. Older browsers fall back to opening a new window.
-		//alert(url);
 		window.open(url, '_blank');
 		window.focus();
 	},
@@ -832,12 +827,11 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 	},
 
 	'delete': function() {
+		
 		var self = this;
-             var id = this.get('id');
-             var type =this.get('type');
-         
-         // $.get("https://ipinfo.io", function(response) {
-           // var ipadd = response.ip ;
+        var id = this.get('id');
+        var type =this.get('type');
+        
 		Mast.Socket.request('/'+type+'/delete',{
 			id:  id
 			//ipadd : ipadd,

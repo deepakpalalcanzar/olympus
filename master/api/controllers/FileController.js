@@ -327,6 +327,8 @@
                         data = data.toString('utf', range[0] || 0, range[1] || size);
                     }
 
+                    console.log(sails.config.appPath);
+                    
 // Get path to file
                     var file = sails.config.appPath + '/public/files/' + fileModel.fsName;
                     if (req.headers['http-range'] !== undefined) {

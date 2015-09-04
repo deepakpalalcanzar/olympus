@@ -9,8 +9,8 @@ var MetaController = {
 
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 		req.session.Account.ip = ip;
-		
 		var enterpriseLogo, hideSetting=0; 
+
 		Account.find({
 			where: { id: req.session.Account.id }
 		}).done(function(err, account) {

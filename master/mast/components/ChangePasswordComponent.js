@@ -5,6 +5,11 @@ Mast.registerComponent('ChangePassword', {
 		'click .submit-update': 'updateAccountPassword'
 	},
 
+
+	init: function(){
+		$('.upload-file').hide();
+	}, 
+
 	updateAccountPassword: function() {
 
 		console.log("UPDATE ACCOUNT PASSWORD");

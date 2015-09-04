@@ -22,6 +22,11 @@ Mast.registerModel('UserNavigation', {
 					iconSrc	: '/images/icon_dropdown_download.png'
 				},
 				{
+					method	: 'appearance',
+					name	: 'Appearance',
+					iconSrc	: '/images/icon_dropdown_download.png'
+				},
+				{
 					method	: 'subscription',
 					name	: 'Subscription',
 					iconSrc	: '/images/icon_dropdown_download.png'

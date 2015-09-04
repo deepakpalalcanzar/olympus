@@ -43,6 +43,7 @@ Mast.registerTree('ListUsersTable', {
 
 	init:function(collection){
         $('.searchbar').show();
+        $('.upload-file').hide();
     },
 
 	bindings: {

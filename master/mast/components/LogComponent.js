@@ -29,6 +29,10 @@ Mast.registerTree('LogTable', {
 		'click .search-details'  :'searchdata',
     },
 
+    init: function(){
+    	$('.upload-file').hide();
+    },
+
     searchdata: function(){
         Mast.Session.from 		= $('input[name="from"]').val();
         Mast.Session.to 		= $('input[name="to"]').val();
