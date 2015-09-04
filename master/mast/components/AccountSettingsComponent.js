@@ -37,7 +37,8 @@ Mast.registerComponent('AccountSettingsComponent',{
 	},
 
 	afterRender: function(){
-		if(Mast.Session.Account.isAdmin && (Mast.Session.Account.isSuperAdmin === 1 || Mast.Session.Account.isSuperAdmin === null)){
+		console.log(Mast.Session.Account);
+		if(Mast.Session.Account.isAdmin && (Mast.Session.Account.isSuperAdmin === 1 || Mast.Session.Account.isSuperAdmin === null || Mast.Session.Account.isSuperAdmin===0)){
 			this.set('showSetting', true);
 			this.set('showSubscription', true);
 		}else if (Mast.Session.Account.isEnterprise === 0){
