@@ -22,14 +22,22 @@ var MetaController = {
 			}).done(function(errs, createdBy){
 				
 				if(createdBy){
-					if(createdBy.enterprise_fsname !== null && createdBy.enterprise_fsname !== ''){
-						enterpriseLogo = createdBy.enterprise_fsname;
+					if(createdBy.enterprise_fsname !== null && createdBy.enterprise_fsname !== '' ){
+						
+						if(createdBy.isSuperAdmin !== 1){
+							enterpriseLogo = createdBy.enterprise_fsname;
+						}else{
+							enterpriseLogo = account.enterprise_fsname;
+						}
+
 					}else{
 						enterpriseLogo = '';
 					}
 					hideSetting= 1;
 				}else{
+
 					enterpriseLogo = account.enterprise_fsname;
+
 				}
 
 				if(account.isSuperAdmin){
