@@ -199,6 +199,7 @@
 
     apiDownload: function(req, res) {
         
+        console.log("!@#$%!@#$%!@#$%!@#$%!@#$%!@#$%!@#$%!@#$%");
         var today = new Date();
         File.find(req.param('id')).success(function(model){
             console.log(model);
@@ -211,15 +212,20 @@
                     access_token: req.headers['authorization'].split(' ')[1]
                 }).done(function(err, result){
 
+                    console.log("%%%%%%%%%%%%%%%%%%%%%% MNBVCXZASDFGHJKLPOIUYTREWQ %%%%%%%%%%%%%%%%%%%%%%");
+                    console.log(result);
                     if (err) {
                         res.send(err);
                     } else {
 // Create a 302 redirect with the file download link in the header.  Also
 // send the URL in the text of the response, in case the client doesn't want
 // to immediately follow the redirect.
+                        console.log("%%%%%%%%%%%%%%%%%%%%%% MNBVCXZASDFGHJKLPOIUYTREWQ %%%%%%%%%%%%%%%%%%%%%%");
+                        console.log(protocol+req.host+"/r/"+result.link_key);
 
                         var protocol = req.connection.encrypted ? 'https://' : 'http://';
                         res.header('Location',protocol+req.host+"/r/"+result.link_key);
+
                         res.send(protocol+req.host+"/r/"+result.link_key, 302);
                     }
                 });
@@ -327,8 +333,6 @@
                         data = data.toString('utf', range[0] || 0, range[1] || size);
                     }
 
-                    console.log(sails.config.appPath);
-                    
 // Get path to file
                     var file = sails.config.appPath + '/public/files/' + fileModel.fsName;
                     if (req.headers['http-range'] !== undefined) {
@@ -456,14 +460,12 @@
     createComment: function(req, res){
 
         var request = require('request');
-        
         var options = {
-            uri: 'http://localhost:1337/file/postComment/',
+            uri: 'http://localhost:1337/file/postComment/' ,
             method: 'POST',
         };
 
         var access_token = req.param('account_id');
-
         options.json =  {
             file_id     : req.param('file_id'),
             comment     : req.param('comment'),
@@ -475,18 +477,6 @@
 //  Resend using the original response statusCode
 //  Use the json parsing above as a simple check we got back good stuff
             res.json(body, response && response.statusCode);
-        });
-
-    },
-
-    size: function(req, res){
-
-        var sql = "SELECT (quota-size) as remainingQuota FROM directory WHERE id=?";
-        sql = Sequelize.Utils.format([sql,req.params.workgroup_id]);
-        sequelize.query(sql, null, {
-            raw: true
-        }).success(function(fileSize) {
-            res.json(fileSize, 200);
         });
 
     },

@@ -30,9 +30,6 @@ Mast.registerComponent('UploadSearchComponent',{
 
 	afterRender: function() {
 		
-		console.log(this);
-		console.log(Mast.Session);
-
 		Olympus.ui.fileSystem.on('cd', this.updateButtonState);
 // Create new autocomplete for use with the textarea. Do this only if this olympus app
 // is not a private deployment.

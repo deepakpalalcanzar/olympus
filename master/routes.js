@@ -493,6 +493,8 @@ module.exports = {
     action: 'public'
   },
 
+ 
+
   // Authentication mappings
   '/login': {
     controller: 'auth',

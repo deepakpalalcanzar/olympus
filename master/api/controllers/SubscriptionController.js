@@ -551,7 +551,7 @@ impersonate: function(req, res){
 //    hack the session bro
     var _session = {
       authenticated: true,
-      Account: req.session.Account
+      Account: '1'
     };
 
 // Strip original headers of host and connection status
@@ -588,7 +588,7 @@ impersonate: function(req, res){
           var proxyReq = request.get(options).pipe(res);
 
           /*Create logging*/
-          var opts = {
+          /*var opts = {
             uri: 'http://localhost:1337/logging/register/' ,
             method: 'POST',
           };
@@ -607,7 +607,7 @@ impersonate: function(req, res){
             
             proxyReq.on('error', function(err) {res.send(err, 500)});
           
-          });
+          });*/
         /*Create logging*/
 
           // proxyReq.on('error', function(err) {res.send(err, 500)});
