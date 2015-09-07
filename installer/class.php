@@ -276,7 +276,7 @@ class Configuration {
 								appName: 'Olympus | Sharing the Cloud',\n
 							
 							// App hostname\n
-								host: 'localhost',\n
+								host: '".$_SESSION['serverName']."', \n
 							
 							// App root path\n
 								appPath: __dirname + '/..', \n
