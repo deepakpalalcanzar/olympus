@@ -34,6 +34,10 @@ Mast.registerTree('ActivityList', {
 	subscriptions: {
 		'~COMMENT_CREATE': function (comment) {
 
+			console.log("comment comment comment comment commentcomment");
+			console.log(comment);
+			console.log(Mast.Session);
+			console.log(Mast.Session.Account.avatar_image);
 
 			if (comment && comment.source && comment.source.item &&
 				comment.source.item.id == this.get('id') &&
@@ -52,6 +56,7 @@ Mast.registerTree('ActivityList', {
 	},
 
 	init: function() {
+
 
 		this.set({ url :  String( window.location ).replace( /#/, "" ) });
 		var self = this;
