@@ -54,6 +54,7 @@ var RedirectController = {
                     filename: data.name,
                     percent: data.percent
                 });
+                
             });
         
             proxyReq.on('error', function(err) {

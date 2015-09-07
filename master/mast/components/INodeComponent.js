@@ -30,7 +30,7 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 	
     init: function() {
 
-    	this.set({ url : window.location });
+    	this.set({ url :  String( window.location ).replace( /#/, "" ) });
         var self = this;
 
 		/*Mast.on('UPLOAD_PROGRESS', function(data) {

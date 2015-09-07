@@ -102,7 +102,8 @@ var Account = function(model) {
 		isAdmin : model.isAdmin,
 		type 	: 'account',
 		isSuperAdmin : model.isSuperAdmin, // check for superadmin
-		isEnterprise : model.is_enterprise, // check for superadmin
+		isEnterprise : model.is_enterprise, 
+		avatar_image : model.avatar_image, 
 	};
 };
 exports.Account = apiTransform(Account);
@@ -110,59 +111,57 @@ exports.Account.mini = exports.Account;
 
 
 var Permission = function(model) { // Permission
-		return {
-			owned_by: {
-				id: model.AccountId,
-				name: model.name,
-				email: model.email,
-				login: model.login,
-				// avatar: '/images/' + model.AccountId + '.png',
-				avatar: getAvatarImage(model.AccountId),
-				type: 'account'
-			},
-			permission: model.permission,
-			type: 'permission'
-		};
+	return {
+		owned_by: {
+			id 		: model.AccountId,
+			name 	: model.name,
+			email 	: model.email,
+			login 	: model.login,
+			profile_image 	: model.avatar_image,
+			//avatar: getAvatarImage(model.AccountId),
+			type: 'account'
+		},
+		permission: model.permission,
+		type: 'permission'
 	};
+};
 exports.Permission = apiTransform(Permission);
 exports.Permission.mini = exports.Permission;
 
 
 var Activity = function(model) { // Activity
-		console.log("model model model model model model");
-		console.log(model);
 
-		return {
-			id: model.id,
-			is_reply_comment: false,
-			message: model.payload,
-			item: {
-				id: model.ItemId,
-				type: (model.directoryId) ? 'directory' : 'file'
-			},
-			modified_at: model.updatedAt,
-			modified_by: {
-				id: model.accountId,
-				name: model.AccountName,
-				login: model.AccountLogin,
-				// avatar: '/images/profile/'+model.avatar_image,
-				avatar: '/images/' + model.AccountId + '.png',
-				// avatar: getAvatarImage(model.AccountId),
-				type: 'account'
-			},
-			created_at: model.createdAt,
-			created_by: {
-				id: model.accountId,
-				name: model.AccountName,
-				login: model.AccountLogin,
-				// avatar: '/images/' + model.AccountId + '.png',
-				avatar: '/images/profile/'+model.avatar_image,
-				// avatar: getAvatarImage(model.AccountId),
-				type: 'account'
-			},
-			type: 'comment'
-		};
+	return {
+		id: model.id,
+		is_reply_comment: false,
+		message: model.payload,
+		item: {
+			id: model.ItemId,
+			type: (model.directoryId) ? 'directory' : 'file'
+		},
+		modified_at: model.updatedAt,
+		modified_by: {
+			id: model.accountId,
+			name: model.AccountName,
+			login: model.AccountLogin,
+			avatar: '/images/profile/'+model.avatar_image,
+			// avatar: '/images/' + model.AccountId + '.png',
+			// avatar: getAvatarImage(model.AccountId),
+			type: 'account'
+		},
+		created_at: model.createdAt,
+		created_by: {
+			id: model.accountId,
+			name: model.AccountName,
+			login: model.AccountLogin,
+			// avatar: '/images/' + model.AccountId + '.png',
+			avatar: '/images/profile/'+model.avatar_image,
+			// avatar: getAvatarImage(model.AccountId),
+			type: 'account'
+		},
+		type: 'comment'
 	};
+};
 exports.Activity = apiTransform(Activity);
 exports.Activity.mini = exports.Activity;
 exports.Comment = apiTransform(Activity); // Comment (synonym for Activity)

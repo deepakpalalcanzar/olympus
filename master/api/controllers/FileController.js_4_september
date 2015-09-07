@@ -199,12 +199,11 @@
 
     apiDownload: function(req, res) {
         
-        console.log("!@#$%!@#$%!@#$%!@#$%!@#$%!@#$%!@#$%!@#$%");
         var today = new Date();
         File.find(req.param('id')).success(function(model){
             console.log(model);
             if (model) {
-// Create a new temporary download link
+            // Create a new temporary download link
                 FileDownloadLink.create({
                     file_id: model.id,
                     link_key: AuthenticationService.randString(20),
@@ -212,18 +211,15 @@
                     access_token: req.headers['authorization'].split(' ')[1]
                 }).done(function(err, result){
 
-                    console.log("%%%%%%%%%%%%%%%%%%%%%% MNBVCXZASDFGHJKLPOIUYTREWQ %%%%%%%%%%%%%%%%%%%%%%");
-                    console.log(result);
                     if (err) {
                         res.send(err);
                     } else {
-// Create a 302 redirect with the file download link in the header.  Also
-// send the URL in the text of the response, in case the client doesn't want
-// to immediately follow the redirect.
+                        // Create a 302 redirect with the file download link in the header.  Also
+                        // send the URL in the text of the response, in case the client doesn't want
+                        // to immediately follow the redirect.
 
                         var protocol = req.connection.encrypted ? 'https://' : 'http://';
                         res.header('Location',protocol+req.host+"/r/"+result.link_key);
-
                         res.send(protocol+req.host+"/r/"+result.link_key, 302);
                     }
                 });
@@ -240,18 +236,18 @@
 
     update: function(req, res) {
         var tasks = [];
-// If the "name" is set, attempt to rename the dir
+        // If the "name" is set, attempt to rename the dir
         if (req.param('name')) {
             tasks.push(function(cb){INodeService.rename(req, res, cb);});
         }
-// If the "parent" is set, attempt a move
+        // If the "parent" is set, attempt a move
         if (req.param('parent') && req.param('parent').id) {
             req.body.directoryId = req.param('parent').id;
             tasks.push(function(cb){INodeService.move(req, res, cb);});
         }
-// Try to perform all the changes. If an error occurs at any point,
-// the error message will be sent back.  Otherwise, the updated
-// API object will be sent back.
+        // Try to perform all the changes. If an error occurs at any point,
+        // the error message will be sent back.  Otherwise, the updated
+        // API object will be sent back.
         async.series(tasks, function(err, results) {
             if (err) {
                 res.json(err, err.status);
@@ -271,6 +267,17 @@
         File.find(id).success(function (fileModel) {
 // If we have a file model to work with...
         if (fileModel) {
+
+            console.log("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP");
+                console.log(fileModel);
+            console.log("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP");
+
+
+            res.setHeader('Content-Type', fileModel.mimetype);
+            options.uri = "http://localhost:1337/file/download/"+fileModel.fsName+"?_session="+JSON.stringify(_session);
+            var proxyReq = request.get(options).pipe(res);
+            proxyReq.on('error', function(err) {res.send(err, 500)});
+
 /*
 // So I can be a little lazier
     var size  = fileModel.size, headers = {};
@@ -283,71 +290,33 @@
 */
 
 // If the "open" param isn't set, force the file to download
-            if (!req.param('open') && !open) {
+            /*if (!req.param('open') && !open) {
                 res.setHeader('Content-disposition', 'attachment; filename=\"' + fileModel.name + '\"');
-            }
+            }*/
 
 // set content-type header
-            res.setHeader('Content-Type', fileModel.mimetype);
+            // res.setHeader('Content-Type', fileModel.mimetype);
 
 // Download and serve file
-            FileAdapter.download({
-                name: fileModel.fsName
-            }, function (err, data, contentLength, stream) {
+            // FileAdapter.download({
+            //     name: fileModel.fsName
+            // }, function (err, data, contentLength, stream) {
+
+            //     console.log("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM");
+            //         console.log(err);
+            //     console.log("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM");
+            //         console.log(data);
+            //     console.log("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM");
+            //         console.log(contentLength);
+            //     console.log("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM");
+            //         console.log(stream);
+
+
                 
-                if (err) return res.send(500,err);
-// Set content-length header
-                res.setHeader('Content-Length', fileModel.size);
-// set content-type header
-                res.setHeader( 'Content-Type', mime.lookup(fileModel.name) );
-// No data available
-                if (!data && !stream) {
-                    return res.send(404);
-                }
-// Stream file (Swift)
-                else if (!data) {
-                    return stream.pipe(res);
-                }
-// Or dump data (S3)
-                else return res.send(data);
-// If the "open" param isn't set, force the file to download
-                if (!req.param('open') && !open)
-                    res.setHeader('Content-disposition', 'attachment; filename=\"' + fileModel.name + '\"');
-// set content-type header
-                    headers['Content-Type'] = mime.lookup(fileModel.name);
-// Set content- length and range headers
-                    headers['Content-Length'] = size; // - (range[1] - range[0]);
-                    headers['Accept-Ranges'] = '0-' + size;
-// No data available
-                    if (!data && !stream) return res.send(404, headers);
-// Go ahead and respond with a 500 ISE on error getting the file model
-                    if (err) return res.send(err, 500);
 
-// Do we have data or a stream?
-                    if (!data) {
-// Get a buffer of the entire stream object. This simplifies http
-// range functionality and makes header management more manageable.
-                        data = stream.read(size);
-                        data = data.toString('utf', range[0] || 0, range[1] || size);
-                    }
+            //     });
 
-// Get path to file
-                    var file = sails.config.appPath + '/public/files/' + fileModel.fsName;
-                    if (req.headers['http-range'] !== undefined) {
-// Check if we've got a valid content range (or none at all, too)
-                        if (req.headers['http-range'].indexOf(',') < 0) {
-// Set our content range based upon the requested range
-                            headers['Content-Range'] = 'bytes ' + range[0] + '-' + range[1] + '/' + size;
-// dump data to the client
-                            return res.send(data, 206, headers);
-                        } else {
-// And tell the client we had an error with the range
-                            return res.send(416, headers);
-                        }
-                    } else {
-                        return res.send(data);
-                    }
-                });
+
             } else {
                 res.json({
                     success: false,
@@ -458,12 +427,14 @@
     createComment: function(req, res){
 
         var request = require('request');
+        
         var options = {
-            uri: 'http://localhost:1337/file/postComment/' ,
+            uri: 'http://localhost:1337/file/postComment/',
             method: 'POST',
         };
 
         var access_token = req.param('account_id');
+
         options.json =  {
             file_id     : req.param('file_id'),
             comment     : req.param('comment'),
@@ -475,6 +446,18 @@
 //  Resend using the original response statusCode
 //  Use the json parsing above as a simple check we got back good stuff
             res.json(body, response && response.statusCode);
+        });
+
+    },
+
+    size: function(req, res){
+
+        var sql = "SELECT (quota-size) as remainingQuota FROM directory WHERE id=?";
+        sql = Sequelize.Utils.format([sql,req.params.workgroup_id]);
+        sequelize.query(sql, null, {
+            raw: true
+        }).success(function(fileSize) {
+            res.json(fileSize, 200);
         });
 
     },

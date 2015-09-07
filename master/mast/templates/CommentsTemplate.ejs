@@ -18,9 +18,17 @@
 
 <!-- comment template -->
 <div class="commentRow-template comment-attire">
-	<div class="comment-user-avatar">
+	
+	{% if (created_by.avatar != null) { %}
+		<div class="file-img" style="height: 42px;width: 42px; background: url('{{created_by.avatar}}') center center no-repeat; background-size: 100%;margin: 3px;"></div>
+  	{% }else{ %}
+		<div class="file-img" style="height: 42px;width: 42px; background: url('images/avatar_anonymous.png') center center no-repeat; background-size: 100%;margin: 3px;"></div>
+	{% } %}
+
+<!--	<div class="comment-user-avatar">
 		<a class="user-avatar-link"  href="#"><img src="{{created_by.avatar}}" class="user-avatar" /></a> 
-	</div>
+	</div> -->
+
 	<div class="comment-container">
 		<h6><a href="#">{{created_by.name}}</a></h6>
 		<span class="comment-date">{{ created_at }}</span>

@@ -12,6 +12,10 @@ module.exports.download = adapter.download;
 
 // Return adapter module given the key string
 function getAdapterByKey (key) {
+
+	console.log(":as;kdalkas;ldas;lkasl;kasl;asl;poewpoopqwop");
+	console.log(key);
+	
 	var adapter;
 	switch (key) {
 		case 's3': adapter = 'S3APIService'; break;

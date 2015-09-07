@@ -6,7 +6,8 @@ Mast.registerModel('Activity',{
 				avatar	: '/images/avatar_anonymous.png'
 			},
 			created_at	: 'someTime',
-			message		: 'Default comment message'
+			message		: 'Default comment message',
+			url		: null
 		}
 	}
 });

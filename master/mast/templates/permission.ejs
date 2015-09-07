@@ -47,14 +47,18 @@
 
 <!-- permission row template -->
 <div class="permissionRow-template">
-  <div class="sharing-inner-spacing">
+  	<div class="sharing-inner-spacing">
+  		{% if (owned_by.profile_image != null) { %}
+		<div class="file-img" style="height: 42px;width: 42px; background: url('{{url}}/images/profile/{{owned_by.profile_image}}') center center no-repeat; background-size: 100%;margin: 3px;"></div>
+  		{% }else{ %}
+		<div class="file-img" style="height: 42px;width: 42px; background: url('{{url}}/images/avatar_anonymous.png') center center no-repeat; background-size: 100%;margin: 3px;"></div>
+		{% } %}
+
 		<div class="comment-user-avatar">
-		  <a class="user-avatar-link">
-		  	<img class="user-avatar" src="/account/avatar/{{owned_by.id}}" />
-		  </a>
+<!--			<img class="user-avatar" src="{% if (owned_by.profile_image!=null) { %} /images/profile/{{owned_by.profile_image}} {% }else{  %} /images/38.png {% } %}" data-img= "{{owned_by.profile_image}}"/> -->
 		</div>
 		<div class="comment-container-sharing">
-		  <h6><a>{{owned_by.name}}</a></h6>
+		  <h6><a> {{owned_by.name}} </a></h6>
 		</div>
 
 		{% if (editable) { %}
@@ -63,7 +67,7 @@
 		</div>
 
 		<div class="detail-container-sharing">
-		  <h6><a class="permission-edit">{{permission}} <img src="/images/ExpandedArrow.png"/></a></h6>
+		  <h6><a class="permission-edit"> {{permission}} <img src="/images/ExpandedArrow.png"/></a></h6>
 		</div>
 		{% } else { %}
 		<div class="detail-container-sharing show-permission">

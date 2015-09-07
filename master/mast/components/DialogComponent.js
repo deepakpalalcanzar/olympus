@@ -24,10 +24,10 @@ Mast.registerComponent('DialogComponent', {
 			}
 		},
 
-// Fade in/out submit button based on value of "enabled" attribute.
+//  Fade in/out submit button based on value of "enabled" attribute.
+//  
 		enabled: function(newVal){
 			var uploadButton = this.$(".upload-button");
-
 			if (newVal) {
 				uploadButton.removeClass('no-submit');
 				uploadButton.addClass('submit');
@@ -36,6 +36,7 @@ Mast.registerComponent('DialogComponent', {
 				uploadButton.addClass('no-submit');
 			}
 		}
+
 	},
 
 	init: function(){

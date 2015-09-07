@@ -167,9 +167,11 @@ Mast.registerTree('PermissionList',{
 	},
 
 	init: function() {
+		
 		var self = this;
 		this.collection.load(this.pattern.model.attributes, function(){
 			_.each(self.collection.models, function(model){
+				console.log(model);
 				if (model.get('id') == Mast.Session.Account.id) {
 					self.ownerPermission = model.get('permission');
 				}

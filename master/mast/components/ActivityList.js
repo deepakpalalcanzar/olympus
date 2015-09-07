@@ -33,9 +33,12 @@ Mast.registerTree('ActivityList', {
 
 	subscriptions: {
 		'~COMMENT_CREATE': function (comment) {
+
+
 			if (comment && comment.source && comment.source.item &&
 				comment.source.item.id == this.get('id') &&
 				comment.source.item.type == this.get('type')) {
+				comment.source.created_by.avatar = '/images/profile/'+Mast.Session.Account.avatar_image;
 				this.collection.add(comment.source);
 				this.scrollToBottom();
 			}
@@ -49,6 +52,8 @@ Mast.registerTree('ActivityList', {
 	},
 
 	init: function() {
+
+		this.set({ url :  String( window.location ).replace( /#/, "" ) });
 		var self = this;
 		this.collection.load(this.pattern.model.attributes,function(){
 			self.scrollToBottom();
@@ -81,7 +86,7 @@ Mast.registerTree('ActivityList', {
 
 		// Clear comment textarea
 		this.$('textarea').val('');
-
+		
 		// Submit comment to server
 		Mast.Socket.request(this.getUrlRoot()+'addComment',{
 			id: this.get('id'),

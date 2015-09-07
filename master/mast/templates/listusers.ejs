@@ -21,8 +21,12 @@
 	{% if(name !=='error_123'){%}
 	<div class="dir-files list-user-name mast-critical">
 		<div class="margin-user-info">
-			<img class="listusers-pic" src="{{ avatarSrc }}" />
-			<span class="list-text">{{name}}</span>
+			{% if (avatar_image != null) { %}
+				<img class="listusers-pic" src="/images/profile/{{avatar_image}}" />
+			{% }else{ %}	
+				<img class="listusers-pic" src="/images/38.png" />
+			{% } %}	
+			<span class="list-text">{{ name }}</span>
 		</div>	
 	</div>
 	

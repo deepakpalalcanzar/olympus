@@ -234,9 +234,9 @@ var AccountController = {
 				res.json(accounts, 200);
 			}else{
 				res.json({
-					name: 'error_123',
-					avatarSrc: '/images/38.png',
-					notFound : true,	
+					name 			: 'error_123',
+					avatar_image 	: '/images/38.png',
+					notFound 		: true,	
 				});
 			}
 		}).error(function(e) {
@@ -635,14 +635,14 @@ var AccountController = {
 
 	 			if(picUploadType === 'enterprise'){
 		 			
-		 			fsx.writeFile("/var/www/html/olympus/master/public/images/enterprises/"+enterpriseName, binaryData, 'binary', function(err){
+		 			fsx.writeFile("/var/www/html/olympus/olympus-web/master/public/images/enterprises/"+enterpriseName, binaryData, 'binary', function(err){
 					});
 			        account.enterprise_fsname     = enterpriseName;
 	                account.enterprise_mimetype   = filetype;
 
 	 			} else if(picUploadType === 'profile'){
 	 				
-					fsx.writeFile("/var/www/html/olympus/master/public/images/profile/"+enterpriseName, binaryData, 'binary', function(err){
+					fsx.writeFile("/var/www/html/olympus/olympus-web/master/public/images/profile/"+enterpriseName, binaryData, 'binary', function(err){
 					});
 
 			        account.avatar_image    = enterpriseName;

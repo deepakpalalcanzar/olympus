@@ -32,9 +32,9 @@ Mast.registerTree('ListUsersTable', {
 		url: '/account/listUsers',
 		model: Mast.Model.extend({
 			defaults: {
-				highlighted : false,
-				name: 'Afzal',
-				avatarSrc: '/images/38.png'	,
+				highlighted 	: false,
+				name 			: 'Afzal',
+				avatar_image 	: '/images/38.png'	,
 			},
 			selectedModel: null
 		})
@@ -112,7 +112,6 @@ Mast.registerComponent('ListUsersRow', {
 
 		Mast.Socket.request('/enterprises/impersonate', options, function(req, err) {
 			if(req == 200){
-				 // window.open('https://localhost/', '_self');
 				window.open('https://dev.olympus.io/', '_blank');
 				window.focus();
 			}		

@@ -20,8 +20,6 @@ Mast.registerTree('DirectoryComponent',{
 		this.set('state','loading');
 		this.collection.reset();
 
-		console.log("this.collection this.collection this.collection");
-		console.log(this.collection);
 
 		this.collection.fetchMembers(this,function(){
 			self.set('state','expanded');

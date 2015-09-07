@@ -987,9 +987,16 @@ exports.removeComment = function(req, res) {
 // Return the comments
 exports.activity = function(req, res, cb) {
 
+console.log("req req req req req req req req req ");
+console.log(req);
+console.log("req req req req req req req req req ");
 	var sql = "SELECT *,c.id AS id, a.avatar_image AS avatar, a.name AS AccountName, " + ((req.param('controller') == 'directory') ? "c.FileId " : "c.DirectoryId ") + "AS ItemId " + "FROM comment c " + "LEFT OUTER JOIN " + "account a " + "ON c.AccountId=a.id " + "WHERE " + ((req.param('controller') == 'directory') ? "c.DirectoryId=?" : "c.FileId=?");
 	sql = Sequelize.Utils.format([sql, req.param('id')]);
 	sequelize.query(sql, Comment).success(function(comments) {
+
+		console.log("comments comments comments comments comments");
+		console.log(comments);
+		console.log("comments comments comments comments comments");
 
 		var apiObj = APIService.Activity.mini(comments);
 		if (!cb) {

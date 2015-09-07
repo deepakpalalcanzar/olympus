@@ -5,8 +5,10 @@ Mast.registerComponent('ActivityComponent',{
 	template: '.activity-template',
 	outlet	: '.activity-sharing-outlet',
 
+
 // create new current viewers and inode comments components
 	afterRender: function() {
+
 		this.activityList = new Mast.components.ActivityList({
 			model: this.pattern.model
 		});
