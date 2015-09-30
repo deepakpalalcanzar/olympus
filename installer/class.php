@@ -264,77 +264,155 @@ class Configuration {
 					port: '".$_SESSION['protocal']."', // change to 80 if you're not using SSL\n";
 
 
-		$masterConfigFile ="module.exports = {\n
-								specialAdminCode: 'ad8h4FJADSLJah34ajsdajchALz2494gasdasdhjasdhj23bn',\n
-								mandrillApiKey: 'f137c8a3-296a-463b-b4b1-d5652b646942',\n
-								bootstrap: function(bootstrap_cb) { \n
-									if(bootstrap_cb) bootstrap_cb(); \n
-								},\n
-								
-								$fileAdapter\n
-							
-							// Default title for layout\n
-								appName: 'Olympus | Sharing the Cloud',\n
-							
-							// App hostname\n
-								host: '".$_SESSION['serverName']."', \n
-							
-							// App root path\n
-								appPath: __dirname + '/..', \n
-							
-							// Port to run the app on \n
-							
-								port: '".$_SESSION['protocal']."', //5008, \n
-							    express: { \n
-									serverOptions: { \n
-								   		ca: fs.readFileSync(__dirname + '/../ssl/gd_bundle.crt'), \n
-								   		key: fs.readFileSync(__dirname + '/../ssl/olympus.key'), \n
-								   		cert: fs.readFileSync(__dirname + '/../ssl/olympus.crt') \n
-									} \n
-								}, \n
 
-							// Development or production environment \n
-								environment: 'development', \n
-							
-							// Path to the static web root for serving images, css, etc. \n
-								staticPath: './public', \n
-							
-							// Rigging configuration (automatic asset compilation) \n
-								rigging: { \n
-									outputPath: './.compiled', \n
-									sequence: ['./public/dependencies', './public/js/blueimp/vendor', './public/js/blueimp/cors', './public/js/blueimp/main', './mast'] \n
-								}, \n
-								
-							// Prune the session before returning it to the client over socket.io \n
-								sessionPruneFn: function(session) { \n
-									var avatar = (session.Account && session.Account.id === 1) ? '/images/' + session.Account.id + '.png' : '/images/avatar_anonymous.png'; \n
-									var prunedSession = { \n
-										Account: _.extend(session.Account || {}, { \n
-											avatar: avatar \n
-										}) \n
-									}; \n
-									return prunedSession; \n
-								}, \n
-							// API token \n
-								apiToken: 'Xw46nGv1Nrearden', \n
-							// Information about your organization \n
-								organization: { \n
-									name: 'Olympus', \n
-									copyright: '&copy; Olympus.io Inc.', \n
-									squareLogoSrc: '/images/logo_square.png', \n
-							// Configurable footer link endpoints \n
-									links: { \n
-										termsOfUse: 'http://www.olympus.io/terms-and-privacy/', \n
-										privacyPolicy: 'http://www.olympus.io/privacy/', \n
-										help: 'http://www.olympus.io/contact-us/' \n
-									} \n
-								}, \n
-								publicLinksEnabledByDefault: true, \n
-							// NOTE: This is just to test for privateDevelopment feature. Need to figure out \n
-							// what determines this config options and implement that. \n
-    							privateDeployment: false, \n
+		if($_SESSION['protocal'] == 'http'){
 
-							};\n";
+			$masterConfigFile ="module.exports = {\n
+									specialAdminCode: 'ad8h4FJADSLJah34ajsdajchALz2494gasdasdhjasdhj23bn',\n
+									mandrillApiKey: 'f137c8a3-296a-463b-b4b1-d5652b646942',\n
+									bootstrap: function(bootstrap_cb) { \n
+										if(bootstrap_cb) bootstrap_cb(); \n
+									},\n
+									
+									$fileAdapter\n
+								
+								// Default title for layout\n
+									appName: 'Olympus | Sharing the Cloud',\n
+								
+								// App hostname\n
+									host: '".$_SESSION['serverName']."', \n
+								
+								// App root path\n
+									appPath: __dirname + '/..', \n
+								
+								// Port to run the app on \n
+								
+									port: '".$_SESSION['protocal']."', //5008, \n
+								    //express: { \n
+									//	serverOptions: { \n
+									  // 		ca: fs.readFileSync(__dirname + '/../ssl/gd_bundle.crt'), \n
+									   	//	key: fs.readFileSync(__dirname + '/../ssl/olympus.key'), \n
+									   	//	cert: fs.readFileSync(__dirname + '/../ssl/olympus.crt') \n
+										//} \n
+									//}, \n
+
+								// Development or production environment \n
+									environment: 'development', \n
+								
+								// Path to the static web root for serving images, css, etc. \n
+									staticPath: './public', \n
+								
+								// Rigging configuration (automatic asset compilation) \n
+									rigging: { \n
+										outputPath: './.compiled', \n
+										sequence: ['./public/dependencies', './public/js/blueimp/vendor', './public/js/blueimp/cors', './public/js/blueimp/main', './mast'] \n
+									}, \n
+									
+								// Prune the session before returning it to the client over socket.io \n
+									sessionPruneFn: function(session) { \n
+										var avatar = (session.Account && session.Account.id === 1) ? '/images/' + session.Account.id + '.png' : '/images/avatar_anonymous.png'; \n
+										var prunedSession = { \n
+											Account: _.extend(session.Account || {}, { \n
+												avatar: avatar \n
+											}) \n
+										}; \n
+										return prunedSession; \n
+									}, \n
+								// API token \n
+									apiToken: 'Xw46nGv1Nrearden', \n
+								// Information about your organization \n
+									organization: { \n
+										name: 'Olympus', \n
+										copyright: '&copy; Olympus.io Inc.', \n
+										squareLogoSrc: '/images/logo_square.png', \n
+								// Configurable footer link endpoints \n
+										links: { \n
+											termsOfUse: 'http://www.olympus.io/terms-and-privacy/', \n
+											privacyPolicy: 'http://www.olympus.io/privacy/', \n
+											help: 'http://www.olympus.io/contact-us/' \n
+										} \n
+									}, \n
+									publicLinksEnabledByDefault: true, \n
+								// NOTE: This is just to test for privateDevelopment feature. Need to figure out \n
+								// what determines this config options and implement that. \n
+	    							privateDeployment: false, \n
+
+								};\n";
+		}else{
+
+						$masterConfigFile ="module.exports = {\n
+									specialAdminCode: 'ad8h4FJADSLJah34ajsdajchALz2494gasdasdhjasdhj23bn',\n
+									mandrillApiKey: 'f137c8a3-296a-463b-b4b1-d5652b646942',\n
+									bootstrap: function(bootstrap_cb) { \n
+										if(bootstrap_cb) bootstrap_cb(); \n
+									},\n
+									
+									$fileAdapter\n
+								
+								// Default title for layout\n
+									appName: 'Olympus | Sharing the Cloud',\n
+								
+								// App hostname\n
+									host: '".$_SESSION['serverName']."', \n
+								
+								// App root path\n
+									appPath: __dirname + '/..', \n
+								
+								// Port to run the app on \n
+								
+									port: '".$_SESSION['protocal']."', //5008, \n
+								    express: { \n
+										serverOptions: { \n
+									   		ca: fs.readFileSync(__dirname + '/../ssl/gd_bundle.crt'), \n
+									   		key: fs.readFileSync(__dirname + '/../ssl/olympus.key'), \n
+									   		cert: fs.readFileSync(__dirname + '/../ssl/olympus.crt') \n
+										} \n
+									}, \n
+
+								// Development or production environment \n
+									environment: 'development', \n
+								
+								// Path to the static web root for serving images, css, etc. \n
+									staticPath: './public', \n
+								
+								// Rigging configuration (automatic asset compilation) \n
+									rigging: { \n
+										outputPath: './.compiled', \n
+										sequence: ['./public/dependencies', './public/js/blueimp/vendor', './public/js/blueimp/cors', './public/js/blueimp/main', './mast'] \n
+									}, \n
+									
+								// Prune the session before returning it to the client over socket.io \n
+									sessionPruneFn: function(session) { \n
+										var avatar = (session.Account && session.Account.id === 1) ? '/images/' + session.Account.id + '.png' : '/images/avatar_anonymous.png'; \n
+										var prunedSession = { \n
+											Account: _.extend(session.Account || {}, { \n
+												avatar: avatar \n
+											}) \n
+										}; \n
+										return prunedSession; \n
+									}, \n
+								// API token \n
+									apiToken: 'Xw46nGv1Nrearden', \n
+								// Information about your organization \n
+									organization: { \n
+										name: 'Olympus', \n
+										copyright: '&copy; Olympus.io Inc.', \n
+										squareLogoSrc: '/images/logo_square.png', \n
+								// Configurable footer link endpoints \n
+										links: { \n
+											termsOfUse: 'http://www.olympus.io/terms-and-privacy/', \n
+											privacyPolicy: 'http://www.olympus.io/privacy/', \n
+											help: 'http://www.olympus.io/contact-us/' \n
+										} \n
+									}, \n
+									publicLinksEnabledByDefault: true, \n
+								// NOTE: This is just to test for privateDevelopment feature. Need to figure out \n
+								// what determines this config options and implement that. \n
+	    							privateDeployment: false, \n
+
+								};\n";
+
+		}
 
 
 
@@ -424,8 +502,7 @@ class Configuration {
   mandrill: {\n
     token: 'f137c8a3-296a-463b-b4b1-d5652b646942'\n
   }\n
-};\n
-"
+};";
 
 
 
