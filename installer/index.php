@@ -29,6 +29,19 @@ echo exec("lsb_release -i | cut -f2"); ?>
 						?>
 					</div>
 
+					<label for="protocal">
+						Configure Protocol: 
+						<img src="img/help.png" tabindex="0" data-toggle="popover" data-html="true" data-trigger="hover" data-original-title="Server protocol" data-content="If you have SSL certificate ready to upload use https other wise use http" style="cursor:pointer;">
+					</label>
+
+					<div class="radio">
+				  		<label>
+							<input type="radio" name="protocal" value="443" style="padding-left:10px;padding-right:10px;"> HTTPS
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="protocal" value="80" style="padding-left:10px;padding-right:10px"> HTTP
+					  	</label>
+					</div>
+
 					<label for="email">
 						Application Server Hostname: 
 						<img src="img/help.png" tabindex="0" data-toggle="popover" data-html="true" data-trigger="hover" data-original-title="Application Server Hostname" data-content="IP address of hostname of the server hosting the Olympus application." style="cursor:pointer;">

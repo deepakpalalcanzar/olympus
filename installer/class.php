@@ -39,6 +39,7 @@ class Configuration {
 					$_SESSION['username'] 	  = $postData['username'];
 					$_SESSION['password']	  = $postData['password'];
 					$_SESSION['serverName']	  = $postData['server_hostname'];
+					$_SESSION['protocal']	  = $postData['protocal'];
 					$url = "http://".$_SESSION['serverName']."/olympus/installer/mandrill.php";
 					echo '<script>window.location.href="'.$url.'"</script>';
 
@@ -156,7 +157,7 @@ class Configuration {
 
 // File store adapter configuration
 				$fileAdapter = "fileAdapter: { \n // Which adapter to use \n
-											adapter: 's3', \n
+											adapter: 'swift', \n
 										// Amazon S3 API credentials \n
 											s3: { \n
 												accessKeyId		: 'AWS_ACCESS_KEY_ID', \n
@@ -183,7 +184,7 @@ class Configuration {
 
 
 				$localConfigFileAdaptor = "exports.fileAdapter = { \n // Choose a file adapter for uploads / downloads \n
-							adapter: 's3', \n
+							adapter: 'swift', \n
 				// Amazon s3 credentials \n
 						s3: { \n
 							accessKeyId		: 'AWS_ACCESS_KEY_ID', \n
@@ -207,7 +208,7 @@ class Configuration {
 
 // File store adapter configuration
 				$fileAdapter = "fileAdapter: { \n // Which adapter to use \n
-										adapter: 's3', \n
+										adapter: 'disk', \n
 										// Amazon S3 API credentials \n
 											s3: { \n
 												accessKeyId		: 'AWS_ACCESS_KEY_ID', \n
@@ -234,7 +235,7 @@ class Configuration {
 
 
 				$localConfigFileAdaptor = "exports.fileAdapter = { \n // Choose a file adapter for uploads / downloads \n
-							adapter: 's3', \n
+							adapter: 'disk', \n
 				// Amazon s3 credentials \n
 						s3: { \n
 							accessKeyId		: 'AWS_ACCESS_KEY_ID', \n
@@ -260,7 +261,7 @@ class Configuration {
 		$dataBaseConfiguration 	= "exports.datasource = {\n database: '".$_SESSION['databaseName']."', \n username: '".$_SESSION['username']."', \n password: '".$_SESSION['password']."' \n // Choose a SQL dialect, one of sqlite, postgres, or mysql (default mysql) \n // dialect:  'mysql', \n // Choose a file storage location (sqlite only) \n //storage:  ':memory:', \n // mySQL only \n // pool: { maxConnections: 5, maxIdleTime: 30} \n };\n
 					// Self-awareness of hostname \n
 					exports.host = '".$_SESSION['serverName']."'; \n
-					port: 443, // change to 80 if you're not using SSL\n";
+					port: '".$_SESSION['protocal']."', // change to 80 if you're not using SSL\n";
 
 
 		$masterConfigFile ="module.exports = {\n
@@ -283,7 +284,7 @@ class Configuration {
 							
 							// Port to run the app on \n
 							
-								port: 443, //5008, \n
+								port: '".$_SESSION['protocal']."', //5008, \n
 							    express: { \n
 									serverOptions: { \n
 								   		ca: fs.readFileSync(__dirname + '/../ssl/gd_bundle.crt'), \n
@@ -407,6 +408,27 @@ class Configuration {
 							};";
 
 
+		$apiConfigApplicationJs = "module.exports = { \n
+  // Port this Sails application will live on\n
+  port: process.env.PORT || 1337,\n
+  // The environment the app is deployed in\n
+  // (`development` or `production`)\n
+  // In `production` mode, all css and js are bundled up and minified\n
+  // And your views and templates are cached in-memory.  Gzip is also used.\n
+  // The downside?  Harder to debug, and the server takes longer to start.\n
+  environment: process.env.NODE_ENV || 'development',\n
+  // Used for sending emails\n
+  hostName: '".$_SESSION['serverName']."',\n
+  protocol: 'http://',\n
+  // TODO: make this an adapter config\n
+  mandrill: {\n
+    token: 'f137c8a3-296a-463b-b4b1-d5652b646942'\n
+  }\n
+};\n
+"
+
+
+
 		exec("sudo chmod 777 $path/olympus/master/config/localConfig.ex.js");
 		exec("sudo scp $path/olympus/master/config/localConfig.ex.js $path/olympus/master/config/localConfig.js");
 		exec("sudo chmod 777 $path/olympus/master/config/localConfig.js");
@@ -417,7 +439,12 @@ class Configuration {
 //  API ADAPTERS FILE 
 		$bootstrapFile = fopen("$path/olympus/api/config/bootstrap.js", "w");
 		fwrite($bootstrapFile, $apiBootstrapConfig);
-		fclose($bootstrapFile);			
+		fclose($bootstrapFile);	
+
+//  API CONFIG APPLICATION JS FILE 
+		$applicationFile = fopen("$path/olympus/api/config/bootstrap.js", "w");
+		fwrite($applicationFile, $apiConfigApplicationJs);
+		fclose($applicationFile);			
 
 //  Database config
 		$myfile = fopen("$path/olympus/master/config/localConfig.js", "w");
@@ -541,21 +568,16 @@ class Configuration {
 
 	function themesetup($postData){
 		
-		//$con = mysql_connect('localhost', 'root', 'root');
-			$con = mysql_connect($_SESSION['hostname'], $_SESSION['username'], $_SESSION["password"]);
+		$con = mysql_connect($_SESSION['hostname'], $_SESSION['username'], $_SESSION["password"]);
 			// Check connection
-
-			if($con === FALSE){
-				$_SESSION['msg'] = "Unable to connect database.";
-				header("Location:index.php");
-			}else{
+		if($con === FALSE){
+			$_SESSION['msg'] = "Unable to connect database.";
+			header("Location:index.php");
+		}else{
 				
-                            $logo=str_replace("uploads/", "", $postData['logoimg']);
-                            
-				$db_selected = mysql_select_db($_SESSION['databaseName'], $con);
-				//$db_selected = mysql_select_db('olympus', $con);
-                                
-                                $SQL_CREATE_TABLE="CREATE TABLE IF NOT EXISTS `theme` (
+        	$logo=str_replace("uploads/", "", $postData['logoimg']);
+			$db_selected = mysql_select_db($_SESSION['databaseName'], $con);
+			$SQL_CREATE_TABLE="CREATE TABLE IF NOT EXISTS `theme` (
                                             `id` int(11) NOT NULL AUTO_INCREMENT,
                                             `header_background` varchar(10) NOT NULL,
                                             `footer_background` varchar(10) NOT NULL,
@@ -579,7 +601,7 @@ class Configuration {
                                 
                                $logo=str_replace("uploads/", "", $postData['logoimg']);
                                $date=  date("Y-m-d H:i:s");
-				$query="INSERT INTO theme SET header_background='#$postData[HeaderColor]',footer_background='#$postData[FooterColor]'
+								$query="INSERT INTO theme SET header_background='#$postData[HeaderColor]',footer_background='#$postData[FooterColor]'
 				,body_background='#$postData[BodyColor]',navigation_color='#$postData[NavigationBarColor]',font_color='#$postData[FontColor]'
 				,font_family='$postData[FontFamily]',createdAt='$date',updatedAt='$date',account_id='1' ";
 				if (mysql_query($query)) {
