@@ -264,8 +264,7 @@ class Configuration {
 					port: '".$_SESSION['protocal']."', // change to 80 if you're not using SSL\n";
 
 
-
-		if($_SESSION['protocal'] == 'http'){
+		if($_SESSION['protocal'] == '80'){
 
 			$masterConfigFile ="module.exports = {\n
 									specialAdminCode: 'ad8h4FJADSLJah34ajsdajchALz2494gasdasdhjasdhj23bn',\n
