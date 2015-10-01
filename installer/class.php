@@ -518,7 +518,7 @@ class Configuration {
 		fclose($bootstrapFile);	
 
 //  API CONFIG APPLICATION JS FILE 
-		$applicationFile = fopen("$path/olympus/api/config/bootstrap.js", "w");
+		$applicationFile = fopen("$path/olympus/api/config/local.js", "w");
 		fwrite($applicationFile, $apiConfigApplicationJs);
 		fclose($applicationFile);			
 

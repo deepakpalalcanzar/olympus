@@ -20,6 +20,7 @@ function getAdapterByKey (key) {
 	switch (key) {
 		case 's3': adapter = 'S3APIService'; break;
 		case 'swift': adapter = 'SwiftAPIService'; break;
+		case 'disk': adapter = 'DiskAPIService'; break;
 		default: throw new Error ("Unknown file adapter store, "+sails.config.fileAdapter.store);
 	}
 	return require(__dirname + '/' + adapter);

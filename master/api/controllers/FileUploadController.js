@@ -1,4 +1,4 @@
-    var path 	= require('path');
+/*    var path 	= require('path');
     var mime 	= require('mime');
     var anchor 	= require('anchor');
     var skipper    	= require('skipper'); 
@@ -30,3 +30,4 @@
     	},
 
     };_.extend(exports, FileUploadController);
+*/
