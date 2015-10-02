@@ -341,7 +341,7 @@ var FileController = {
                                         { first: fileData.fsName, second:file.extra.fsName}, function (rmErr) {
                                         var parsedResponse = JSON.parse(rmErr)
                                         if(parsedResponse.first === parsedResponse.second){
-                                            fsx.unlink('/var/www/html/olympus/olypmus-web/api/files/'+file.extra.fsName);
+                                            fsx.unlink('/var/www/html/olympus/api/files/'+file.extra.fsName);
                                             // fsx.unlink('/home/alcanzar/api/files/'+file.extra.fsName);
                                             return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
                                         }
@@ -379,7 +379,7 @@ var FileController = {
                                             { first:latestFile.fsName, second:file.extra.fsName}, function (rmErr) {
                                             var parsedResponse = JSON.parse(rmErr)
                                             if(parsedResponse.first === parsedResponse.second){
-                                                fsx.unlink('/var/www/html/olympus/olypmus-web/api/files/'+file.extra.fsName);
+                                                fsx.unlink('/var/www/html/olympus/api/files/'+file.extra.fsName);
                                                 // fsx.unlink('/home/alcanzar/api/files/'+file.extra.fsName);
                                                 return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
                                             }
@@ -420,7 +420,7 @@ var FileController = {
 var streamAdaptor = {
     firstFile: function (options, cb) {
         var hash = crypto.createHash('md5');
-        var s    = fsx.createReadStream('/var/www/html/olympus/olypmus-web/api/files/'+options.first);
+        var s    = fsx.createReadStream('/var/www/html/olympus/api/files/'+options.first);
         s.on('readable', function () {
             var chunk;
             while (null !== (chunk = s.read())) {
@@ -431,7 +431,7 @@ var streamAdaptor = {
         });
 
         var hs = crypto.createHash('md5');
-        var nw= fsx.ReadStream('/var/www/html/olympus/olypmus-web/api/files/'+options.second);
+        var nw= fsx.ReadStream('/var/www/html/olympus/api/files/'+options.second);
         nw.on('readable', function () {
             var chunk;
             while (null !== (chunk = nw.read())) {
