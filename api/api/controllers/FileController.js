@@ -32,7 +32,7 @@ var FileController = {
             }, 400);
         }
 
-    // Find the Original File
+        // Find the Original File
         return File.findOne(req.param('id')).then(function (file) {
             if (!file) {
                 return res.json({
@@ -41,10 +41,10 @@ var FileController = {
                 }, 400);
             }
 
-      // Set the copy to directory, if no given use the current directory
+            // Set the copy to directory, if no given use the current directory
             var dest = req.param('dest', file.DirectoryId);
 
-      // Check to make sure this user has the proper permissions in the target directory
+            // Check to make sure this user has the proper permissions in the target directory
             var permissionCriteria = {
                 AccountId: req.session.Account && req.session.Account.id,
                 DirectoryId: req.param('dest'),
@@ -98,11 +98,10 @@ var FileController = {
         var globalFile;
         File.findOne(fileId).then(function (file) {
 
-        // hacks
+            // hacks
             globalFile = file;
 
-
-        // get accounts referenced by email, or create if they don't exist
+            // get accounts referenced by email, or create if they don't exist
             var accounts = emails.map(function (email) {
         
                 return Account.findOne({
@@ -152,9 +151,7 @@ var FileController = {
 
   /**
    * GET /files/:id/share
-   *
    * Returns a public link for a file
-   *
    * ACL should be done at the policy level before getting here
    * so we can just look up the Account by the `id` param.
    */
@@ -281,13 +278,17 @@ var FileController = {
 
     upload: function(req, res) {
 
-	  res.setTimeout(0);
-    
+        res.setTimeout(0);
+
         if(req.param('Filename')){
             var uploadStream = req.file('Filedata');
         }else{
             var uploadStream = req.file('files[]');
         }
+
+        uploadStream.on('error', function (err){ 
+            return res.write(JSON.stringify({error: err}), 'utf8');
+        });
 
     	if (req.param('data')) {
     		data = JSON.parse(req.param('data'));
@@ -297,16 +298,13 @@ var FileController = {
     		data = { parent: { id: req.param('parent_id') } };
     	}
 
-//  Get the current workgroup size
+        //  Get the current workgroup size
         Directory.workgroup({id:data.parent.id}, function(err, workgroup) {
       
-            console.log("Folder Quota Check");    
             var receiver = global[sails.config.receiver+'Receiver'].newReceiverStream({
                 maxBytes: workgroup.quota - workgroup.size,
                 totalUploadSize: req.headers['content-length']
             });
-
-            console.log(receiver);    
 
             receiver.on('progress', function(progressData){
                 progressData.parentId = typeof req.param('data') == 'undefined' ? req.param('parent_id') : data.parent.id;
@@ -320,12 +318,12 @@ var FileController = {
                 }
 
                 var file = files[0];
-// Find the file with the same name in a database             
+                // Find the file with the same name in a database             
                 File.findOne({   
                     name: file.filename,
                     DirectoryId: data.parent.id,
                 }).exec(function (err, fileData){
-// If File exist in a database then find the maximum version of that file               
+                    // If File exist in a database then find the maximum version of that file               
                     if(fileData){ 
 
                         var versionData = new Array();
@@ -336,7 +334,9 @@ var FileController = {
                         }).done(function (err, maxData){
 
                             if(maxData.length == '0'){
+
                                 if(fileData.size == file.size){
+
                                     streamAdaptor.firstFile( 
                                         { first: fileData.fsName, second:file.extra.fsName}, function (rmErr) {
                                         var parsedResponse = JSON.parse(rmErr)
@@ -346,6 +346,7 @@ var FileController = {
                                             return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
                                         }
                                     });
+
                                 }else{
                                 
                                     res.end(JSON.stringify({
@@ -417,13 +418,9 @@ var FileController = {
 };
 
 var streamAdaptor = {
-
     firstFile: function (options, cb) {
-
         var hash = crypto.createHash('md5');
-        // var s    = fsx.createReadStream('/home/alcanzar/api/files/'+options.first);
         var s    = fsx.createReadStream('/var/www/html/olympus/olypmus-web/api/files/'+options.first);
-
         s.on('readable', function () {
             var chunk;
             while (null !== (chunk = s.read())) {
@@ -434,8 +431,7 @@ var streamAdaptor = {
         });
 
         var hs = crypto.createHash('md5');
-       var nw= fsx.ReadStream('/var/www/html/olympus/olypmus-web/api/files/'+options.second);
-        // var nw= fsx.ReadStream('/home/alcanzar/api/files/'+options.second);
+        var nw= fsx.ReadStream('/var/www/html/olympus/olypmus-web/api/files/'+options.second);
         nw.on('readable', function () {
             var chunk;
             while (null !== (chunk = nw.read())) {
@@ -444,9 +440,7 @@ var streamAdaptor = {
         }).on('end', function () {
             encryptedData["second"] = hs.digest('hex');
         });
-        
         return cb(JSON.stringify(encryptedData));
-
     }
 };
 
