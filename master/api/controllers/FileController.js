@@ -6,8 +6,8 @@
 
     // Check if a file exists
     stat: function (req, res) {
-// Given path, look up inode
-// (note: first check and see if the Box API has an analogue and implement that if possible)
+        // Given path, look up inode
+        // (note: first check and see if the Box API has an analogue and implement that if possible)
         var path = req.param('path');
         PathService.lookupFile(path, function (err, file){
             if (err) return res.send(err, 500);
@@ -40,7 +40,7 @@
         }
 
         sails.log.info('Upload new file into ' + req.param('parent_id') + ' [User:' + req.session.Account.id + ']');
-// Perform upload
+        // Perform upload
         File.upload({
             file: {
                 path  : file.path,
@@ -61,25 +61,25 @@
     * Download a file
     */
     'public': function(req, res) {
-// Get the file record from the db based on the UDID in the request
+        // Get the file record from the db based on the UDID in the request
         File.find({where:{fsName:req.param('fsName')}}).success(function(model){
-// If there's no such file, return a 404
+            // If there's no such file, return a 404
             if (model === null) {
                 res.send(404);
             }
-// If the file's public link is disabled, send a 403
+            // If the file's public link is disabled, send a 403
             else if (!model.public_link_enabled) {
                 res.send(403);
             }
-// Find the file's workgroup
+            // Find the file's workgroup
             else {
                 Directory.workgroup(model.DirectoryId,function(workgroup){
-// If the workgroup doesn't allow public links, send a 403
+                    // If the workgroup doesn't allow public links, send a 403
                     if (workgroup!==null && !workgroup.public_sublinks_enabled) {
                         res.send(403);
                         return;
                     }
-// Otherwise stream the file
+                    // Otherwise stream the file
                     else {
                         return FileController._download(req, res, model.id);
                     }
@@ -89,7 +89,7 @@
     },
 
     retrieve: function(req, res) {
-// Find the download link using the specified key, and verify that it's still valid
+        // Find the download link using the specified key, and verify that it's still valid
         async.auto({
             getLink: function(cb, results) {
                 FileDownloadLink.find({where:{link_key:req.param('key')}}).done(function(err, model){
@@ -117,7 +117,7 @@
                     }
                 });
             },
-// Verify that the link references a valid API access token
+            // Verify that the link references a valid API access token
             verifyAccessToken: ['getLink', function(cb, results){
                 var link = results.getLink;
                 AccountDeveloper.find({where:{access_token:link.access_token}}).done(function(err, model){
@@ -136,7 +136,7 @@
                     }
                 });
             }],
-// Get the file in question
+            // Get the file in question
             getFile: ['getLink', function(cb, results){
                 File.find(results.getLink.file_id).done(function(err, model){
                     if (model === null || err) {
@@ -167,10 +167,10 @@
     },
 
     download: function(req, res) {
-    // PathService.lookupFile(req, res, function (err, file) {
-    // if (err) return res.send(err, 500);
+        // PathService.lookupFile(req, res, function (err, file) {
+        // if (err) return res.send(err, 500);
         return FileController._download(req, res, req.param('id'), false);
-    // });
+        // });
     },
 
     dispatchAPI: function(req, res) {
@@ -199,12 +199,11 @@
 
     apiDownload: function(req, res) {
         
-        console.log("!@#$%!@#$%!@#$%!@#$%!@#$%!@#$%!@#$%!@#$%");
         var today = new Date();
         File.find(req.param('id')).success(function(model){
             console.log(model);
             if (model) {
-// Create a new temporary download link
+                // Create a new temporary download link
                 FileDownloadLink.create({
                     file_id: model.id,
                     link_key: AuthenticationService.randString(20),
@@ -212,19 +211,17 @@
                     access_token: req.headers['authorization'].split(' ')[1]
                 }).done(function(err, result){
 
-                    console.log("%%%%%%%%%%%%%%%%%%%%%% MNBVCXZASDFGHJKLPOIUYTREWQ %%%%%%%%%%%%%%%%%%%%%%");
-                    console.log(result);
                     if (err) {
                         res.send(err);
                     } else {
-// Create a 302 redirect with the file download link in the header.  Also
-// send the URL in the text of the response, in case the client doesn't want
-// to immediately follow the redirect.
 
+                        // Create a 302 redirect with the file download link in the header.  Also
+                        // send the URL in the text of the response, in case the client doesn't want
+                        // to immediately follow the redirect.
                         var protocol = req.connection.encrypted ? 'https://' : 'http://';
                         res.header('Location',protocol+req.host+"/r/"+result.link_key);
-
                         res.send(protocol+req.host+"/r/"+result.link_key, 302);
+
                     }
                 });
             } else {
@@ -240,18 +237,18 @@
 
     update: function(req, res) {
         var tasks = [];
-// If the "name" is set, attempt to rename the dir
+        // If the "name" is set, attempt to rename the dir
         if (req.param('name')) {
             tasks.push(function(cb){INodeService.rename(req, res, cb);});
         }
-// If the "parent" is set, attempt a move
+        // If the "parent" is set, attempt a move
         if (req.param('parent') && req.param('parent').id) {
             req.body.directoryId = req.param('parent').id;
             tasks.push(function(cb){INodeService.move(req, res, cb);});
         }
-// Try to perform all the changes. If an error occurs at any point,
-// the error message will be sent back.  Otherwise, the updated
-// API object will be sent back.
+        // Try to perform all the changes. If an error occurs at any point,
+        // the error message will be sent back.  Otherwise, the updated
+        // API object will be sent back.
         async.series(tasks, function(err, results) {
             if (err) {
                 res.json(err, err.status);
@@ -267,87 +264,89 @@
 
     _download: function(req, res, id, open) {
 
-// Make sure the user has access to the file
+        // Make sure the user has access to the file
         File.find(id).success(function (fileModel) {
-// If we have a file model to work with...
-        if (fileModel) {
-/*
-// So I can be a little lazier
-    var size  = fileModel.size, headers = {};
-// Get our range!
-    var range = (req.headers['http-range'] ? req.headers['http-range'].split(',')[0].split('-') : [0, size]);
-    if (range.length == 1) {
-        range[1] = range[0] == 0 ? size : range[0];
-        range[0] = 0;
-    }
-*/
 
-// If the "open" param isn't set, force the file to download
-            if (!req.param('open') && !open) {
-                res.setHeader('Content-disposition', 'attachment; filename=\"' + fileModel.name + '\"');
-            }
-
-// set content-type header
-            res.setHeader('Content-Type', fileModel.mimetype);
-
-// Download and serve file
-            FileAdapter.download({
-                name: fileModel.fsName
-            }, function (err, data, contentLength, stream) {
-                
-                if (err) return res.send(500,err);
-// Set content-length header
-                res.setHeader('Content-Length', fileModel.size);
-// set content-type header
-                res.setHeader( 'Content-Type', mime.lookup(fileModel.name) );
-// No data available
-                if (!data && !stream) {
-                    return res.send(404);
-                }
-// Stream file (Swift)
-                else if (!data) {
-                    return stream.pipe(res);
-                }
-// Or dump data (S3)
-                else return res.send(data);
-// If the "open" param isn't set, force the file to download
-                if (!req.param('open') && !open)
+            // If we have a file model to work with...
+            if (fileModel) {
+            
+                // If the "open" param isn't set, force the file to download
+                if (!req.param('open') && !open) {
                     res.setHeader('Content-disposition', 'attachment; filename=\"' + fileModel.name + '\"');
-// set content-type header
-                    headers['Content-Type'] = mime.lookup(fileModel.name);
-// Set content- length and range headers
-                    headers['Content-Length'] = size; // - (range[1] - range[0]);
-                    headers['Accept-Ranges'] = '0-' + size;
-// No data available
-                    if (!data && !stream) return res.send(404, headers);
-// Go ahead and respond with a 500 ISE on error getting the file model
-                    if (err) return res.send(err, 500);
+                }
 
-// Do we have data or a stream?
-                    if (!data) {
-// Get a buffer of the entire stream object. This simplifies http
-// range functionality and makes header management more manageable.
-                        data = stream.read(size);
-                        data = data.toString('utf', range[0] || 0, range[1] || size);
-                    }
+                // set content-type header
+                if(sails.config.fileAdapter.adapter == 'disk'){
+                    //Download and serve file from local Disk
+                    var file = '/var/www/html/olympus/api/files/'+fileModel.fsName;
+                    res.setHeader('Content-disposition', 'attachment; filename='+fileModel.name);
+                    res.setHeader('Content-Type', fileModel.mimetype);
+                    var filestream = fs.createReadStream(file);
+                    return filestream.pipe(res);
 
-// Get path to file
-                    var file = sails.config.appPath + '/public/files/' + fileModel.fsName;
-                    if (req.headers['http-range'] !== undefined) {
-// Check if we've got a valid content range (or none at all, too)
-                        if (req.headers['http-range'].indexOf(',') < 0) {
-// Set our content range based upon the requested range
-                            headers['Content-Range'] = 'bytes ' + range[0] + '-' + range[1] + '/' + size;
-// dump data to the client
-                            return res.send(data, 206, headers);
-                        } else {
-// And tell the client we had an error with the range
-                            return res.send(416, headers);
+                }else{
+
+                    // Download and serve file from s3 and swift
+                    FileAdapter.download({
+                       name: fileModel.fsName
+                    }, function (err, data, contentLength, stream) {
+
+                        if (err) return res.send(500,err);
+                        // Set content-length header
+                        res.setHeader('Content-Length', fileModel.size);
+                        // set content-type header
+                        res.setHeader( 'Content-Type', mime.lookup(fileModel.name) );
+    
+                        // No data available
+                        if (!data && !stream) {
+                            return res.send(404);
+                        }else if (!data) { // Stream file (Swift)
+                            return stream.pipe(res);
                         }
-                    } else {
-                        return res.send(data);
-                    }
-                });
+                        else return res.send(data); // Or dump data (S3)
+                        // If the "open" param isn't set, force the file to download
+                        if (!req.param('open') && !open)
+                            res.setHeader('Content-disposition', 'attachment; filename=\"' + fileModel.name + '\"');
+                    
+                        // set content-type header
+                        headers['Content-Type'] = mime.lookup(fileModel.name);
+                        // Set content- length and range headers
+                        headers['Content-Length'] = size; // - (range[1] - range[0]);
+                        headers['Accept-Ranges'] = '0-' + size;
+                    
+                        // No data available
+                        if (!data && !stream) return res.send(404, headers);
+                        
+                        // Go ahead and respond with a 500 ISE on error getting the file model
+                        if (err) return res.send(err, 500);
+
+                        // Do we have data or a stream?
+                        if (!data) {
+                            // Get a buffer of the entire stream object. This simplifies http
+                            // range functionality and makes header management more manageable.
+                            data = stream.read(size);
+                            data = data.toString('utf', range[0] || 0, range[1] || size);
+                        }
+
+                        // Get path to file
+                        var file = sails.config.appPath + '/public/files/' + fileModel.fsName;
+                        if (req.headers['http-range'] !== undefined) {
+                            // Check if we've got a valid content range (or none at all, too)
+                            if (req.headers['http-range'].indexOf(',') < 0) {
+                                // Set our content range based upon the requested range
+                                headers['Content-Range'] = 'bytes ' + range[0] + '-' + range[1] + '/' + size;
+                                // dump data to the client
+                                return res.send(data, 206, headers);
+                            } else {
+                                // And tell the client we had an error with the range
+                                return res.send(416, headers);
+                            }
+                        } else {
+                            return res.send(data);
+                        }
+                    });
+                } 
+
             } else {
                 res.json({
                     success: false,
@@ -416,12 +415,12 @@
         });
     },
 
-// Copy a file
+    // Copy a file
     copy: function (req, res) {
         var destFileName = 'Copy of';
-// Search for directory using id parameter
+        // Search for directory using id parameter
         File.find(req.param('id')).done(function (err, srcFile) {
-// Throw an error if there is an error finding the directory
+            // Throw an error if there is an error finding the directory
             if (err) return res.json({error:err});
             if (req.param('name')) destFileName = req.param('name');
             else destFileName += srcFile.name;
@@ -472,8 +471,8 @@
 
         request(options, function(err, response, body) {
             if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
-//  Resend using the original response statusCode
-//  Use the json parsing above as a simple check we got back good stuff
+            //  Resend using the original response statusCode
+            //  Use the json parsing above as a simple check we got back good stuff
             res.json(body, response && response.statusCode);
         });
 
