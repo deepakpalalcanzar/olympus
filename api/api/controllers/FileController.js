@@ -287,96 +287,70 @@ var FileController = {
         }
 
         uploadStream.on('error', function (err){ 
-            return res.write(JSON.stringify({error: err}), 'utf8');
+            // console.log("STREAM ERROR OCCURED STREAM ERROR OCCURED STREAM ERROR OCCURED STREAM ERROR OCCURED")
+            return res.end(JSON.stringify({error: err}), 'utf8');
         });
 
-    	if (req.param('data')) {
-    		data = JSON.parse(req.param('data'));
-    	}else if (req.param('id')) {
-    		data = { parent: { id: req.param('id') }};
-    	}else if (req.param('parent_id')) {
-    		data = { parent: { id: req.param('parent_id') } };
-    	}
+        /*console.log("uploadStream uploadStream uploadStream uploadStream uploadStream uploadStream");
+        console.log(uploadStream);
+        console.log("uploadStream uploadStream uploadStream uploadStream uploadStream uploadStream");
+*/
+       // uploadStream.on('data', function (data){
+            
+            
+            
+            if (req.param('data')) {
+                data = JSON.parse(req.param('data'));
+            }else if (req.param('id')) {
+                data = { parent: { id: req.param('id') }};
+            }else if (req.param('parent_id')) {
+                data = { parent: { id: req.param('parent_id') } };
+            }
 
-        //  Get the current workgroup size
-        Directory.workgroup({id:data.parent.id}, function(err, workgroup) {
+            //  Get the current workgroup size
+            Directory.workgroup({ id:data.parent.id }, function(err, workgroup) {
       
-            var receiver = global[sails.config.receiver+'Receiver'].newReceiverStream({
-                maxBytes: workgroup.quota - workgroup.size,
-                totalUploadSize: req.headers['content-length']
-            });
+                var receiver = global[sails.config.receiver+'Receiver'].newReceiverStream({
+                    maxBytes: workgroup.quota - workgroup.size,
+                    totalUploadSize: req.headers['content-length']
+                });
 
-            receiver.on('progress', function(progressData){
-                progressData.parentId = typeof req.param('data') == 'undefined' ? req.param('parent_id') : data.parent.id;
-                res.write(JSON.stringify(progressData), 'utf8')
-            });
+                receiver.on('progress', function(progressData){
+                    progressData.parentId = typeof req.param('data') == 'undefined' ? req.param('parent_id') : data.parent.id;
+                    res.write(JSON.stringify(progressData), 'utf8')
+                });
 
-            uploadStream.upload(receiver, function (err, files) {
+                uploadStream.upload(receiver, function (err, files) {
 
-                if (err) {
-                    return res.write(JSON.stringify({error: err}), 'utf8');
-                }
+                    if (err) {
+                        return res.write(JSON.stringify({error: err}), 'utf8');
+                    }
 
-                var file = files[0];
-                // Find the file with the same name in a database             
-                File.findOne({   
-                    name: file.filename,
-                    DirectoryId: data.parent.id,
-                }).exec(function (err, fileData){
-                    // If File exist in a database then find the maximum version of that file               
-                    if(fileData){ 
+                    var file = files[0];
 
-                        var versionData = new Array();
-                        var fileVersionData = new Array();
+                    if(file === undefined){
+                         return res.write(JSON.stringify({error: err}), 'utf8');
+                    }
+                    // Find the file with the same name in a database             
+                    File.findOne({   
+                        name: file.filename,
+                        DirectoryId: data.parent.id,
+                    }).exec(function (err, fileData){
+                        // If File exist in a database then find the maximum version of that file               
+                        if(fileData){ 
+
+                            var versionData = new Array();
+                            var fileVersionData = new Array();
                         
-                        Version.find({
-                            parent_id: fileData.id 
-                        }).done(function (err, maxData){
+                            Version.find({
+                                parent_id: fileData.id 
+                            }).done(function (err, maxData){
 
-                            if(maxData.length == '0'){
-
-                                if(fileData.size == file.size){
-
-                                    streamAdaptor.firstFile( 
-                                        { first: fileData.fsName, second:file.extra.fsName}, function (rmErr) {
-                                        var parsedResponse = JSON.parse(rmErr)
-                                        if(parsedResponse.first === parsedResponse.second){
-                                            fsx.unlink('/var/www/html/olympus/api/files/'+file.extra.fsName);
-                                            // fsx.unlink('/home/alcanzar/api/files/'+file.extra.fsName);
-                                            return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
-                                        }
-                                    });
-
-                                }else{
-                                
-                                    res.end(JSON.stringify({
-                                        origParams: req.params.all(),
-                                        name:     file.filename,
-                                        size:     file.size,
-                                        fsName:   file.extra.fsName,
-                                        mimetype: file.type,
-                                        version:  '1' ,
-                                        oldFile: fileData.id
-                                    }), 'utf8');
-
-                                }
-
-                            }else{
-
-                                maxData.forEach(function(applicant)  {
-                                    versionData.push(applicant.version);
-                                    fileVersionData.push(applicant.FileId);
-                                });
-
-                                var findMax = Math.max.apply(Math, versionData);
-                                var maxElementIndex = versionData.indexOf(Math.max.apply(Math, versionData));
-
-                                File.findOne({
-                                    id: fileVersionData[maxElementIndex]
-                                }).done(function (err, latestFile){
-                                    if(latestFile.size == file.size){
+                                if(maxData.length == '0'){
+                                    
+                                    if(fileData.size == file.size){
                                         streamAdaptor.firstFile( 
-                                            { first:latestFile.fsName, second:file.extra.fsName}, function (rmErr) {
+                                            { first: fileData.fsName, second:file.extra.fsName}, function (rmErr) {
                                             var parsedResponse = JSON.parse(rmErr)
                                             if(parsedResponse.first === parsedResponse.second){
                                                 fsx.unlink('/var/www/html/olympus/api/files/'+file.extra.fsName);
@@ -385,36 +359,72 @@ var FileController = {
                                             }
                                         });
                                     }else{
-
+                                
                                         res.end(JSON.stringify({
                                             origParams: req.params.all(),
                                             name:     file.filename,
                                             size:     file.size,
                                             fsName:   file.extra.fsName,
                                             mimetype: file.type,
-                                            version: parseInt(findMax) + 1 ,
+                                            version:  '1' ,
                                             oldFile: fileData.id
                                         }), 'utf8');
                                     }
-                                });
-                            }
-                        });
-                    }else{
-                          
-                        res.end(JSON.stringify({
-                            origParams: req.params.all(),
-                            name: file.filename,
-                            size: file.size,
-                            fsName: file.extra.fsName,
-                            mimetype: file.type,
-                            version: 0,
-                            oldFile: 0                        
-                        }), 'utf8');
-                    }
+                                
+                                }else{
+
+                                    maxData.forEach(function(applicant)  {
+                                        versionData.push(applicant.version);
+                                        fileVersionData.push(applicant.FileId);
+                                    });
+
+                                    var findMax = Math.max.apply(Math, versionData);
+                                    var maxElementIndex = versionData.indexOf(Math.max.apply(Math, versionData));
+
+                                    File.findOne({
+                                        id: fileVersionData[maxElementIndex]
+                                    }).done(function (err, latestFile){
+                                        if(latestFile.size == file.size){
+                                            streamAdaptor.firstFile( 
+                                                { first:latestFile.fsName, second:file.extra.fsName}, function (rmErr) {
+                                                var parsedResponse = JSON.parse(rmErr)
+                                                if(parsedResponse.first === parsedResponse.second){
+                                                    fsx.unlink('/var/www/html/olympus/api/files/'+file.extra.fsName);
+                                                    // fsx.unlink('/home/alcanzar/api/files/'+file.extra.fsName);
+                                                    return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
+                                                }
+                                            });
+                                        }else{
+
+                                            res.end(JSON.stringify({
+                                                origParams: req.params.all(),
+                                                name:     file.filename,
+                                                size:     file.size,
+                                                fsName:   file.extra.fsName,
+                                                mimetype: file.type,
+                                                version: parseInt(findMax) + 1 ,
+                                                oldFile: fileData.id
+                                            }), 'utf8');
+                                        }
+                                    });
+                                }
+                            });
+
+                        }else{
+                            res.end(JSON.stringify({
+                                origParams: req.params.all(),
+                                name: file.filename,
+                                size: file.size,
+                                fsName: file.extra.fsName,
+                                mimetype: file.type,
+                                version: 0,
+                                oldFile: 0                        
+                            }), 'utf8');
+                        }
+                    });
                 });
             });
-        });
-    }
+        }    
 };
 
 var streamAdaptor = {

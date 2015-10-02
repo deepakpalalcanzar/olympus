@@ -111,6 +111,8 @@ module.exports = {
             password        : options.password || crypto.randomBytes(10).toString('hex'),
             is_enterprise   : options.is_enterprise,
             enterprise_name : options.enterprise_name,
+            first_name      : options.first_name,
+            last_name       : options.last_name,
             ip_address      : options.ip_address
         }).exec(function foundAccount (err, account) {
             if (err) return cb && cb(err);
