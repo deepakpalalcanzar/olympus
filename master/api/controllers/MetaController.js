@@ -52,6 +52,7 @@ var MetaController = {
 						if(theme === null){
 
 							res.view('meta/superadmin',{
+								is_super_admin	: '1',
 								apps 			: account.created_by,
 								email 			: account.email,
 								enterprise_logo : enterpriseLogo,
@@ -69,6 +70,7 @@ var MetaController = {
 						}else{
 
 							res.view('meta/superadmin',{
+								is_super_admin	: '1',
 								apps 			: account.created_by,
 								email 			: account.email,
 								enterprise_logo : enterpriseLogo,
@@ -97,6 +99,7 @@ var MetaController = {
 							if(theme === null){
 
 							res.view('meta/workgroupadmin',{
+								is_super_admin	: '0',
 								apps 			 : account.created_by,
 								email 			 : account.email,
 								enterprise_logo  : enterpriseLogo,
@@ -112,6 +115,7 @@ var MetaController = {
 	
 							}else{
 								res.view('meta/workgroupadmin',{
+									is_super_admin	: '0',
 									apps 			 : account.created_by,
 									email 			 : account.email,
 									enterprise_logo  : enterpriseLogo,
@@ -145,6 +149,7 @@ var MetaController = {
 								if(theme === null){
 
 									res.view('meta/home',{
+										is_super_admin	: '0',
 										apps 			 : account.created_by,
 										email 			 : account.email,
 										enterprise_logo  : enterpriseLogo,
@@ -162,6 +167,7 @@ var MetaController = {
 								}else{
 									
 									res.view('meta/home',{
+										is_super_admin	: '0',
 										apps 			 : account.created_by,
 										email 			 : account.email,
 										enterprise_logo  : enterpriseLogo,
