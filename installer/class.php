@@ -445,11 +445,18 @@ class Configuration {
 													if (err) throw err;
 													console.log('ACCOUNT CREATE:', account); \n
  // Now create a workgroup, assigning the new account as an admin \n
-													Directory.createWorkgroup({ name: 'Sample Workgroup' }, account.id, true, function(err, results) { \n
+													Subscription.create({ \n
+														features 	: 'Default Plan',\n
+														price 		: '0',\n
+														duration 	: '1200',\n
+														users_limit : '5',\n
+														is_default 	: true,\n
+														is_active	: true,\n
+														quota		: '100000000000'\n
+													}).done(function done(err, subscription){ \n
 														if (err) throw err; \n
-														console.log('DIRECTOR CREATE WORKGROUP RESULTS:', results); \n
 														cb && cb(); \n
-												}); \n
+													}); \n
 											}); \n
 										}); \n
 									}, \n
