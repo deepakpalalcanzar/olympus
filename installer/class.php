@@ -33,9 +33,12 @@ class Configuration {
 
 		    // If we couldn't, then it either doesn't exist, or we can't see it.
 				$query="CREATE DATABASE IF NOT EXISTS $postData[database_name]";
+
 				if (mysql_query($query)) {
+					
 					$_SESSION['databaseName'] = $postData['database_name'];
 					$_SESSION['hostname'] 	  = $postData['database_hostname'];
+					$_SESSION['domain_name']  = $postData['domain_hostname'];
 					$_SESSION['username'] 	  = $postData['username'];
 					$_SESSION['password']	  = $postData['password'];
 					$_SESSION['serverName']	  = $postData['server_hostname'];
@@ -260,7 +263,7 @@ class Configuration {
 
 		$dataBaseConfiguration 	= "exports.datasource = {\n database: '".$_SESSION['databaseName']."', \n username: '".$_SESSION['username']."', \n password: '".$_SESSION['password']."' \n // Choose a SQL dialect, one of sqlite, postgres, or mysql (default mysql) \n // dialect:  'mysql', \n // Choose a file storage location (sqlite only) \n //storage:  ':memory:', \n // mySQL only \n // pool: { maxConnections: 5, maxIdleTime: 30} \n };\n
 					// Self-awareness of hostname \n
-					exports.host = '".$_SESSION['serverName']."'; \n
+					exports.host = '".$_SESSION['domain_name']."'; \n
 					port: '".$_SESSION['protocal']."', // change to 80 if you're not using SSL\n";
 
 
@@ -268,7 +271,7 @@ class Configuration {
 
 			$masterConfigFile ="module.exports = {\n
 									specialAdminCode: 'ad8h4FJADSLJah34ajsdajchALz2494gasdasdhjasdhj23bn',\n
-									mandrillApiKey: 'f137c8a3-296a-463b-b4b1-d5652b646942',\n
+									mandrillApiKey: '".$_SESSION['mandrill_api_key']."',\n
 									bootstrap: function(bootstrap_cb) { \n
 										if(bootstrap_cb) bootstrap_cb(); \n
 									},\n
@@ -279,7 +282,7 @@ class Configuration {
 									appName: 'Olympus | Sharing the Cloud',\n
 								
 								// App hostname\n
-									host: '".$_SESSION['serverName']."', \n
+									host: '".$_SESSION['domain_name']."', \n
 								
 								// App root path\n
 									appPath: __dirname + '/..', \n
@@ -341,7 +344,7 @@ class Configuration {
 
 						$masterConfigFile ="module.exports = {\n
 									specialAdminCode: 'ad8h4FJADSLJah34ajsdajchALz2494gasdasdhjasdhj23bn',\n
-									mandrillApiKey: 'f137c8a3-296a-463b-b4b1-d5652b646942',\n
+									mandrillApiKey: '".$_SESSION['mandrill_api_key']."',\n
 									bootstrap: function(bootstrap_cb) { \n
 										if(bootstrap_cb) bootstrap_cb(); \n
 									},\n
@@ -352,7 +355,7 @@ class Configuration {
 									appName: 'Olympus | Sharing the Cloud',\n
 								
 								// App hostname\n
-									host: '".$_SESSION['serverName']."', \n
+									host: '".$_SESSION['domain_name']."', \n
 								
 								// App root path\n
 									appPath: __dirname + '/..', \n
@@ -495,11 +498,11 @@ class Configuration {
   // The downside?  Harder to debug, and the server takes longer to start.\n
   environment: process.env.NODE_ENV || 'development',\n
   // Used for sending emails\n
-  hostName: '".$_SESSION['serverName']."',\n
+  hostName: '".$_SESSION['domain_name']."',\n
   protocol: 'http://',\n
   // TODO: make this an adapter config\n
   mandrill: {\n
-    token: 'f137c8a3-296a-463b-b4b1-d5652b646942'\n
+    token: '".$_SESSION['mandrill_api_key']."'\n
   }\n
 };";
 
@@ -642,70 +645,61 @@ class Configuration {
 		echo "<script>window.location = 'https://"+$_SESSION['serverName']+"'</script>";
 	}
 
+
 	function themesetup($postData){
 		
 		$con = mysql_connect($_SESSION['hostname'], $_SESSION['username'], $_SESSION["password"]);
 			// Check connection
 		if($con === FALSE){
+
 			$_SESSION['msg'] = "Unable to connect database.";
 			header("Location:index.php");
+
 		}else{
 				
         	$logo=str_replace("uploads/", "", $postData['logoimg']);
 			$db_selected = mysql_select_db($_SESSION['databaseName'], $con);
-			$SQL_CREATE_TABLE="CREATE TABLE IF NOT EXISTS `theme` (
-                                            `id` int(11) NOT NULL AUTO_INCREMENT,
-                                            `header_background` varchar(10) NOT NULL,
-                                            `footer_background` varchar(10) NOT NULL,
-                                            `body_background` varchar(10) NOT NULL,
-                                            `navigation_color` varchar(10) NOT NULL,
-                                            `font_family` varchar(100) NOT NULL,
-                                            `font_color` varchar(10) NOT NULL,
-                                            `createdAt` datetime DEFAULT NULL,
-                                            `updatedAt` datetime DEFAULT NULL,
-                                            `account_id` varchar(255) DEFAULT NULL,
-                                            PRIMARY KEY (`id`)
-                                          ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=0 ;";
-                                $RESULT_CREATE_TABLE= mysql_query($SQL_CREATE_TABLE);
+			$SQL_CREATE_TABLE="CREATE TABLE IF NOT EXISTS `theme` ( `id` int(11) NOT NULL AUTO_INCREMENT, `header_background` varchar(10) NOT NULL, `footer_background` varchar(10) NOT NULL,
+				`body_background` varchar(10) NOT NULL,`navigation_color` varchar(10) NOT NULL, `font_family` varchar(100) NOT NULL, `font_color` varchar(10) NOT NULL,
+				`createdAt` datetime DEFAULT NULL, `updatedAt` datetime DEFAULT NULL, `account_id` varchar(255) DEFAULT NULL, PRIMARY KEY (`id`) ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=0 ;";
+			$RESULT_CREATE_TABLE= mysql_query($SQL_CREATE_TABLE);
+			
+			if(mysql_num_rows(mysql_query("SHOW TABLES LIKE 'theme'"))!=1) {
+                $_SESSION['msg'] =  "Table does not exist";
+                header("Location:theme_setup.php");
+			}
+            
+           	$logo=str_replace("uploads/", "", $postData['logoimg']);
+           	$date=  date("Y-m-d H:i:s");
+			$query="INSERT INTO theme SET header_background='#$postData[HeaderColor]',footer_background='#$postData[FooterColor]' ,body_background='#$postData[BodyColor]',navigation_color='#$postData[NavigationBarColor]',font_color='#$postData[FontColor]' ,font_family='$postData[FontFamily]',createdAt='$date',updatedAt='$date',account_id='1' ";
+			
+			if (mysql_query($query)) {
+            	chmod ("installer/logo_crop/uploads/$logo", 0777);
+                $source= 'logo_crop/uploads/'.$logo;
+                $destination= '../master/public/images/enterprises/'.$logo;
+                copy($source, $destination);
+			}
+            
+            $query_logo="UPDATE account SET enterprise_fsname='$logo' WHERE isSuperAdmin='1'";
+            $result_logo= mysql_query($query_logo);
                                 
-
-                                if(mysql_num_rows(mysql_query("SHOW TABLES LIKE 'theme'"))!=1) {
-                                    $_SESSION['msg'] =  "Table does not exist";
-                                    header("Location:theme_setup.php");
-                                }
-                                
-                                
-                               $logo=str_replace("uploads/", "", $postData['logoimg']);
-                               $date=  date("Y-m-d H:i:s");
-								$query="INSERT INTO theme SET header_background='#$postData[HeaderColor]',footer_background='#$postData[FooterColor]'
-				,body_background='#$postData[BodyColor]',navigation_color='#$postData[NavigationBarColor]',font_color='#$postData[FontColor]'
-				,font_family='$postData[FontFamily]',createdAt='$date',updatedAt='$date',account_id='1' ";
-				if (mysql_query($query)) {
-                                        chmod ("installer/logo_crop/uploads/$logo", 0777);
-                                        $source= 'logo_crop/uploads/'.$logo;
-                                        $destination= '../master/public/images/enterprises/'.$logo;
-                                        copy($source, $destination);
-				}
-                                $query_logo="UPDATE account SET enterprise_fsname='$logo' WHERE isSuperAdmin='1'";
-                                $result_logo= mysql_query($query_logo);
-                                
-                                if($result_logo){
-//                                   
-                                    $files = glob('logo_crop/uploads/*'); // get all file names
-                                    foreach($files as $file){ // iterate files
-                                      if(is_file($file))
-                                        unlink($file); // delete file
-                                    }
-                                    
-                                    $files = glob('logo_crop/uploads/big/*'); // get all file names
-                                    foreach($files as $file){ // iterate files
-                                      if(is_file($file))
-                                        unlink($file); // delete file
-                                    }
-                                }
-                                
-				$url = "http://".$_SESSION['serverName']."/olympus/installer/preview.php";
-				echo '<script>window.location.href="'.$url.'"</script>';
+	        if($result_logo){
+	//                                   
+	            $files = glob('logo_crop/uploads/*'); // get all file names
+	            foreach($files as $file){ // iterate files
+	              if(is_file($file))
+	                unlink($file); // delete file
+	            }
+	            
+	            $files = glob('logo_crop/uploads/big/*'); // get all file names
+	            foreach($files as $file){ // iterate files
+	              if(is_file($file))
+	                unlink($file); // delete file
+	            }
+	        }
+	        
+			$url = "http://".$_SESSION['serverName']."/olympus/installer/preview.php";
+			echo '<script>window.location.href="'.$url.'"</script>';
 		}
 	}
 

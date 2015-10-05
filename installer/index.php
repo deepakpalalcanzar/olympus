@@ -48,6 +48,14 @@ echo exec("lsb_release -i | cut -f2"); ?>
 					</label>
 					<input type="text" class="login-input-field server-hostname" placeholder="Please enter your application server hostname" name="server_hostname">
 					
+
+					<label for="email">
+						Application Server Domain Name: 
+						<img src="img/help.png" tabindex="0" data-toggle="popover" data-html="true" data-trigger="hover" data-original-title="Application Server Hostname" data-content="Domain name of hostname of the server hosting the Olympus application." style="cursor:pointer;">
+					</label>
+					<input type="text" class="login-input-field server-hostname" placeholder="Please enter your application server domain name" name="domain_hostname">
+
+
 					<label for="database_name">
 						Database Server Hostname: 
 						<img src="img/help.png" tabindex="0" data-toggle="popover" data-html="true" data-trigger="hover" data-original-title="Database Server Hostname" data-content="This is the hostname or IP address of the server hosting the database. It can be the same as the application server hostname or different if your database is running on a separate server." style="cursor:pointer;">
