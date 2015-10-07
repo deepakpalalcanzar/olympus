@@ -13,7 +13,7 @@ module.exports = {
 
   // Used for sending emails
   hostName: 'localhost',
-  protocol: 'http://',
+  protocol: 'https://',
 
   // TODO: make this an adapter config
   mandrill: {
