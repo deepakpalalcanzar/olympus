@@ -466,7 +466,7 @@ class Configuration {
 											where: {api_key: '3y6gp1hz9de7cgvkn7xqjb3285p8udf2'} \n
 										}).done(function (err, developer) { \n
 											if (err) throw err; \n
-											if (developer) return cb && cb(); \n
+											if (developer.length > 0) { return cb && cb(); } \n
 											// Otherwise create a new administrator account \n
 											Developer.create({ \n
 												api_key: '3y6gp1hz9de7cgvkn7xqjb3285p8udf2', \n
@@ -475,19 +475,20 @@ class Configuration {
 												redirect_url: 'http://www.pigandcow.com/olympus_test_api_app' \n
 											}).done(function done (err, developer) { \n
 												if (err) throw err; \n
-												else return cb && cb(); \n
-											}); \n
-
-											AccountDeveloper.create({ \n
-												api_key: '3y6gp1hz9de7cgvkn7xqjb3285p8udf2', \n
-												account_id: 1, \n
-												code: '', \n
-												access_token: 'baudzVitCraHCB1', \n
-												refresh_token: 'abcdefg', \n
-												code_expires: '2020-01-01', \n
-												access_expires: '2020-01-01', \n
-												refresh_expires: '2020-01-01', \n
-												scope: 3 \n
+												AccountDeveloper.create({ \n
+													api_key: '3y6gp1hz9de7cgvkn7xqjb3285p8udf2', \n
+													account_id: 1, \n
+													code: '', \n
+													access_token: 'baudzVitCraHCB1', \n
+													refresh_token: 'abcdefg', \n
+													code_expires: '2020-01-01', \n
+													access_expires: '2020-01-01', \n
+													refresh_expires: '2020-01-01', \n
+													scope: 3 \n
+												}).done(function done(err, accountdeveloper){ \n
+													if (err) throw err; \n
+													else return cb && cb(); \n
+												}); \n
 											}); \n
 										}); \n
 									} \n
@@ -506,7 +507,7 @@ class Configuration {
   environment: process.env.NODE_ENV || 'development',\n
   // Used for sending emails\n
   hostName: '".$_SESSION['domain_name']."',\n
-  protocol: 'http://',\n
+  protocol: 'https://',\n
   // TODO: make this an adapter config\n
   mandrill: {\n
     token: '".$_SESSION['mandrill_api_key']."'\n
