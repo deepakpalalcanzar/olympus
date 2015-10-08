@@ -219,4 +219,29 @@ var TempAccountController = {
     },
 
 
+    createComment: function(req, res){
+
+        var request = require('request');
+        var options = {
+            uri: 'http://localhost:1337/file/postComment/' ,
+            method: 'POST',
+        };
+
+        var access_token = req.param('account_id');
+        options.json =  {
+            file_id     : req.param('file_id'),
+            comment     : req.param('comment'),
+            account_id  : req.param('account_id'),
+        };
+
+        request(options, function(err, response, body) {
+            if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
+            //  Resend using the original response statusCode
+            //  Use the json parsing above as a simple check we got back good stuff
+            res.json(body, response && response.statusCode);
+        });
+
+    }
+
+
 };_.extend(exports, TempAccountController);
