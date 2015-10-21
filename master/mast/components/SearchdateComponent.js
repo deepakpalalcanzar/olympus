@@ -18,6 +18,10 @@ Mast.registerTree('Searchdate', {
 			name: 'Date',
 			className: 'log-date-column'
 		},
+		column5: {
+			name: 'Platform',
+			className: 'log-platform-column'
+		},
 		selectedModel: null
 	},
 	

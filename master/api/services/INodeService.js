@@ -68,10 +68,15 @@ exports.rename = function(req, res, cb) {
 	    							activity  	: 'rename',
 	    							on_user		: req.session.Account.id,
 	    							client_ip   : req.param('ipadd'),
-									ip   		: req.session.Account.ip
+									ip   		: req.session.Account.ip,
+                                                                         platform    : req.headers.user_platform,
 
 	    						};
-
+                                                          
+                                                            console.log('&&&&&&&#############################65546456456##############&&&');
+                                                            console.log(req);
+                                                            console.log('&&&&&&&#############################65546456456##############&&&');
+                        
 								request(options, function(err, response, body) {
 								if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
 	      							res.json(apiObj);
@@ -92,11 +97,16 @@ exports.rename = function(req, res, cb) {
 	    								activity  	: 'rename',
 	    								on_user		: req.session.Account.id,
 	    								client_ip   : req.param('ipadd'),
-										ip   		: req.session.Account.ip
-
+										ip   		: req.session.Account.ip,
+                                                                                 platform    : req.headers.user_platform,
+                                                                                 
 	    							};
 
-
+                                                                  
+                                                         console.log('&&&&&&&#############################65546456456##############&&&');
+                                                        console.log(req.headers.user_platform);
+                                                        console.log('&&&&&&&#############################65546456456##############&&&');
+                        
 									request(options, function(err, response, body) {
 									if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
 	      								res.json(apiObj);
@@ -436,7 +446,8 @@ exports.destroy = function(options, cb) {
 	    		activity  	: 'delete',
 	    		on_user		: options.accountId,
 	    		client_ip   : options.ipadd,
-	    		ip   		: options.ip
+	    		ip   		: options.ip,
+                         platform    : options.platform,
 	    	};
 
 			request(opts, function(err, response, body) {
@@ -467,7 +478,8 @@ exports.destroy = function(options, cb) {
 	    			activity  	: 'delete',
 	    			on_user		: options.accountId,
 	    			client_ip   : options.ipadd,
-	    			ip   		: options.ip
+	    			ip   		: options.ip,
+                                 platform    : options.platform,
 	    		};
 
 				request(opts, function(err, response, body) {
@@ -943,7 +955,8 @@ exports.addComment = function(req, res) {
 	    			activity  	: 'comment',
 	    			on_user		: req.session.Account.id,
 	    			client_ip   :  req.param('ipadd'),
-					ip   		: req.session.Account.ip
+					ip   		: req.session.Account.ip,
+                                         platform    : req.headers.user_platform,
 	    		};
 
 				request(options, function(err, response, body) {
@@ -1037,6 +1050,11 @@ exports.version= function(req, res, cb){
 };
 
 exports.comments = function(req, res) {
+	
+	console.log("lllllllllllllllllllllllllllllllllll");
+	console.log(req);
+	console.log("lllllllllllllllllllllllllllllllllll");
+
 	INodeService.activity(req, res, function(err, result) {
 		if (err) {
 			res.json(err, err.status);
@@ -1119,8 +1137,10 @@ exports.enablePublicLink = function(req, res) {
 
 exports.assignPermission = function(req, res) {
 
+	console.log(req);
+
 	sails.log("######################################");
-	sails.log.info('AddPermission:' + req.param('id') + ' [User:' + req.session.Account.id + ']');
+	//sails.log.info('AddPermission:' + req.param('id') + ' [User:' + req.session.Account.id + ']');
 	sails.log("######################################");
 	var request = require('request');
 	var inodeId 	= req.param('id');
@@ -1128,6 +1148,7 @@ exports.assignPermission = function(req, res) {
 
 // And broadcast activity to all sockets subscribed
 	var subscribers = INodeModel.roomName(inodeId);
+
 	async.waterfall([
 	
 // Get info about the node we're trying to add permissions for
@@ -1159,6 +1180,7 @@ exports.assignPermission = function(req, res) {
 // Otherwise, create an account using this email, and create a verification
 // code for them.  Then grant permissions to this new user
 				else {
+
 					var verificationCode = UUIDGenerator.v1();
 					var password = new Array(8);
 					UUIDGenerator.v1(null, password, 0);
@@ -1169,28 +1191,35 @@ exports.assignPermission = function(req, res) {
 						password: password,
 						verified: false,
 						verificationCode: verificationCode,
-subscription_id: '1'
+						subscription_id: '1'
 					}).success(function(newAccount) {
-
-						console.log("alskdalsdalskdjalskdjalksdjaslkdjaslkdjalksdkasllksj");
-				    		console.log(newAccount);
-						
-callback(null, inode, newAccount);
+						callback(null, inode, newAccount);
 					});
 				}
 			});
 		}
 // If we were sent the ID of an existing user, look them up and continue
 		else {
-			sails.log.debug('checking id of existing user');
-			sails.log.info('checking owed_by.id: ', req.param('owned_by').id);
-			Account.find(req.param('owned_by').id).done(function(err, account) {
 
-				// if we cannot find the user then pass a
-				if(err) {
-					return callback(err);
+			sails.log.debug('checking id of existing user');
+			sails.log.debug(req);
+			console.log(req.param('owned_by'));
+			// sails.log.info('checking owed_by.id: ', req.param('owned_by').id);
+			Account.find({
+				where: {
+					email: req.param('owned_by')
 				}
-				callback(null, inode, account);
+			}).success(function(account) {
+				
+				console.log(account);
+
+				Account.find(account.id).done(function(err, account) {
+				// if we cannot find the user then pass a
+					if(err) {
+						return callback(err);
+					}
+					callback(null, inode, account);
+				});
 			});
 		}
 	},
@@ -1297,18 +1326,6 @@ var getRequestData = exports.getRequestData = function(req, res) {
 			Model: Model,
 			modelName: Model.getModelName().toLowerCase(),
 			getModelName: Model.getModelName,
-
-			//		// Request/response transport
-			//		req				: req,
-			//		res				: res,
-			//		isSocket		: req.isSocket,
-			//		// This user's id, from session
-			//		who				: {
-			//			id				: req.session && req.session.Account.id,
-			//			name			: 'test'+(req.session && req.session.Account.id),
-			//			avatarSrc		: '/images/'+(req.session && req.session.Account.id)+".png"
-			//		},
-			// Rooms
 			subscribers: Model.roomName(id),
 			active: Model.activeRoomName(id)
 		};

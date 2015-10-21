@@ -564,15 +564,15 @@ module.exports = {
     action: 'redirect'
   },
 
-  /*'/files/content': {
+  '/files/content': {
     controller: 'redirect',
     action: 'redirect'
   },  
-*/
-  '/files/content': {
-    controller: 'fileupload',
-    action: 'upload'
-  },
+
+  // '/files/content': {
+  //   controller: 'fileupload',
+  //   action: 'upload'
+  // },
 
   '/file/download/:id': {
     controller: 'redirect',

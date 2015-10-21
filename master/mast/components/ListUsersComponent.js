@@ -46,6 +46,11 @@ Mast.registerTree('ListUsersTable', {
         $('.upload-file').hide();
     },
 
+    afterRender: function(){
+		console.log(this);
+		console.log(this.model);
+    },
+
 	bindings: {
 // set highlight to false except for newly selected user
 		selectedModel: function(newModel) {
@@ -86,6 +91,7 @@ Mast.registerComponent('ListUsersRow', {
 
 // Selects the user that was clicked on. gives the parent the current users model
 	selectUser: function() {
+		console.log(this.model);
 		this.parent.set({selectedModel: this.model});
 	},
 

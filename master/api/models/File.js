@@ -204,8 +204,8 @@ File = Model.extend({
 
 						if (err) return cb(err);
 
-// Keep track of this as our uploaded file
-// so we can cleanup if necessary (i.e. upload doesn't finish)
+							// Keep track of this as our uploaded file
+							// so we can cleanup if necessary (i.e. upload doesn't finish)
 							Version.createVersion({
 								fileId  : result.id,
 								version : options.version,
@@ -220,7 +220,7 @@ File = Model.extend({
 					});
 				}],
 
-// Move file into the specified parent directory, inheriting permissions
+				// Move file into the specified parent directory, inheriting permissions
 				inheritPermissions: ['fileModel', function (cb,r) {
 					// console.log("INHERIT CALLED");
 					r.fileModel.mv(options.parentId, function (err,result) {
@@ -229,7 +229,7 @@ File = Model.extend({
 					});
 				}],
 
-// Update the parent directory sizes.
+				// Update the parent directory sizes.
 				updateParentDirectorySizes: ['fileModel', function(cb, r) {
 					sails.log.debug('updating parent directories');
 					Directory.updateParentDirectorySizes(options.parentId, options.size, function(err) {
@@ -238,7 +238,7 @@ File = Model.extend({
 					});
 				}],
 
-// If this is a replace op, emove the existing File model
+				// If this is a replace op, emove the existing File model
 				destroyExistingFile: ['fileModel', function destroyExistingFile(cb, r) {
 					if(!options.replaceId) return cb();
 					else {
@@ -249,7 +249,7 @@ File = Model.extend({
 					}
 				}],
 
-// Combine the different pieces into a single object
+				// Combine the different pieces into a single object
 				coallesced: ['inheritPermissions', function (cb, result) {
 					var parentDirRoomName = Directory.roomName(options.parentId);
 					var apiResponse = APIService.File.mini(result.fileModel);
@@ -262,7 +262,7 @@ File = Model.extend({
 				if (err) return cb(err);
 				else if (!results) return cb("No results!");
 				
-// File upload was successful
+				// File upload was successful
 				uploadBufferComplete = true;
 				
 				return cb(err, results.coallesced);
@@ -291,8 +291,6 @@ File = Model.extend({
 
 			// Get files that are children of the specified parent
 			// which you have permission to see
-//select max(FileId) as file from version where fileId NOT IN (Select parent_id from version group by parent_id) group by parent_id
-
  			var basicSet = ["SELECT p.type AS permission, f.id AS pk, f.* "+
 						"FROM file f "+
 						"INNER JOIN filepermission p ON p.FileId=f.id "+
@@ -303,15 +301,6 @@ File = Model.extend({
 						(options.accountId ? "AND a.id=? " : "AND a.id IS NULL")+
 					""];
 
-			/* var basicSet = ["SELECT p.type AS permission, f.id AS pk, f.* "+
-						"FROM file f "+
-						"INNER JOIN filepermission p ON p.FileId=f.id "+
-						"INNER JOIN account a ON a.id=p.AccountId "+
-						"WHERE (p.type='read' OR p.type='comment' OR p.type='write' OR p.type='admin') "+
-						(options.parentId ? "AND f.DirectoryId=? " : "AND f.DirectoryId IS NULL ")+
-						(options.accountId ? "AND a.id=? " : "AND a.id IS NULL ")+
-					""];
-			*/
 			options.parentId && basicSet.push(options.parentId);
 			options.accountId && basicSet.push(options.accountId);
 			basicSet = Sequelize.Utils.format(basicSet);

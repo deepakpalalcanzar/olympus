@@ -576,16 +576,27 @@ impersonate: function(req, res){
         if (fileModel) {
         
           // If the "open" param isn't set, force the file to download
-          if (!req.url.match(/^\/file\/open\//)) {
-            res.setHeader('Content-disposition', 'attachment; filename=\"' + fileName.trim() + '\"');
-          }
+            if (!req.url.match(/^\/file\/open\//)) {
+                res.setHeader('Content-disposition', 'attachment; filename=\"' + fileName.trim() + '\"');
+            }
 
           // set content-type header
-          res.setHeader('Content-Type', fileModel.mimetype);
 
-          options.uri = "http://localhost:1337/file/download/"+fileModel.fsName;
+            // res.setHeader('Content-Type', fileModel.mimetype);
+            // options.uri = "http://localhost:1337/file/download/"+fileModel.fsName;
+            // var proxyReq = request.get(options).pipe(res);
 
-          var proxyReq = request.get(options).pipe(res);
+            var file = '/var/www/html/olympus/api/files/'+fileName;
+            var filename = path.basename(file);
+            var mimetype = mime.lookup(file);
+
+            res.setHeader('Content-disposition', 'attachment; filename=' + fileName);
+            res.setHeader('Content-Type', fileModel.mimetype);
+
+            var filestream = fs.createReadStream(file);
+            filestream.pipe(res);
+
+
 
           /*Create logging*/
           /*var opts = {

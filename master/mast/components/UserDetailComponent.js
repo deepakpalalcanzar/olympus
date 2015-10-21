@@ -75,6 +75,9 @@ Mast.registerComponent('UserDetail', {
 		var self = this;
 		var payload = this.getPayload();
 		payload.id = Mast.Session.User.id;
+		
+		console.log(payload);
+
 		Mast.Socket.request('/account/updateUserData', payload, function(res, err){
 			//self.addPermissionViaEmail();		
 			alert('Your account has been updated.');
@@ -95,17 +98,11 @@ Mast.registerComponent('UserDetail', {
 
 		var name, email, title, phone;
 		return {
-
 			name  		: $('input[name="name"]').val(),
 			email 		: $('input[name="email"]').val(),
 			title 		: $('input[name="title"]').val(),
 			id 	 		: $('input[name="user_id"]').val(),
 			phone 		: $('input[name="phone"]').val(),
-			//workgroup 	: $('select[name="workgroup"]').val(),
-			//role 		: $('select[name="role"]').val(),
-			//profile_id 	: $('select[name="profile"]').find(':selected').attr('data-id'),
-			//profile 	: $('select[name="profile"]').val()
-
 		};
 		
 	},
@@ -115,8 +112,6 @@ Mast.registerComponent('UserDetail', {
 		this.$('input[name="email"]').val('');
 		this.$('input[name="title"]').val('');
 		this.$('input[name="phone"]').val('');
-		//workgroup: this.$('select[name="workgroup"]').val();
-		//role: this.$('select[name="role"]').val();
 	},
 
 	selectText: function(e) {

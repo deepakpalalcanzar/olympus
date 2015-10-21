@@ -4,7 +4,8 @@ Mast.registerModel('SearchdateUser',{
 			name			: 'someName',
 			text_message	: 'Client Activity',
 			ip_address		: '255.255.255.0',
-			created_at		: 'Mar 21 2015 07:15 AM'
+			created_at		: 'Mar 21 2015 07:15 AM',
+			platform		: '-'
 		}
 	}
 });

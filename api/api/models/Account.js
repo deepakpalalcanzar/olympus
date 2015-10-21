@@ -143,6 +143,7 @@ module.exports = {
   // creates an account, returning a promise if no callback is specified
     createAccount: function (options, cb) {
 
+
         var name                = options.name || options.email;
         var email               = options.email;
         var password            = options.password || crypto.randomBytes(10).toString('hex');
@@ -171,6 +172,9 @@ module.exports = {
         }).exec(function foundAccount (err, account) {
 
             if (err) return cb && cb(err);
+            console.log("PRINTING ACCOUNT INFORMATION");
+            console.log(account);
+            console.log("PRINTING ACCOUNT INFORMATION");
 
     // Now create a workgroup, assigning the new account as an admin
             if(typeof options.enterprise_name !== 'undefined'){

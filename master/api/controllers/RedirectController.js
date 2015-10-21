@@ -67,9 +67,29 @@ var RedirectController = {
             File.find(req.param('id')).success(function (fileModel) {
 // If we have a file model to work with...
                 if (fileModel) {
+
+		var options = {
+                	uri: 'http://localhost:1337/logging/register/' ,
+                        method: 'POST',
+                };
+
 // If the "open" param isn't set, force the file to download
                     if (!req.url.match(/^\/file\/open\//)) {
                         res.setHeader('Content-disposition', 'attachment; filename=\"' + fileModel.name + '\"');
+
+
+/* Logging Of File Download */
+                        options.json =  {
+                            user_id     : req.session.Account.id,
+                            text_message: 'has downloaded '+fileModel.name,
+                            activity    : 'download',
+                            on_user     : fileModel.id,
+                            ip          : req.session.Account.ip
+                        };
+
+                        request(options, function(err, response, body) {
+                            if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
+                        });
                     }
 
           // set content-type header

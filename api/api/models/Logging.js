@@ -23,6 +23,7 @@ module.exports = {
 
     on_user: 'integer',
     ip_address:    'string',
+    platform:    'string',
 
 
     /****************************************************

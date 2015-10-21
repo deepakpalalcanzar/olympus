@@ -15,7 +15,6 @@
         <div class="dir-files {{column1.className}} header-color mast-critical" style="padding: 15px 0 !important;">
             <span style="font-size:15px;" >{{column1.name}}</span>
         </div>
-        
         <div class="dir-files {{column2.className}} header-color mast-critical" style="padding: 15px 0 !important;">
             <span style="font-size:15px;" >{{column2.name}}</span>
         </div>
@@ -25,6 +24,9 @@
         <div class="dir-files {{column4.className}} header-color mast-critical" style="padding: 15px 0 !important;">
             <span style="font-size:15px;">{{column4.name}}</span>
         </div>
+        <div class="dir-files {{column5.className}} header-color mast-critical" style="padding: 15px 0 !important;">
+            <span style="font-size:15px;">{{column5.name}}</span>
+        </div>
         <div class="log-outlet clearfix"  style="width:100%;"></div>
     </div>  
 
@@ -33,7 +35,6 @@
 </div>
 
 <div class="searchdate-result-row-template organization-bar main-mod clearfix" style="width:96%;">
-
     {% if(name !=='error_123'){%}
 
     <div class="dir-files log-user-column mast-critical log-column-text" style="padding: 15px 0 !important;">
@@ -47,6 +48,9 @@
     </div>
     <div class="dir-files log-date-column mast-critical log-column-text" style="padding: 15px 0 !important;">
         <span style="font-size:15px;">{{ created_at }}</span>
+    </div>
+    <div class="dir-files log-plateform-column mast-critical log-column-text" style="padding: 15px 0 !important;">
+        <span style="font-size:15px;">{{ plateform }}</span>
     </div>
     {% }else{%}
      <div class="dir-files" style="font-size:13px;margin-left:50px;">No records found !</div>

@@ -11,6 +11,8 @@ var TempAccountController = {
 
     register: function (req, res) {
 
+
+
         if (!req.param('email')) return res.json({
             error: 'No email provided',
             type: 'error'
@@ -88,9 +90,9 @@ var TempAccountController = {
 
                         return res.json({
                             account: {
-                                name   : account.name,
-                                email  : account.email,
-                                id     : account.id
+                              name   : account.name,
+                              email  : account.email,
+                              id     : account.id
                             }
                         });
                     });
