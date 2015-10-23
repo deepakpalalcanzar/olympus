@@ -11,6 +11,8 @@ var crypto       = require('crypto'),
     path 		 = require('path');
     gm 			 = require('gm');
 
+    var easyimg = require('easyimage');
+
 var encryptedData = {};
 
 var FileController = {
@@ -410,6 +412,17 @@ var FileController = {
                             oldFile: 0                        
                         }), 'utf8');
                     }
+
+
+                    if (file.type == "image/png" || file.type == "image/jpg" || file.type == "image/jpeg") {
+                        easyimg.resize({src: '/var/www/html/olympus/olympus1/api/files/' + file.extra.fsName, dst: '/var/www/html/olympus/olympus1/api/files/thumbnail/' + file.extra.fsName, width: 100, height: 100}, function (err, stdout, stderr) {
+                            if (err)
+                                throw err;
+                            console.log('Resized to 100x100');
+                        });
+                    }
+                    
+
                 });
             });
         });
