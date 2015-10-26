@@ -421,8 +421,6 @@ var FileController = {
                             console.log('Resized to 100x100');
                         });
                     }
-                    
-
                 });
             });
         });

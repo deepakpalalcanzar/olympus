@@ -68,9 +68,9 @@ var RedirectController = {
 // If we have a file model to work with...
                 if (fileModel) {
 
-		var options = {
+		          var options = {
                 	uri: 'http://localhost:1337/logging/register/' ,
-                        method: 'POST',
+                    method: 'POST',
                 };
 
 // If the "open" param isn't set, force the file to download
