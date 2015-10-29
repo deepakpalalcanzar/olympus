@@ -79,10 +79,36 @@ var AccountController = {
         var action = "'" + req.params.activity + "'";
         var actioncon = req.params.activity;
 
-        if (actioncon == 'all') {
-            var sql = "SELECT l.text_message, l.ip_address, DATE_FORMAT( l.createdAt, '%b %d %Y %h:%i %p' ) AS created_at, a.name FROM `logging` l INNER JOIN account a ON l.user_id = a.id where l.user_id=" + req.session.Account.id + " And l.createdAt between " + sdate + " and " + edate + " ORDER BY l.id DESC ";
+       if (actioncon == 'all') {
+
+            if(req.session.Account.isSuperAdmin === 1){
+                var sql = "SELECT l.text_message, l.ip_address, DATE_FORMAT( l.createdAt, '%b %d %Y %h:%i %p' ) AS created_at, a.name FROM `logging` l INNER JOIN account a ON l.user_id = a.id where l.createdAt between " + sdate + " and " + edate + " ORDER BY l.id DESC ";
+            }else{
+                var sql = "SELECT l.text_message, l.ip_address, DATE_FORMAT( l.createdAt, '%b %d %Y %h:%i %p' ) AS created_at, a.name FROM `logging` l INNER JOIN account a ON l.user_id = a.id where l.user_id=" + req.session.Account.id + " And l.createdAt between " + sdate + " and " + edate + " ORDER BY l.id DESC ";
+            }
         } else {
-            var sql = "SELECT l.text_message, l.ip_address, DATE_FORMAT( l.createdAt, '%b %d %Y %h:%i %p' ) AS created_at, a.name FROM `logging` l INNER JOIN account a ON l.user_id = a.id where l.user_id=" + req.session.Account.id + " And l.action = " + action + " And l.createdAt between " + sdate + " and " + edate + " ORDER BY l.id DESC ";
+
+            var query;
+            
+            if( req.params.from !== '' && req.params.to !== '' && actioncon !== ''){
+                query = "l.action = " + action + " And l.createdAt between " + sdate + " and " + edate + " ORDER BY l.id DESC ";                
+            }else if ( req.params.from !== '' && req.params.to !== '' && actioncon === '') {
+                query = "l.createdAt between " + sdate + " and " + edate + " ORDER BY l.id DESC ";                
+            }else if ( req.params.from !== '' && req.params.to === '' && actioncon === ''){
+                query = "l.createdAt =" + sdate + " ORDER BY l.id DESC ";                
+            }else if ( req.params.from === '' && req.params.to !== '' && actioncon === ''){
+                query = "edate = " + edate + " ORDER BY l.id DESC ";                
+            }else if ( req.params.from === '' && req.params.to === '' && actioncon !== ''){
+                query = "l.action = " + action + " ORDER BY l.id DESC ";                
+            }
+
+            if(req.session.Account.isSuperAdmin === 1){
+                var sql = "SELECT l.text_message, l.ip_address, DATE_FORMAT( l.createdAt, '%b %d %Y %h:%i %p' ) AS created_at, a.name FROM `logging` l INNER JOIN account a ON l.user_id = a.id where "+ query; 
+            }else{
+                var sql = "SELECT l.text_message, l.ip_address, DATE_FORMAT( l.createdAt, '%b %d %Y %h:%i %p' ) AS created_at, a.name FROM `logging` l INNER JOIN account a ON l.user_id = a.id where l.user_id=" + req.session.Account.id + " and " + query; 
+            }
+
+            // var sql = "SELECT l.text_message, l.ip_address, DATE_FORMAT( l.createdAt, '%b %d %Y %h:%i %p' ) AS created_at, a.name FROM `logging` l INNER JOIN account a ON l.user_id = a.id where l.user_id=" + req.session.Account.id + " And l.action = " + action + " And l.createdAt between " + sdate + " and " + edate + " ORDER BY l.id DESC ";
         }
 
         sql = Sequelize.Utils.format([sql]);
