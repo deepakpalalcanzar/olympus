@@ -805,14 +805,14 @@ var AccountController = {
 
                 if (picUploadType === 'enterprise') {
 
-                    fsx.writeFile("/var/www/olympus/master/public/images/enterprises/" + enterpriseName, binaryData, 'binary', function (err) {
+                    fsx.writeFile("/var/www/html/olympus/master/public/images/enterprises/" + enterpriseName, binaryData, 'binary', function (err) {
                     });
                     account.enterprise_fsname = enterpriseName;
                     account.enterprise_mimetype = filetype;
 
                 } else if (picUploadType === 'profile') {
 
-                    fsx.writeFile("/var/www/olympus/master/public/images/profile/" + enterpriseName, binaryData, 'binary', function (err) {
+                    fsx.writeFile("/var/www/html/olympus/master/public/images/profile/" + enterpriseName, binaryData, 'binary', function (err) {
                     });
 
                     account.avatar_image = enterpriseName;
