@@ -326,6 +326,7 @@
 <main class="cd-main-content">
 
     <div href="#0" style="background-color: #383f4f;" class="cd-btn">Change Theme</div>
+    <div href="#0" onclick="window.location.href = 'post.php?action=themesetup'" style="background-color: #383f4f;" class="cd-btn">Skip</div>    
     <!-- your content here -->
 </main>
 
