@@ -1,30 +1,35 @@
 /*---------------------
-	:: File
-	-> controller
----------------------*/
-var crypto       = require('crypto'),
-    uuid         = require('node-uuid'),
-    fileService  = require('../services/lib/file/util');
-    emailService = require('../services/email');
-    knox         = require('knox');
-    fsx          = require('fs-extra');  
-    path 		 = require('path');
-    gm 			 = require('gm');
+ :: File
+ -> controller
+ ---------------------*/
+var crypto = require('crypto'),
+        uuid = require('node-uuid'),
+        fileService = require('../services/lib/file/util');
+emailService = require('../services/email');
+knox = require('knox');
+fsx = require('fs-extra');
+path = require('path');
 
-    var easyimg = require('easyimage');
+var easyimg = require('easyimage');
+
+var request = require('request');
+var gm = require("gm");
+var multer = require('multer');
+var AWS = require('aws-sdk');
+var mime = require('mime');
+//var im = require('imagemagick');
 
 var encryptedData = {};
 
 var FileController = {
-
-  /**
-   * POST /files/:id/copy
-   *
-   * Copies a file to a new directory
-   *
-   * ACL should be done at the policy level before getting here
-   * so we can just look up the Account by the `id` param.
-   */
+    /**
+     * POST /files/:id/copy
+     *
+     * Copies a file to a new directory
+     *
+     * ACL should be done at the policy level before getting here
+     * so we can just look up the Account by the `id` param.
+     */
 
     copy: function (req, res) {
 
@@ -55,13 +60,15 @@ var FileController = {
             };
 
             DirectoryPermission.find(permissionCriteria).exec(function (err, perms) {
-            
-                if (err) return res.json({
-                    error: err.message,
-                    type: 'error'
-                }, 400);
-            
-                if (perms.length < 1) return res.send(403);
+
+                if (err)
+                    return res.json({
+                        error: err.message,
+                        type: 'error'
+                    }, 400);
+
+                if (perms.length < 1)
+                    return res.send(403);
 
                 // Set name if the param is passed in
                 var name = req.param('name', file.name);
@@ -69,10 +76,11 @@ var FileController = {
 
                 // Copy the File and it's permissions to the new directory
                 file.copy(dest, file.name, function (err, newFile) {
-                    if (err) return res.json({
-                        error: err.message,
-                        type: 'error'
-                    }, 400);
+                    if (err)
+                        return res.json({
+                            error: err.message,
+                            type: 'error'
+                        }, 400);
                     res.json(newFile);
                 });
             });
@@ -84,13 +92,12 @@ var FileController = {
             }, 400);
         });
     },
-
     share: function (req, res) {
-    
+
         var fileId = req.params.id;
         var emails = req.param('emails', []);
         var type = req.param('type');
-        
+
         if (!fileId || emails.length === 0 || !type) {
             return res.json({
                 error: 'No file id and/or emails and/or type specified',
@@ -106,13 +113,14 @@ var FileController = {
 
             // get accounts referenced by email, or create if they don't exist
             var accounts = emails.map(function (email) {
-        
+
                 return Account.findOne({
                     email: email
                 }).then(function (account) {
-                    
-                    if (account) return account;
-                    return Account.createAccount({ email: email, isVerified: false, isAdmin: false }).then(function (account) {
+
+                    if (account)
+                        return account;
+                    return Account.createAccount({email: email, isVerified: false, isAdmin: false}).then(function (account) {
                         // send an invite email
                         emailService.sendInviteEmail({
                             accountName: req.session.Account && req.session.Account.name || 'Someone',
@@ -120,7 +128,8 @@ var FileController = {
                             inode: file,
                             nodeType: 'file'
                         }, function (err, data) {
-                            if (err) sails.log.warn(err);
+                            if (err)
+                                sails.log.warn(err);
                         });
                         return account;
                     });
@@ -132,17 +141,18 @@ var FileController = {
             sails.log('The file :: ', file);
             return accounts;
 
-        }).all().then(function(accounts){
+        }).all().then(function (accounts) {
 
             sails.log('The list of accounts :: ', accounts);
             // grant file permissions
             accounts.map(function (account) {
-                if (!account) return;
+                if (!account)
+                    return;
                 globalFile.share(type, account.id, true);
             });
 
-        }).then(function() {
-            res.json({ status: 'ok' });
+        }).then(function () {
+            res.json({status: 'ok'});
         }).fail(function (err) {
             res.json({
                 error: err && err.stack,
@@ -150,22 +160,20 @@ var FileController = {
             });
         });
     },
-
-
-  /**
-   * GET /files/:id/share
-   * Returns a public link for a file
-   * ACL should be done at the policy level before getting here
-   * so we can just look up the Account by the `id` param.
-   */
+    /**
+     * GET /files/:id/share
+     * Returns a public link for a file
+     * ACL should be done at the policy level before getting here
+     * so we can just look up the Account by the `id` param.
+     */
 
     shareurl: function (req, res) {
-    
+
         var fileId = req.params.id;
         var accountId = req.param('accountId', 1);
 
         File.findOne(fileId).then(function (file) {
-            
+
             // If there's no such file, return a 404
             if (!file) {
                 return res.json({
@@ -183,7 +191,7 @@ var FileController = {
             }
             // Find the file's workgroup
             else {
-                
+
                 function workGroupFinder(dir) {
                     return Directory.findOne({
                         id: dir.DirectoryId
@@ -197,7 +205,7 @@ var FileController = {
                 }
 
                 return workGroupFinder(file).then(function (workgroup) {
-                    
+
                     // If the workgroup doesn't allow public links, send a 403
                     if (workgroup !== null && !workgroup.public_sublinks_enabled) {
                         return res.json({
@@ -222,35 +230,33 @@ var FileController = {
             });
         });
     },
-
-
-    postComment: function(req, res){
+    postComment: function (req, res) {
         var access_token = req.param('account_id');
         AccountDeveloper.findOne({
-          access_token: req.param('account_id')
+            access_token: req.param('account_id')
         }).exec(function (err, account) {
             Comment.create({
-                payload     : req.param('comment'),
-                AccountId   : account.account_id,
-                FileId      : req.param('file_id')
+                payload: req.param('comment'),
+                AccountId: account.account_id,
+                FileId: req.param('file_id')
             }).exec(function (err, accounts) {
-                if (err) return err;
-                Account.findOne(account.account_id).then(function (file){
+                if (err)
+                    return err;
+                Account.findOne(account.account_id).then(function (file) {
                     accounts.name = file.name;
                     return res.json(accounts, 200);
                 });
             });
         });
     },
-
-  /**
-   * GET /files/:id/thumbnail
-   *
-   * Returns a thumbnail for the file
-   *
-   * ACL should be done at the policy level before getting here
-   * so we can just look up the Account by the `id` param.
-   */
+    /**
+     * GET /files/:id/thumbnail
+     *
+     * Returns a thumbnail for the file
+     *
+     * ACL should be done at the policy level before getting here
+     * so we can just look up the Account by the `id` param.
+     */
 
     thumbnail: function (req, res) {
 
@@ -267,105 +273,119 @@ var FileController = {
                 return res.json({
                     error: new Error('No File found with Id ' + req.param('id')).message,
                     type: 'error'
-                }, 400);    
+                }, 400);
             }
             res.json(file, 200);
         });
     },
-
-    download: function(req, res) {
-        var emitter = global[sails.config.receiver+'Receiver'].newEmitterStream({id: req.param('id'), stream: res});
-        emitter.on('finish', function(){res.end();});
+    download: function (req, res) {
+        var emitter = global[sails.config.receiver + 'Receiver'].newEmitterStream({id: req.param('id'), stream: res});
+        emitter.on('finish', function () {
+            res.end();
+        });
         emitter.pipe(res);
     },
+    upload: function (req, res) {
 
-    upload: function(req, res) {
+
 
         res.setTimeout(0);
 
-        if(req.param('Filename')){
+
+        if (req.param('Filename')) {
             var uploadStream = req.file('Filedata');
-        }else{
+        } else {
             var uploadStream = req.file('files[]');
         }
 
-        uploadStream.on('error', function (err){ 
+        uploadStream.on('error', function (err) {
+            // console.log("STREAM ERROR OCCURED STREAM ERROR OCCURED STREAM ERROR OCCURED STREAM ERROR OCCURED")
             return res.end(JSON.stringify({error: err}), 'utf8');
         });
 
-        
+        // uploadStream.on('data', function (data){
+
         if (req.param('data')) {
             data = JSON.parse(req.param('data'));
-        }else if (req.param('id')) {
-            data = { parent: { id: req.param('id') }};
-        }else if (req.param('parent_id')) {
-            data = { parent: { id: req.param('parent_id') } };
+        } else if (req.param('id')) {
+            data = {parent: {id: req.param('id')}};
+        } else if (req.param('parent_id')) {
+            data = {parent: {id: req.param('parent_id')}};
         }
 
-		//  Get the current workgroup size
-        Directory.workgroup({ id:data.parent.id }, function(err, workgroup) {
-      
-            var receiver = global[sails.config.receiver+'Receiver'].newReceiverStream({
+
+        //  Get the current workgroup size
+        Directory.workgroup({id: data.parent.id}, function (err, workgroup) {
+
+            var receiver = global[sails.config.receiver + 'Receiver'].newReceiverStream({
                 maxBytes: workgroup.quota - workgroup.size,
                 totalUploadSize: req.headers['content-length']
             });
 
-            receiver.on('progress', function(progressData){
+            receiver.on('progress', function (progressData) {
                 progressData.parentId = typeof req.param('data') == 'undefined' ? req.param('parent_id') : data.parent.id;
                 res.write(JSON.stringify(progressData), 'utf8')
             });
 
+
+
+
             uploadStream.upload(receiver, function (err, files) {
 
-				gm(file).resize('200', '200').stream().pipe(output);
                 if (err) {
                     return res.write(JSON.stringify({error: err}), 'utf8');
                 }
 
                 var file = files[0];
 
-                if(file === undefined){
-                     return res.write(JSON.stringify({error: err}), 'utf8');
+                if (file === undefined) {
+                    return res.write(JSON.stringify({error: err}), 'utf8');
                 }
-                    // Find the file with the same name in a database             
-                File.findOne({   
+
+
+
+                // Find the file with the same name in a database             
+                File.findOne({
                     name: file.filename,
                     DirectoryId: data.parent.id,
-                }).exec(function (err, fileData){
-                    // If File exist in a database then find the maximum version of that file               
-                    if(fileData){ 
+                }).exec(function (err, fileData) {
+                    // If File exist in a database then find the maximum version of that file 
+
+                    if (fileData) {
 
                         var versionData = new Array();
                         var fileVersionData = new Array();
-                    
-                        Version.find({
-                            parent_id: fileData.id 
-                        }).done(function (err, maxData){
 
-                            if(maxData.length == '0'){
-                                if(fileData.size == file.size){
-                                    streamAdaptor.firstFile( 
-                                        { first: fileData.fsName, second:file.extra.fsName}, function (rmErr) {
+                        Version.find({
+                            parent_id: fileData.id
+                        }).done(function (err, maxData) {
+
+                            if (maxData.length == '0') {
+
+                                if (fileData.size == file.size) {
+                                    streamAdaptor.firstFile(
+                                            {first: fileData.fsName, second: file.extra.fsName}, function (rmErr) {
                                         var parsedResponse = JSON.parse(rmErr)
-                                        if(parsedResponse.first === parsedResponse.second){
-                                            fsx.unlink('/var/www/html/olympus/api/files/'+file.extra.fsName);
+                                        if (parsedResponse.first === parsedResponse.second) {
+                                            fsx.unlink('/var/www/olympus_abhieshek/olympus1/api/files/' + file.extra.fsName);
+                                            // fsx.unlink('/home/alcanzar/api/files/'+file.extra.fsName);
                                             return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
                                         }
                                     });
-                                }else{
+                                } else {
                                     res.end(JSON.stringify({
                                         origParams: req.params.all(),
-                                        name:     file.filename,
-                                        size:     file.size,
-                                        fsName:   file.extra.fsName,
+                                        name: file.filename,
+                                        size: file.size,
+                                        fsName: file.extra.fsName,
                                         mimetype: file.type,
-                                        version:  '1' ,
+                                        version: '1',
                                         oldFile: fileData.id
                                     }), 'utf8');
                                 }
-                            }else{
+                            } else {
 
-                                maxData.forEach(function(applicant)  {
+                                maxData.forEach(function (applicant) {
                                     versionData.push(applicant.version);
                                     fileVersionData.push(applicant.FileId);
                                 });
@@ -375,25 +395,25 @@ var FileController = {
 
                                 File.findOne({
                                     id: fileVersionData[maxElementIndex]
-                                }).done(function (err, latestFile){
-                                    if(latestFile.size == file.size){
-                                        streamAdaptor.firstFile( 
-                                            { first:latestFile.fsName, second:file.extra.fsName}, function (rmErr) {
+                                }).done(function (err, latestFile) {
+                                    if (latestFile.size == file.size) {
+                                        streamAdaptor.firstFile(
+                                                {first: latestFile.fsName, second: file.extra.fsName}, function (rmErr) {
                                             var parsedResponse = JSON.parse(rmErr)
-                                            if(parsedResponse.first === parsedResponse.second){
-                                                fsx.unlink('/var/www/html/olympus/api/files/'+file.extra.fsName);
+                                            if (parsedResponse.first === parsedResponse.second) {
+                                                fsx.unlink('/var/www/olympus_abhieshek/olympus1/api/files/' + file.extra.fsName);
+                                                // fsx.unlink('/home/alcanzar/api/files/'+file.extra.fsName);
                                                 return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
                                             }
                                         });
-                                    }else{
-
+                                    } else {
                                         res.end(JSON.stringify({
                                             origParams: req.params.all(),
-                                            name:     file.filename,
-                                            size:     file.size,
-                                            fsName:   file.extra.fsName,
+                                            name: file.filename,
+                                            size: file.size,
+                                            fsName: file.extra.fsName,
                                             mimetype: file.type,
-                                            version: parseInt(findMax) + 1 ,
+                                            version: parseInt(findMax) + 1,
                                             oldFile: fileData.id
                                         }), 'utf8');
                                     }
@@ -401,7 +421,7 @@ var FileController = {
                             }
                         });
 
-                    }else{
+                    } else {
                         res.end(JSON.stringify({
                             origParams: req.params.all(),
                             name: file.filename,
@@ -409,43 +429,154 @@ var FileController = {
                             fsName: file.extra.fsName,
                             mimetype: file.type,
                             version: 0,
-                            oldFile: 0                        
+                            oldFile: 0
                         }), 'utf8');
                     }
 
 
                     if (file.type == "image/png" || file.type == "image/jpg" || file.type == "image/jpeg") {
-                        easyimg.resize({src: '/var/www/html/olympus/olympus1/api/files/' + file.extra.fsName, dst: '/var/www/html/olympus/olympus1/api/files/thumbnail/' + file.extra.fsName, width: 100, height: 100}, function (err, stdout, stderr) {
-                            if (err)
-                                throw err;
-                            console.log('Resized to 100x100');
-                        });
+                        if (sails.config.receiver == "S3") {
+
+                            var s3 = new AWS.S3();
+                            gm(request("https://localhost/file/open/985/DSCN0255.JPG"), "DSCN0255.JPG")
+                                    .resize("100^", "100^")
+                                    .stream(function (err, stdout, stderr) {
+//                                        var data = {
+//                                            Bucket: "app.olympus.io",
+//                                            Key: "AKIAIEURF2O4FGCDDK6A",
+//                                            Body: stdout,
+//                                            ContentType: mime.lookup("JPG")
+//                                        };
+
+                                        s3.client.putObject(receiver, function (err, res) {
+                                            console.log("done");
+                                        });
+                                    });
+
+                        }  else {
+
+                            easyimg.resize({src: '/var/www/olympus_abhishek/olympus1/api/files/' + file.extra.fsName, dst: '/var/www/olympus_abhishek/olympus1/api/files/thumbnail-' + file.extra.fsName, width: 100, height: 100}, function (err, stdout, stderr) {
+                                if (err)
+                                    throw err;
+                                console.log('Resized to 100x100');
+                            });
+                        }
                     }
+
+
                 });
             });
+
+
+
+
         });
-	}    
+
+
+//
+//        if (req.param('Filename')) {
+//            var uploadStream = req.file('Filedata');
+//        } else {
+//            var uploadStream = req.file('files[]');
+//        }
+//
+//        uploadStream.on('error', function (err) {
+//            // console.log("STREAM ERROR OCCURED STREAM ERROR OCCURED STREAM ERROR OCCURED STREAM ERROR OCCURED")
+//            return res.end(JSON.stringify({error: err}), 'utf8');
+//        });
+//
+//        // uploadStream.on('data', function (data){
+//
+//        if (req.param('data')) {
+//            data = JSON.parse(req.param('data'));
+//        } else if (req.param('id')) {
+//            data = {parent: {id: req.param('id')}};
+//        } else if (req.param('parent_id')) {
+//            data = {parent: {id: req.param('parent_id')}};
+//        }
+//
+//
+//
+//          //Get the current workgroup size
+//        Directory.workgroup({id: data.parent.id}, function (err, workgroup) {
+//
+//            var receiver = global[sails.config.receiver + 'Receiver'].newReceiverStream({
+//                maxBytes: workgroup.quota - workgroup.size,
+//                totalUploadSize: req.headers['content-length']
+//            });
+//
+//            receiver.on('progress', function (progressData) {
+//                progressData.parentId = typeof req.param('data') == 'undefined' ? req.param('parent_id') : data.parent.id;
+//                res.write(JSON.stringify(progressData), 'utf8')
+//            });
+//            
+//
+//
+//
+//            uploadStream.upload(receiver, function (err, files) {
+//
+//                if (err) {
+//                    return res.write(JSON.stringify({error: err}), 'utf8');
+//                }
+//
+//                var file = files[0];
+//
+//                if (file === undefined) {
+//                    return res.write(JSON.stringify({error: err}), 'utf8');
+//                }
+//
+//            
+//console.log("^^^^^^^^^^^^^^^^^^^^^^$$$$$$$$$$$$$$$ file $$$$$$$$$$$$$^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+//console.log(file);
+//
+//
+//                // Find the file with the same name in a database             
+//                File.findOne({
+//                    name: file.filename,
+//                    DirectoryId: data.parent.id,
+//                }).exec(function (err, fileData) {
+//                    // If File exist in a database then find the maximum version of that file 
+//
+//console.log("^^^^^^^^^^^^^^^^^^^^^^$$$$$$$$$$$$$$$$  content-length $$$$$$$$$$$$^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+//console.log(req.headers['content-length']);
+//          
+//
+//                });
+//            });
+//
+//
+//////                          if (file.type == "image/png" || file.type == "image/jpg" || file.type == "image/jpeg") {
+//////                                easyimg.resize({src: '/var/www/olympus_abhishek/olympus1/api/files/' + file.extra.fsName, dst: '/var/www/olympus_abhishek/olympus1/api/files/thumbnail-'+file.extra.fsName, width: 100, height: 100}, function (err, stdout, stderr) {
+//////                                    if (err)
+//////                                        throw err;
+//////                                    console.log('Resized to 100x100');
+//////                                });
+//////                            }
+//
+//
+//        });
+    }
 };
 
 var streamAdaptor = {
     firstFile: function (options, cb) {
         var hash = crypto.createHash('md5');
-        var s    = fsx.createReadStream('/var/www/html/olympus/api/files/'+options.first);
+        var s = fsx.createReadStream('/var/www/olympus_abhieshek/olympus1/api/files/' + options.first);
         s.on('readable', function () {
             var chunk;
             while (null !== (chunk = s.read())) {
-              hash.update(chunk);
+                hash.update(chunk);
             }
         }).on('end', function () {
             encryptedData["first"] = hash.digest('hex');
         });
 
         var hs = crypto.createHash('md5');
-        var nw= fsx.ReadStream('/var/www/html/olympus/api/files/'+options.second);
+        var nw = fsx.ReadStream('/var/www/olympus_abhieshek/olympus1/api/files/' + options.second);
         nw.on('readable', function () {
             var chunk;
             while (null !== (chunk = nw.read())) {
-              hs.update(chunk);
+                hs.update(chunk);
             }
         }).on('end', function () {
             encryptedData["second"] = hs.digest('hex');

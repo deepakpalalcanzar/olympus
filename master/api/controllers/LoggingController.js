@@ -5,8 +5,11 @@ var LoggingController = {
 
 	listLog: function(req, res){
     var request = require('request');
+    
+    
+    var IsSuperAdmin = req.session.Account.isSuperAdmin;
 
-    if(req.session.Account.isSuperAdmin === 1){
+    if(IsSuperAdmin === 1){
 
       var sql = "SELECT log.*,DATE_FORMAT(log.createdAt,'%b %d %Y %h:%i %p') AS created_at,"+
       " a.id AS user_id,a.name AS name,a.email AS email,a.title AS title,a.phone AS phone,"+

@@ -44,12 +44,27 @@ var AccountController = {
             method: 'POST',
         };
 
+        var user_platform;
+        if (req.headers.user_platform) {
+            user_platform = req.headers.user_platform;
+        } else {
+            if (req.headers['user-agent']) {
+                user_platform = req.headers['user-agent'];
+            } else {
+                user_platform = "Web Application";
+            }
+        }
+        if (user_platform == "Apache-HttpClient/UNAVAILABLE (java 1.4)") {
+            user_platform = "Android-Phone"
+        }
+
         opts.json = {
             user_id: req.session.Account.id,
             text_message: 'has Uploaded a File ' + req.params.name,
             activity: 'Uploaded',
             on_user: req.session.Account.id,
-            ip: req.session.Account.ip
+            ip: req.session.Account.ip,
+            platform: user_platform,
         };
 
         request(opts, function (err1) {
@@ -57,44 +72,17 @@ var AccountController = {
         });
         /*Create logging*/
     },
-    
     searchdate: function (req, res) {
 
-        var sdate       = "'" + req.params.from + "'";
-        var edate       = "'" + req.params.to + "'";
-        var action      = "'" + req.params.activity + "'";
-        var actioncon   = req.params.activity;
+        var sdate = "'" + req.params.from + "'";
+        var edate = "'" + req.params.to + "'";
+        var action = "'" + req.params.activity + "'";
+        var actioncon = req.params.activity;
 
         if (actioncon == 'all') {
-
-            if(req.session.Account.isSuperAdmin === 1){
-                var sql = "SELECT l.text_message, l.ip_address, DATE_FORMAT( l.createdAt, '%b %d %Y %h:%i %p' ) AS created_at, a.name FROM `logging` l INNER JOIN account a ON l.user_id = a.id where l.createdAt between " + sdate + " and " + edate + " ORDER BY l.id DESC ";
-            }else{
-                var sql = "SELECT l.text_message, l.ip_address, DATE_FORMAT( l.createdAt, '%b %d %Y %h:%i %p' ) AS created_at, a.name FROM `logging` l INNER JOIN account a ON l.user_id = a.id where l.user_id=" + req.session.Account.id + " And l.createdAt between " + sdate + " and " + edate + " ORDER BY l.id DESC ";
-            }
+            var sql = "SELECT l.text_message, l.ip_address, DATE_FORMAT( l.createdAt, '%b %d %Y %h:%i %p' ) AS created_at, a.name FROM `logging` l INNER JOIN account a ON l.user_id = a.id where l.user_id=" + req.session.Account.id + " And l.createdAt between " + sdate + " and " + edate + " ORDER BY l.id DESC ";
         } else {
-
-            var query;
-            
-            if( req.params.from !== '' && req.params.to !== '' && actioncon !== ''){
-                query = "l.action = " + action + " And l.createdAt between " + sdate + " and " + edate + " ORDER BY l.id DESC ";                
-            }else if ( req.params.from !== '' && req.params.to !== '' && actioncon === '') {
-                query = "l.createdAt between " + sdate + " and " + edate + " ORDER BY l.id DESC ";                
-            }else if ( req.params.from !== '' && req.params.to === '' && actioncon === ''){
-                query = "l.createdAt =" + sdate + " ORDER BY l.id DESC ";                
-            }else if ( req.params.from === '' && req.params.to !== '' && actioncon === ''){
-                query = "edate = " + edate + " ORDER BY l.id DESC ";                
-            }else if ( req.params.from === '' && req.params.to === '' && actioncon !== ''){
-                query = "l.action = " + action + " ORDER BY l.id DESC ";                
-            }
-
-            if(req.session.Account.isSuperAdmin === 1){
-                var sql = "SELECT l.text_message, l.ip_address, DATE_FORMAT( l.createdAt, '%b %d %Y %h:%i %p' ) AS created_at, a.name FROM `logging` l INNER JOIN account a ON l.user_id = a.id where "+ query; 
-            }else{
-                var sql = "SELECT l.text_message, l.ip_address, DATE_FORMAT( l.createdAt, '%b %d %Y %h:%i %p' ) AS created_at, a.name FROM `logging` l INNER JOIN account a ON l.user_id = a.id where l.user_id=" + req.session.Account.id + " and " + query; 
-            }
-
-            // var sql = "SELECT l.text_message, l.ip_address, DATE_FORMAT( l.createdAt, '%b %d %Y %h:%i %p' ) AS created_at, a.name FROM `logging` l INNER JOIN account a ON l.user_id = a.id where l.user_id=" + req.session.Account.id + " And l.action = " + action + " And l.createdAt between " + sdate + " and " + edate + " ORDER BY l.id DESC ";
+            var sql = "SELECT l.text_message, l.ip_address, DATE_FORMAT( l.createdAt, '%b %d %Y %h:%i %p' ) AS created_at, a.name FROM `logging` l INNER JOIN account a ON l.user_id = a.id where l.user_id=" + req.session.Account.id + " And l.action = " + action + " And l.createdAt between " + sdate + " and " + edate + " ORDER BY l.id DESC ";
         }
 
         sql = Sequelize.Utils.format([sql]);
@@ -159,7 +147,6 @@ var AccountController = {
             }
         }
     },
-
     register: function (req, res) {
 
         var request = require('request');
@@ -188,7 +175,6 @@ var AccountController = {
             res.json(body, response && response.statusCode);
         });
     },
-
     read: function (req, res) {
 
         Account.find(req.session.Account.id).success(function (model) {
@@ -219,7 +205,6 @@ var AccountController = {
         });
 
     },
-
     listUsers: function (req, res) {
 
         var userId;
@@ -231,7 +216,7 @@ var AccountController = {
 
         if (req.session.Account.isSuperAdmin === 1) {
 
-            var sql ="SELECT account.*, subscription.features, " +
+            var sql = "SELECT account.*, subscription.features, " +
                     "adminuser.admin_profile_id, adminuser.id as adminuser_id, enterprises.name as enterprise_name, enterprises.id as enterprises_id FROM account " +
                     "LEFT JOIN subscription ON account.subscription_id=subscription.id " +
                     "LEFT JOIN adminuser ON account.id=adminuser.user_id " +
@@ -267,7 +252,6 @@ var AccountController = {
             throw new Error(e);
         });
     },
-
     listWorkgroup: function (req, res) {
 
         if (req.session.Account.isSuperAdmin) {
@@ -404,76 +388,202 @@ var AccountController = {
     deletePermission: function (req, res) {
 
         var request = require('request');
-        var sql = "Delete FROM directorypermission where AccountId =? and DirectoryId = ?";
-        sql = Sequelize.Utils.format([sql, req.param('user_id'), req.param('workgroup_id')]);
+
+        //console.log(req);
+
+        var sql = "SELECT id, DirectoryId, name FROM directory WHERE DirectoryId =? or id =? UNION ALL SELECT id, DirectoryId, name FROM directory WHERE FIND_IN_SET( DirectoryId, ( SELECT GROUP_CONCAT( id ) FROM directory WHERE DirectoryId =? ) )";
+        sql = Sequelize.Utils.format([sql, req.param('workgroup_id'), req.param('workgroup_id'), req.param('workgroup_id')]);
+
+        console.log(sql);
 
         sequelize.query(sql, null, {
             raw: true
-        }).success(function (dirs) {
+        }).success(function (directorys) {
+            if (directorys != null) {
+                directorys.forEach(function (diry) {
 
-            /*Create logging*/
-            var options = {
-                uri: 'http://localhost:1337/logging/register/',
-                method: 'POST',
-            };
 
-            options.json = {
-                user_id: req.session.Account.id,
-                text_message: 'has deleted ' + req.param('workgroup_name') + ' from ' + req.param('user_name') + '\'s account.',
-                activity: 'delete',
-                on_user: req.param('user_id'),
-                id: req.session.Account.ip
-            };
+                    var sql = "SELECT id, DirectoryId, name FROM directory WHERE DirectoryId =? or id =? UNION ALL SELECT id, DirectoryId, name FROM directory WHERE FIND_IN_SET( DirectoryId, ( SELECT GROUP_CONCAT( id ) FROM directory WHERE DirectoryId =? ) )";
+                    sql = Sequelize.Utils.format([sql, diry.id, diry.id, diry.id]);
 
-            request(options, function (err, response, body) {
-                if (err)
-                    return res.json({error: err.message, type: 'error'}, response && response.statusCode);
-            });
+                    console.log(sql);
 
-            /*Create logging*/
+                    sequelize.query(sql, null, {
+                        raw: true
+                    }).success(function (directorys) {
+                        if (directorys != null) {
+                            directorys.forEach(function (diry) {
 
-            File.findAll({
-                where: ['DirectoryId=' + req.param('workgroup_id')],
-            }).success(function (files) {
-                if (files != null) {
 
-                    files.forEach(function (applicant) {
+                                console.log(' DirectoryId : ' + diry.id + ' Account Id ' + req.param('user_id'));
 
-                        var sql3 = "Delete FROM filepermission where FileId = ? and AccountId =?";
-                        sql3 = Sequelize.Utils.format([sql3, applicant.id, req.param('user_id')]);
+                                var sql = "Delete FROM directorypermission where AccountId =? and DirectoryId = ?";
+                                sql = Sequelize.Utils.format([sql, req.param('user_id'), diry.id]);
 
-                        sequelize.query(sql3, null, {
-                            raw: true
-                        }).success(function (dirs) {
+                                sequelize.query(sql, null, {
+                                    raw: true
+                                }).success(function (dirs) {
 
-                            /*Create logging*/
-                            var options = {
-                                uri: 'http://localhost:1337/logging/register/',
-                                method: 'POST',
-                            };
+                                    /*Create logging*/
+                                    var options = {
+                                        uri: 'http://localhost:1337/logging/register/',
+                                        method: 'POST',
+                                    };
 
-                            options.json = {
-                                user_id: req.session.Account.id,
-                                text_message: req.session.Account.name + ' has deleted file' + applicant.name + ' located in ' + req.param('workgroup_name') + ' from ' + req.param('user_name') + '\'s account.',
-                                activity: 'delete',
-                                on_user: req.param('user_id'),
-                                ip: req.session.Account.ip
-                            };
+                                    options.json = {
+                                        user_id: req.session.Account.id,
+                                        text_message: 'has deleted ' + req.param('workgroup_name') + ' from ' + req.param('user_name') + '\'s account.',
+                                        activity: 'delete',
+                                        on_user: req.param('user_id'),
+                                        id: req.session.Account.ip
+                                    };
 
-                            request(options, function (err, response, body) {
-                                if (err)
-                                    return res.json({error: err.message, type: 'error'}, response && response.statusCode);
-                                res.json(body, response && response.statusCode);
+                                    request(options, function (err, response, body) {
+                                        if (err)
+                                            return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+                                    });
+
+                                    /*Create logging*/
+
+                                    File.findAll({
+                                        where: ['DirectoryId=' + req.param('workgroup_id')],
+                                    }).success(function (files) {
+                                        if (files != null) {
+
+                                            files.forEach(function (applicant) {
+
+                                                var sql3 = "Delete FROM filepermission where FileId = ? and AccountId =?";
+                                                sql3 = Sequelize.Utils.format([sql3, applicant.id, req.param('user_id')]);
+
+                                                sequelize.query(sql3, null, {
+                                                    raw: true
+                                                }).success(function (dirs) {
+
+                                                    /*Create logging*/
+                                                    var options = {
+                                                        uri: 'http://localhost:1337/logging/register/',
+                                                        method: 'POST',
+                                                    };
+
+                                                    options.json = {
+                                                        user_id: req.session.Account.id,
+                                                        text_message: req.session.Account.name + ' has deleted file' + applicant.name + ' located in ' + req.param('workgroup_name') + ' from ' + req.param('user_name') + '\'s account.',
+                                                        activity: 'delete',
+                                                        on_user: req.param('user_id'),
+                                                        ip: req.session.Account.ip
+                                                    };
+
+                                                    request(options, function (err, response, body) {
+                                                        if (err)
+                                                            return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+                                                        res.json(body, response && response.statusCode);
+                                                    });
+                                                    /*Create logging*/
+                                                });
+                                            });
+                                        }
+                                    }).error(function (e) {
+                                        throw new Error(e);
+                                    });
+                                });
+
+
+
+
+
                             });
-                            /*Create logging*/
-                        });
+                        }
+                        res.json(directorys, 200);
+                    }).error(function (e) {
+                        throw new Error(e);
                     });
-                }
-            }).error(function (e) {
-                throw new Error(e);
-            });
+
+
+
+                });
+            }
+            res.json(directorys, 200);
+        }).error(function (e) {
+            throw new Error(e);
         });
+
+
     },
+//    deletePermission: function (req, res) {
+//
+//        var request = require('request');
+//        var sql = "Delete FROM directorypermission where AccountId =? and DirectoryId = ?";
+//        sql = Sequelize.Utils.format([sql, req.param('user_id'), req.param('workgroup_id')]);
+//
+//        sequelize.query(sql, null, {
+//            raw: true
+//        }).success(function (dirs) {
+//
+//            /*Create logging*/
+//            var options = {
+//                uri: 'http://localhost:1337/logging/register/',
+//                method: 'POST',
+//            };
+//
+//            options.json = {
+//                user_id: req.session.Account.id,
+//                text_message: 'has deleted ' + req.param('workgroup_name') + ' from ' + req.param('user_name') + '\'s account.',
+//                activity: 'delete',
+//                on_user: req.param('user_id'),
+//                id: req.session.Account.ip,
+//                platform: req.headers.user_platform,
+//            };
+//
+//            request(options, function (err, response, body) {
+//                if (err)
+//                    return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+//            });
+//
+//            /*Create logging*/
+//
+//            File.findAll({
+//                where: ['DirectoryId=' + req.param('workgroup_id')],
+//            }).success(function (files) {
+//                if (files != null) {
+//
+//                    files.forEach(function (applicant) {
+//
+//                        var sql3 = "Delete FROM filepermission where FileId = ? and AccountId =?";
+//                        sql3 = Sequelize.Utils.format([sql3, applicant.id, req.param('user_id')]);
+//
+//                        sequelize.query(sql3, null, {
+//                            raw: true
+//                        }).success(function (dirs) {
+//
+//                            /*Create logging*/
+//                            var options = {
+//                                uri: 'http://localhost:1337/logging/register/',
+//                                method: 'POST',
+//                            };
+//
+//                            options.json = {
+//                                user_id: req.session.Account.id,
+//                                text_message: req.session.Account.name + ' has deleted file' + applicant.name + ' located in ' + req.param('workgroup_name') + ' from ' + req.param('user_name') + '\'s account.',
+//                                activity: 'delete',
+//                                on_user: req.param('user_id'),
+//                                ip: req.session.Account.ip,
+//                                platform: req.headers.user_platform,
+//                            };
+//
+//                            request(options, function (err, response, body) {
+//                                if (err)
+//                                    return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+//                                res.json(body, response && response.statusCode);
+//                            });
+//                            /*Create logging*/
+//                        });
+//                    });
+//                }
+//            }).error(function (e) {
+//                throw new Error(e);
+//            });
+//        });
+//    },
     /**
      * Change user password
      * @param {} oldPrometheus => old password
@@ -669,14 +779,14 @@ var AccountController = {
 
                 if (picUploadType === 'enterprise') {
 
-                    fsx.writeFile("/var/www/html/olympus/master/public/images/enterprises/" + enterpriseName, binaryData, 'binary', function (err) {
+                    fsx.writeFile("/var/www/olympus/master/public/images/enterprises/" + enterpriseName, binaryData, 'binary', function (err) {
                     });
                     account.enterprise_fsname = enterpriseName;
                     account.enterprise_mimetype = filetype;
 
                 } else if (picUploadType === 'profile') {
 
-                    fsx.writeFile("/var/www/html/olympus/master/public/images/profile/" + enterpriseName, binaryData, 'binary', function (err) {
+                    fsx.writeFile("/var/www/olympus/master/public/images/profile/" + enterpriseName, binaryData, 'binary', function (err) {
                     });
 
                     account.avatar_image = enterpriseName;
@@ -751,10 +861,10 @@ var AccountController = {
                                     //	      use the json parsing above as a simple check we got back good stuff
 
                                     Subscription.find({
-                                        where: {id: '1' }
+                                        where: {id: '1'}
                                     }).done(function (err, subscription) {
 
-                                    // Save to transactionDetails table
+                                        // Save to transactionDetails table
                                         var tran_options = {
                                             uri: 'http://localhost:1337/transactiondetails/register/',
                                             method: 'POST',
@@ -778,7 +888,7 @@ var AccountController = {
                                                 return res.json({error: err1.message, type: 'error'}, response1 && response1.statusCode);
                                         });
 
-                                });
+                                    });
 
                                 });
                             }
@@ -812,44 +922,89 @@ var AccountController = {
     delOwnAccount: function (req, res) {
 
         var request = require('request');
-
         var sql = "Select id from directory where deleted is null and ownerId = ?";
         sql = Sequelize.Utils.format([sql, req.params.id]);
         sequelize.query(sql, null, {
             raw: true
         }).success(function (dirs) {
-            console.log("adskl;sakdl;aslk;da;sldk;alskd;alskd;alkskda;lsdk");
             console.log(dirs);
         });
 
+        var options = {
+            uri: 'http://localhost:1337/account/del/',
+            method: 'POST',
+        };
+
+        options.json = {
+            id: req.params.id,
+            accId: req.session.Account.id, //for logging
+            accName: req.session.Account.name, //for logging
+        };
+
+        request(options, function (err, response, body) {
+            if (err)
+                return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+            if (req.session.Account.isAdmin === true) {
+                var sql = "UPDATE enterprises SET is_active=0 where account_id = ?";
+                sql = Sequelize.Utils.format([sql, req.params.id]);
+                sequelize.query(sql, null, {
+                    raw: true
+                }).success(function (dirs) {
+                    res.json(body, response && response.statusCode);
+                });
+            } else {
+                res.json(body, response && response.statusCode);
+            }
+
+            var sql = "SELECT dir.*, dp.type FROM directory dir JOIN directorypermission dp ON dir.id = dp.DirectoryId  where dp.AccountId =?";
+            sql = Sequelize.Utils.format([sql, req.param('id')]);
+            sequelize.query(sql, null, {
+                raw: true
+            }).success(function (directorys) {
+                if (directorys != null) {
+                    directorys.forEach(function (diry) {
+                        var sql = "Delete FROM directorypermission where DirectoryId = ?";
+                        sql = Sequelize.Utils.format([sql, diry.id]);
+                        sequelize.query(sql, null, {
+                            raw: true
+                        }).success(function (dirs) {
+                            console.log("Delete permission of id ++++++++++++ " + diry.id);
 
 
-        /*		var options = {
-         uri: 'http://localhost:1337/account/del/' ,
-         method: 'POST',
-         };
-         
-         options.json =  {
-         id		: req.params.id,
-         accId 	: req.session.Account.id, //for logging
-         accName : req.session.Account.name, //for logging
-         };
-         
-         request(options, function(err, response, body) {
-         if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
-         if(req.session.Account.isAdmin === true){
-         var sql = "UPDATE enterprises SET is_active=0 where account_id = ?";
-         sql = Sequelize.Utils.format([sql, req.params.id]);
-         sequelize.query(sql, null, {
-         raw: true
-         }).success(function(dirs) {
-         res.json(body, response && response.statusCode);
-         });
-         }else{
-         res.json(body, response && response.statusCode);
-         }
-         });
-         */	},
+                            var sql = "SELECT * FROM file  where DirectoryId =?";
+                            sql = Sequelize.Utils.format([sql, diry.id]);
+                            sequelize.query(sql, null, {
+                                raw: true
+                            }).success(function (files) {
+                                if (files != null) {
+                                    files.forEach(function (file) {
+                                        var deleted = "Deleted"+file.fsName;
+                                        var sql = "UPDATE file SET deteled='1', deleteDate='"+new Date()+"',fsName='"+deleted+"' where id = ?";
+                                        console.log(sql);
+                                        sql = Sequelize.Utils.format([sql, file.id]);
+                                        sequelize.query(sql, null, {
+                                            raw: true
+                                        }).success(function (fls) {
+                                            console.log("Delete file of id : " + file.id);
+                                        });
+                                    });
+                                }
+                                res.json(directorys, 200);
+                            }).error(function (e) {
+                                throw new Error(e);
+                            });
+
+
+
+                        });
+                    });
+                }
+                res.json(directorys, 200);
+            }).error(function (e) {
+                throw new Error(e);
+            });
+        });
+    },
     'delete' : INodeService["delete"],
             /*
              This fucntion is called from the #addEnterprise and #reports to check 

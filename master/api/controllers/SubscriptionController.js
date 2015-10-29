@@ -36,7 +36,8 @@ var SubscriptionController = {
                 text_message: 'has added a subscription plan named '+req.params.features+'.',
                 activity    : 'add',
                 on_user     : req.session.Account.id,
-                ip          : req.session.Account.ip
+                ip          : req.session.Account.ip,
+                 platform    : req.headers.user_platform,
             };
 
             request(opts, function(err1, response1, body1) {
@@ -72,7 +73,8 @@ var SubscriptionController = {
                     text_message: 'has deleted a subscription plan named '+subscription.features+'.',
                     activity    : 'deleted',
                     on_user     : req.session.Account.id,
-                    ip          : req.session.Account.ip
+                    ip          : req.session.Account.ip,
+                     platform    : req.headers.user_platform,
                 };
 
                 request(opts, function(err1, response1, body1) {
@@ -120,7 +122,8 @@ var SubscriptionController = {
                 text_message: 'has updated a subscription plan.',
                 activity    : 'updated',
                 on_user     : req.session.Account.id,
-                ip          : req.session.Account.ip
+                ip          : req.session.Account.ip,
+                 platform    : req.headers.user_platform,
             };
 
             request(opts, function(err1, response1, body1) {
@@ -610,6 +613,7 @@ impersonate: function(req, res){
             activity    : 'download',
             on_user     : req.session.Account.id,
             ip          : req.session.Account.ip,
+             platform    : req.headers.user_platform,
 
           };
 
@@ -774,6 +778,7 @@ impersonate: function(req, res){
                 activity    : 'upgrade',
                 on_user     : req.session.Account.id,
                 ip          : req.session.Account.ip,
+                platform    : req.headers.user_platform,
             };
 
           request(options, function(err21, response21, body21) {
@@ -851,7 +856,8 @@ impersonate: function(req, res){
               text_message: 'has upgraded own subscription plan.',
               activity    : 'upgrade',
               on_user     : req.session.Account.id,
-                ip          : req.session.Account.ip
+                ip          : req.session.Account.ip,
+                platform    : req.headers.user_platform,
 
             };
 

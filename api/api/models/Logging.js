@@ -22,8 +22,10 @@ module.exports = {
     action: 'string',
 
     on_user: 'integer',
-    ip_address:    'string',
-    platform:    'string',
+
+    ip_address:  'string',
+    
+    platform: 'string',
 
 
     /****************************************************
@@ -98,11 +100,12 @@ module.exports = {
       action          : options.activity,
       on_user         : options.on_user,
       ip_address      : options.ip,
+      platform        : options.platform,
+      
      
     }).exec(function foundAccount (err, logging) {
       console.log(err);
         if (err) return cb && cb(err);
-
         return cb && cb(null, logging);
     });
   },
