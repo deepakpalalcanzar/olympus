@@ -17,10 +17,6 @@ Mast.registerTree('LogTable', {
             name: 'Date',
             className: 'log-date-column'
         },
-        column5: {
-            name: 'Plate Form',
-            className: 'log-plateform-column'
-        },
         selectedModel: null
     },
     template: '.log-template',

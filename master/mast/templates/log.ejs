@@ -28,7 +28,6 @@
         <div class="dir-files {{column2.className}} header-color mast-critical"><span>{{column2.name}}</span></div>
         <div class="dir-files {{column3.className}} header-color mast-critical"><span>{{column3.name}}</span></div>
         <div class="dir-files {{column4.className}} header-color mast-critical"><span>{{column4.name}}</span></div>
-        <div class="dir-files {{column5.className}} header-color mast-critical"><span>{{column5.name}}</span></div>
         <div class="log-outlet clearfix"  style="width:100%;"></div>
         <div class="paginate"></div>
     </div>
@@ -53,9 +52,7 @@
     <div class="dir-files log-date-column mast-critical mast-column-header">
         <span>{{ created_at }}</span>
     </div>
-    <div class="dir-files log-plateform-column mast-critical log-column-text">
-        <span>{{ plateform }}</span>
-    </div>
+   
     {% }else{%}
     <div class="dir-files" style="font-size:13px;margin-left:50px;">No records found !</div>
     {% }%}
