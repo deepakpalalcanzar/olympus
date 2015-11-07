@@ -34,6 +34,7 @@ module.exports = {
     replaceFileId: 'integer',
 
     DirectoryId: 'integer',
+    thumbnail: 'integer',
 
 
     /****************************************************
