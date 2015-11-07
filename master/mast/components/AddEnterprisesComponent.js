@@ -19,14 +19,17 @@ Mast.registerComponent('AddEnterprisesComponent',{
 						if(res){
 
 							if(res.id && res.error){
+
                                 var accData = {
 									account_id  : res.id,
 							 		subscription_id	: entData.subscription,
 								};
+
 								Mast.Socket.request('/enterprises/updateUserAccount', accData, function(respo, erro){
 									if(respo){
 									}
 								});
+								
 							}
 
 							var data = {

@@ -12,32 +12,36 @@
             <option value="add">Add</option>
             <option value="change">Change</option>
             <option value="delete">Delete</option>
-            <option value="newaccount">Create</option>
+            <option value="create">Create</option>
             <option value="comment">Comment</option>
-            <option value="Uploaded">Upload</option>
+            <option value="upload">Upload</option>
             <option value="opened">Opened</option>
-            <option value="download">downloaded</option>
+            <option value="Downloaded">downloaded</option>
             <option value="rename">Rename</option>
+            <option value="Downloaded">downloaded</option>
+            <option value="Downloaded">downloaded</option>
         </select>
+        <!--<div><ul class="pagination"><li class="active"><a href="https://localhost/#log/1">1</a></li><li><a href="https://localhost/#log/2">2</a></li><li><a href="https://localhost/#log/3">3</a></li><li><a href="https://localhost/#log/4">4</a></li><li><a href="https://localhost/#log/5">5</a></li><li><a href="https://localhost/#log/2" class="paginator-next">Next</a></li></ul></div>-->
         <div class="account-save-button search-details" style="float:right;margin-right:9%;margin-top:0%">Search</div>
+        
     </div>
-    <div class="organization-bar clearfix" >
+    <div class="organization-bar">
+       <div id="list_pagignation" align="right"  style="width:100%;"></div>
+    </div>
+    <div class="organization-bar clearfix">
         <div class="dir-files {{column1.className}} header-color mast-critical"><span>{{column1.name}}</span></div>
         <div class="dir-files {{column2.className}} header-color mast-critical"><span>{{column2.name}}</span></div>
         <div class="dir-files {{column3.className}} header-color mast-critical"><span>{{column3.name}}</span></div>
         <div class="dir-files {{column4.className}} header-color mast-critical"><span>{{column4.name}}</span></div>
         <div class="log-outlet clearfix"  style="width:100%;"></div>
-        <div class="paginate"></div>
     </div>
-
 </div>
 
 <!-- log row template -->
 
 <div class="log-row-template clearfix" style="width:100%;float:left;">
-
-    {% if(text_message !=='error_123'){%}
-
+    {% if(text_message !=='error_123'){ %}
+    
     <div class="dir-files log-user-column mast-critical log-column-text">
         <span>{{ name }}</span>
     </div>
@@ -50,10 +54,10 @@
     <div class="dir-files log-date-column mast-critical mast-column-header">
         <span>{{ created_at }}</span>
     </div>
-   
-    {% }else{%}
+    
+    {% }else{ %}
     <div class="dir-files" style="font-size:13px;margin-left:50px;">No records found !</div>
-    {% }%}
+   
+    {% } %}
+     
 </div>
-
-

@@ -20,24 +20,24 @@ Mast.registerTree('UITableComponent',{
 	collection: [],
 	branchOutlet: '.list-outlet',
 	bindings: {
-		visible: function (visible) {
-			
-		}
+            visible: function (visible) {
+
+            }
 	},
 
 	afterRender: function() {
-		this.$el.disableSelection();
+            this.$el.disableSelection();
 	},
 	
 	// Fetch data on initialization
 	init: function () {
 
-		var self = this;
-		this.collection.fetch({
-			success: function (model,res) {
-				self.collection.reset(_.map(res,Mast.models.INode.prototype.marshal));
-			}
-		});
+            var self = this;
+            this.collection.fetch({
+                    success: function (model,res) {
+                            self.collection.reset(_.map(res,Mast.models.INode.prototype.marshal));
+                    }
+            });
 	}
 
 });
