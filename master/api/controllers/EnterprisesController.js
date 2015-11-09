@@ -1,5 +1,6 @@
 var UUIDGenerator = require('node-uuid');
 var cacheRoute = require('booty-cache');
+var pagination = require('pagination');
 
 var EnterprisesController = {
 
@@ -11,22 +12,98 @@ var EnterprisesController = {
 		"INNER JOIN subscription s ON s.id = a.subscription_id "+
 		"INNER JOIN transactiondetails td ON td.account_id = a.id "+
 		" WHERE e.is_active=1 AND td.is_deleted = 0";
+        
+        
 		sql = Sequelize.Utils.format([sql]);
 		sequelize.query(sql, null, {
 			raw: true
 		}).success(function(enterprises) {
-			if(enterprises.length){ // check for no records exists
-            	res.json(enterprises, 200);
-            }else{
-                res.json({
-                    name: 'error_123',
-                    notFound : true,  
-                });
-            }
+                         if(enterprises.length){ // check for no records exists
+                             
+                             
+                        var totalpage = (enterprises.length / 50)+1 ;
+                        var range = ((req.param('id') * 50)-50) + "," + 50;
+
+                        var boostrapPaginator = new pagination.TemplatePaginator({
+                            prelink: '/', current: req.param('id'), rowsPerPage: 1,
+                            totalResult: enterprises.length, slashSeparator: false,
+                            template: function (result) {
+                                var i, len, prelink;
+                                var html = "<div>";
+                                if (result.pageCount < 2) {
+                                    html += "</div>";
+                                    return html;
+                                }
+                                prelink = this.preparePreLink(result.prelink);
+                                if (result.previous) {
+                                    html += "<a href='#enterprises/" + result.previous + "'>" + this.options.translator("PREVIOUS") + "</a> &nbsp; | &nbsp; ";
+                                }
+                                if (result.range.length) {
+                                    for (i = 0, len = result.range.length; i < len; i++) {
+                                        if (totalpage > result.range[i]) {
+                                            if (result.range[i] === result.current) {
+                                                html += "<a href='#enterprises/" + result.range[i] + "'>" + result.range[i] + "</a> &nbsp; | &nbsp;";
+                                            } else {
+                                                html += "<a href='#enterprises/" + result.range[i] + "'>" + result.range[i] + "</a> &nbsp; | &nbsp;";
+                                            }
+                                        }
+                                    }
+                                }
+                                if (result.next) {
+                                    if (totalpage > result.next) {
+                                        html += "<a href='#enterprises/" + result.next + "' class='paginator-next'>" + this.options.translator("NEXT") + "</a> &nbsp; ";
+                                    }
+                                }
+                                html += "</div>";
+                                return html;
+                            }
+                        });
+
+                        var Paginator = boostrapPaginator.render();
+
+
+                             
+                    var sql = "SELECT e.*,a.id AS account,a.name AS acc_name,a.email AS acc_email,s.id AS sub_id,"+
+                    " td.plan_name AS features,td.users_limit, " + '"' + Paginator + '" ' + " as Paginator FROM enterprises e "+
+                    "INNER JOIN account a ON a.id = e.account_id "+
+                    "INNER JOIN subscription s ON s.id = a.subscription_id "+
+                    "INNER JOIN transactiondetails td ON td.account_id = a.id "+
+                    " WHERE e.is_active=1 AND td.is_deleted = 0 LIMIT " + range + " ";
+        
+        
+                                sql = Sequelize.Utils.format([sql]);
+                                sequelize.query(sql, null, {
+                                        raw: true
+                                }).success(function(enterprises) {
+                                         if(enterprises.length){ // check for no records exists
+
+                                        res.json(enterprises, 200);
+                                    }else{
+                                        res.json({
+                                            name: 'error_123',
+                                            notFound : true,  
+                                        });
+                                    }
+                                }).error(function(e) {
+                                        throw new Error(e);
+                                });
+                             
+                             
+                             
+                             
+//                        res.json(enterprises, 200);
+                    }else{
+                        res.json({
+                            name: 'error_123',
+                            notFound : true,  
+                        });
+                    }
+                    
 		}).error(function(e) {
 			throw new Error(e);
 		});
 	},
+
 
 	register: function(req, res){
 
@@ -142,7 +219,7 @@ var EnterprisesController = {
                       activity    : 'delete',
                       on_user     : req.params.id,
                       ip          : req.session.Account.ip,
-                      platform    : req.headers.user_platform,
+                       platform    : req.headers.user_platform,
                   };
 
                   request(options, function(err, response, body) {

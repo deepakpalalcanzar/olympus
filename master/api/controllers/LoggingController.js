@@ -9,7 +9,6 @@ var LoggingController = {
 
 
         if (req.session.Account.isSuperAdmin === 1) {
-
             var sql = "SELECT log.*,DATE_FORMAT(log.createdAt,'%b %d %Y %h:%i %p') AS created_at," +
                     " a.id AS user_id,a.name AS name,a.email AS email,a.title AS title,a.phone AS phone," +
                     " e.name AS ent_name, e.id AS ent_id FROM" +
@@ -26,30 +25,14 @@ var LoggingController = {
                     " (SELECT id from account where created_by=" + req.session.Account.id + ") ORDER BY log.id DESC";
             sql = Sequelize.Utils.format([sql]);
         }
-
         sequelize.query(sql, null, {
             raw: true
         }).success(function (log) {
-
-
             /*Looking for data if not found return appropriate*/
             if (log.length) {
-//            if (req.param('page')) {
 
-//                 res.render('article' + req.params.id);
-
-                var totalpage = (log.length / 50)+1;
-
-                var Endlogdata = req.param('id') * 50;
-                var Startlogdata = Endlogdata - 50;
-
-                var range = Startlogdata + "," + Endlogdata;
-
-                console.log('************** Id and Range ************');
-                console.log(req.param('id'));
-                console.log(totalpage);
-                console.log('****************************************');
-
+                var totalpage = (log.length / 50) + 1;
+                var range = ((req.param('id') * 50) - 50) + "," + 50;
 
                 var boostrapPaginator = new pagination.TemplatePaginator({
                     prelink: '/', current: req.param('id'), rowsPerPage: 1,
@@ -86,10 +69,7 @@ var LoggingController = {
                     }
                 });
 
-                //log.Paginator = {'Paginator': boostrapPaginator.render()};
-
                 var Paginator = boostrapPaginator.render();
-
                 if (req.session.Account.isSuperAdmin === 1) {
 
                     var sql = "SELECT log.*,DATE_FORMAT(log.createdAt,'%b %d %Y %h:%i %p') AS created_at," +
@@ -107,22 +87,13 @@ var LoggingController = {
                             // " LEFT JOIN enterprises e ON e.account_id=a.id"+
                             " WHERE log.user_id=" + req.session.Account.id + " OR log.user_id IN" +
                             " (SELECT id from account where created_by=" + req.session.Account.id + ") ORDER BY log.id DESC LIMIT " + range + " ";
-
-//                    console.log('******************* Sql *********************');
-//                    console.log(sql);
-//                    console.log('*********************************************');
-
                     sql = Sequelize.Utils.format([sql]);
                 }
-
                 sequelize.query(sql, null, {
                     raw: true
                 }).success(function (logdata) {
-
                     if (logdata.length) {
-
                         res.json(logdata, 200);
-
                     }
                 });
 
@@ -132,14 +103,6 @@ var LoggingController = {
                     notFound: true,
                 });
             }
-//            } else {
-//                res.json({
-//                    text_message: 'error_123',
-//                    notFound: true,
-//                });
-//            }
-
-
 
         }
         ).error(function (e) {

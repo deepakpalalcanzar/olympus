@@ -67,11 +67,6 @@ var AccountController = {
             platform: user_platform,
         };
 
-        console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
-        console.log(user_platform);
-        console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
-
-
         request(opts, function (err1) {
 
         });
@@ -246,14 +241,8 @@ var AccountController = {
             if (accounts.length) {
 
                 var totalpage = (accounts.length / 50) + 1;
-                var Endlogdata = req.param('id') * 50;
-                var Startlogdata = Endlogdata - 50;
-                var range = Startlogdata + "," + Endlogdata;
+                var range = ((req.param('id') * 50) - 50) + "," + 50;
 
-                console.log('************** Id and Range ************');
-                console.log(req.param('id'));
-                console.log(totalpage);
-                console.log('****************************************');
 
 
                 var boostrapPaginator = new pagination.TemplatePaginator({
@@ -302,9 +291,7 @@ var AccountController = {
                             "LEFT JOIN adminuser ON account.id=adminuser.user_id " +
                             "LEFT JOIN enterprises ON account.created_by=enterprises.account_id " +
                             "WHERE account.is_enterprise=0 and account.deleted != 1  LIMIT " + range + " ";
-                    
-                     console.log(sql);
-                     
+
                     sql = Sequelize.Utils.format([sql]);
 
                 } else {
@@ -315,9 +302,7 @@ var AccountController = {
                             "LEFT JOIN adminuser ON account.id=adminuser.user_id " +
                             "LEFT JOIN enterprises ON account.created_by=enterprises.account_id " +
                             "WHERE account.is_enterprise=0 and account.deleted != 1 and account.created_by=?  LIMIT " + range + "";
-                    
-                    console.log(sql);
-                    
+
                     sql = Sequelize.Utils.format([sql, userId]);
                 }
 
@@ -339,11 +324,6 @@ var AccountController = {
                 }).error(function (e) {
                     throw new Error(e);
                 });
-
-
-
-
-
 
                 //res.json(accounts, 200);
             } else {
@@ -809,14 +789,14 @@ var AccountController = {
 
                 if (picUploadType === 'enterprise') {
 
-                    fsx.writeFile("/var/www/olympus/master/public/images/enterprises/" + enterpriseName, binaryData, 'binary', function (err) {
+                    fsx.writeFile("/var/www/html/olympus/master/public/images/enterprises/" + enterpriseName, binaryData, 'binary', function (err) {
                     });
                     account.enterprise_fsname = enterpriseName;
                     account.enterprise_mimetype = filetype;
 
                 } else if (picUploadType === 'profile') {
 
-                    fsx.writeFile("/var/www/olympus/master/public/images/profile/" + enterpriseName, binaryData, 'binary', function (err) {
+                    fsx.writeFile("/var/www/html/olympus/master/public/images/profile/" + enterpriseName, binaryData, 'binary', function (err) {
                     });
 
                     account.avatar_image = enterpriseName;
@@ -831,14 +811,16 @@ var AccountController = {
         });
 
     },
-    /*****************************************************************************************
+   /*****************************************************************************************
      Post Registration csv Data
      @Auth : Avneesh
      ********************************************************************************************/
 
     readCSVFile: function (req, res) {
 
-        //var temp = require('temp');
+        /*Define dependencies.*/
+
+        var request = require('request');
 
         var sql = "SELECT subscription_id FROM account WHERE id=?";
         sql = Sequelize.Utils.format([sql, req.session.Account.id]);
@@ -846,29 +828,22 @@ var AccountController = {
             raw: true
         }).success(function (account) {
 
-
             var sql = "SELECT id FROM directory WHERE OwnerId=?";
             sql = Sequelize.Utils.format([sql, req.session.Account.id]);
             sequelize.query(sql, null, {
                 raw: true
             }).success(function (directory) {
-
                 var i = 0;
-                var request = require('request');
                 //console.log(req.params.filepath);
-                var stream = fsx.createReadStream('/var/www/html/olympus/olympus-web/master/public/Teatdata1.csv');
-
+                var stream = fsx.createReadStream('/var/www/html/olympus/master/public/Teatdata1.csv');
                 csv
                         .fromStream(stream)
                         .on("data", function (data) {
-
                             if (i != 0) {
-
                                 var options = {
                                     uri: 'http://localhost:1337/account/register/',
                                     method: 'POST',
                                 };
-
                                 options.json = {
                                     name: data[0] + ' ' + data[1],
                                     email: data[2],
@@ -880,20 +855,15 @@ var AccountController = {
                                     title: data[3],
                                     subscription: account[0]['subscription_id'],
                                 };
-
                                 request(options, function (err, response, body) {
-                                    //console.log(options);
-
+                                    // console.log(options);
                                     if (err)
                                         return res.json({error: err.message, type: 'error'}, response && response.statusCode);
-
                                     //	      Resend using the original response statusCode
                                     //	      use the json parsing above as a simple check we got back good stuff
-
                                     Subscription.find({
                                         where: {id: '1'}
                                     }).done(function (err, subscription) {
-
                                         // Save to transactionDetails table
                                         var tran_options = {
                                             uri: 'http://localhost:1337/transactiondetails/register/',
@@ -903,7 +873,7 @@ var AccountController = {
                                         var created_date = new Date();
                                         tran_options.json = {
                                             trans_id: (req.session.Account.isSuperAdmin === 1) ? 'superadmin' : 'workgroupadmin',
-                                            account_id: body.account.id,
+                                            account_id: '1',
                                             created_date: created_date,
                                             users_limit: subscription.users_limit,
                                             quota: subscription.quota,
@@ -916,24 +886,20 @@ var AccountController = {
                                         request(tran_options, function (err1, response1, body1) {
                                             if (err1)
                                                 return res.json({error: err1.message, type: 'error'}, response1 && response1.statusCode);
+                                     
                                         });
-
                                     });
-
+                                    res.json(body, response && response.statusCode);
                                 });
                             }
                             i++;
-
                         })
                         .on("end", function (count) {
                             console.log('Number of lines: ' + count - 1);
-
                         })
                         .on('error', function (error) {
                             console.log(error.message);
                         });
-
-
             });
         });
     },
@@ -941,6 +907,7 @@ var AccountController = {
      Post Registration CSV Data
      @Auth : Avneesh
      ********************************************************************************************/
+
 
     getImage: function (req, res) {
         Account.find(req.session.Account.id).done(function (err, account) {
