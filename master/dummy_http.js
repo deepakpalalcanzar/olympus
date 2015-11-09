@@ -1,1 +1,0 @@
-require('http').createServer(function (req, res) { res.writeHead(302, {Location: 'https://olympus.io' + req.url}); res.end(); }).listen(80);
