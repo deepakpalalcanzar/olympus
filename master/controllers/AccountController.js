@@ -789,6 +789,7 @@ var AccountController = {
     }),
     imageUpload: function (req, res) {
 
+ 
         binaryData = req.param('binary');
         var filefname = req.param('name');
         var filetype = req.param('type');
@@ -800,23 +801,23 @@ var AccountController = {
             if (err)
                 return res.send(err, 500);
             if (account) {
-
+                
                 var enterpriseName = fsName + '.png';
-
                 var base64Data = binaryData.replace(/^data:image\/(png|gif|jpeg);base64,/, "");
                 base64Data += base64Data.replace('+', ' ');
                 binaryData = new Buffer(base64Data, 'base64').toString('binary');
 
                 if (picUploadType === 'enterprise') {
 
-                    fsx.writeFile("/var/www/olympus/master/public/images/enterprises/" + enterpriseName, binaryData, 'binary', function (err) {
+
+                    fsx.writeFile("/var/www/html/olympus/master/public/images/enterprises/" + enterpriseName, binaryData, 'binary', function (err) {
                     });
                     account.enterprise_fsname = enterpriseName;
                     account.enterprise_mimetype = filetype;
 
                 } else if (picUploadType === 'profile') {
-
-                    fsx.writeFile("/var/www/olympus/master/public/images/profile/" + enterpriseName, binaryData, 'binary', function (err) {
+                 
+                    fsx.writeFile("/var/www/html/olympus/master/public/images/profile/" + enterpriseName, binaryData, 'binary', function (err) {
                     });
 
                     account.avatar_image = enterpriseName;
