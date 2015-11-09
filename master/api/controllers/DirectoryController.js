@@ -373,9 +373,6 @@ var DirectoryController = {
 // uploads a file to this directory
     upload: function (req, res) {
 
-
- //console.log("\n\n\n\n\n", "Uploading file...", "\n\n\n\n");
-
         // Parse form data from client, if specified
         var parsedFormData;
         if (req.param('data')) {

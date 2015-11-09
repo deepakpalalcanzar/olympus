@@ -36,8 +36,7 @@ var SubscriptionController = {
                 text_message: 'has added a subscription plan named '+req.params.features+'.',
                 activity    : 'add',
                 on_user     : req.session.Account.id,
-                ip          : req.session.Account.ip,
-                 platform    : req.headers.user_platform,
+                ip          : req.session.Account.ip
             };
 
             request(opts, function(err1, response1, body1) {
@@ -73,8 +72,7 @@ var SubscriptionController = {
                     text_message: 'has deleted a subscription plan named '+subscription.features+'.',
                     activity    : 'deleted',
                     on_user     : req.session.Account.id,
-                    ip          : req.session.Account.ip,
-                     platform    : req.headers.user_platform,
+                    ip          : req.session.Account.ip
                 };
 
                 request(opts, function(err1, response1, body1) {
@@ -122,8 +120,7 @@ var SubscriptionController = {
                 text_message: 'has updated a subscription plan.',
                 activity    : 'updated',
                 on_user     : req.session.Account.id,
-                ip          : req.session.Account.ip,
-                 platform    : req.headers.user_platform,
+                ip          : req.session.Account.ip
             };
 
             request(opts, function(err1, response1, body1) {
@@ -579,27 +576,16 @@ impersonate: function(req, res){
         if (fileModel) {
         
           // If the "open" param isn't set, force the file to download
-            if (!req.url.match(/^\/file\/open\//)) {
-                res.setHeader('Content-disposition', 'attachment; filename=\"' + fileName.trim() + '\"');
-            }
+          if (!req.url.match(/^\/file\/open\//)) {
+            res.setHeader('Content-disposition', 'attachment; filename=\"' + fileName.trim() + '\"');
+          }
 
           // set content-type header
+          res.setHeader('Content-Type', fileModel.mimetype);
 
-            res.setHeader('Content-Type', fileModel.mimetype);
-            options.uri = "http://localhost:1337/file/download/"+fileModel.fsName;
-            var proxyReq = request.get(options).pipe(res);
+          options.uri = "http://localhost:1337/file/download/"+fileModel.fsName;
 
-          /*  var file = '/var/www/html/olympus/api/files/'+fileName;
-            var filename = path.basename(file);
-            var mimetype = mime.lookup(file);
-
-            res.setHeader('Content-disposition', 'attachment; filename=' + fileName);
-            res.setHeader('Content-Type', fileModel.mimetype);
-
-            var filestream = fs.createReadStream(file);
-            filestream.pipe(res);*/
-
-
+          var proxyReq = request.get(options).pipe(res);
 
           /*Create logging*/
           /*var opts = {
@@ -613,7 +599,6 @@ impersonate: function(req, res){
             activity    : 'download',
             on_user     : req.session.Account.id,
             ip          : req.session.Account.ip,
-             platform    : req.headers.user_platform,
 
           };
 
@@ -778,7 +763,6 @@ impersonate: function(req, res){
                 activity    : 'upgrade',
                 on_user     : req.session.Account.id,
                 ip          : req.session.Account.ip,
-                platform    : req.headers.user_platform,
             };
 
           request(options, function(err21, response21, body21) {
@@ -856,8 +840,7 @@ impersonate: function(req, res){
               text_message: 'has upgraded own subscription plan.',
               activity    : 'upgrade',
               on_user     : req.session.Account.id,
-                ip          : req.session.Account.ip,
-                platform    : req.headers.user_platform,
+                ip          : req.session.Account.ip
 
             };
 

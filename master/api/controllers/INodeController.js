@@ -54,8 +54,11 @@ _.extend(module.exports,{
 							options.accountId && basicSet.push(options.accountId);
 							basicSet = Sequelize.Utils.format(basicSet);
 
+				
+
 				sequelize.query(basicSet,File).done(cb);
 			}
+
 		}, afterwards);
 
 		function afterwards(err, results) {

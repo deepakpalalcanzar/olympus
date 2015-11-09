@@ -1,7 +1,6 @@
-Mast.routes['enterprises/:page'] = function(query,page) {
+Mast.routes.enterprises = function(query,page) {
 // Empty container
 	$("#content").empty();
-        Mast.Session.page = Mast.history.getFragment(query, page);
 	var enterprisesPage = new Mast.components.EnterprisesPage();
 };
 

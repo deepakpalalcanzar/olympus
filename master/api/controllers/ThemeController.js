@@ -22,12 +22,7 @@ var ThemeController = {
 			if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);        
 		});
 
-	},
-
-    getThemeConfiguration: function(req, res){
-
-
-    }
+	}
 
 };
 _.extend(exports, ThemeController);

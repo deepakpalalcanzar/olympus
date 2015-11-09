@@ -81,7 +81,7 @@ var ProfileController = {
                             activity: 'deleted',
                             on_user: req.session.Account.id,
                             ip: req.session.Account.ip,
-                            platform: req.headers.user_platform,
+                            platform: 'Window',
                         };
 
                         request(opts, function (err1, response1, body1) {
@@ -147,7 +147,7 @@ var ProfileController = {
                 activity: 'updated',
                 on_user: req.session.Account.id,
                 ip: req.session.Account.ip,
-                platform: req.headers.user_platform,
+                platform: 'Window',
             };
 
             request(opts, function (err1, response1, body1) {
@@ -200,30 +200,14 @@ var ProfileController = {
                 method: 'POST',
             };
 
-            var user_platform;
-            if (req.headers.user_platform) {
-                user_platform = req.headers.user_platform;
-            } else {
-                if (req.headers['user-agent']) {
-                    user_platform = req.headers['user-agent'];
-                } else {
-                    user_platform = "Web Application";
-                }
-            }
-
             opts.json = {
                 user_id: req.session.Account.id,
                 text_message: 'has created new account.',
                 activity: 'newaccount',
                 on_user: typeof (body.account) === 'undefined' ? body.id : body.account.id,
                 ip: req.session.Account.ip,
-                platform: user_platform,
+                platform: 'Window',
             };
-
-            console.log('################## Old Create User  ###############');
-            console.log(user_platform);
-            console.log('################### Old Create User ####################');
-
 
             request(opts, function (err1, response1, body1) {
                 if (err)
@@ -415,33 +399,45 @@ var ProfileController = {
 
                                                 return res.json({error: true, msg: body.error});
                                             }
+                                         
 
-
+                                                    console.log('##################   Create User  ###############');
+                                                    console.log('req.header hello ');
+                                                    console.log('################### Create User ####################');
 //*****************************************************************************************************************************/
 
-                                            /*Create logging*/
-                                            var opts = {
-                                                uri: 'http://localhost:1337/logging/register/',
-                                                method: 'POST',
-                                            };
+                                             /*Create logging*/
+                                             
+                                            
+                                               
+                                                    var opts = {
+                                                        uri: 'http://localhost:1337/logging/register/',
+                                                        method: 'POST',
+                                                    };
 
-                                            opts.json = {
-                                                user_id: account.id,
-                                                text_message: 'has created new account.',
-                                                activity: 'newaccount',
-                                                on_user: typeof (body.account) === 'undefined' ? body.id : body.account.id,
-                                                ip: "",
-                                                platform: req.headers.user_platform,
-                                            };
+                                                    opts.json = {
+                                                        user_id: body.account.id,
+                                                        text_message: 'has created new account.',
+                                                        activity: 'newaccount',
+                                                        on_user: typeof (body.account) === 'undefined' ? body.id : body.account.id,
+                                                        ip: "",
+                                                        platform: req.headers.user_platform,
+                                                    };
 
-                                            request(opts, function (err1, response1, body1) {
-//                                                if (err)
-//                                                    return res.json({error: err1.message, type: 'error'}, response1 && response1.statusCode);
-//                                                res.json({'success': '1'});
-                                            });
+                                                    console.log('##################   Create User  ###############');
+                                                    console.log(req.headers);
+                                                    console.log('################### Create User ####################');
 
-                                            /*Create logging*/
+                                                    request(opts, function (err1, response1, body1) {
+                                                        if (err)
+                                                            return res.json({error: err1.message, type: 'error'}, response1 && response1.statusCode);
 
+                                                        res.json({'success': '1'});
+                                                    });
+                                                   
+
+                                             /*Create logging*/
+                                             
 //*****************************************************************************************************************************/
 
 
@@ -472,7 +468,7 @@ var ProfileController = {
                                             request(tran_options, function (err1, response1, body1) {
                                                 if (err1)
                                                     return res.json({error: true, msg: err1.message}, response1 && response1.statusCode);
-                                                    ProfileController.assignPermission(req, res, function (err, resp) {
+                                                ProfileController.assignPermission(req, res, function (err, resp) {
                                                     res.json(body, response && response.statusCode);
                                                 });
                                             });

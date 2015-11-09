@@ -20,9 +20,9 @@ var LoggingController = {
             platform: req.body.platform,            
 
         };
-//                        console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& check data &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
-//                        console.log(newoption);
-//                        console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&& check data &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+                        console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& check data &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+                        console.log(newoption);
+                        console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&& check data &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
                         
                         
         Logging.createLog(newoption, function (err, logging) {

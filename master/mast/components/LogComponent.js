@@ -27,9 +27,14 @@ Mast.registerTree('LogTable', {
     },
   
     init: function () {
- 
+        
+        console.log("*************************************************");
+        console.log(Mast.Session.page);
+        console.log(Mast.history.getFragment);
+//        var sss= window.location.hash.split( '/' )['1'];
         $('.upload-file').hide();
         this.collection.fetch();
+        var lock = {id: '2'};
         Mast.Socket.request('/logging/listLog/'+window.location.hash.split( '/' )['1'], null, function (res, err) {
             if (res) {
                 var options = "";
@@ -48,12 +53,16 @@ Mast.registerTree('LogTable', {
     branchOutlet: '.log-outlet',
     
     collection: {
+        
         initialize: function(options) {
-            console.log(Mast.Session.page);
+            this.date = '2';
+            console.log(this.date); console.log(Mast.Session.page);
+//            url: function () { return '/logging/listLog/'+this.get('page'); },
               this.url = '/logging/listLog/'+Mast.Session.page;
           
         },
         autoFetch: false,
+        
         model: Mast.Model.extend({
             defaults: {
                 highlighted: false,

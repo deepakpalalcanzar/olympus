@@ -10,11 +10,6 @@ Mast.routes.reports = function(query,page) {
 	new Mast.components.AddUserComponent();
 };
 
-Mast.routes.importusers = function(query,page) {
-// Empty container
-	$("#content").empty();
-	new Mast.components.ImportUserComponent();
-};
 
 Mast.routes['user/details'] = function(query, page) {
 	$("#content").empty();

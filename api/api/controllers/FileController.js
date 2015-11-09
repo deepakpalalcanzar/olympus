@@ -10,16 +10,16 @@ var crypto = require('crypto'),
         fsx = require('fs-extra');
         path = require('path');
 
-var easyimg = require('easyimage');
+// var easyimg = require('easyimage');
 //var im = require('imagemagick');
 
 
 /*%%%%%%%%%%%%%%%%%%%%%% For S3 Resize image file %%%%%%%%%%%%%%%%%%%%%%%%%%*/
-var request = require('request');
-var gm = require("gm");
-var multer = require('multer');
-var AWS = require('aws-sdk');
-var mime = require('mime');
+//var request = require('request');
+//var gm = require("gm");
+//var multer = require('multer');
+//var AWS = require('aws-sdk');
+//var mime = require('mime');
 /*%%%%%%%%%%%%%%%%%%%%%% For S3 Resize image file %%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
 
@@ -287,13 +287,16 @@ var FileController = {
         });
         emitter.pipe(res);
     },
+    
     thumbnaildownload: function (req, res) {
+        
         var emitter = global[sails.config.receiver + 'Receiver'].newEmitterStream({id: req.param('id'), stream: res});
         emitter.on('finish', function () {
             res.end();
         });
         emitter.pipe(res);
     },
+
     upload: function (req, res) {
 
         res.setTimeout(0);
@@ -333,9 +336,6 @@ var FileController = {
                 res.write(JSON.stringify(progressData), 'utf8')
             });
 
-
-
-
             uploadStream.upload(receiver, function (err, files) {
 
                 if (err) {
@@ -373,7 +373,7 @@ var FileController = {
                                             {first: fileData.fsName, second: file.extra.fsName}, function (rmErr) {
                                         var parsedResponse = JSON.parse(rmErr)
                                         if (parsedResponse.first === parsedResponse.second) {
-                                            fsx.unlink('/var/www/olympus_abhieshek/olympus1/api/files/' + file.extra.fsName);
+                                            fsx.unlink('/var/www/html/olympus/api/files/' + file.extra.fsName);
                                             // fsx.unlink('/home/alcanzar/api/files/'+file.extra.fsName);
                                             return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
                                         }
@@ -386,7 +386,8 @@ var FileController = {
                                         fsName: file.extra.fsName,
                                         mimetype: file.type,
                                         version: '1',
-                                        oldFile: fileData.id
+                                        oldFile: fileData.id,
+                                        thumbnail: "1",
                                     }), 'utf8');
                                 }
                             } else {
@@ -407,7 +408,7 @@ var FileController = {
                                                 {first: latestFile.fsName, second: file.extra.fsName}, function (rmErr) {
                                             var parsedResponse = JSON.parse(rmErr)
                                             if (parsedResponse.first === parsedResponse.second) {
-                                                fsx.unlink('/var/www/olympus_abhieshek/olympus1/api/files/' + file.extra.fsName);
+                                                fsx.unlink('/var/www/html/olympus/api/files/' + file.extra.fsName);
                                                 // fsx.unlink('/home/alcanzar/api/files/'+file.extra.fsName);
                                                 return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
                                             }
@@ -420,7 +421,8 @@ var FileController = {
                                             fsName: file.extra.fsName,
                                             mimetype: file.type,
                                             version: parseInt(findMax) + 1,
-                                            oldFile: fileData.id
+                                            oldFile: fileData.id,
+                                            thumbnail: "1",
                                         }), 'utf8');
                                     }
                                 });
@@ -435,7 +437,8 @@ var FileController = {
                             fsName: file.extra.fsName,
                             mimetype: file.type,
                             version: 0,
-                            oldFile: 0
+                            oldFile: 0,
+                            thumbnail: "1",
                         }), 'utf8');
                     }
 
@@ -443,25 +446,25 @@ var FileController = {
                     if (file.type == "image/png" || file.type == "image/jpg" || file.type == "image/jpeg") {
                         if (sails.config.receiver == "S3") {
 
-                            var s3 = new AWS.S3();
-                            gm(request("https://localhost/file/open/985/DSCN0255.JPG"), "DSCN0255.JPG")
-                                    .resize("100^", "100^")
-                                    .stream(function (err, stdout, stderr) {
-//                                        var data = {
-//                                            Bucket: "app.olympus.io",
-//                                            Key: "AKIAIEURF2O4FGCDDK6A",
-//                                            Body: stdout,
-//                                            ContentType: mime.lookup("JPG")
-//                                        };
+//                             var s3 = new AWS.S3();
+//                             gm(request("https://localhost/file/open/985/DSCN0255.JPG"), "DSCN0255.JPG")
+//                                     .resize("100^", "100^")
+//                                     .stream(function (err, stdout, stderr) {
+// //                                        var data = {
+// //                                            Bucket: "app.olympus.io",
+// //                                            Key: "AKIAIEURF2O4FGCDDK6A",
+// //                                            Body: stdout,
+// //                                            ContentType: mime.lookup("JPG")
+// //                                        };
 
-                                        s3.client.putObject(receiver, function (err, res) {
-                                            console.log("done");
-                                        });
-                                    });
+//                                         s3.client.putObject(receiver, function (err, res) {
+//                                             console.log("done");
+//                                         });
+//                                     });
 
                         }  else {
 
-                            easyimg.resize({src: '/var/www/olympus_abhishek/olympus1/api/files/' + file.extra.fsName, dst: '/var/www/olympus_abhishek/olympus1/api/files/thumbnail-' + file.extra.fsName, width: 100, height: 100}, function (err, stdout, stderr) {
+                            easyimg.resize({src: '/var/www/html/olympus/api/files/' + file.extra.fsName, dst: '/var/www/html/olympus/api/files/thumbnail-' + file.extra.fsName, width: 150, height: 150}, function (err, stdout, stderr) {
                                 if (err)
                                     throw err;
                                 console.log('Resized to 100x100');
@@ -567,7 +570,7 @@ var FileController = {
 var streamAdaptor = {
     firstFile: function (options, cb) {
         var hash = crypto.createHash('md5');
-        var s = fsx.createReadStream('/var/www/olympus_abhieshek/olympus1/api/files/' + options.first);
+        var s = fsx.createReadStream('/var/www/html/olympus/api/files/' + options.first);
         s.on('readable', function () {
             var chunk;
             while (null !== (chunk = s.read())) {
@@ -578,7 +581,7 @@ var streamAdaptor = {
         });
 
         var hs = crypto.createHash('md5');
-        var nw = fsx.ReadStream('/var/www/olympus_abhieshek/olympus1/api/files/' + options.second);
+        var nw = fsx.ReadStream('/var/www/html/olympus/api/files/' + options.second);
         nw.on('readable', function () {
             var chunk;
             while (null !== (chunk = nw.read())) {

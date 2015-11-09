@@ -141,8 +141,7 @@ var EnterprisesController = {
                       text_message: 'has deleted '+ent.name+' enterprise.',
                       activity    : 'delete',
                       on_user     : req.params.id,
-                      ip          : req.session.Account.ip,
-                      platform    : req.headers.user_platform,
+                      ip          : req.session.Account.ip
                   };
 
                   request(options, function(err, response, body) {
@@ -258,8 +257,7 @@ var EnterprisesController = {
                         text_message: 'has updated an enterprise.',
                         activity    : 'update',
                         on_user     : req.params.ent_id,
-                        ip          : req.session.Account.ip,
-                         platform    : req.headers.user_platform,
+                        ip          : req.session.Account.ip
                     };
 
                     request(options, function(err, response, body) {

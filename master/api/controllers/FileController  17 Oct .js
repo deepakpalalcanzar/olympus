@@ -178,14 +178,50 @@ var FileController = {
 
 
             switch (req.method) {
-
-
+           
+                
                 case 'GET':
+                    
+                         
+                       File.find(req.param('id')).success(function (model) {
 
+                        if (model) {
+                            var options = {
+                                uri: 'http://localhost:1337/logging/register/',
+                                method: 'POST',
+                            };
+
+                            // If the "open" param isn't set, force the file to download
+                            if (!req.url.match(/^\/file\/open\//)) {
+                                res.setHeader('Content-disposition', 'attachment; filename=\"' + model.name + '\"');
+
+
+                                options.json = {
+                                    user_id: req.session.Account.id,
+                                    text_message: 'has other ' + model.name,
+                                    activity: 'other',
+                                    on_user: model.id,
+                                    ip: req.session.Account.ip,
+                                    platform: req.headers.user_platform,
+                                };
+
+                                console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& other   &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+                                console.log(req.headers);
+                                console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& other  &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+
+
+                                request(options, function (err, response, body) {
+                                    if (err)
+                                        return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+                                });
+                            }
+                        }
+                    });
+                    
                     return FileController.info(req, res);
 
                 case 'PUT':
-
+                    
                     File.find(req.param('id')).success(function (model) {
 
                         if (model) {
@@ -220,7 +256,7 @@ var FileController = {
                             }
                         }
                     });
-
+                    
                     return sails.policies.can('write')(req, res, function () {
                         FileController.update(req, res);
                     });
@@ -248,6 +284,11 @@ var FileController = {
                                     ip: req.session.Account.ip,
                                     platform: req.headers.user_platform,
                                 };
+
+                                console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& DELETE   &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+                                console.log(req.headers);
+                                console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& DELETE  &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+
 
                                 request(options, function (err, response, body) {
                                     if (err)
@@ -291,19 +332,6 @@ var FileController = {
                 if (!req.url.match(/^\/file\/open\//)) {
                     res.setHeader('Content-disposition', 'attachment; filename=\"' + model.name + '\"');
 
-                    var user_platform;
-                    if (req.headers.user_platform) {
-                        user_platform = req.headers.user_platform;
-                    } else {
-                        if (req.headers['user-agent']) {
-                            user_platform = req.headers['user-agent'];
-                        } else {
-                            user_platform = "Web Application";
-                        }
-                    }
-                    if(user_platform=="Apache-HttpClient/UNAVAILABLE (java 1.4)"){
-                        user_platform= "Android - Phone"
-                    }
 
                     options.json = {
                         user_id: req.session.Account.id,
@@ -311,17 +339,17 @@ var FileController = {
                         activity: 'download',
                         on_user: model.id,
                         ip: req.session.Account.ip,
-                        platform: user_platform,
+                        platform: req.headers.user_platform,
                     };
 
                     console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& file Downloaded &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
-                    console.log(user_platform);
+                    console.log(req.headers);
                     console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& file Downloaded &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
 
 
                     request(options, function (err, response, body) {
-                        //if (err)
-                        //return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+                        if (err)
+                            return res.json({error: err.message, type: 'error'}, response && response.statusCode);
                     });
                 }
 
@@ -396,37 +424,35 @@ var FileController = {
             if (fileModel) {
 
 
-//                var options = {
-//                    uri: 'http://localhost:1337/logging/register/',
-//                    method: 'POST',
-//                };
+                var options = {
+                    uri: 'http://localhost:1337/logging/register/',
+                    method: 'POST',
+                };
 
 
                 // If the "open" param isn't set, force the file to download
-//                if (!req.url.match(/^\/file\/open\//)) {
-
-                if (!req.param('open') && !open) {
+                if (!req.url.match(/^\/file\/open\//)) {
                     res.setHeader('Content-disposition', 'attachment; filename=\"' + fileModel.name + '\"');
 
 
-//                    options.json = {
-//                        user_id: req.session.Account.id,
-//                        text_message: 'has downloaded ' + fileModel.name,
-//                        activity: 'download',
-//                        on_user: fileModel.id,
-//                        ip: req.session.Account.ip,
-//                        platform: req.headers['user-agent'],
-//                    };
+                    options.json = {
+                        user_id: req.session.Account.id,
+                        text_message: 'has downloaded ' + fileModel.name,
+                        activity: 'download',
+                        on_user: fileModel.id,
+                        ip: req.session.Account.ip,
+                        platform: req.headers['user-agent'],
+                    };
 
-//                    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
-//                    console.log(req);
-//                    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+                    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+                    console.log(req);
+                    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
 
 
-//                    request(options, function (err, response, body) {
-//                        if (err)
-//                            return res.json({error: err.message, type: 'error'}, response && response.statusCode);
-//                    });
+                    request(options, function (err, response, body) {
+                        if (err)
+                            return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+                    });
                 }
 
                 // set content-type header

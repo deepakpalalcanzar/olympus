@@ -219,7 +219,7 @@ var TempAccountController = {
     },
 
 
-    createComment: function(req, res){
+ createComment: function(req, res){
 
         var request = require('request');
         var options = {
@@ -242,6 +242,5 @@ var TempAccountController = {
         });
 
     }
-
 
 };_.extend(exports, TempAccountController);

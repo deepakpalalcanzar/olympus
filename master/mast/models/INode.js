@@ -69,9 +69,8 @@ Mast.models.INode = Mast.Model.extend({
 			//modifiedBy : i['modified_by']['name'],
 			modifiedAt : moment(new Date(i['modified_at'])).fromNow(),
 			mimeClass  : i['mimetype'] ? i['mimetype'].replace(/[\/.]/g, '-') : '',
-			link       : Mast.Socket.baseurl+"/file/public/"+i['fsName']+'/'+encodeURIComponent(i['name']),
-			// link       : Mast.Socket.baseurl+"/file/publicDownload/"+i['fsName']+'/'+encodeURIComponent(i['name']),
-
+			//link       : Mast.Socket.baseurl+"/file/public/"+i['fsName']+'/'+encodeURIComponent(i['name']),
+			link       : Mast.Socket.baseurl+"/file/publicDownload/"+i['fsName']+'/'+encodeURIComponent(i['name']),
 			//link       : Mast.Socket.baseurl+"/file/download/"+i['id'],
 			//link : Mast.Socket.baseurl+"/file/open/"+i['id']+"/"+i['name'],
 			
