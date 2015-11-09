@@ -10,7 +10,7 @@ var crypto = require('crypto'),
         fsx = require('fs-extra');
         path = require('path');
 
-// var easyimg = require('easyimage');
+var easyimg = require('easyimage');
 //var im = require('imagemagick');
 
 

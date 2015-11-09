@@ -1,4 +1,10 @@
-Mast.routes.enterprises = function(query,page) {
+/*Mast.routes.enterprises = function(query,page) {
+// Empty container
+	$("#content").empty();
+	var enterprisesPage = new Mast.components.EnterprisesPage();
+};
+*/
+Mast.routes['enterprises/:page'] = function(query,page) {
 // Empty container
 	$("#content").empty();
 	var enterprisesPage = new Mast.components.EnterprisesPage();
