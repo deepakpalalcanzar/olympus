@@ -38,7 +38,8 @@ Mast.registerComponent('UserNavigationComponent', {
 	updateNavDropDown: function(){
 		this.set('showMenus', false);
 		var d = this.get('dropdownItems');
-		if(Mast.Session.Account.isAdmin && Mast.Session.Account.isSuperAdmin === 1){
+		//if(Mast.Session.Account.isAdmin && Mast.Session.Account.isSuperAdmin === 1){
+		if(Mast.Session.Account.isAdmin=="" && Mast.Session.Account.isSuperAdmin !== 1){ //Avneesh
 			d.splice('2', '2');
 		}else if (Mast.Session.Account.isEnterprise === 0){
 			d.splice('2', '1');

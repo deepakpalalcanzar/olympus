@@ -127,10 +127,14 @@ var RedirectController = {
                     // set content-type header
                     res.setHeader('Content-Type', fileModel.mimetype);
                     
-                    if(fileModel.thumbnail=="1"){
-                        var fsNamethumbanil= "thumbnail-"+ fileModel.fsName;
-                    }else{
-                       var fsNamethumbanil= fileModel.fsName;
+                 if (sails.config.fileAdapter.adapter == "s3") {
+                        var fsNamethumbanil = fileModel.fsName;
+                    } else {
+                        if (fileModel.thumbnail == "1") {
+                            var fsNamethumbanil = "thumbnail-" + fileModel.fsName;
+                        } else {
+                            var fsNamethumbanil = fileModel.fsName;
+                        }
                     }
                     
                     
