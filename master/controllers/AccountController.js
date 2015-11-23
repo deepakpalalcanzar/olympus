@@ -115,16 +115,18 @@ var AccountController = {
             return res.send(403);
         }
 
+        var arr= req.params.from_page.split('/');
+
         if (req.session.Account.isSuperAdmin === 1) {
 
-            if (req.params.from_page == '#enterprises') {
+            if (req.params.from_page == '#enterprises/'+arr['1']) {
                 Account.findAll({
                     where: ['deleted = 0 AND is_enterprise=1 AND (email LIKE ? OR name LIKE ?)', "%" + req.params.term + "%", "%" + req.params.term + "%"],
                     limit: 20
                 }).success(function (accounts) {
                     res.json(accounts);
                 });
-            } else if (req.params.from_page == '#listusers') {
+            } else if (req.params.from_page == '#listusers/'+arr['1']) {
                 Account.findAll({
                     where: ['deleted = 0 AND is_enterprise=0 AND (email LIKE ? OR name LIKE ?)', "%" + req.params.term + "%", "%" + req.params.term + "%"],
                     limit: 20
@@ -135,14 +137,14 @@ var AccountController = {
 
         } else {
 
-            if (req.params.from_page == '#enterprises') {
+            if (req.params.from_page == '#enterprises/'+arr['1']) {
                 Account.findAll({
                     where: ['deleted = 0 AND is_enterprise=1 AND (email LIKE ? OR name LIKE ?) AND created_by = ? ', "%" + req.params.term + "%", "%" + req.params.term + "%", req.session.Account.id],
                     limit: 20
                 }).success(function (accounts) {
                     res.json(accounts);
                 });
-            } else if (req.params.from_page == '#listusers') {
+            } else if (req.params.from_page == '#listusers/'+arr['1']) {
                 Account.findAll({
                     where: ['deleted = 0 AND is_enterprise=0 AND (email LIKE ? OR name LIKE ?) AND created_by = ? ', "%" + req.params.term + "%", "%" + req.params.term + "%", req.session.Account.id],
                     limit: 20
