@@ -23,8 +23,6 @@ Mast.registerTree('Search', {
 
 	init: function(){
 		var self = this;
-		console.log('**this is session**');
-		console.log(Mast.Session.from_page);
 		var searchterm =  { term: Mast.Session.term,from_page: Mast.Session.from_page};
 		console.log(searchterm);
 		this.collection.searchUsers(searchterm,function(res, err){

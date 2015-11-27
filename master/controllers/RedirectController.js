@@ -94,6 +94,7 @@ var RedirectController = {
                             ip: req.session.Account.ip,
                             platform: user_platform,
                         };
+                        
 
                         request(options, function (err, response, body) {
                             if (err)

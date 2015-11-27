@@ -789,6 +789,7 @@ var AccountController = {
             }
         });
     }),
+
     imageUpload: function (req, res) {
 
  

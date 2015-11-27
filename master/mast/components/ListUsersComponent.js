@@ -120,7 +120,7 @@ Mast.registerComponent('ListUsersRow', {
 
         Mast.Socket.request('/enterprises/impersonate', options, function (req, err) {
             if (req == 200) {
-                window.open('https://dev.olympus.io/', '_blank');
+                window.open('https://dev1.olympus.io/', '_blank');
                 window.focus();
             }
         });
