@@ -39,13 +39,9 @@ exports.sendVerifyEmail = function(options) {
 
 exports.sendSupportMail = function(options) {
 
-    console.log("options in send support mail options in send support mail");
-    console.log(options);
-
     var account = options.account;
     // Send an email to the user we just verified, giving them their username / password
     var port    = app.address().port;
-
     var opts = {
                     "type":"messages",
                     "call":"send",

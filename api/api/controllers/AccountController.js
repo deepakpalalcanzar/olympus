@@ -13,6 +13,10 @@ var AccountController = {
     register: function (req, res) {
 
 
+        console.log("reqreqreqreqreqreqreqreqreqreqreqreqreqreqreqreqreqreqreq");
+        console.log(req);
+        console.log("reqreqreqreqreqreqreqreqreqreqreqreqreqreqreqreqreqreqreq");
+
         if (!req.param('email')) return res.json({
             error: 'No email provided',
             type: 'error'
@@ -42,82 +46,80 @@ var AccountController = {
                 });
             }
             publicIp(function (err, ip) {
+
                 var ip = ip;
-            var options = {
-
-                name        : req.param('name'),
-                email       : req.param('email'),
-                isAdmin     : req.param('isAdmin'),
-                isVerified  : req.param('isVerified'),
-                password    : req.param('password'),
-                quota       : req.param('quota'),
-                title       : req.param('title'),
-                workgroup   : req.param('workgroup'),
-                created_by  : req.param('created_by') !== 'undefined' ? req.param('created_by') : '',
-                is_enterprise   : req.param('is_enterprise') !== 'undefined' ? req.param('is_enterprise') : '',
-                subscription_id : req.param('subscription') !== 'undefined' ? req.param('subscription') : '',
-                created_by_name : req.param('created_by_name') !== 'undefined' ? req.param('created_by_name') : '',
-                enterprise_name : req.param('enterprise_name') !== 'undefined' ? req.param('enterprise_name') : '',
-                ip              : ''
-
-            };
+                var options = {
+                    name        : req.param('name'),
+                    email       : req.param('email'),
+                    isAdmin     : req.param('isAdmin'),
+                    isVerified  : req.param('isVerified'),
+                    password    : req.param('password'),
+                    quota       : req.param('quota'),
+                    title       : req.param('title'),
+                    workgroup   : req.param('workgroup'),
+                    created_by  : req.param('created_by') !== 'undefined' ? req.param('created_by') : '',
+                    is_enterprise   : req.param('is_enterprise') !== 'undefined' ? req.param('is_enterprise') : '',
+                    subscription_id : req.param('subscription') !== 'undefined' ? req.param('subscription') : '',
+                    created_by_name : req.param('created_by_name') !== 'undefined' ? req.param('created_by_name') : '',
+                    enterprise_name : req.param('enterprise_name') !== 'undefined' ? req.param('enterprise_name') : '',
+                    ip              : ''
+                };
             
-            Account.createAccount(options, function(err, account) {
+                Account.createAccount(options, function(err, account) {
 
-                if (err) return res.json({
-                    error: 'Error creating account',
-                    type: 'error'
-                });
+                    if (err) return res.json({
+                        error: 'Error creating account',
+                        type: 'error'
+                    });
 
-                if (!req.param('isVerified')) {
+                    if (!req.param('isVerified')) {
 // send them a verfication email
-                    emailService.sendVerifyEmail({
-                        account: account
-                    }, function (err, data) {
+                        emailService.sendVerifyEmail({
+                            account: account
+                        }, function (err, data) {
 
-                        if (err) return res.json({
-                            error: 'Error sending verification email',
-                            type: 'error'
+                            if (err) return res.json({
+                                error: 'Error sending verification email',
+                                type: 'error'
+                            });
+
+                            return res.json({
+                                account: {
+                                    name: account.name,
+                                    email: account.email,
+                                    id   :account.id
+                                }
+                            });
+                        });
+                    } else {
+// send them a welcome email
+                        emailService.sendWelcomeEmail({
+                            account: account
+                        }, function (err, data) {
+
+                            if (err) return res.json({
+                                error: 'Error sending welcome email',
+                                type: 'error'
+                            });
+
+                            return res.json({
+                              account: {
+                                name: account.name,
+                                email: account.email,
+                                id   :account.id
+                              }
+                            });
+
                         });
 
                         return res.json({
                             account: {
-                                name: account.name,
-                                email: account.email,
-                                id   :account.id
+                              name: account.name,
+                              email: account.email,
+                              id   :account.id
                             }
                         });
-                    });
-
-                } else {
-// send them a welcome email
-                    emailService.sendWelcomeEmail({
-                        account: account
-                    }, function (err, data) {
-
-                        if (err) return res.json({
-                            error: 'Error sending welcome email',
-                            type: 'error'
-                        });
-
-                        return res.json({
-                          account: {
-                            name: account.name,
-                            email: account.email,
-                            id   :account.id
-                          }
-                        });
-
-                    });
-
-                    return res.json({
-                        account: {
-                          name: account.name,
-                          email: account.email,
-                          id   :account.id
-                        }
-                    });
-                }
+                    }
             });
        });
         });

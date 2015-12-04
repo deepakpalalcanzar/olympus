@@ -21,6 +21,8 @@ module.exports = {
 	
 	newReceiverStream: function newReceiverStream (options) {
 
+		
+
 		sails.log('Creating new Disk receiver.');
 		var log = sails.log;
 
@@ -35,7 +37,7 @@ module.exports = {
 
 	    	// var fsName = uuid + "." + _.str.fileExtension(__newFile.filename);
 
-			log(('Receiver: Received file `'+__newFile.filename+'` from an Upstream.').grey);
+			log(('Receiver DISK: Received file `'+__newFile.filename+'` from an Upstream.').grey);
 
 			var outs = blobAdapter.touch({id: path.resolve(sails.config.uploadPath||'files', fsName)});
 			outs.written = 0;
@@ -78,8 +80,9 @@ module.exports = {
 				log(('Receiver: Finished writing `'+__newFile.filename+'`').grey);
 				next();
 			});
+
 			outs.on('error', function (err) {
-				log(('Receiver: Error writing `'+__newFile.filename+'`:: '+ require('util').inspect(err)+' :: Cancelling upload and cleaning up already-written bytes...').red);
+				log(('Receiver Disk: Error writing `'+__newFile.filename+'`:: '+ require('util').inspect(err)+' :: Cancelling upload and cleaning up already-written bytes...').red);
 				
 				// Garbage-collects the already-written bytes for this file.
 				blobAdapter.rm({id: path.resolve(sails.config.uploadPath||'files', fsName)}, function (rmErr) {

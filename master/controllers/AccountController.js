@@ -67,11 +67,6 @@ var AccountController = {
             platform: user_platform,
         };
 
-        console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
-        console.log(user_platform);
-        console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
-
-
         request(opts, function (err1) {
 
         });
@@ -251,12 +246,6 @@ var AccountController = {
                 var Endlogdata = req.param('id') * 50;
                 var Startlogdata = Endlogdata - 50;
                 var range = Startlogdata + "," + Endlogdata;
-
-                console.log('************** Id and Range ************');
-                console.log(req.param('id'));
-                console.log(totalpage);
-                console.log('****************************************');
-
 
                 var boostrapPaginator = new pagination.TemplatePaginator({
                     prelink: '/', current: req.param('id'), rowsPerPage: 1,
@@ -811,16 +800,15 @@ var AccountController = {
                 binaryData = new Buffer(base64Data, 'base64').toString('binary');
 
                 if (picUploadType === 'enterprise') {
-
-
-                    fsx.writeFile("/var/www/html/olympus/master/public/images/enterprises/" + enterpriseName, binaryData, 'binary', function (err) {
+                    
+                    fsx.writeFile("/var/www/html/olympus/olympus1/master/public/images/enterprises/" + enterpriseName, binaryData, 'binary', function (err) {
                     });
                     account.enterprise_fsname = enterpriseName;
                     account.enterprise_mimetype = filetype;
 
                 } else if (picUploadType === 'profile') {
                  
-                    fsx.writeFile("/var/www/html/olympus/master/public/images/profile/" + enterpriseName, binaryData, 'binary', function (err) {
+                    fsx.writeFile("/var/www/html/olympus/olympus1/master/public/images/profile/" + enterpriseName, binaryData, 'binary', function (err) {
                     });
 
                     account.avatar_image = enterpriseName;
@@ -842,105 +830,99 @@ var AccountController = {
 
     readCSVFile: function (req, res) {
 
-        //var temp = require('temp');
-
         var sql = "SELECT subscription_id FROM account WHERE id=?";
         sql = Sequelize.Utils.format([sql, req.session.Account.id]);
         sequelize.query(sql, null, {
             raw: true
         }).success(function (account) {
 
-
             var sql = "SELECT id FROM directory WHERE OwnerId=?";
             sql = Sequelize.Utils.format([sql, req.session.Account.id]);
+
             sequelize.query(sql, null, {
                 raw: true
             }).success(function (directory) {
 
                 var i = 0;
                 var request = require('request');
-                //console.log(req.params.filepath);
-                var stream = fsx.createReadStream('/var/www/html/olympus/olympus-web/master/public/Teatdata1.csv');
+                var stream = fsx.createReadStream('/var/www/html/olympus/olympus1/master/public/Testdata1.csv');
+                csv.fromStream(stream).on("data", function (data) {
 
-                csv
-                        .fromStream(stream)
-                        .on("data", function (data) {
+                    console.log("datadatadatadatadatadatadatadatadatadata");
+                    console.log(data);
+                    console.log("datadatadatadatadatadatadatadatadatadata");
+                    
+                    if (i != 0) {
 
-                            if (i != 0) {
+                        var options = {
+                            uri: 'http://localhost:1337/account/register/',
+                            method: 'POST',
+                        };
 
-                                var options = {
-                                    uri: 'http://localhost:1337/account/register/',
+                        options.json = {
+                            name        : data[0] + ' ' + data[1],
+                            email       : data[2],
+                            isVerified  : true,
+                            isAdmin     : false,
+                            password    : data[3],
+                            created_by  : req.session.Account.id,
+                            workgroup   : directory[0]['id'],
+                            title       : data[3],
+                            subscription: account[0]['subscription_id'],
+                        };
+
+                        request(options, function (err, response, body) {
+
+                            if (err)
+                                return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+
+                            //	Resend using the original response statusCode
+                            //	Use the json parsing above as a simple check we got back good stuff
+
+                            Subscription.find({
+                                where: {id: '1'}
+                            }).done(function (err, subscription) {
+
+                                // Save to transactionDetails table
+                                var tran_options = {
+                                    uri: 'http://localhost:1337/transactiondetails/register/',
                                     method: 'POST',
                                 };
 
-                                options.json = {
-                                    name: data[0] + ' ' + data[1],
-                                    email: data[2],
-                                    isVerified: true,
-                                    isAdmin: false,
-                                    password: data[3],
-                                    created_by: req.session.Account.id,
-                                    workgroup: directory[0]['id'],
-                                    title: data[3],
-                                    subscription: account[0]['subscription_id'],
+                                var created_date = new Date();
+                                tran_options.json = {
+                                    trans_id: (req.session.Account.isSuperAdmin === 1) ? 'superadmin' : 'workgroupadmin',
+                                    account_id: body.account.id,
+                                    created_date: created_date,
+                                    users_limit: subscription.users_limit,
+                                    quota: subscription.quota,
+                                    plan_name: subscription.features,
+                                    price: subscription.price,
+                                    duration: subscription.duration,
+                                    paypal_status: '',
                                 };
 
-                                request(options, function (err, response, body) {
-                                    //console.log(options);
-
-                                    if (err)
-                                        return res.json({error: err.message, type: 'error'}, response && response.statusCode);
-
-                                    //	      Resend using the original response statusCode
-                                    //	      use the json parsing above as a simple check we got back good stuff
-
-                                    Subscription.find({
-                                        where: {id: '1'}
-                                    }).done(function (err, subscription) {
-
-                                        // Save to transactionDetails table
-                                        var tran_options = {
-                                            uri: 'http://localhost:1337/transactiondetails/register/',
-                                            method: 'POST',
-                                        };
-
-                                        var created_date = new Date();
-                                        tran_options.json = {
-                                            trans_id: (req.session.Account.isSuperAdmin === 1) ? 'superadmin' : 'workgroupadmin',
-                                            account_id: body.account.id,
-                                            created_date: created_date,
-                                            users_limit: subscription.users_limit,
-                                            quota: subscription.quota,
-                                            plan_name: subscription.features,
-                                            price: subscription.price,
-                                            duration: subscription.duration,
-                                            paypal_status: '',
-                                        };
-
-                                        request(tran_options, function (err1, response1, body1) {
-                                            if (err1)
-                                                return res.json({error: err1.message, type: 'error'}, response1 && response1.statusCode);
-                                        });
-
-                                    });
-
+                                request(tran_options, function (err1, response1, body1) {
+                                    if (err1)
+                                        return res.json({error: err1.message, type: 'error'}, response1 && response1.statusCode);
                                 });
-                            }
-                            i++;
 
-                        })
-                        .on("end", function (count) {
-                            console.log('Number of lines: ' + count - 1);
-
-                        })
-                        .on('error', function (error) {
-                            console.log(error.message);
+                            });
                         });
+                    }
 
+                    i++;
 
+                }).on("end", function (count) {
+                    console.log('Number of lines: ' + count - 1);
+                }).on('error', function (error) {
+                    console.log(error.message);
+                });
             });
         });
     },
+
+
     /*****************************************************************************************
      Post Registration CSV Data
      @Auth : Avneesh

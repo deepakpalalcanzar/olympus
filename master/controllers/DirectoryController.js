@@ -354,18 +354,12 @@ var DirectoryController = {
                         platform: req.headers.user_platform,
                     };
 
-                    console.log('###################  Create User  ###############');
-                    console.log(req.headers);
-                    console.log('################### Create User ####################');
-
-
                     request(options, function (err, response, body) {
                         if (err)
                             return res.json({error: err.message, type: 'error'}, response && response.statusCode);
-                        // res.send(200);
                     });
                 });
-// Respond with new directory
+                // Respond with new directory
                 res.json(apiResponse);
             });
         }

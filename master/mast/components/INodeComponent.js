@@ -202,18 +202,13 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 			if (event && event.source && event.source.parent && event.source.parent.id && 
 				event.source.parent.id == this.get('id')) {
 
-				// console.log(event.source.parent.id ,"+++++ ITEM_CREATE ");
-				var newDir = event.source;
-				// console.log('new dir', newDir);
-				// alert(newDir.name);
-				
-				// var removeFile = newDir.name.replace(/ *\([^)]*\) */g, '');
-				// alert(removeFile);
-				// if($('span:contains("'+removeFile+'")').length > '1') {
-//$('span:contains("'+removeFile+'")').parents().eq(3)
-					// $('.branchOutlet').first().css('background-color', 'blue');
-				// }
 
+
+					console.log('#####################################');
+					
+
+
+				var newDir = event.source;
 				// If this is on the account who created the directory, just update the id
 				if (this.collection.where({id: undefined}).length !== 0) {
 
@@ -232,9 +227,14 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 				else {
 					// creating the new inode and marshaling the data. We then want to 
 					// add 1 to depth to so setPadding will have work properly
+
+					console.log('depthdepthdepthdepthdepthdepthdepthdepthdepthdepth');
+					console.log(this.get('depth'));
+					console.log('depthdepthdepthdepthdepthdepthdepthdepthdepthdepth');
+
 					var marshaledData = new Mast.models.INode().marshal(_.extend(newDir, {
-						depth: this.get('depth')+1,
-						parent: _.extend({}, this.model, {model:this.model}) // Hack to get public link visibility working...
+						depth 	: 0,
+						parent 	: _.extend({}, this.model, { model:this.model }) // Hack to get public link visibility working...
 					}));
 
 					if (event.source.created_by.id == Mast.Session.Account.id) {
@@ -738,6 +738,11 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 			this.$branchOutlet.empty();
 		}
 
+
+		console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+		console.log(this.$branchOutlet);
+		console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+
 		// Generate component
 		var compo = model.get('type') === 'file' ? Mast.components.FileComponent : Mast.components.DirectoryComponent;
 		var r = new compo({
@@ -765,36 +770,18 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 
 	// Download a file
 	download	: function(e) {
-
-		/*var url = "/file/download/"+this.get('id');
-		var iframe;
-		iframe = document.getElementById("hiddenDownloader");
-		if (iframe === null)
-		{
+		var curid = this.get('id');
+		var url = "/file/download/"+curid;
+        var iframe;
+        iframe = document.getElementById("hiddenDownloader");
+        if (iframe === null){
 			iframe = document.createElement('iframe');
 			iframe.id = "hiddenDownloader";
 			iframe.style.visibility = 'hidden';
 			document.body.appendChild(iframe);
-		}
-		iframe.src = url;
-		
-		e.stopPropagation();*/
-
-                var curid = this.get('id');
-				var url = "/file/download/"+curid;
-		        var iframe;
-		        iframe = document.getElementById("hiddenDownloader");
-		        if (iframe === null)
-		         {
-				iframe = document.createElement('iframe');
-				iframe.id = "hiddenDownloader";
-				iframe.style.visibility = 'hidden';
-				document.body.appendChild(iframe);
-		      }
-		      iframe.src = url;
-                     e.stopPropagation();
-                   //}, "jsonp");              
-
+    	}
+      	iframe.src = url;
+        e.stopPropagation();
 	},
 
 	open : function(e) {

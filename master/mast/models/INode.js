@@ -61,6 +61,8 @@ Mast.models.INode = Mast.Model.extend({
 
 	// Marshal server-side model into presentable format
 	marshal: function(i) {
+
+		console.log(i);
 		return _.extend(i, {
 			
 			urlRoot    : "/" + i['type'] + "/",
