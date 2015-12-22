@@ -26,8 +26,8 @@ exports.sendVerifyEmail = function(options) {
             "google_analytics_domains":["werxltd.com"],
             "google_analytics_campaign":["..."],
             "metadata":["..."],
-            "html": "Dear "+account.name+",<br/><br/>Welcome to the Olympus file sharing system!  Your account details are: <br/><br/>User: "+account.email+"<br/><br/>To log in to Olympus, <a href='https://"+host+"'>click here.</a><br/><br/>Sincerely,<br/>The Olympus Team",
-            "text": "Dear "+account.name+",\n\nWelcome to the Olympus file sharing system!  Your account details are: \n\nUser: "+account.email+"\n\nTo log in to Olympus, go to https://"+host+"\n\nSincerely,\nThe Olympus Team"
+            "html": "Dear "+account.name+",<br/><br/>Welcome to the Olympus file sharing system!  Your account details are: <br/><br/>User: "+account.email+"<br/><br/>To log in to Olympus, <a href='https://"+host+"'>click here.</a><br/><br/>You can also download our app from Google Play Store, to download <a href='https://play.google.com/store/apps/details?id=com.Olympus'>click here.</a> <br/> You can also download our app from Apple App Store, to download <a href='https://itunes.apple.com/us/app/olympus.io/id778404078?mt=8'>click here.</a><br/>Sincerely,<br/>The Olympus Team",
+            "text": "Dear "+account.name+",\n\nWelcome to the Olympus file sharing system!  Your account details are: \n\nUser: "+account.email+"\n\nTo log in to Olympus, go to https://"+host+"\n\nYou can also download our app from Google Play Store, to download <a href='https://play.google.com/store/apps/details?id=com.Olympus'>click here.</a> \n\n You can also download our app from Apple App Store, to download <a href='https://itunes.apple.com/us/app/olympus.io/id778404078?mt=8'>click here.</a>\n\nSincerely,\nThe Olympus Team"
         }
     };
     mandrill.call({'key': mandrillKey});
@@ -130,15 +130,15 @@ exports.sendInviteEmail = function(options) {
         }
     };
     if (account.verified === true) {
-        opts.message.html = "Dear "+account.name+",<br/><br/>You were added to the "+controller+" &ldquo;"+inode.name+"&rdquo;.";
-        opts.message.text = "Dear "+account.name+",\n\nYou were added to the "+ controller +" '"+inode.name+"'.";
+        opts.message.html = "Dear "+account.name+",<br/><br/>You were added to the "+controller+" &ldquo;"+inode.name+"&rdquo;.<br/>You can also download our app from Google Play Store, to download <a href='https://play.google.com/store/apps/details?id=com.Olympus'>click here.</a> <br/> You can also download our app from Apple App Store, to download <a href='https://itunes.apple.com/us/app/olympus.io/id778404078?mt=8'>click here.</a>";
+        opts.message.text = "Dear "+account.name+",\n\nYou were added to the "+ controller +" '"+inode.name+"'.\n\n You can also download our app from Google Play Store, to download <a href='https://play.google.com/store/apps/details?id=com.Olympus'>click here.</a> \n\n You can also download our app from Apple App Store, to download <a href='https://itunes.apple.com/us/app/olympus.io/id778404078?mt=8'>click here.</a>";
     } else {
 
         if (port && port != '80') {
             host = host + ":"+port;
         }
-        opts.message.html = "Dear "+account.name+",<br/><br/>"+account.name+"    has shared a "+controller+" with you in the Olympus file sharing system.  In order to log in to Olympus, please verify your account by <a href='https://"+host+"/auth/verify?code="+account.verificationCode+"'>clicking here</a>";
-        opts.message.text = "Dear "+account.name+",\n\n"+accountName+" has      shared a "+controller+" with you in the Olympus file sharing system.  In order to log in to     Olympus, please verify your account by <a href='https://"+host+"/auth/verify?code="+account.verificationCode+"'>clicking here</a>";
+        opts.message.html = "Dear "+account.name+",<br/><br/>"+account.name+" has shared a "+controller+" with you in the Olympus file sharing system.  In order to log in to Olympus, please verify your account by <a href='https://"+host+"/auth/verify?code="+account.verificationCode+"'>clicking here</a> <br/>You can also download our app from Google Play Store, to download <a href='https://play.google.com/store/apps/details?id=com.Olympus'>click here.</a> <br/> You can also download our app from Apple App Store, to download <a href='https://itunes.apple.com/us/app/olympus.io/id778404078?mt=8'>click here.</a>";
+        opts.message.text = "Dear "+account.name+",\n\n"+accountName+" has shared a "+controller+" with you in the Olympus file sharing system.  In order to log in to     Olympus, please verify your account by <a href='https://"+host+"/auth/verify?code="+account.verificationCode+"'>clicking here</a> \n\n You can also download our app from Google Play Store, to download <a href='https://play.google.com/store/apps/details?id=com.Olympus'>click here.</a> <br/> You can also download our app from Apple App Store, to download <a href='https://itunes.apple.com/us/app/olympus.io/id778404078?mt=8'>click here.</a>";
     }
     mandrill.call({'key': mandrillKey});
     mandrill.call(opts, function(data){
