@@ -19,7 +19,8 @@ var ThemeController = {
         };
 
         request(options, function(err, response, body) {
-			if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);        
+            if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);        
+        	res.json({ error: false, type: 'success' });        
 		});
 
 	}

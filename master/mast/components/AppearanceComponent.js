@@ -33,10 +33,14 @@ Mast.registerComponent('AppearanceComponent',{
 	},
 
 	saveConfiguration: function(){
+
 		var themeChanges = this.getThemeColors();
 		Mast.Socket.request('/theme/updateColor', themeChanges, function(req, err){
-			console.log("laksdklasdsjladssakdasjdlasdjljklsadljkasjasjs");
+			if(req.type === 'success'){
+				alert("Theme updated successfully.");
+			}
 		});
+
 	},
 
 	// get theme changes 

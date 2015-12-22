@@ -49,7 +49,8 @@ module.exports = {
 
         	if (err) return cb && cb(err);   
     		if(themeOne){
-            	Theme.update({ id : '1' },
+
+            	Theme.update({ id : themeOne.id },
             	{
             		header_background 	: options.headerColor 	!== "#undefined" ? options.headerColor 	: themeOne.header_background,
             		navigation_color 	: options.navColor 		!== "#undefined" ? options.navColor 	: themeOne.navigation_color,
@@ -59,7 +60,7 @@ module.exports = {
 					font_family			: options.fontFamily 	!== '' 			 ? options.fontFamily 	: themeOne.font_family
 
 		        }).then(function (theme){
-		    	    return theme;  
+					return cb && cb(null, theme);
 				});
 		
 			}else{
@@ -74,8 +75,10 @@ module.exports = {
 		            account_id			: options.account_id
 		        }).exec(function foundAccount (err, theme) {
 		            if (err) return cb && cb(err);   
-		            return cb && cb(null, theme);  
+					return cb && cb(null, theme);
+
 		        });
+
     		}
 		});
 	}	

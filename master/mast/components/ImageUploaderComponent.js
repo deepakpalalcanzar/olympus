@@ -28,11 +28,9 @@ Mast.registerComponent('ImageUploaderComponent', {
 	init: function(){
 		var self = this;
 		this.on('addFile',function(files){
-			//self.set('uploading',true);
 			self.uploadImage(files);
 		});
-
-	//	this.on('uploadComplete',this.afterUpload);
+		
 	},
 
 	// Gives permission for upload process to take place
@@ -43,7 +41,6 @@ Mast.registerComponent('ImageUploaderComponent', {
 	// Gives permission for upload process to take place
 	uploadImage: function(input) {
 
-		console.log("input input input inputinput input input input input");
 		var self = this;
 		if (input[0]) {
 
@@ -69,17 +66,7 @@ Mast.registerComponent('ImageUploaderComponent', {
 
 
 	uploadAvatar: function(){
-		
 		var file = fileData['0'];
-		console.log(file);
-		console.log(this.get('fileData'));
-
-		// if (file.type !== "image/jpeg" && file.type !== "image/jpg" && file.type !== "image/png" && file.type !== "image/gif") {
-		// 	alert("Please upload jpeg, jpg, gif and png");
-		// }else{
-		// 	Mast.Socket.request('/account/imageUpload', { name:file.name, type:file.type, size:file.size, binary: fileBinary, pic_type: 'profile'}, function(req, res, next) {
-		// 	});
-		// }
 	},
 
 

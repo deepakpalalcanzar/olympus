@@ -102,10 +102,6 @@ var RedirectController = {
                         });
                     }
 
-//                    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&  FS name  &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
-//                    console.log(req.url);
-//                    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&& FS name &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
-
                     // set content-type header
                     res.setHeader('Content-Type', fileModel.mimetype);
                     options.uri = "http://localhost:1337/file/download/" + fileModel.fsName + "?_session=" + JSON.stringify(_session);
