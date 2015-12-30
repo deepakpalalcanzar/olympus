@@ -13,16 +13,6 @@ var crypto = require('crypto'),
 var easyimg = require('easyimage');
 //var im = require('imagemagick');
 
-
-/*%%%%%%%%%%%%%%%%%%%%%% For S3 Resize image file %%%%%%%%%%%%%%%%%%%%%%%%%%*/
-//var request = require('request');
-//var gm = require("gm");
-//var multer = require('multer');
-//var AWS = require('aws-sdk');
-//var mime = require('mime');
-/*%%%%%%%%%%%%%%%%%%%%%% For S3 Resize image file %%%%%%%%%%%%%%%%%%%%%%%%%%*/
-
-
 var encryptedData = {};
 
 var FileController = {
@@ -301,18 +291,11 @@ var FileController = {
 
         res.setTimeout(0);
 
-        if (req.param('Filename')) {
-            var uploadStream = req.file('Filedata');
-        } else {
-            var uploadStream = req.file('files[]');
-        }
-
+        if (req.param('Filename')) { var uploadStream = req.file('Filedata'); } else { var uploadStream = req.file('files[]'); }
+        
         uploadStream.on('error', function (err) {
-            // console.log("STREAM ERROR OCCURED STREAM ERROR OCCURED STREAM ERROR OCCURED STREAM ERROR OCCURED")
             return res.end(JSON.stringify({error: err}), 'utf8');
         });
-
-        // uploadStream.on('data', function (data){
 
         if (req.param('data')) {
             data = JSON.parse(req.param('data'));
@@ -338,25 +321,17 @@ var FileController = {
 
             uploadStream.upload(receiver, function (err, files) {
 
-                if (err) {
-                    return res.write(JSON.stringify({error: err}), 'utf8');
-                }
-
+                if (err) { return res.write(JSON.stringify({error: err}), 'utf8'); }
                 var file = files[0];
-
-                if (file === undefined) {
-                    return res.write(JSON.stringify({error: err}), 'utf8');
-                }
-
-
+                if (file === undefined) { return res.write(JSON.stringify({error: err}), 'utf8'); }
 
                 // Find the file with the same name in a database             
                 File.findOne({
                     name: file.filename,
                     DirectoryId: data.parent.id,
                 }).exec(function (err, fileData) {
+                    
                     // If File exist in a database then find the maximum version of that file 
-
                     if (fileData) {
 
                         var versionData = new Array();
@@ -373,8 +348,7 @@ var FileController = {
                                             {first: fileData.fsName, second: file.extra.fsName}, function (rmErr) {
                                         var parsedResponse = JSON.parse(rmErr)
                                         if (parsedResponse.first === parsedResponse.second) {
-                                            fsx.unlink('/var/www/html/olympus/api/files/' + file.extra.fsName);
-                                            // fsx.unlink('/home/alcanzar/api/files/'+file.extra.fsName);
+                                            fsx.unlink('/var/www/html/olympus/olympus1/api/files/' + file.extra.fsName);
                                             return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
                                         }
                                     });
@@ -408,8 +382,7 @@ var FileController = {
                                                 {first: latestFile.fsName, second: file.extra.fsName}, function (rmErr) {
                                             var parsedResponse = JSON.parse(rmErr)
                                             if (parsedResponse.first === parsedResponse.second) {
-                                                fsx.unlink('/var/www/html/olympus/api/files/' + file.extra.fsName);
-                                                // fsx.unlink('/home/alcanzar/api/files/'+file.extra.fsName);
+                                                fsx.unlink('/var/www/html/olympus/olympus1/api/files/' + file.extra.fsName);
                                                 return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
                                             }
                                         });
@@ -446,131 +419,23 @@ var FileController = {
                     if (file.type == "image/png" || file.type == "image/jpg" || file.type == "image/jpeg") {
                         if (sails.config.receiver == "S3") {
 
-//                             var s3 = new AWS.S3();
-//                             gm(request("https://localhost/file/open/985/DSCN0255.JPG"), "DSCN0255.JPG")
-//                                     .resize("100^", "100^")
-//                                     .stream(function (err, stdout, stderr) {
-// //                                        var data = {
-// //                                            Bucket: "app.olympus.io",
-// //                                            Key: "AKIAIEURF2O4FGCDDK6A",
-// //                                            Body: stdout,
-// //                                            ContentType: mime.lookup("JPG")
-// //                                        };
-
-//                                         s3.client.putObject(receiver, function (err, res) {
-//                                             console.log("done");
-//                                         });
-//                                     });
-
                         }  else {
-
-                            easyimg.resize({src: '/var/www/html/olympus/api/files/' + file.extra.fsName, dst: '/var/www/html/olympus/api/files/thumbnail-' + file.extra.fsName, width: 150, height: 150}, function (err, stdout, stderr) {
-                                if (err)
-                                    throw err;
+                            easyimg.resize({src: '/var/www/html/olympus/olympus1/api/files/' + file.extra.fsName, dst: '/var/www/html/olympus/olympus1/api/files/thumbnail-' + file.extra.fsName, width: 150, height: 150}, function (err, stdout, stderr) {
+                                if (err) throw err;
                                 console.log('Resized to 100x100');
                             });
                         }
                     }
-
-
                 });
             });
-
-
-
-
         });
-
-
-//
-//        if (req.param('Filename')) {
-//            var uploadStream = req.file('Filedata');
-//        } else {
-//            var uploadStream = req.file('files[]');
-//        }
-//
-//        uploadStream.on('error', function (err) {
-//            // console.log("STREAM ERROR OCCURED STREAM ERROR OCCURED STREAM ERROR OCCURED STREAM ERROR OCCURED")
-//            return res.end(JSON.stringify({error: err}), 'utf8');
-//        });
-//
-//        // uploadStream.on('data', function (data){
-//
-//        if (req.param('data')) {
-//            data = JSON.parse(req.param('data'));
-//        } else if (req.param('id')) {
-//            data = {parent: {id: req.param('id')}};
-//        } else if (req.param('parent_id')) {
-//            data = {parent: {id: req.param('parent_id')}};
-//        }
-//
-//
-//
-//          //Get the current workgroup size
-//        Directory.workgroup({id: data.parent.id}, function (err, workgroup) {
-//
-//            var receiver = global[sails.config.receiver + 'Receiver'].newReceiverStream({
-//                maxBytes: workgroup.quota - workgroup.size,
-//                totalUploadSize: req.headers['content-length']
-//            });
-//
-//            receiver.on('progress', function (progressData) {
-//                progressData.parentId = typeof req.param('data') == 'undefined' ? req.param('parent_id') : data.parent.id;
-//                res.write(JSON.stringify(progressData), 'utf8')
-//            });
-//            
-//
-//
-//
-//            uploadStream.upload(receiver, function (err, files) {
-//
-//                if (err) {
-//                    return res.write(JSON.stringify({error: err}), 'utf8');
-//                }
-//
-//                var file = files[0];
-//
-//                if (file === undefined) {
-//                    return res.write(JSON.stringify({error: err}), 'utf8');
-//                }
-//
-//            
-//console.log("^^^^^^^^^^^^^^^^^^^^^^$$$$$$$$$$$$$$$ file $$$$$$$$$$$$$^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-//console.log(file);
-//
-//
-//                // Find the file with the same name in a database             
-//                File.findOne({
-//                    name: file.filename,
-//                    DirectoryId: data.parent.id,
-//                }).exec(function (err, fileData) {
-//                    // If File exist in a database then find the maximum version of that file 
-//
-//console.log("^^^^^^^^^^^^^^^^^^^^^^$$$$$$$$$$$$$$$$  content-length $$$$$$$$$$$$^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-//console.log(req.headers['content-length']);
-//          
-//
-//                });
-//            });
-//
-//
-//////                          if (file.type == "image/png" || file.type == "image/jpg" || file.type == "image/jpeg") {
-//////                                easyimg.resize({src: '/var/www/olympus_abhishek/olympus1/api/files/' + file.extra.fsName, dst: '/var/www/olympus_abhishek/olympus1/api/files/thumbnail-'+file.extra.fsName, width: 100, height: 100}, function (err, stdout, stderr) {
-//////                                    if (err)
-//////                                        throw err;
-//////                                    console.log('Resized to 100x100');
-//////                                });
-//////                            }
-//
-//
-//        });
     }
 };
 
 var streamAdaptor = {
     firstFile: function (options, cb) {
         var hash = crypto.createHash('md5');
-        var s = fsx.createReadStream('/var/www/html/olympus/api/files/' + options.first);
+        var s = fsx.createReadStream('/var/www/html/olympus/olympus1/api/files/' + options.first);
         s.on('readable', function () {
             var chunk;
             while (null !== (chunk = s.read())) {
@@ -581,7 +446,7 @@ var streamAdaptor = {
         });
 
         var hs = crypto.createHash('md5');
-        var nw = fsx.ReadStream('/var/www/html/olympus/api/files/' + options.second);
+        var nw = fsx.ReadStream('/var/www/html/olympus/olympus1/api/files/' + options.second);
         nw.on('readable', function () {
             var chunk;
             while (null !== (chunk = nw.read())) {

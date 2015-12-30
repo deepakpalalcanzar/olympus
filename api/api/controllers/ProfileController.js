@@ -9,11 +9,6 @@ var ProfileController = {
 
     profileUpdate: function(req, res){
 
-        console.log("JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ");
-        console.log(req);
-        console.log(req.param('id'));
-        console.log("JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ");
-
         if (!req.param('id')) {
           return res.send({
             error: new Error('Must include an Account ID').message,

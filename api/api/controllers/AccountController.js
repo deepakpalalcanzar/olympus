@@ -12,11 +12,6 @@ var AccountController = {
 
     register: function (req, res) {
 
-
-        console.log("reqreqreqreqreqreqreqreqreqreqreqreqreqreqreqreqreqreqreq");
-        console.log(req);
-        console.log("reqreqreqreqreqreqreqreqreqreqreqreqreqreqreqreqreqreqreq");
-
         if (!req.param('email')) return res.json({
             error: 'No email provided',
             type: 'error'
