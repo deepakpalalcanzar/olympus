@@ -84,11 +84,6 @@ exports.rename = function (req, res, cb) {
                                         platform: user_platform,
                                     };
 
-                                    console.log('&&&&&&&#############################65546456456##############&&&');
-                                    console.log(user_platform);
-                                    console.log('&&&&&&&#############################65546456456##############&&&');
-
-
                                     request(options, function (err, response, body) {
                                         if (err)
                                             return res.json({error: err.message, type: 'error'}, response && response.statusCode);
@@ -123,11 +118,6 @@ exports.rename = function (req, res, cb) {
                                             ip: req.session.Account.ip,
                                             platform: user_platform,
                                         };
-
-                                        console.log('&&&&&&&############ Web App Rename ###########&&&');
-                                        console.log(user_platform);
-                                        console.log('&&&&&&&########### Web App Rename #############&&&');
-
 
                                         request(options, function (err, response, body) {
                                             if (err)
@@ -313,11 +303,63 @@ exports.rename = function (req, res, cb) {
                 DirectoryPermission.findAll({
                     where: {DirectoryId: options.id}
                 }).success(function (directorypermission) {
-                    directorypermission.forEach(function (dirpermission) {
-                        var sql = "Insert into deletedlist ( type, deleted_id, createdAt, updatedAt, user_id, account_id ) VALUES ( '" + 2 + "', '" + dirpermission.DirectoryId + "', '" + datetime + "', '" + datetime + "',  '" + options.accountId + "', '" + dirpermission.AccountId + "')";
-                        sql = Sequelize.Utils.format([sql]);
-                        sequelize.query(sql, null, {raw: true});
+
+
+                    console.log("directorypermissiondirectorypermissiondirectorypermissiondirectorypermission");
+                    console.log(directorypermission);
+                    console.log("directorypermissiondirectorypermissiondirectorypermissiondirectorypermission");
+                    
+                    async.auto({
+
+                        updateDeletedDir : function(cb){
+                            Directory.findAll({
+                                where: { id : directorypermission[0].DirectoryId }
+                            }).success(function (directory) {
+                                directorypermission.forEach(function (dirpermission) {
+                                    var sql = "Insert into deletedlist ( type, deleted_id, createdAt, updatedAt, user_id, account_id, directory_id, permission) VALUES ( '" + 2 + "', '" + dirpermission.DirectoryId + "', '" + datetime + "', '" + datetime + "',  '" + options.accountId + "', '" + dirpermission.AccountId + "', '"+ directory[0].DirectoryId +"', '"+dirpermission.type+"')";
+                                    sql = Sequelize.Utils.format([sql]);
+                                    sequelize.query(sql, null, {raw: true});
+                                }, cb);
+                            });
+                        },
+
+                        updateFileDir : function(cb){
+                            File.findAll({
+                                where: { DirectoryId : directorypermission[0].DirectoryId }
+                            }).success(function (file) {
+                                file.forEach(function (filelist) {
+                                    INodeService.insertDirectoryFile({
+                                        filelist    : filelist, 
+                                        datetime    : datetime,
+                                        account_id  : options.accountId
+                                    });
+                                },cb);
+                            });
+                        },
+                        
+                        updateSubDir : function(cb){
+
+                            Directory.findAll({
+                                where: { DirectoryId : directorypermission[0].DirectoryId }
+                            }).success(function (directory) {
+                                directory.forEach(function (directorylist) {
+                                    INodeService.insertDirectoryData({
+                                        directory    : directorylist, 
+                                        datetime    : datetime,
+                                        account_id  : options.accountId
+                                    });
+                                },cb);
+
+                            });
+
+                        },
+
+                    }, function(err, response){
+
+                        console.log(response);
+                        // cb(null, list);
                     });
+
                 }).error(function (err) {
                     throw new Error(err);
                 });
@@ -326,20 +368,68 @@ exports.rename = function (req, res, cb) {
             } else if (options.model.name == "File") {
 
                 FilePermission.findAll({
-                    where: {FileId: options.id}
+                    where: { FileId: options.id}
                 }).success(function (filepermission) {
-                    filepermission.forEach(function (filepermission) {
-                        var sql = "Insert into deletedlist ( type, deleted_id, createdAt, updatedAt, user_id, account_id ) VALUES ( '" + 1 + "', '" + filepermission.FileId + "', '" + datetime + "', '" + datetime + "',  '" + options.accountId + "', '" + filepermission.AccountId + "')";
-                        sql = Sequelize.Utils.format([sql]);
-                        console.log(sql);
-                        sequelize.query(sql, null, {raw: true});
+                    File.findAll({
+                        where: { id : filepermission[0].FileId }
+                    }).success(function (file) {
+                        filepermission.forEach(function (filepermission) {
+                            var sql = "Insert into deletedlist ( type, deleted_id, createdAt, updatedAt, user_id, account_id, directory_id, permission) VALUES ( '" + 1 + "', '" +filepermission.FileId + "', '" + datetime + "', '" + datetime + "',  '" + options.accountId + "', '" + filepermission.AccountId + "', '"+ file[0].DirectoryId +"', '"+filepermission.type+"')";
+                            sql = Sequelize.Utils.format([sql]);
+                            sequelize.query(sql, null, {raw: true});
+                        });
                     });
                 }).error(function (err) {
                     throw new Error(err);
                 });
             }
+        },
 
-        }
+
+
+exports.insertDirectoryData = function(options, cb){
+
+    var sql = "Select * from directory where DirectoryId = ?";
+    sql = Sequelize.Utils.format([sql]);
+    sequelize.query(sql, null, {raw: true});
+
+    
+
+/*    var sql = "Select * from file where DirectoryId = ?";
+    sql = Sequelize.Utils.format([sql]);
+    sequelize.query(sql, null, {raw: true});
+*/
+
+};
+
+function getSubDirectory(){
+
+
+}
+
+exports.insertDirectoryFile = function(options, cb){
+
+    var fileData    = options.filelist;
+    var datetime    = options.datetime;
+    var account_id  = options.account_id;
+
+    FilePermission.findAll({
+        where: { FileId: fileData.id }
+    }).success(function (filepermission) {
+        File.findAll({
+            where: { id : filepermission[0].FileId }
+        }).success(function (file) {
+            filepermission.forEach(function (filepermission) {
+                var sql = "Insert into deletedlist ( type, deleted_id, createdAt, updatedAt, user_id, account_id, directory_id, permission) VALUES ( '" + 1 + "', '" + filepermission.FileId + "', '" + datetime + "', '" + datetime + "',  '" + account_id + "', '" + filepermission.AccountId + "', '"+ fileData.DirectoryId +"', '"+ filepermission.type+ "')";
+                sql = Sequelize.Utils.format([sql]);
+                sequelize.query(sql, null, {raw: true});
+            });
+        });
+    }).error(function (err) {
+        throw new Error(err);
+    });
+};
+
 
 
 /**
@@ -370,23 +460,23 @@ exports['delete'] = function (req, res, cb) {
         accountName: req.session.Account.name,
     });
 
-    var subscribers = INodeModel.roomName(inodeId);
 
-    if (INodeModel.name == 'File') {
+    // var subscribers = INodeModel.roomName(inodeId);
+
+    /*if (INodeModel.name == 'File') {
         var sql = ("Delete from version where FileId = ?");
         sql = Sequelize.Utils.format([sql, inodeId]);
         sequelize.query(sql, null, {
             raw: true
         });
-    }
+    }*/
 
     // Make sure the user has sufficient permissions for the delete
-    var sourcePermissionClass = (req.param('controller') == "directory" && !req.param('replaceFileId')) ? DirectoryPermission : FilePermission;
+   /* var sourcePermissionClass = (req.param('controller') == "directory" && !req.param('replaceFileId')) ? DirectoryPermission : FilePermission;
 
     var sourceCriteria = {
         AccountId: req.session.Account.id,
         type: 'admin'
-                // isLocked: false
     };
 
     if (sourcePermissionClass == DirectoryPermission) {
@@ -433,7 +523,7 @@ exports['delete'] = function (req, res, cb) {
                     });
             });
         }
-    });
+    });*/
 };
 
 
@@ -451,8 +541,6 @@ exports.destroy = function (options, cb) {
         Directory.find(options.id).error(cb).success(function (directory) {
             if (!directory)
                 return cb("No directory found!");
-
-
 
             /*Create logging*/
             var opts = {
@@ -547,16 +635,6 @@ exports.destroy = function (options, cb) {
     }
 
 };
-
-/*
- * Temp Remove Data 
- */
-
-/*exports.tempRemove = function(req, res) {
- 
- 
- 
- };*/
 
 /**
  * Return the set of users who are currently viewing the stream
@@ -1089,11 +1167,6 @@ exports.version = function (req, res, cb) {
 };
 
 exports.comments = function (req, res) {
-
-    console.log("lllllllllllllllllllllllllllllllllll");
-    console.log(req);
-    console.log("lllllllllllllllllllllllllllllllllll");
-
     INodeService.activity(req, res, function (err, result) {
         if (err) {
             res.json(err, err.status);

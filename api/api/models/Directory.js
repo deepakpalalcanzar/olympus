@@ -289,59 +289,60 @@ module.exports = {
 
   // Get a dir's workgroup
 workgroup: function(id, cb) {
+
     if(id === null) {
-      cb(null);
-      return;
+        cb(null);
+        return;
     }
+
     Directory.findOne(id).exec(function(err, model) {
-      if (err) {return cb(err);}
-      if(model === null) {
-        return cb(null);
-      } else if(model.DirectoryId === null) {
-        return cb(null, model);
-      } else {
-        var workgroup = null;
-        async.until(
+        if (err) {return cb(err);}
+        
+        if(model === null) {
+            return cb(null);
+        } else if(model.DirectoryId === null) {
+            return cb(null, model);
+        } else {
+    
+            var workgroup = null;
+            async.until(
+            function() {
+                return workgroup !== null;
+            }, function(callback) {
+                
+                Directory.findOne(model.DirectoryId).exec(function(err, parentModel) {
+                    if (err) {return callback(err);}
+                    if(parentModel.DirectoryId === null) {
+                        workgroup = parentModel;
+                    } else {
+                        model = parentModel;
+                    }
+                    callback();
+                });
 
-        function() {
-          return workgroup !== null;
-        }, function(callback) {
-          
-          Directory.findOne(model.DirectoryId).exec(function(err, parentModel) {
-            
-            if (err) {return callback(err);}
-            if(parentModel.DirectoryId === null) {
-              workgroup = parentModel;
-            } else {
-              model = parentModel;
-            }
-            
-            callback();
-          });
-        }, function(err) {
-          if (err) {return cb(err);}
-
-          cb(null, workgroup);
-        });
-      }
+            }, function(err) {
+                if (err) {return cb(err);}
+                cb(null, workgroup);
+            });
+        }
     });
-  },
+},
 
-  checkQuota: function(id, size, cb) {
+checkQuota: function(id, size, cb) {
     Directory.workgroup(id, function(workgroup) {
-      if(workgroup.quota === null) {
-        return cb();
-      }
-      if(workgroup.quota >= (workgroup.size + size)) {
-        sails.log.debug('Quota check clear.');
-        cb();
-      } else {
-        var message = 'Quota exceeded: Current size='+workgroup.size+' Quota='+workgroup.quota+' Attempting to upload='+size+'';
-        sails.log.info(message);
-        cb(message);
-      }
+        if(workgroup.quota === null) {
+            return cb();
+        }
+        if(workgroup.quota >= (workgroup.size + size)) {
+            sails.log.debug('Quota check clear.');
+            cb();
+        } else {
+            var message = 'Quota exceeded: Current size='+workgroup.size+' Quota='+workgroup.quota+' Attempting to upload='+size+'';
+            sails.log.info(message);
+            cb(message);
+        }
     });
-  },
+},
   
   /**
    * Creates a workgroup (a folder with no parent directory, but has an owner id)

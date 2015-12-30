@@ -22,20 +22,20 @@ exports.API.mini = exports.API;
 
 
 var Directory = function(model) { // Directory
-		return _.extend(File(model), {
-			num_children: (+model.num_dir_children + +model.num_file_children) || 0,
-			type: 'directory',
-			mimetype: null,
-			size: model.size,
-			sizeString: model.size &&
-						model.size > 1000000000 ? (Math.round((model.size/10000000))/100) + " GB" :
-						model.size > 1000000 ? (Math.round((model.size/10000))/100)  + " MB":
-						model.size > 1000 ? (Math.round((model.size/10))/100) + " KB":
-						model.size + " bytes",
-			quota: model.quota,
-			public_sublinks_enabled: model.public_sublinks_enabled
-		});
-	};
+	return _.extend(File(model), {
+		num_children: (+model.num_dir_children + +model.num_file_children) || 0,
+		type: 'directory',
+		mimetype: null,
+		size: model.size,
+		sizeString: model.size &&
+					model.size > 1000000000 ? (Math.round((model.size/10000000))/100) + " GB" :
+					model.size > 1000000 ? (Math.round((model.size/10000))/100)  + " MB":
+					model.size > 1000 ? (Math.round((model.size/10))/100) + " KB":
+					model.size + " bytes",
+		quota: model.quota,
+		public_sublinks_enabled: model.public_sublinks_enabled
+	});
+};
 exports.Directory = apiTransform(Directory);
 exports.Directory.mini = exports.Directory;
 
@@ -167,7 +167,7 @@ var Activity = function(model) { // Activity
                 
                 
 	};
-        console.log(model.avatar);
+        // console.log(model.avatar);
 };
 
 
