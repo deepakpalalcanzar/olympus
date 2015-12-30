@@ -1,4 +1,4 @@
-Mast.components.INodeComponent = Mast.Tree.extend({
+Mast.components.TrashComponent = Mast.Tree.extend({
 	
 	events: {
 		'dblclick'              : 'download',
@@ -15,11 +15,11 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 		'click .shared_peop'   	: 'displaySharingSidebar',
 	},
 
-	model       : 'INode',
+	model       : 'Trashnode',
 	emptyHTML   : '',
 	branchOutlet: '.branchOutlet',
-	template    : '.inode-template',
-	collection  : 'DirectoryMembers',
+	template    : '.trash-template',
+	collection  : 'TrashMembers',
 	active      : false,
 
 	beforeClose: function() {
@@ -46,7 +46,7 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 	        }
 		});*/
 
-        Mast.on('NEW_UPLOADING_CHILD', function(data) {
+       /* Mast.on('NEW_UPLOADING_CHILD', function(data) {
             if (data.id == self.model.id) {
                 data.files[0].modified_by = {};
                 data.files[0].uploading = true;
@@ -84,7 +84,7 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 				self.afterRender();
 			}
 
-		});
+		});*/
 
     },
 
@@ -150,10 +150,6 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 			}
 		},
 
-		depth: function(newVal) {
-
-		},
-
 		editing: function(newVal) {
 			if (newVal) {
 				this.$el.closest_descendant('input.inode-name-input').show();
@@ -167,7 +163,7 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 	
 	subscriptions: {
 
-		'~COMMENT_CREATE': function (comment) {
+		/*'~COMMENT_CREATE': function (comment) {
 			if (comment && comment.source && comment.source.item &&
 				comment.source.item.id == this.get('id') &&
 				comment.source.item.type == this.get('type')) {
@@ -176,7 +172,7 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 				});
 			}
 		},
-		
+		*/
 		'~ACCOUNT_JOIN': function (model) {
 			if (model && model.source && model.source.part_of &&
 				model.source.part_of.id == this.get('id') &&
@@ -364,14 +360,14 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 
 	beforeCreate: function () {
 		// TODO: only show options for which this user has permission
-		if (this.get('type') === 'file') {
+		/*if (this.get('type') === 'file') {
 			var d= this.get('dropdownItems');
 			d.unshift({method : 'versioning',name   : 'Manage Version'});
 			d.unshift({method : 'update', name   : 'Update'});
 			d.unshift({method : 'download', name   : 'Download'});
 			d.unshift({method : 'open',name   : 'Open'});
 			d.splice('7', '1');
-		}
+		}*/
 	},
 
 	naiveRender: false,
@@ -806,26 +802,45 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 	},
 
 	'delete': function() {
-		
 		var self = this;
         var id = this.get('id');
         var type =this.get('type');
-        
-		Mast.Socket.request('/'+type+'/delete',{
-			id:  id
-			//ipadd : ipadd,
+		Mast.Socket.request('/trash/deletePermanent',{
+			id 	 :  id,
+			type : type,
 		}, function(response){
 			if (response===403) {
 				alert('Permission denied. You do not have sufficient permissions to delete this item.');
 			} else {
-				self.parent.collection.fetchMembers(self.parent,function(){
-				});
+
+				$("#content").empty();
+				var trash = new Mast.components.TrashFileSystem({ outlet : '#content'});
+
+			}
+		});
+	},
+
+	restore: function(e){
+
+		var self = this;
+        var id = this.get('id');
+        var type =this.get('type');
+        
+		Mast.Socket.request('/trash/restore', {
+			id 	 :  id,
+			type : type,
+		}, function(response){
+			if (response===403) {
+				alert('Permission denied. You do not have sufficient permissions to delete this item.');
+			} else {
+				$("#content").empty();
+				var trash = new Mast.components.TrashFileSystem({ outlet : '#content'});
 			}
 		});
 
-		//}, "jsonp");
-
 	},
+
+
 
 	comment: function(e) {
 		this.select(e);

@@ -35,6 +35,7 @@ var AccountController = {
             res.json(APIService.Account.mini(accounts));
         });
     },
+
     createuploadlog: function (req, res) {
 
         var request = require('request');
@@ -72,6 +73,7 @@ var AccountController = {
         });
         /*Create logging*/
     },
+
     searchdate: function (req, res) {
 
         var sdate = "'" + req.params.from + "'";
@@ -104,6 +106,7 @@ var AccountController = {
             throw new Error(e);
         });
     },
+
     search: function (req, res) {
 // If this is a private deployment, just send back a 403. We dont want to search for users.
         if (sails.config.privateDeployment) {
@@ -149,6 +152,7 @@ var AccountController = {
             }
         }
     },
+
     register: function (req, res) {
 
         var request = require('request');
@@ -189,6 +193,7 @@ var AccountController = {
         });
 
     },
+
     /* @By Alcanzar */
 
     listMembers: function (req, res) {
@@ -198,15 +203,17 @@ var AccountController = {
             res.json(accounts, 200);
         });
     },
-    listEnterprisesMembers: function (req, res) {
 
+
+
+    listEnterprisesMembers: function (req, res) {
         Account.findAll({
             where: ['deleted = 0 AND created_by = ' + req.params.id],
         }).success(function (accounts) {
             res.json(accounts, 200);
         });
-
     },
+
     listUsers: function (req, res) {
 
         var userId;
@@ -219,20 +226,22 @@ var AccountController = {
         if (req.session.Account.isSuperAdmin === 1) {
 
             var sql = "SELECT account.*, subscription.features, " +
-                    "adminuser.admin_profile_id, adminuser.id as adminuser_id, enterprises.name as enterprise_name, enterprises.id as enterprises_id FROM account " +
+                    "adminuser.admin_profile_id, adminuser.id as adminuser_id, enterprises.name as enterprise_name, enterprises.id as enterprises_id, dir.size, dir.quota FROM account " +
                     "LEFT JOIN subscription ON account.subscription_id=subscription.id " +
                     "LEFT JOIN adminuser ON account.id=adminuser.user_id " +
                     "LEFT JOIN enterprises ON account.created_by=enterprises.account_id " +
+                    "LEFT JOIN directory dir ON dir.OwnerId = account.id " +
                     "WHERE account.is_enterprise=0 and account.deleted != 1";
             sql = Sequelize.Utils.format([sql]);
 
         } else {
 
             var sql = "SELECT account.*,subscription.features, adminuser.admin_profile_id, " +
-                    "adminuser.id as adminuser_id , enterprises.name as enterprise_name, enterprises.id as enterprises_id FROM account " +
+                    "adminuser.id as adminuser_id , enterprises.name as enterprise_name, enterprises.id as enterprises_id, dir.size, dir.quota FROM account " +
                     "LEFT JOIN subscription ON account.subscription_id=subscription.id " +
                     "LEFT JOIN adminuser ON account.id=adminuser.user_id " +
                     "LEFT JOIN enterprises ON account.created_by=enterprises.account_id " +
+                    "LEFT JOIN directory dir ON dir.OwnerId = account.id " +
                     "WHERE account.is_enterprise=0 and account.deleted != 1 and account.created_by=?";
             sql = Sequelize.Utils.format([sql, userId]);
         }
@@ -288,10 +297,11 @@ var AccountController = {
                 if (req.session.Account.isSuperAdmin === 1) {
 
                     var sql = "SELECT account.*, subscription.features, " +
-                            "adminuser.admin_profile_id, adminuser.id as adminuser_id, enterprises.name as enterprise_name, enterprises.id as enterprises_id, " + '"' + Paginator + '" ' + " as Paginator  FROM account " +
+                            "adminuser.admin_profile_id, adminuser.id as adminuser_id, enterprises.name as enterprise_name, dir.size, dir.quota, enterprises.id as enterprises_id, " + '"' + Paginator + '" ' + " as Paginator  FROM account " +
                             "LEFT JOIN subscription ON account.subscription_id=subscription.id " +
                             "LEFT JOIN adminuser ON account.id=adminuser.user_id " +
                             "LEFT JOIN enterprises ON account.created_by=enterprises.account_id " +
+                            "LEFT JOIN directory dir ON dir.OwnerId = account.id " +
                             "WHERE account.is_enterprise=0 and account.deleted != 1  LIMIT " + range + " ";
                     
                      console.log(sql);
@@ -301,10 +311,11 @@ var AccountController = {
                 } else {
 
                     var sql = "SELECT account.*,subscription.features, adminuser.admin_profile_id, " +
-                            "adminuser.id as adminuser_id , enterprises.name as enterprise_name, enterprises.id as enterprises_id, " + '"' + Paginator + '" ' + " as Paginator  FROM account " +
+                            "adminuser.id as adminuser_id , enterprises.name as enterprise_name, dir.size, dir.quota, enterprises.id as enterprises_id, " + '"' + Paginator + '" ' + " as Paginator  FROM account " +
                             "LEFT JOIN subscription ON account.subscription_id=subscription.id " +
                             "LEFT JOIN adminuser ON account.id=adminuser.user_id " +
                             "LEFT JOIN enterprises ON account.created_by=enterprises.account_id " +
+                            "LEFT JOIN directory dir ON dir.OwnerId = account.id " +
                             "WHERE account.is_enterprise=0 and account.deleted != 1 and account.created_by=?  LIMIT " + range + "";
                     
                     console.log(sql);
@@ -330,11 +341,6 @@ var AccountController = {
                 }).error(function (e) {
                     throw new Error(e);
                 });
-
-
-
-
-
 
                 //res.json(accounts, 200);
             } else {
@@ -365,6 +371,9 @@ var AccountController = {
         });
 
     },
+
+
+
     getNestedWorkgroups: function (req, res) {
         Directory.findAll({
             where: [' deleted != 1 AND DirectoryId = ' + dir.id],

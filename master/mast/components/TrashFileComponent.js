@@ -1,9 +1,11 @@
-Mast.registerTree('DirectoryComponent',{
+Mast.registerTree('TrashFileComponent',{
 	
-	extendsFrom: 'INodeComponent',
+	extendsFrom: 'TrashComponent',
+
+	collection  : 'TrashMembers',
 	
 	events: {
-		'click >.expand-close-arrow': 'toggleExpandCollapse',
+		'click >.expand-arrow': 'toggleExpandCollapse',
 		'dblclick'	: 'toggleExpandCollapse'
 	},
 	
@@ -19,14 +21,12 @@ Mast.registerTree('DirectoryComponent',{
 		var self = this;
 		this.set('state','loading');
 		this.collection.reset();
-
 		this.collection.fetchMembers(this,function(){
 			self.set('state','expanded');
 			self.$el.find('.shared_peop').not(":first").hide();// hide numbershared for files
 		});
-	
 		if (e) {	e.stopPropagation(); }
-		
+
 	},
 	
 	// Collapse this directory and hide its contents

@@ -5,18 +5,20 @@ var EnterprisesController = {
 
 	listEnterprises: function(req, res){
 
-		var sql = "SELECT e.*,a.id AS account,a.name AS acc_name,a.email AS acc_email,s.id AS sub_id,"+
+		var sql = "SELECT e.*,a.id AS account,a.name AS acc_name,a.email AS acc_email,s.id AS sub_id, dir.size, dir.quota, "+
 		" td.plan_name AS features,td.users_limit FROM enterprises e "+
 		"INNER JOIN account a ON a.id = e.account_id "+
 		"INNER JOIN subscription s ON s.id = a.subscription_id "+
-		"INNER JOIN transactiondetails td ON td.account_id = a.id "+
+        "INNER JOIN transactiondetails td ON td.account_id = a.id "+
+		"INNER JOIN directory dir ON dir.OwnerId = a.id "+
 		" WHERE e.is_active=1 AND td.is_deleted = 0";
+
 		sql = Sequelize.Utils.format([sql]);
 		sequelize.query(sql, null, {
 			raw: true
 		}).success(function(enterprises) {
 			if(enterprises.length){ // check for no records exists
-            	res.json(enterprises, 200);
+                res.json(enterprises, 200);
             }else{
                 res.json({
                     name: 'error_123',
@@ -120,38 +122,38 @@ var EnterprisesController = {
         sequelize.query(sql, null, {
         	raw: true
        	}).success(function(dirs) {
-       		Enterprises.find({
+       		
+            Enterprises.find({
             	where: { id: req.params.id }
             }).done(function(err, ent) {
+
             	var sql = "UPDATE account SET deleted=1 where id = ?";
         		sql = Sequelize.Utils.format([sql, ent.account_id]);
         		sequelize.query(sql, null, {
             		raw: true
         		}).success(function(response) {
-        			console.log(response);
+                    /*Create logging*/
+                    var options = {
+                        uri: 'http://localhost:1337/logging/register/' ,
+                        method: 'POST',
+                    };
 
-                  /*Create logging*/
-                  var options = {
-                    uri: 'http://localhost:1337/logging/register/' ,
-                    method: 'POST',
-                  };
+                    options.json =  {
+                        user_id     : req.session.Account.id,
+                        text_message: 'has deleted '+ent.name+' enterprise.',
+                        activity    : 'delete',
+                        on_user     : req.params.id,
+                        ip          : req.session.Account.ip,
+                        platform    : req.headers.user_platform,
+                    };
 
-                 options.json =  {
-                      user_id     : req.session.Account.id,
-                      text_message: 'has deleted '+ent.name+' enterprise.',
-                      activity    : 'delete',
-                      on_user     : req.params.id,
-                      ip          : req.session.Account.ip,
-                      platform    : req.headers.user_platform,
-                  };
-
-                  request(options, function(err, response, body) {
-                    if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
-                        res.json({'success':'1'});
+                    request(options, function(err, response, body) {
+                        
+                        if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
+                            res.json({'success':'1'});
                     });
-                  /*End logging*/
-        			
-				        });
+                    /*End logging*/
+                });
             });
        	});
     },

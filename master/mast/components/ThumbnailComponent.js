@@ -454,7 +454,8 @@ Mast.registerComponent('ThumbnailComponent', {
 		/* We really shouldn't have to send up the "num_children" values for the
 		 * source item, its directory or the destination directory.  These should
 		 * be calculated on the server.
-		 */
+		*/
+
 		Mast.Socket.request('/'+inodeType+'/mv', {
 			source_num_children: draggedInode.model.get('num_children'),
 			source_dir_num_children: draggedInode.parent.model.get('num_children'),
@@ -472,8 +473,6 @@ Mast.registerComponent('ThumbnailComponent', {
 			silent:true
 		});
 	},
-
-	
 
 	// Create a DOM element to use as a proxy for the inode we want to drag, so that we don't visually
 	// drag the whole row and leave a big gap.
@@ -833,26 +832,12 @@ Mast.registerComponent('ThumbnailComponent', {
 	},
 
 	'delete': function() {
-		var self = this;
-		/*Mast.Socket.request('/'+this.get('type')+'/delete',{
-			id: this.get('id')
-		}, function(response){
-			if (response===403) {
-				alert('Permission denied. You do not have sufficient permissions to delete this item.');
-			} else {
-				self.parent.collection.fetchMembers(self.parent,function(){
-				});
-			}
-		});*/
 
-             var id = this.get('id');
-             var type =this.get('type');
-         
-         // $.get("https://ipinfo.io", function(response) {
-           // var ipadd = response.ip ;
+		var self = this;
+		var id = this.get('id');
+		var type =this.get('type');
 		Mast.Socket.request('/'+type+'/delete',{
 			id:  id
-			//ipadd : ipadd,
 		}, function(response){
 			if (response===403) {
 				alert('Permission denied. You do not have sufficient permissions to delete this item.');

@@ -15,9 +15,6 @@ Mast.registerCollection('Searchresult', {
 	searchUsers: function(inodeAttrs,callback) {
 		var self = this;
 		Mast.Socket.request('/account/search', { term: inodeAttrs.term,from_page: inodeAttrs.from_page }, function(res, err){
-			console.log("resresresresresresresresresresresresresres");			
-			console.log(res);			
-			console.log(err);			
 			if(res){
 				self.reset(res);
 				callback && callback(res);

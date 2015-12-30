@@ -9,13 +9,10 @@ Mast.registerComponent('EnterprisesSidebar', {
 
 	// close the sidebar
 	closeUserSidebar: function() {
-		// this.parent.set({sidebarDisplayed: false});
 		this.$el.animate({
 			right: '-500px'
 		},200);
 		$('.enterprises-row-template').removeClass('highlighted');
-		
-		//this.close();
 	},
 
 // Show the sidebar with an animation

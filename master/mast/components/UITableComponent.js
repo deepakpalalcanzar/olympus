@@ -35,7 +35,7 @@ Mast.registerTree('UITableComponent',{
 		var self = this;
 		this.collection.fetch({
 			success: function (model,res) {
-				self.collection.reset(_.map(res,Mast.models.INode.prototype.marshal));
+				self.collection.reset(_.map(res, Mast.models.INode.prototype.marshal));
 			}
 		});
 	}

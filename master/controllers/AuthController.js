@@ -47,7 +47,8 @@ var AuthController = {
 						expires_in: 3600,
 						token_type: "bearer",
 						refresh_token: accountDev.refresh_token,
-						is_enterprise: account.is_enterprise
+						is_enterprise: account.is_enterprise,
+						adaptor: sails.config.fileAdapter.adapter
 					});
 				});
 			});

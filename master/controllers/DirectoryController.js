@@ -13,6 +13,7 @@ var DirectoryController = {
             }
         });
     },
+    
     createlogupload: function (req, res) {
         // Create Loggingggggggggggggg
         var opts = {
@@ -68,6 +69,7 @@ var DirectoryController = {
             res.json(APIService.Directory.mini(results)); // Send API response
         }
     },
+
     dispatchAPI: function (req, res) {
 
         if (!_.isUndefined(req.param('id'))) {
@@ -104,6 +106,7 @@ var DirectoryController = {
         }
 
     },
+    
     update: function (req, res) {
 
         var tasks = [];
@@ -135,6 +138,7 @@ var DirectoryController = {
             }
         });
     },
+
     deletePermission: function (req, res) {
 
         DirectoryPermission.findAll({
@@ -164,7 +168,6 @@ var DirectoryController = {
             // Get this directory's files
             directories: childrenOf(Directory) // Get this directory's directories
         }, afterwards);
-
 
         function childrenOf(model) {
             return function (cb, rs) {
@@ -197,17 +200,15 @@ var DirectoryController = {
             }
         }
     },
+
     info: function (req, res) {
         Directory.find(req.param('id')).success(function (model) {
             res.json(APIService.Directory.mini(model));
         });
     },
+
+
     items: function (req, res) {
-
-//        console.log('&&&&&&&###################65546456456##############&&&');
-//        console.log(req.headers);
-//        console.log('&&&&&&&####################65546456456##############&&&');
-
         DirectoryController.ls(req, res, function (items) {
             var response = {
                 "item_collection": {
@@ -220,7 +221,9 @@ var DirectoryController = {
             res.json(response);
         });
     },
+
     comments: INodeService.comments,
+    
     mkdir: function (req, res) {
         var request = require('request');
 

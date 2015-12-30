@@ -174,9 +174,6 @@ var FileController = {
 
         if (!_.isUndefined(req.param('id'))) {
 
-
-
-
             switch (req.method) {
 
 
@@ -207,11 +204,6 @@ var FileController = {
                                     ip: req.session.Account.ip,
                                     platform: req.headers.user_platform,
                                 };
-
-                                console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& RENAME   &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
-                                console.log(req.headers);
-                                console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& RENAME  &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
-
 
                                 request(options, function (err, response, body) {
                                     if (err)
@@ -314,11 +306,6 @@ var FileController = {
                         platform: user_platform,
                     };
 
-                    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& file Downloaded &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
-                    console.log(user_platform);
-                    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& file Downloaded &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
-
-
                     request(options, function (err, response, body) {
                         //if (err)
                         //return res.json({error: err.message, type: 'error'}, response && response.statusCode);
@@ -358,6 +345,7 @@ var FileController = {
             }
         });
     },
+    
     update: function (req, res) {
         var tasks = [];
         // If the "name" is set, attempt to rename the dir
@@ -386,7 +374,9 @@ var FileController = {
             }
         });
     },
+
     comments: INodeService.comments,
+    
     _download: function (req, res, id, open) {
 
         // Make sure the user has access to the file

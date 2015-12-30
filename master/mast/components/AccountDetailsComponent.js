@@ -27,6 +27,8 @@ Mast.registerComponent('AccountDetails', {
 		if (Mast.isTouch) {
 			this.$('.change-profile-pic').remove();
 		}
+
+		this.attach('.quotas-outlet', 'QuotasComponent');
 	},
 
 	// set model to the mast session account attributes. Useful for placing the attributes as

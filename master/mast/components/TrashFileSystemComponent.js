@@ -1,7 +1,7 @@
-//Mast.components.FileSystem = Mast.ui.Table.extend({
-Mast.registerTree('ThumbnailFileSystem',{
+Mast.registerTree('TrashFileSystem',{
 
 	extendsFrom: 'UITableComponent',
+
 	model: {
 		depth	: -1,
 		column1: {
@@ -21,7 +21,6 @@ Mast.registerTree('ThumbnailFileSystem',{
 		selectedInode: null,
 		renaming     : false,
 		loading      : true
-
 	},
 	
 	currentHighlightedBranch: null,
@@ -38,24 +37,23 @@ Mast.registerTree('ThumbnailFileSystem',{
 
 		loading: function(newVal) {
 			if (newVal) {
-				$('.fileSystem-template .loading-spinner').show();
+				$('.trashSystem-template .loading-spinner').show();
 			} else {
-				$('.fileSystem-template .loading-spinner').hide();
+				$('.trashSystem-template .loading-spinner').hide();
 			}
 		}
+
 	},
 	
 	computePath	: function() {return '/';},
 
-	emptyHTML	: '<div class="loading-spinner"></div>',
-	template	: '.fileSystem-template',
-	collection	: 'Workgroups',
-	branchComponent	: 'DirectoryComponent',
-	branchOutlet	: '#fileSystem-outlet',
+	emptyHTML		: '<div class="loading-spinner"></div>',
+	template		: '.trashSystem-template',
+	collection		: 'Trash',
+	branchComponent	: 'TrashFileComponent',
+	branchOutlet	: '#trashSystem-outlet',
 
 	afterRender: function(e) {
-		// this.$el.disableSelection();
-		
 		/* For number shared*/
 		Mast.Socket.request('/tempaccount/sharedDirectory', null, function(res, err){
 			$.each(res, function( i, val ) {

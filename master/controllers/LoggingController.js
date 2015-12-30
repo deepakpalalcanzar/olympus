@@ -45,12 +45,6 @@ var LoggingController = {
 
                 var range = Startlogdata + "," + Endlogdata;
 
-                console.log('************** Id and Range ************');
-                console.log(req.param('id'));
-                console.log(totalpage);
-                console.log('****************************************');
-
-
                 var boostrapPaginator = new pagination.TemplatePaginator({
                     prelink: '/', current: req.param('id'), rowsPerPage: 1,
                     totalResult: log.length, slashSeparator: false,
@@ -108,10 +102,6 @@ var LoggingController = {
                             " WHERE log.user_id=" + req.session.Account.id + " OR log.user_id IN" +
                             " (SELECT id from account where created_by=" + req.session.Account.id + ") ORDER BY log.id DESC LIMIT " + range + " ";
 
-//                    console.log('******************* Sql *********************');
-//                    console.log(sql);
-//                    console.log('*********************************************');
-
                     sql = Sequelize.Utils.format([sql]);
                 }
 
@@ -132,15 +122,6 @@ var LoggingController = {
                     notFound: true,
                 });
             }
-//            } else {
-//                res.json({
-//                    text_message: 'error_123',
-//                    notFound: true,
-//                });
-//            }
-
-
-
         }
         ).error(function (e) {
             throw new Error(e);

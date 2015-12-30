@@ -293,13 +293,13 @@ var SubscriptionController = {
             TempAccount.findAll({
                 where: { id: req.params.temp }
             }).done(function(error, tempaccount) {
-                
+
                 res.view('subscription/paid',{
                     id              : req.params.id,
                     amount          : subscription[0].price,
                     temp            : req.params.temp,
-                    f_name          : tempaccount[0].name.split(' ').slice(0, -1).join(' '),
-                    l_name          : tempaccount[0].name.split(' ').slice(-1).join(' '),
+                    f_name          : tempaccount[0].first_name,
+                    l_name          : tempaccount[0].last_name,
                     email           : tempaccount[0].email,
                     duration        : subscription[0].duration,
                     is_enterprise   : tempaccount[0].is_enterprise,
@@ -435,11 +435,8 @@ var SubscriptionController = {
                             subscription    : sub_id,
                         };
 
-                        console.log('****this is options****');
-                        console.log(options.json);
-                        console.log('****closed options****');
-
                         request(options, function(err, response, body) {
+                            
                             if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
                             //  Resend using the original response statusCode
                             //  Use the json parsing above as a simple check we got back good stuff
@@ -472,51 +469,49 @@ var SubscriptionController = {
                                     //res.json(body1, response1 && response1.statusCode);
                                 });
 
-      // end transaction history
+                                // end transaction history
 
-        /* Check is enterprise save data to enterprise table*/
-        if(account[0].is_enterprise == '1'){
+                                /* Check is enterprise save data to enterprise table*/
+                                if(account[0].is_enterprise == '1'){
          
-            var ent_options = {
-                uri: 'http://localhost:1337/enterprises/register/' ,
-                method: 'POST',
-              };
-            ent_options.json =  {
-                account_id              : body.account.id,
-                enterprises_name        : account[0].name,
-                error                   : '',
-            };
+                                    var ent_options = {
+                                        uri: 'http://localhost:1337/enterprises/register/' ,
+                                        method: 'POST',
+                                    };
 
-            request(ent_options, function(err11, response11, body11) {
-            if(err11) return res.json({ error: err11.message, type: 'error' }, response11 && response11.statusCode);
-    
-            //res.json(body11, response11 && response11.statusCode);
-            });
-        }
-        /*End checking*/
+                                    ent_options.json =  {
+                                        account_id              : body.account.id,
+                                        enterprises_name        : account[0].name,
+                                        error                   : '',
+                                    };
 
-        res.view('subscription/confirm',{
-            payment_id    : payment.id,
-            create_time   : payment.create_time,
-            state         : 'Approved',
-            amount        : req.body.amount,
-            email         : req.body.email,
-            duration_from : d,
-            duration_to   : duration_to,
-            sub_name      : sub_name,
-          });
+                                    request(ent_options, function(err11, response11, body11) {
+                                        if(err11) return res.json({ error: err11.message, type: 'error' }, response11 && response11.statusCode);
+                                    });
+                                }
+                                /*End checking*/
 
+                                res.view('subscription/confirm',{
+                                    payment_id    : payment.id,
+                                    create_time   : payment.create_time,
+                                    state         : 'Approved',
+                                    amount        : req.body.amount,
+                                    email         : req.body.email,
+                                    duration_from : d,
+                                    duration_to   : duration_to,
+                                    sub_name      : sub_name,
+                                });
+
+                            });
+                        });
+                    });
+
+                }else{ 
+                    console.log('**not approved**'); 
+                }
+            }
       });
-
-    });
-
-  });
-
-}else{ console.log('**not approved**'); }
-    }
-
-  });
-},
+    },
 
 /* for check Delete it after check*/ 
 confirm: function(req, res){
