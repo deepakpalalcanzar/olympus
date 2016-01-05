@@ -122,6 +122,7 @@ File = Model.extend({
                             cb(err, result);
                         });
                     }],
+
                 // Update the parent directory sizes.
                 updateParentDirectorySizes: ['fileModel', function (cb, r) {
                         sails.log.debug('updating parent directories');
@@ -131,6 +132,7 @@ File = Model.extend({
                             cb();
                         });
                     }],
+
                 // If this is a replace op, emove the existing File model
                 destroyExistingFile: ['fileModel', function destroyExistingFile(cb, r) {
                         if (!options.replaceId)
@@ -142,6 +144,7 @@ File = Model.extend({
                             }, cb);
                         }
                     }],
+
                 // Combine the different pieces into a single object
                 coallesced: ['inheritPermissions', function (cb, result) {
                         console.log("INHERIT permissions");
@@ -154,6 +157,7 @@ File = Model.extend({
                         SocketService.broadcast('ITEM_CREATE', parentDirRoomName, apiResponse);
                         cb(null, apiResponse);
                     }],
+
             }, function (err, results) {
                 if (err)
                     return cb(err);
@@ -191,14 +195,9 @@ File = Model.extend({
                             replaceFileId: options.replaceId || null,
                             public_link_enabled: sails.config.publicLinksEnabledByDefault,
                             thumbnail: "1",
-
-                         
-                         
-
                         }).done(function (err, result) {
 
-                            if (err)
-                                return cb(err);
+                            if (err) return cb(err);
 
                             // Keep track of this as our uploaded file
                             // so we can cleanup if necessary (i.e. upload doesn't finish)
@@ -211,6 +210,7 @@ File = Model.extend({
                                 if (err)
                                     return res.send(err, 500);
                             });
+
                             uploadedFile = result;
                             cb(err, result);
 
@@ -264,6 +264,7 @@ File = Model.extend({
                 return cb(err, results.coallesced);
             });
         },
+
         /**
          * Return files which match the specified criteria
          */
@@ -563,7 +564,6 @@ File = Model.extend({
         // Get the room name for membership
         activeRoomName: function () {
             return File.activeRoomName(this.id);
-        }
-
+        },
     }
 });

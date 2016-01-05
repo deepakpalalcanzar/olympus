@@ -71,9 +71,11 @@ var TempAccountController = {
     }, 
 
     numSharedDirectory: function(req, res){
-        var sql = "SELECT COUNT(dp.id) AS num_shared FROM directorypermission dp"+
-      " INNER JOIN account a ON a.id=dp.AccountId WHERE dp.DirectoryId=? ";
+        var sql =   "SELECT COUNT(dp.id) AS num_shared FROM directorypermission dp"+
+                    " INNER JOIN account a ON a.id=dp.AccountId WHERE dp.DirectoryId=? ";
+        
         sql = Sequelize.Utils.format([sql,req.params.dirId]);
+        
         sequelize.query(sql, null, {
             raw: true
         }).success(function(dirs) {
@@ -241,6 +243,24 @@ var TempAccountController = {
             res.json(body, response && response.statusCode);
         });
 
+    },
+
+    getWorkgroups: function(req, res){
+
+        if( req.params.dir_type === '0' ){
+            var sql = "SELECT d.id, d.name from directory d JOIN directorypermission dp ON d.id = dp.DirectoryId where dp.AccountId = ? and deleted=0";
+            sql = Sequelize.Utils.format([ sql, req.session.Account.id ]);
+
+        }else { 
+            var sql = "SELECT d.id, d.name from directory d JOIN directorypermission dp ON d.id = dp.DirectoryId where dp.AccountId = ? and d.DirectoryId=?";
+            sql = Sequelize.Utils.format([ sql, req.session.Account.id, req.params.dir_type ]);
+        }
+
+        sequelize.query(sql, null, {
+            raw: true
+        }).success(function(deletedlist) {
+            res.json(deletedlist);
+        });
     }
 
 };_.extend(exports, TempAccountController);

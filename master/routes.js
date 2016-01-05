@@ -63,10 +63,12 @@ module.exports = {
         controller: 'directory',
         action: 'read'
     },
+    
     '/directory/workgroups': {
         controller: 'directory',
         action: 'workgroups'
     },
+
     '/directory/dispatchAPI': {
         controller: 'directory',
         action: 'dispatchAPI'
@@ -75,6 +77,12 @@ module.exports = {
         controller: 'directory',
         action: 'ls'
     },
+
+    '/directory/deletedls': {
+        controller: 'directory',
+        action: 'deletedls'
+    },
+    
     '/directory/info': {
         controller: 'directory',
         action: 'info'
@@ -369,6 +377,29 @@ module.exports = {
         controller: 'file',
         action: 'apiDownload'
     },
+
+
+    '/trash/:id/content': {
+        controller: 'file',
+        action: 'apiDownload'
+    },
+
+    '/trash/list' : {
+        controller: 'trash',
+        action: 'deletedList'
+    },
+
+    '/trash/deletePermanent' : {
+        controller: 'trash',
+        action: 'deletePermanent'
+    },
+
+    '/trash/restore' : {
+        controller: 'trash',
+        action: 'restore'
+    },
+
+
     /*
      // this doesn't seem to work.
      // ~mike, july 22nd
@@ -531,6 +562,11 @@ module.exports = {
     '/file/publicDownload/:fsName/:pubName': {
         controller: 'subscription',
         action: 'publicDownload'
+    },
+
+    '/theme/getThemeConfiguration/:id': {
+        controller: 'theme',
+        action: 'getThemeConfiguration'
     },
 //  
 //  '/log/:page': {

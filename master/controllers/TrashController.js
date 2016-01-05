@@ -4,10 +4,6 @@ var TrashController = {
 
 	deletedList : function (req, res, cb){
 
-		console.log("deletedistdeletedistdeletedistdeletedistdeletedist");
-		console.log(req);
-		console.log("deletedistdeletedistdeletedistdeletedistdeletedist");
-
         async.auto({
             files: childrenOf(File),
             // Get this directory's files
@@ -48,7 +44,6 @@ var TrashController = {
 	},
 
 	deletePermanent : function(req, res){
-
 		Deletedlist.restore({
 	        file_id : req.param('id'),
 			type 	: req.param('type')
@@ -77,18 +72,22 @@ var TrashController = {
 
         request(options, function (err, response, body) {
 
-        	if (err)
-                return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+            if(typeof body === 'undefined'){
+                return res.json(err);
+            }else{
 
-        	Deletedlist.restore({
-	            file_id : body.fileUpdate[0].id,
-	            type 	: options.json.type,
-            }, function(err, result){
-	        	if (err)
-    	            return res.json({error: err.message, type: 'error'}, response && response.statusCode);
-
-            	res.json(body, response && response.statusCode);
-            });
+            	Deletedlist.restore({
+    	            file_id : options.json.file_id,
+    	            type 	: options.json.type,
+                }, function(err, result){
+    	        	if (err)
+        	            return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+                	res.json(body, response && response.statusCode);
+                });
+            }
+            //if (err)
+              //  return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+            
         });
 	}
 };

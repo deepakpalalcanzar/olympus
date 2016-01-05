@@ -5,6 +5,7 @@ var UUIDGenerator = require('node-uuid');
 exports.rename = function (req, res, cb) {
     var request = require('request');
 
+
     sails.log.info('Rename:' + req.param('id') + ' [User:' + req.session.Account.id + ']');
     var inodeId = req.param('id');
     var INodeModel = (req.param('controller') == "directory") ? Directory : File;
@@ -288,11 +289,14 @@ exports.rename = function (req, res, cb) {
             });
 
         },
+
+
         /**
-         @alcanzar
-         Create new records entry in the table
-         Whenever someone try to delete the file and directory
-         */
+            @alcanzar
+            Create new records entry in the table
+            Whenever someone try to delete the file and directory
+        */
+
         exports.deletedFileInfo = function (options, cb) {
 
             var dt = new Date();
@@ -301,17 +305,13 @@ exports.rename = function (req, res, cb) {
             if (options.model.name == "Directory") {
 
                 DirectoryPermission.findAll({
-                    where: {DirectoryId: options.id}
+                    where: { DirectoryId: options.id }
                 }).success(function (directorypermission) {
 
-
-                    console.log("directorypermissiondirectorypermissiondirectorypermissiondirectorypermission");
-                    console.log(directorypermission);
-                    console.log("directorypermissiondirectorypermissiondirectorypermissiondirectorypermission");
-                    
                     async.auto({
 
                         updateDeletedDir : function(cb){
+
                             Directory.findAll({
                                 where: { id : directorypermission[0].DirectoryId }
                             }).success(function (directory) {
@@ -321,49 +321,49 @@ exports.rename = function (req, res, cb) {
                                     sequelize.query(sql, null, {raw: true});
                                 }, cb);
                             });
-                        },
 
+                        },
+                        
                         updateFileDir : function(cb){
+
                             File.findAll({
                                 where: { DirectoryId : directorypermission[0].DirectoryId }
                             }).success(function (file) {
+                                
                                 file.forEach(function (filelist) {
                                     INodeService.insertDirectoryFile({
                                         filelist    : filelist, 
                                         datetime    : datetime,
-                                        account_id  : options.accountId
+                                        account_id  : options.accountId,
                                     });
                                 },cb);
+
                             });
+
                         },
                         
                         updateSubDir : function(cb){
-
                             Directory.findAll({
-                                where: { DirectoryId : directorypermission[0].DirectoryId }
+                                where: { DirectoryId : directorypermission[0].DirectoryId, deleted : null }
                             }).success(function (directory) {
-                                directory.forEach(function (directorylist) {
+                                if(directory.length === 0){
+                                }else{
                                     INodeService.insertDirectoryData({
-                                        directory    : directorylist, 
+                                        directory   : directory,
                                         datetime    : datetime,
-                                        account_id  : options.accountId
+                                        account_id  : options.accountId,
+                                        add         : 0,
                                     });
-                                },cb);
-
+                                }
                             });
-
-                        },
+                        }
 
                     }, function(err, response){
-
-                        console.log(response);
-                        // cb(null, list);
+                        cb(null, list);
                     });
-
                 }).error(function (err) {
                     throw new Error(err);
                 });
-
 
             } else if (options.model.name == "File") {
 
@@ -389,23 +389,76 @@ exports.rename = function (req, res, cb) {
 
 exports.insertDirectoryData = function(options, cb){
 
-    var sql = "Select * from directory where DirectoryId = ?";
-    sql = Sequelize.Utils.format([sql]);
-    sequelize.query(sql, null, {raw: true});
+    var directoryData   = options.directory;
+    var datetime        = options.datetime;
+    var account_id      = options.account_id;
+    var checkInsert     = options.add; 
 
-    
+    directoryData.forEach(function (directorylist) {
 
-/*    var sql = "Select * from file where DirectoryId = ?";
-    sql = Sequelize.Utils.format([sql]);
-    sequelize.query(sql, null, {raw: true});
-*/
+        if(checkInsert === 0){
+            DirectoryPermission.findAll({
+                where: { DirectoryId : directorylist.id }
+            }).success(function (directorypermission) {
+                var sql = "Insert into deletedlist ( type, deleted_id, createdAt, updatedAt, user_id, account_id, directory_id, permission) VALUES ( '" + 2 + "', '" + directorylist.id + "', '" + datetime + "', '" + datetime + "',  '" + account_id + "', '" + directorypermission[0].AccountId + "', '"+ directorylist.DirectoryId +"', '"+directorypermission[0].type+"')";
+                sql = Sequelize.Utils.format([sql]);
+                sequelize.query(sql, null, {raw: true});
+            });
+        }
+
+        Directory.findAll({
+            where: { DirectoryId : directorylist.id, deleted : null }
+        }).success(function (directory) {
+            if(directory.length === 0){
+            }else{
+
+                async.auto({
+
+                    updateDeletedDir : function(cb){
+
+                        DirectoryPermission.findAll({
+                            where: { DirectoryId : directorylist.id }
+                        }).success(function (directorypermission) {
+                            directorypermission.forEach( function (dirper) {
+                                var sql = "Insert into deletedlist ( type, deleted_id, createdAt, updatedAt, user_id, account_id, directory_id, permission) VALUES ( '" + 2 + "', '" + directory[0].id + "', '" + datetime + "', '" + datetime + "',  '" + account_id + "', '" + dirper.AccountId + "', '"+ directory[0].DirectoryId +"', '"+dirper.type+"')";
+                                sql = Sequelize.Utils.format([sql]);
+                                sequelize.query(sql, null, {raw: true});
+                            }, cb);
+                        });
+                    },
+
+                    updateFileDir : function(cb){
+
+                        directory.forEach(function (dir) {
+                            File.findAll({
+                                where: { DirectoryId : dir.id }
+                            }).success(function (file) {
+                                file.forEach(function (filelist) {
+                                    INodeService.insertDirectoryFile({
+                                        filelist    : filelist, 
+                                        datetime    : datetime,
+                                        account_id  : account_id
+                                    });
+                                },cb);
+                            });
+                        },cb);
+                    }
+
+                }, function(err, results){
+
+                });
+            }
+
+            INodeService.insertDirectoryData({
+                directory   : directory,
+                datetime    : datetime,
+                account_id  : account_id,
+                add         : 1
+            });
+        });
+    });
 
 };
-
-function getSubDirectory(){
-
-
-}
 
 exports.insertDirectoryFile = function(options, cb){
 
@@ -461,7 +514,7 @@ exports['delete'] = function (req, res, cb) {
     });
 
 
-    // var subscribers = INodeModel.roomName(inodeId);
+    var subscribers = INodeModel.roomName(inodeId);
 
     /*if (INodeModel.name == 'File') {
         var sql = ("Delete from version where FileId = ?");
@@ -472,11 +525,11 @@ exports['delete'] = function (req, res, cb) {
     }*/
 
     // Make sure the user has sufficient permissions for the delete
-   /* var sourcePermissionClass = (req.param('controller') == "directory" && !req.param('replaceFileId')) ? DirectoryPermission : FilePermission;
+    var sourcePermissionClass = (req.param('controller') == "directory" && !req.param('replaceFileId')) ? DirectoryPermission : FilePermission;
 
     var sourceCriteria = {
         AccountId: req.session.Account.id,
-        type: 'admin'
+        type : 'admin'
     };
 
     if (sourcePermissionClass == DirectoryPermission) {
@@ -499,14 +552,15 @@ exports['delete'] = function (req, res, cb) {
         } else {
 
             INodeService.destroy({
-                id: inodeId,
-                model: INodeModel,
-                replaceFileId: req.param('replaceFileId'),
-                accountId: req.session.Account.id,
-                accountName: req.session.Account.name,
-                ipadd: req.param('ipadd'),
-                ip: req.session.Account.ip
 
+                id      : inodeId,
+                model   : INodeModel,
+                replaceFileId   : req.param('replaceFileId'),
+                accountId       : req.session.Account.id,
+                accountName     : req.session.Account.name,
+                ipadd           : req.param('ipadd'),
+                ip              : req.session.Account.ip
+                
             }, function afterDestroy(err) {
 
                 // Respond and broadcast activity to all sockets subscribed
@@ -523,7 +577,7 @@ exports['delete'] = function (req, res, cb) {
                     });
             });
         }
-    });*/
+    });
 };
 
 
@@ -739,9 +793,6 @@ exports.addPermission = function (req, res) {
                             verified: false,
                             verificationCode: verificationCode
                         }).success(function (newAccount) {
-
-                            console.log("ACCOUNT CREATED");
-                            console.log(newAccount);
 
                             var options = {
                                 uri: 'http://localhost:1337/directory/createWorkgroup/',

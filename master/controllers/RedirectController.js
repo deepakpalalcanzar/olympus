@@ -18,6 +18,10 @@ var RedirectController = {
         delete headers.host;
         delete headers.connection;
 
+        console.log("RedirectRedirectRedirectRedirectRedirectRedirect");
+        console.log(req);
+        console.log("RedirectRedirectRedirectRedirectRedirectRedirect");
+
 // Build options for request
         var options = {
             uri: 'http://localhost:1337' + req.path,

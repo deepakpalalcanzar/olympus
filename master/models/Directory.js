@@ -706,6 +706,7 @@ Directory = Model.extend({
 					// If action is null, we want to remove all permissions.
 					if(action !== null) {
 						async.auto({
+
 							currentPermissions: function(cb2, rs) {
 								DirectoryPermission.findAll({
 									where: {
@@ -714,6 +715,7 @@ Directory = Model.extend({
 									}
 								}).done(cb2);
 							},
+
 							updatePermissions: ['currentPermissions', function(cb2, rs) {
 								DirectoryPermission.updateAll(rs.currentPermissions, {
 									orphan: null
@@ -726,6 +728,7 @@ Directory = Model.extend({
 								});
 
 							}],
+							
 							createPermissions: ['currentPermissions', function(cb2, rs) {
 								var curPermDirIds = _.map(rs.currentPermissions, function(perm) {
 									return perm.DirectoryId;

@@ -33,19 +33,24 @@ Deletedlist = Model.extend({
 
 		restore: function(options, cb){
 			if(options.type === 'directory'){
-				var basicSet = ["Delete from deletedlist where deleted_id=?"];
+				var basicSet = ["Delete from deletedlist where deleted_id=? or directory_id=?"];
+				options.file_id && basicSet.push(options.file_id);
+				options.directory_id && basicSet.push(options.file_id);
+
 			}else{
 				var basicSet = ["Delete from deletedlist where deleted_id=?"];
+				options.file_id && basicSet.push(options.file_id);
 			}
-			// var basicSet = ["Delete from deletedlist where deleted_id=?"];
-			options.file_id && basicSet.push(options.file_id);
+
 			basicSet = Sequelize.Utils.format(basicSet);
+			console.log("basicSetbasicSetbasicSetbasicSetbasicSetbasicSet");
+			console.log(basicSet);
+			
 			sequelize.query(basicSet, null, {
-            	raw	: true
+        		raw	: true
 	        }).success(function (resultSet) {
 				cb(null, resultSet);
     	    });
 		}
 	}
-
 });

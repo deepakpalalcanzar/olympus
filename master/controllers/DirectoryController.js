@@ -225,6 +225,11 @@ var DirectoryController = {
     comments: INodeService.comments,
     
     mkdir: function (req, res) {
+
+        console.log("reqreqreqreqreqreqreqreqreqreqreqreqreqreqreqreqreqreq");
+        console.log(req);
+        console.log("reqreqreqreqreqreqreqreqreqreqreqreqreqreqreqreqreqreq");
+
         var request = require('request');
 
         // We want to create a workgroup (a directory at the toplevel). Client does not send an id.
