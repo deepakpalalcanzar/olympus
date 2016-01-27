@@ -287,13 +287,12 @@ File = Model.extend({
             // Get files that are children of the specified parent
             // which you have permission to see
             var basicSet = ["SELECT p.type AS permission, f.id AS pk, f.* " +
-                        "FROM file f " +
-                        "INNER JOIN filepermission p ON p.FileId=f.id " +
+                        "FROM file f " + "INNER JOIN filepermission p ON p.FileId=f.id " +
                         "INNER JOIN account a ON a.id=p.AccountId " +
                         "WHERE f.id IN (select max(FileId) from version v group by v.parent_id) " +
                         "AND (p.type='read' OR p.type='comment' OR p.type='write' OR p.type='admin') " +
                         (options.parentId ? "AND f.DirectoryId=? " : "AND f.DirectoryId IS NULL ") +
-                        (options.accountId ? "AND a.id=? " : "AND a.id IS NULL") +
+                        (options.accountId ? "AND a.id=? " : "AND a.id IS NULL ") +
                         ""];
 
             options.parentId && basicSet.push(options.parentId);
@@ -307,11 +306,10 @@ File = Model.extend({
                     "LEFT OUTER JOIN comment ON Parent.pk=comment.FileId " +
                     "GROUP BY Parent.id";
 
-            var sql =
-                    "SELECT * FROM (" + basicSet + ") basic " +
-                    "INNER JOIN (" + num_comments + ") nc ON nc.pk=basic.id ";
+            var sql = "SELECT * FROM (" + basicSet + ") basic " +
+                      "INNER JOIN (" + num_comments + ") nc ON nc.pk=basic.id Order By basic.id DEsc";
 
-            sequelize.query(sql, File).success(_.unprefix(callback)).error(function (err) {
+           sequelize.query(sql, File).success(_.unprefix(callback)).error(function (err) {
                 throw new Error(err);
             });
         },
@@ -351,6 +349,7 @@ File = Model.extend({
         }
 
     },
+    
     instanceMethods: {
         // Subscribe to updates from this file
         subscribe: function (req) {

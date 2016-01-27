@@ -104,6 +104,8 @@
 
 		<!-- main content -->
 		<div class="wrapper portal-only">
+
+
 			<!-- top section with navigation and search -->
 			<% if(header_color !== 'undefined') { %>
 			<div id="topbar" style="background-color:<%= header_color %>">
@@ -193,16 +195,16 @@ src="/images/subscription_menu.png"/>
 									</div>
 								</a>
 							</li>
-<!-- 
-							<li class="last-item">
+
+<!--							<li class="last-item">
 								<a href="#profile" title="Create profile"  style="background-color:<%=header_color %>;border:1px solid <%=header_color %>;width:auto;">
 									<div class="main-nav-div">
-										<img class="main-nav-imgs" src="/images/manage_admin_profiles_small.png"/>
-										<span class="main-nav-span">Manage Admin Profiles</span>
+										
+										<span class="main-nav-span">Total Space Used: <%- total_space_used %></span>
 									</div>
 								</a>
 							</li> 
-
+ 
 							<li class="last-item">
 								<a href="#adminUser" title="Manage Admin User"  style="background-color:<%=header_color %>;border:1px solid <%=header_color %>;width:auto;">
 									<div class="main-nav-div">
@@ -239,7 +241,13 @@ src="/images/subscription_menu.png"/>
 				</div>
 			</div>
 
-			<div id="content" style="background-color:<%= body_background %>"></div>
+			<div style="float:right;padding:15px 37px 0px 0px;">
+				<span class="main-nav-span">Total Space Used: <%- total_space_used %> GB</span>
+			</div>
+			
+			<div id="content" style="background-color:<%= body_background %>">
+
+			</div>
 			<div class="push"></div>
 		</div>
 
