@@ -17,8 +17,13 @@ Mast.registerComponent('AppearanceComponent',{
 	}, 
 
 	finalizeHeaderColor: function(){
+		
 		var workArea = $('.colpick_submit').parent().parent().attr('class');
 		var x = $('.colpick_hex_field > input').val();
+
+		console.log(workArea);
+		console.log(x);
+
 		if(workArea == 'olympusHeader'){
 			$("#top-nav").css({ 'background-color' : "#"+x });
 		}else if (workArea == 'olympusBody'){

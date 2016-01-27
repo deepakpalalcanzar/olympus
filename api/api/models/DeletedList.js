@@ -21,6 +21,7 @@ module.exports = {
 
     restore: function(options, cb){
 
+
         DeletedList.find({
             deleted_id : options.file_id 
         }).then(function (res) {
@@ -33,7 +34,7 @@ module.exports = {
                     }, {
                         deleted         : null,
                         deleteDate      : null,
-                        DirectoryId     : res[0].directory_id                    
+                        DirectoryId     : options.directory_id === '' ? res[0].directory_id : options.directory_id                    
                     }).exec(cb);
 
 
@@ -123,12 +124,8 @@ module.exports = {
                 }
             });
         });
-
-
     },
 
-
-    
 
     updateFile : function(options, cb){
 
@@ -141,7 +138,7 @@ module.exports = {
                 }, {
                     deleted         : null,
                     deleteDate      : null,
-                    DirectoryId     : options.directory_id                    
+                    DirectoryId     : options.directory_id === '' ? res[0].directory_id : options.directory_id                    
                 }).exec(cb);
             }, 
 
@@ -167,12 +164,9 @@ module.exports = {
                         }).then(function(per){
 
                         });
-
-
                     });
                 });
             }
-
         }, function(err, result){
             if (err) cb(null ,err);
             cb(null, result);
@@ -189,7 +183,7 @@ module.exports = {
                 }, {
                     deleted         : null,
                     deleteDate      : null,
-                    DirectoryId     : options.directory_id                    
+                    DirectoryId     : options.directory_id === '' ? res[0].directory_id : options.directory_id                    
                 }).exec(cb);
             }, 
 

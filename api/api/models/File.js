@@ -186,20 +186,6 @@ module.exports = {
             });
         },
 
-        restoreUpdate: function(opt, cb){
-            console.log(":::::::::::::::::::::::::::::::::::::::::::::::::::");
-            console.log(opt);
-            console.log(":::::::::::::::::::::::::::::::::::::::::::::::::::");
-
-            /*        File.update({
-            AccountId: accountId,
-            FileId: self.id
-            }, {
-            type: type
-            }).then(function (perm) {
-            return perm;
-            });
-            */
-        }
+        
     }
 };

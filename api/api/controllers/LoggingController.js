@@ -9,6 +9,7 @@ var destroy = require('../services/lib/account/destroy'),
 var myip = require('myip');
 
 var LoggingController = {
+
     register: function (req, res) {
 
         var newoption = {
@@ -18,13 +19,8 @@ var LoggingController = {
             on_user: req.body.on_user,
             ip: req.body.ip,
             platform: req.body.platform,            
-
         };
-                        console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& check data &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
-                        console.log(newoption);
-                        console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&& check data &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
-                        
-                        
+
         Logging.createLog(newoption, function (err, logging) {
             if (err)
                 return res.json({error: 'Error creating logging', type: 'error'});

@@ -221,7 +221,7 @@ var TempAccountController = {
     },
 
 
- createComment: function(req, res){
+    createComment: function(req, res){
 
         var request = require('request');
         var options = {
@@ -247,19 +247,31 @@ var TempAccountController = {
 
     getWorkgroups: function(req, res){
 
-        if( req.params.dir_type === '0' ){
-            var sql = "SELECT d.id, d.name from directory d JOIN directorypermission dp ON d.id = dp.DirectoryId where dp.AccountId = ? and deleted=0";
-            sql = Sequelize.Utils.format([ sql, req.session.Account.id ]);
+        var sqlcheck = "SELECT dl.deleted_id, dl.directory_id, d.name, d.id, d.deleted, d.DirectoryId FROM  `deletedlist` dl JOIN directory d ON dl.directory_id = d.id WHERE dl.deleted_id =?"
+        sqlcheck = Sequelize.Utils.format([ sqlcheck, req.params.item_id ]);
 
-        }else { 
-            var sql = "SELECT d.id, d.name from directory d JOIN directorypermission dp ON d.id = dp.DirectoryId where dp.AccountId = ? and d.DirectoryId=?";
-            sql = Sequelize.Utils.format([ sql, req.session.Account.id, req.params.dir_type ]);
-        }
-
-        sequelize.query(sql, null, {
+        sequelize.query(sqlcheck, null, {
             raw: true
-        }).success(function(deletedlist) {
-            res.json(deletedlist);
+        }).success(function(checkFile) {
+           
+            if(checkFile[0].deleted !== 1){
+                res.json(checkFile);
+            }else{
+
+                if( req.params.dir_type === '0' ){
+                    var sql = "SELECT d.id, d.name, d.deleted from directory d JOIN directorypermission dp ON d.id = dp.DirectoryId where dp.AccountId = ? and deleted=0";
+                    sql     = Sequelize.Utils.format([ sql, req.session.Account.id ]);
+                }else { 
+                    var sql = "SELECT d.id, d.name, d.deleted from directory d JOIN directorypermission dp ON d.id = dp.DirectoryId where dp.AccountId = ? and d.DirectoryId=?";
+                    sql     = Sequelize.Utils.format([ sql, req.session.Account.id, req.params.dir_type ]);
+                }
+
+                sequelize.query(sql, null, {
+                    raw: true
+                }).success(function(deletedlist) {
+                    res.json(deletedlist);
+                });
+            }
         });
     }
 

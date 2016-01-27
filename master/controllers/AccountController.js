@@ -60,12 +60,12 @@ var AccountController = {
         }
 
         opts.json = {
-            user_id: req.session.Account.id,
+            user_id     : req.session.Account.id,
             text_message: 'has Uploaded a File ' + req.params.name,
-            activity: 'Uploaded',
-            on_user: req.session.Account.id,
-            ip: req.session.Account.ip,
-            platform: user_platform,
+            activity    : 'Uploaded',
+            on_user     : req.session.Account.id,
+            ip          : req.session.Account.ip === 'undefined' ? req.headers['Ip'] : req.session.Account.ip,
+            platform    : user_platform,
         };
 
         request(opts, function (err1) {
@@ -430,7 +430,8 @@ var AccountController = {
                     text_message: 'has updated a user.',
                     activity: 'update',
                     on_user: req.params.id,
-                    ip: req.session.Account.ip
+                    // ip: req.session.Account.ip
+                    ip: req.session.Account.ip === 'undefined' ? req.headers['Ip'] : req.session.Account.ip,
                 };
 
                 request(options, function (err, response, body) {
@@ -540,7 +541,8 @@ var AccountController = {
                                         text_message: 'has deleted ' + req.param('workgroup_name') + ' from ' + req.param('user_name') + '\'s account.',
                                         activity: 'delete',
                                         on_user: req.param('user_id'),
-                                        id: req.session.Account.ip
+                                        // id: req.session.Account.ip
+                                        ip: req.session.Account.ip === 'undefined' ? req.headers['Ip'] : req.session.Account.ip,
                                     };
 
                                     request(options, function (err, response, body) {
@@ -575,7 +577,8 @@ var AccountController = {
                                                         text_message: req.session.Account.name + ' has deleted file' + applicant.name + ' located in ' + req.param('workgroup_name') + ' from ' + req.param('user_name') + '\'s account.',
                                                         activity: 'delete',
                                                         on_user: req.param('user_id'),
-                                                        ip: req.session.Account.ip
+                                                        // ip: req.session.Account.ip
+                                                        ip: req.session.Account.ip === 'undefined' ? req.headers['Ip'] : req.session.Account.ip,
                                                     };
 
                                                     request(options, function (err, response, body) {
@@ -655,7 +658,9 @@ var AccountController = {
                     text_message: 'has changed own password.',
                     activity: 'change',
                     on_user: req.session.Account.id,
-                    ip: req.session.Account.ip
+                    // ip: req.session.Account.ip
+                    ip: req.session.Account.ip === 'undefined' ? req.headers['Ip'] : req.session.Account.ip,
+
                 };
 
                 request(options, function (err, response, body) {
@@ -692,7 +697,9 @@ var AccountController = {
                     text_message: 'has changed ' + model.name + '\'s password.',
                     activity: 'change',
                     on_user: req.param('id'),
-                    ip: req.session.Account.ip
+                    // ip: req.session.Account.ip
+                    ip: req.session.Account.ip === 'undefined' ? req.headers['Ip'] : req.session.Account.ip,
+
                 };
 
                 request(options, function (err, response, body) {
@@ -735,7 +742,8 @@ var AccountController = {
                     text_message: 'has updated own account.',
                     activity: 'update',
                     on_user: req.session.Account.id,
-                    ip: req.session.Account.ip
+                    // ip: req.session.Account.ip
+                    ip: req.session.Account.ip === 'undefined' ? req.headers['Ip'] : req.session.Account.ip,
                 };
 
                 request(options, function (err, response, body) {

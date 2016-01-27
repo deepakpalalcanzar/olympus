@@ -5,16 +5,15 @@
 module.exports = {
 
 	s3: {
-		API_KEY   : 'AWS_ACCESS_KEY_ID',
-    	API_SECRET: 'AWS_SECRET_ACCESS_KEY',
-        BUCKET    : 'AWS_BUCKET'
+		API_KEY   : 'AKIAIEURF2O4FGCDDK6A',
+    	API_SECRET: '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',
+        BUCKET    : 'app.olympus.io'
 	},
 	
 	MYSQL: {
 		PASS: 'refico',
-		DB: 'olympus'
+		DB: 'trash'
   	},
-
-  	receiver: 'Disk'
-    
+  	
+  	receiver: 'Disk'    
 };

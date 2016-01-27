@@ -2,26 +2,42 @@ var path = require('path');
 var fsx = require('fs-extra');
 var UUIDGenerator = require('node-uuid');
 
+var easyimg = require('easyimage');
+
 module.exports = {
 
 
 	newEmitterStream: function newEmitterStream (options) {
-
 		sails.log('Downloading '+options.id+' using from Disk.');
-		return blobAdapter.read({id: path.resolve(sails.config.uploadPath||'files', options.id)});
+		return blobAdapter.read({ id : path.resolve(sails.config.uploadPath||'files', options.id) });
+	},
+
+
+	newThumbEmitterStream: function newThumbEmitterStream (options) {
+
+		sails.log('Downloading Thumb'+options.id+' using from Disk.');
+		sails.log(options);
+		if(options.thumb === '0'){ // thumb 0 means thumbnail does not exists in system
+			return blobAdapter.generateThumb({ 
+				id : path.resolve(sails.config.uploadPath||'files', options.id), 
+				filename : options.id
+			});
+		}else if(options.thumb === '1'){ // If we already have thumbnail
+			return blobAdapter.read({ 
+				id : path.resolve(sails.config.uploadPath||'files', 'thumbnail-'+options.id),
+				filename : options.id
+			});
+		}
 
 	},
 
 	/**
 	 * Build a mock writable stream that handles incoming files.
 	 * (used for file uploads)
-	 * 
 	 * @return {Stream.Writable}
 	 */
 	
 	newReceiverStream: function newReceiverStream (options) {
-
-		
 
 		sails.log('Creating new Disk receiver.');
 		var log = sails.log;
@@ -32,7 +48,7 @@ module.exports = {
 		receiver__._write = function onFile (__newFile, encoding, next) {
 
 		    // Create a unique(?) filename
-		    var fsName = UUIDGenerator.v1();
+		    var fsName 		= UUIDGenerator.v1();
 		    __newFile.extra = {fsName:fsName};
 
 	    	// var fsName = uuid + "." + _.str.fileExtension(__newFile.filename);
@@ -40,6 +56,7 @@ module.exports = {
 			log(('Receiver DISK: Received file `'+__newFile.filename+'` from an Upstream.').grey);
 
 			var outs = blobAdapter.touch({id: path.resolve(sails.config.uploadPath||'files', fsName)});
+			
 			outs.written = 0;
 
 			__newFile.on('readable', readFromStream);
@@ -114,11 +131,17 @@ var blobAdapter = {
 	},
 
 	read: function (options) {
-		var id = options.id;
-		var filePath = id;
+
+		var id 			= options.id;
+		var filePath 	= id;
 
 		// TODO: validate/normalize file path
+		return fsx.createReadStream(filePath, 'utf8');
+	},
 
+	generateThumb: function(options){
+		var id 			= options.id;
+		var filePath 	= id;
 		return fsx.createReadStream(filePath, 'utf8');
 	},
 

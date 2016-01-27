@@ -60,11 +60,9 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 				marshaledData.mimeClass = marshaledData.type.replace('/','-');
 				marshaledData.type = "file";
 
-
 				console.log(marshaledData);
 
 				self.afterRender();
-
 				// add new marshaled inode to this inodes collecton
 				data.files[0].inodeModel = new self.collection.model(marshaledData);
 				self.collection.add(data.files[0].inodeModel);
@@ -74,6 +72,7 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 				});
 			}
         });
+
 		Mast.on('CANCEL_UPLOAD', function(data) {
 			// Remove the component for the uploading file from the collection
 			if (data.id == self.model.id && self.model.get('type') == 'directory') { 
@@ -602,7 +601,6 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 
 	// shows the dropdown menu for inode button
 	showDropdownAtArrow: function(e) {
-
 		this.select(e);
 		Olympus.util.dropdownHelper.showDropdownAt(this.$(".dropdown-button"),-126,24,e,this,this.get('dropdownItems'));
 	},
@@ -616,29 +614,24 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 	displayActionButtons: function(e) {
 		e.preventDefault();
 		e.stopPropagation();
-		
 		// Check if there's an inode being dragged, by checking if a draggable helper element is in the DOM.
 		// If we're doing a drag n' drop, we don't want the action buttons to appear for the row.
 		//
 		// Better: abstract this into a method.
 		if ($('.activeInodeDrag').length > 0) {
-
 			// Files aren't droppable, so add a class that prevents them from being highlighted at all.
 			if (this.model.get('type')=='file') {
 				this.$el.addClass('inode-inactive-on-drag');
 			}
-
 			Olympus.ui.fileSystem.currentHighlightedBranch = this;
 			return;
 		}
-
 		this.$el.closest_descendant('.dropdown-button').show();
 		this.$el.closest_descendant('.sidebar-button').show();
 	},
 	
 	// hide both action buttons for this inode
 	hideActionButtons: function(e) {
-
 		// Make sure the directory is no longer set to "active" for drag n' drop purposes.
 		this.active = false;
 		this.$el.removeClass('inode-inactive-on-drag');
@@ -655,7 +648,6 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 		// that was already created has already been edited so it is no longer auto focused
 		this.$el.closest_descendant('input.inode-name-input').select();
 
-		// ??
 		Olympus.ui.fileSystem.set({
 			renaming: false
 		}, {silent: true});
@@ -732,22 +724,22 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 
 		// Generate component
 		var compo = model.get('type') === 'file' ? Mast.components.FileComponent : Mast.components.DirectoryComponent;
+
 		var r = new compo({
-			parent: this,
-			autoRender: false,
-			model: model,
-			outlet: this.$branchOutlet
+			parent 		: this,
+			autoRender 	: false,
+			model 		: model,
+			outlet 		: this.$branchOutlet
 		});
 
 		// Add at a position
 		if (options && !_.isUndefined(options.at)) {
 			r.insert(options.at);
 			// Push or splice branch component to stack for garbage collection
-			this._branchStack.splice(options.at,0,r);
-		}
-		// or append to the end
-		else {
+			this._branchStack.splice(options.at, 0, r);
+		} else { // or append to the end
 			r.append();
+			// this.$el.prepend("<p>My Name is Abhishek</p>");  
 			// Push or splice branch component to stack for garbage collection
 			this._branchStack.push(r);
 		}
@@ -813,7 +805,6 @@ Mast.components.INodeComponent = Mast.Tree.extend({
         
 		Mast.Socket.request('/'+type+'/delete',{
 			id:  id
-			//ipadd : ipadd,
 		}, function(response){
 			if (response===403) {
 				alert('Permission denied. You do not have sufficient permissions to delete this item.');
@@ -822,8 +813,6 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 				});
 			}
 		});
-
-		//}, "jsonp");
 
 	},
 

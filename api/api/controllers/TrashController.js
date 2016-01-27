@@ -3,15 +3,19 @@ var TrashController = {
 	restore: function(req, res){
 
 		var options = {
-			file_id : req.param('file_id'),
-			type 	: req.param('type')
+			file_id 	 : req.param('file_id'),
+			type 		 : req.param('type'),
+			directory_id : req.param('directory_id')
 		};
 
+
 		if(req.param('type') === 'file'){
+			
 			DeletedList.restore(options, function(err, account){
 				if(err) return;
 				return res.json(account, 200);
 			});
+
 		}else if (req.param('type') === 'directory'){
 
 			DeletedList.find({
@@ -44,23 +48,18 @@ var TrashController = {
                             deleted_id   : null,
                             directory_id : null 
                         }).then(function(per){
-
                         });
-
-                        
                     });
 
 					DeletedList.restoreParent(options, function(err, account){
 						// if(err) return;
 						// return res.send(200);
 					});
+					
 				});
-
 			});
-
 		}
 	}
-	
 };
 
 module.exports = TrashController;

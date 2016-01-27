@@ -430,9 +430,7 @@ var AuthController = {
 		// Handles sending the user to change their password.
 		if(req.method == 'GET' && req.param('code')) {
 			return Account.find({
-				where: {
-					verificationCode: req.param('code')
-				}
+				where: { verificationCode: req.param('code') }
 			}).done(function(err, account) {
 				// No account found?  Then bail.
 				if (account === null) {
@@ -460,22 +458,80 @@ var AuthController = {
 
 		// Send the forgot password email and respond to the user.
 		if(req.method == 'POST') {
+
+			console.log(req);
+		    if(req.params.emailid==undefined){
+            	var email= req.param('email');
+            }else{
+            	var email= req.params.emailid;
+			}
+			
 			Account.find({
 				where: {
-					email: req.param('email')
+					email: email
 				}
 			}).done(function(err, account) {
-				if (err || !account) return res.redirect("/auth/resetPassword?error=That email address doesn't exist.");
+				
+				if (err || !account){
+                	if(req.params.emailid==undefined){
+						return res.redirect("/auth/resetPassword?error=That email address doesn't exist.");
+					}else{
+                    	return res.json({message: 'That email address does not exist.'});
+					}        
+				}
+                    
 				EmailService.sendForgotPasswordEmail({
 					host: req.header('host'),
 					account: account
 				});
-				res.view('auth/check_your_email', {
-					message: 'An email has been sent to recover your password.'
-				});
+                
+                if(req.params.emailid==undefined){
+                	res.view('auth/check_your_email', {
+						message: 'An email has been sent to recover your password.'
+                    });
+				}else{
+                	return res.json({message: 'An email has been sent check your new password.'});
+                }
 			});
 		}
 	},
+
+
+forgetPassword: function(req, res) {
+            
+            console.log(req.params.emailid);
+
+		// Send the forgot password email and respond to the user.
+		if(req.method == 'POST') {
+			Account.find({
+				where: {
+					email: req.params.emailid
+				}
+			}).done(function(err, account) {
+				if (err || !account) return res.json({message: 'That email address does not exist.'});
+                                
+                               var randPassword = AuthenticationService.randString(6);
+                               var hashPassword =  AuthenticationService.hashPassword(randPassword);
+                                
+                                 var sql = "UPDATE account SET password=? WHERE email=?";
+                                    sql = Sequelize.Utils.format([sql, hashPassword , req.params.emailid]);
+
+
+                                    sequelize.query(sql, null, {
+                                        raw: true
+                                    }).success(function (accountdetails) {
+                                
+				EmailService.sendForgotPassword({
+					host: req.header('host'),
+					account: account,
+					randPassword: randPassword,
+				});
+				return res.json({message: 'An email has been sent check your new password.'});
+			});
+                      });
+		}
+	},
+
 
 	createPassword: function(req, res) {
 		var password = req.param('prometheus');

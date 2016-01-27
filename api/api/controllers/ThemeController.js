@@ -45,49 +45,58 @@ var ThemeController = {
                 Theme.findOne({account_id: account_enter.id}).done(function (err, dir) {
                     if (err)
                         res.json({success: false, error: err});
-                    if (!dir) {
-                        return  res.json({
-                                    success             : true, 
-                                    enterprise_fsname   : account_enter.enterprise_fsname, 
-                                    enterprise_mimetype : account_enter.enterprise_mimetype, 
-                                    header_background   : "null", 
-                                    footer_background   : "null", 
-                                    body_background     : "null", 
-                                    navigation_color    : "null", 
-                                    font_color          : "null", 
-                                    font_family         : "null",
-                                    adaptor             : sails.config.fileAdapter.adapter,
-                                    bucket              : "app.olympus.io",
-                                    api_key             : "AKIAIEURF2O4FGCDDK6A",
-                                    api_secret_key      : "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"
-                                });
-                    }
 
-                    var Rgb_header_background = ""+ (hexToRgb(dir.header_background).r)+","+(hexToRgb(dir.header_background).g)+","+(hexToRgb(dir.header_background).b)+"";
-                    var Rgb_footer_background = ""+ (hexToRgb(dir.footer_background).r)+","+(hexToRgb(dir.footer_background).g)+","+(hexToRgb(dir.footer_background).b)+"";
-                    var Rgb_body_background = ""+ (hexToRgb(dir.body_background).r)+","+(hexToRgb(dir.body_background).g)+","+(hexToRgb(dir.body_background).b)+"";
-                    var Rgb_navigation_color = ""+ (hexToRgb(dir.navigation_color).r)+","+(hexToRgb(dir.navigation_color).g)+","+(hexToRgb(dir.navigation_color).b)+"";
-                    var Rgb_font_color = ""+ (hexToRgb(dir.font_color).r)+","+(hexToRgb(dir.font_color).g)+","+(hexToRgb(dir.font_color).b)+"";
-                    
-                    return  res.json({
+
+                    TransactionDetails.findOne({
+                        account_id: account_enter.id
+                    }).sort('createdAt DESC').done(function(err, trans){
+
+                        if (!dir) {
+
+                            return  res.json({
                                 success             : true, 
                                 enterprise_fsname   : account_enter.enterprise_fsname, 
-                                enterprise_mimetype : account_enter.enterprise_mimetype,
-                                header_background   : Rgb_header_background, 
-                                footer_background   : Rgb_footer_background, 
-                                body_background     : Rgb_body_background, 
-                                navigation_color: Rgb_navigation_color, 
-                                font_color: Rgb_font_color, 
-                                font_family: dir.font_family, 
-                                adaptor : sails.config.fileAdapter.adapter,
-                                bucket              : "app.olympus.io",
-                                api_key             : "AKIAIEURF2O4FGCDDK6A",
-                                api_secret_key      : "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"
-                                
+                                enterprise_mimetype : account_enter.enterprise_mimetype, 
+                                header_background   : "null", 
+                                footer_background   : "null", 
+                                body_background     : "null", 
+                                navigation_color    : "null", 
+                                font_color          : "null", 
+                                font_family         : "null",
+                                adaptor             : sails.config.receiver,
+                                users_limit         : trans.users_limit,
+                                quota               : trans.quota,
+                                plan_name           : trans.plan_name,
+                                duration            : trans.duration,
                             });
+
+                        }
+
+                        var Rgb_header_background   = ""+ (dir.header_background === '#undefined' ? null : (hexToRgb(dir.header_background).r)) +","+(dir.header_background === '#undefined' ? null : (hexToRgb(dir.header_background).g))+","+(dir.header_background === '#undefined' ? null : (hexToRgb(dir.header_background).b))+"";
+                        var Rgb_footer_background   = ""+ (dir.footer_background === '#undefined' ? null : (hexToRgb(dir.footer_background).r)) +","+(dir.footer_background === '#undefined' ? null : (hexToRgb(dir.footer_background).g))+","+(dir.footer_background === '#undefined' ? null : (hexToRgb(dir.footer_background).b))+"";
+                        var Rgb_body_background     = ""+ (dir.body_background === '#undefined' ? null : (hexToRgb(dir.body_background).r)) +","+(dir.body_background === '#undefined' ? null : (hexToRgb(dir.body_background).g))+","+(dir.body_background === '#undefined' ? null : (hexToRgb(dir.body_background).b))+"";
+                        var Rgb_navigation_color    = ""+ (dir.navigation_color === '#undefined' ? null : (hexToRgb(dir.navigation_color).r)) +","+(dir.navigation_color === '#undefined' ? null : (hexToRgb(dir.navigation_color).g))+","+(dir.navigation_color === '#undefined' ? null : (hexToRgb(dir.navigation_color).b))+"";
+                        var Rgb_font_color          = ""+ (dir.font_color === '#undefined' ? null : (hexToRgb(dir.font_color).r)) +","+(dir.font_color === '#undefined' ? null : (hexToRgb(dir.font_color).g))+","+(dir.font_color === '#undefined' ? null : (hexToRgb(dir.font_color).b))+"";
+                    
+                        return  res.json({
+                            success             : true, 
+                            enterprise_fsname   : account_enter.enterprise_fsname, 
+                            enterprise_mimetype : account_enter.enterprise_mimetype,
+                            header_background   : Rgb_header_background, 
+                            footer_background   : Rgb_footer_background, 
+                            body_background     : Rgb_body_background, 
+                            navigation_color    : Rgb_navigation_color, 
+                            font_color          : Rgb_font_color, 
+                            font_family         : dir.font_family, 
+                            adaptor             : sails.config.receiver,
+                            users_limit         : trans.users_limit,
+                            quota               : trans.quota,
+                            plan_name           : trans.plan_name,
+                            duration            : trans.duration,
+                        });
+                    });
                 });
             })
-
         }
     }
 };

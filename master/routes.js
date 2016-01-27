@@ -400,6 +400,16 @@ module.exports = {
     },
 
 
+    '/auth/resetPassword/:emailid': {
+        controller: 'auth',
+        action: 'resetPassword'
+    },
+
+
+ '/auth/forgetPassword/:emailid': {
+        controller: 'auth',
+        action: 'forgetPassword'
+    },
     /*
      // this doesn't seem to work.
      // ~mike, july 22nd

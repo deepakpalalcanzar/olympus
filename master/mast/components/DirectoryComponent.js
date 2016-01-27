@@ -25,7 +25,7 @@ Mast.registerTree('DirectoryComponent',{
 			self.$el.find('.shared_peop').not(":first").hide();// hide numbershared for files
 		});
 	
-		if (e) {	e.stopPropagation(); }
+		if (e) { e.stopPropagation(); }
 		
 	},
 	

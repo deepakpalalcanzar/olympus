@@ -67,15 +67,14 @@ var TrashController = {
 
         options.json = {
 			file_id : req.param('id'),
-			type 	: req.param('type')
+            type    : req.param('type'),
+			directory_id 	: req.param('directory_id')
 		};
 
         request(options, function (err, response, body) {
-
             if(typeof body === 'undefined'){
                 return res.json(err);
             }else{
-
             	Deletedlist.restore({
     	            file_id : options.json.file_id,
     	            type 	: options.json.type,
@@ -85,10 +84,13 @@ var TrashController = {
                 	res.json(body, response && response.statusCode);
                 });
             }
-            //if (err)
-              //  return res.json({error: err.message, type: 'error'}, response && response.statusCode);
-            
         });
-	}
+
+	},
+
+    checkForFile : function(){
+
+    }
+
 };
 _.extend(exports, TrashController);

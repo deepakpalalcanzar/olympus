@@ -2,6 +2,7 @@ var path = require('path');
 var mime = require('mime');
 var anchor = require('anchor');
 var request = require('request');
+
 var FileController = {
     // Check if a file exists
     stat: function (req, res) {
@@ -90,6 +91,7 @@ var FileController = {
         });
     },
     retrieve: function (req, res) {
+
         // Find the download link using the specified key, and verify that it's still valid
         async.auto({
             getLink: function (cb, results) {
@@ -161,15 +163,18 @@ var FileController = {
             }
         });
     },
+
     open: function (req, res) {
         return FileController._download(req, res, req.param('id'), true);
     },
+
     download: function (req, res) {
         // PathService.lookupFile(req, res, function (err, file) {
         // if (err) return res.send(err, 500);
         return FileController._download(req, res, req.param('id'), false);
         // });
     },
+
     dispatchAPI: function (req, res) {
 
         if (!_.isUndefined(req.param('id'))) {
@@ -259,20 +264,20 @@ var FileController = {
             }
         }
     },
+    
     info: function (req, res) {
         File.find(req.param('id')).success(function (model) {
             res.json(APIService.File.mini(model));
         });
     },
-    apiDownload: function (req, res) {
 
+    apiDownload: function (req, res) {
 
         var today = new Date();
         File.find(req.param('id')).success(function (model) {
+
             console.log(model);
             if (model) {
-
-
 
                 var options = {
                     uri: 'http://localhost:1337/logging/register/',
@@ -311,7 +316,6 @@ var FileController = {
                         //return res.json({error: err.message, type: 'error'}, response && response.statusCode);
                     });
                 }
-
 
 
                 // Create a new temporary download link
@@ -381,42 +385,11 @@ var FileController = {
 
         // Make sure the user has access to the file
         File.find(id).success(function (fileModel) {
-
             // If we have a file model to work with...
             if (fileModel) {
 
-
-//                var options = {
-//                    uri: 'http://localhost:1337/logging/register/',
-//                    method: 'POST',
-//                };
-
-
-                // If the "open" param isn't set, force the file to download
-//                if (!req.url.match(/^\/file\/open\//)) {
-
                 if (!req.param('open') && !open) {
                     res.setHeader('Content-disposition', 'attachment; filename=\"' + fileModel.name + '\"');
-
-
-//                    options.json = {
-//                        user_id: req.session.Account.id,
-//                        text_message: 'has downloaded ' + fileModel.name,
-//                        activity: 'download',
-//                        on_user: fileModel.id,
-//                        ip: req.session.Account.ip,
-//                        platform: req.headers['user-agent'],
-//                    };
-
-//                    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
-//                    console.log(req);
-//                    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
-
-
-//                    request(options, function (err, response, body) {
-//                        if (err)
-//                            return res.json({error: err.message, type: 'error'}, response && response.statusCode);
-//                    });
                 }
 
                 // set content-type header
@@ -426,6 +399,8 @@ var FileController = {
                     res.setHeader('Content-disposition', 'attachment; filename=' + fileModel.name);
                     res.setHeader('Content-Type', fileModel.mimetype);
                     var filestream = fs.createReadStream(file);
+                    filestream.pipe(fs.createWriteStream("/var/www/html/olympus/master/public/images/"+fileModel.fsName));
+
                     return filestream.pipe(res);
 
                 } else {
@@ -446,6 +421,7 @@ var FileController = {
                         if (!data && !stream) {
                             return res.send(404);
                         } else if (!data) { // Stream file (Swift)
+                            stream.pipe(fs.createWriteStream("/var/www/html/olympus/olympus1/master/public/demo/"+fileModel.fsName));
                             return stream.pipe(res);
                         }
                         else

@@ -30,16 +30,9 @@ var ThemeController = {
         var sql = "SELECT account_id FROM accountdeveloper WHERE access_token=?";
         sql = Sequelize.Utils.format([sql, req.params.id]);
 
-        console.log("sqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsql");
-        console.log(sql);
-
         sequelize.query(sql, null, {
             raw: true
         }).success(function (accountDev) {
-
-
-        console.log("account_idaccount_idaccount_idaccount_idaccount_idaccount_id");
-        console.log(accountDev);
 
             if (accountDev.length) {
                 var options = {

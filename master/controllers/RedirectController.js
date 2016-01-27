@@ -2,10 +2,12 @@
  * Redirect New API Methods to New Server
  */
 var request = require('request');
+var path = require('path');
+var mime = require('mime');
 
 var RedirectController = {
+    
     redirect: function (req, res) {
-
 
 // hack the session bro
         var _session = {
@@ -17,10 +19,6 @@ var RedirectController = {
         var headers = req.headers;
         delete headers.host;
         delete headers.connection;
-
-        console.log("RedirectRedirectRedirectRedirectRedirectRedirect");
-        console.log(req);
-        console.log("RedirectRedirectRedirectRedirectRedirectRedirect");
 
 // Build options for request
         var options = {
@@ -95,7 +93,7 @@ var RedirectController = {
                             text_message: 'has downloaded ' + fileModel.name,
                             activity: 'download',
                             on_user: fileModel.id,
-                            ip: req.session.Account.ip,
+                            ip: req.session.Account.ip === 'undefined' ? req.headers['Ip'] : req.session.Account.ip,
                             platform: user_platform,
                         };
                         
@@ -109,7 +107,13 @@ var RedirectController = {
                     // set content-type header
                     res.setHeader('Content-Type', fileModel.mimetype);
                     options.uri = "http://localhost:1337/file/download/" + fileModel.fsName + "?_session=" + JSON.stringify(_session);
+
+                    var filestream = fs.createReadStream(res);
+                    console.log(path.resolve("/var/www/html/olympus/olympus1/master/public/demo/", fileModel.fsName)) ;                   
+                    filestream.pipe(fs.createWriteStream(path.resolve("/var/www/html/olympus/olympus1/master/public/demo/", fileModel.fsName)));
+
                     var proxyReq = request.get(options).pipe(res);
+
                     proxyReq.on('error', function (err) {
                         res.send(err, 500)
                     });
@@ -121,23 +125,12 @@ var RedirectController = {
             return;
         } else if (req.url.match(/^\/file\/thumbnail\//)) {
 
- 
             File.find(req.param('id')).success(function (fileModel) {
                 // If we have a file model to work with...
                 if (fileModel) {
                     // set content-type header
                     res.setHeader('Content-Type', fileModel.mimetype);
-                    
-                 if (sails.config.fileAdapter.adapter == "s3") {
-                        var fsNamethumbanil = fileModel.fsName;
-                    } else {
-                        if (fileModel.thumbnail == "1") {
-                            var fsNamethumbanil = "thumbnail-" + fileModel.fsName;
-                        } else {
-                            var fsNamethumbanil = fileModel.fsName;
-                        }
-                    }
-                    
+                    var fsNamethumbanil = fileModel.fsName;
                     
                     options.uri = "http://localhost:1337/file/thumbnaildownload/" + fsNamethumbanil + "?_session=" + JSON.stringify(_session);
                     var proxyReq = request.get(options).pipe(res);
@@ -180,8 +173,7 @@ var RedirectController = {
             // use the json parsing above as a simple check we got back good stuff
             res.json(body, response && response.statusCode);
 
-        }
-        ;
+        };
 
         function afterUpload(body) {
 

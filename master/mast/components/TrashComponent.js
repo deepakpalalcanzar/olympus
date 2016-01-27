@@ -16,7 +16,7 @@ Mast.components.TrashComponent = Mast.Tree.extend({
 	},
 
 	model       : 'Trashnode',
-	emptyHTML   : '',
+	emptyHTML   : '<p>No element to list</p>',
 	branchOutlet: '.branchOutlet',
 	template    : '.trash-template',
 	collection  : 'TrashMembers',
@@ -825,22 +825,36 @@ Mast.components.TrashComponent = Mast.Tree.extend({
 		var self = this;
         var id = this.get('id');
         var type =this.get('type');
-        
-		Mast.Socket.request('/trash/restore', {
-			id 	 :  id,
-			type : type,
-		}, function(response){
-			if (response===403) {
-				alert('Permission denied. You do not have sufficient permissions to delete this item.');
-			} else {
-				$("#content").empty();
-				var trash = new Mast.components.TrashFileSystem({ outlet : '#content'});
-			}
+        // console.log(this.parent.collection.get(id));
+        // this.parent.collection.remove(this.parent.collection.get(id));
+
+		var trash = new Mast.components.TrashRestoreComponent({},{
+			id 	: this.get('id'),
+			type :this.get('type')
 		});
+
+        // var uploadDialog = new Mast.components.TrashRestoreComponent(this.get('id'));
+		e.stopPropagation();
+        
+		// Mast.Socket.request('/trash/restore', {
+		// 	id 	 :  id,
+		// 	type : type,
+		// }, function(response){
+		// 	if (response===403) {
+		// 		alert('Permission denied. You do not have sufficient permissions to delete this item.');
+		// 	} else {
+		// 		$("#content").empty();
+		// 		var trash = new Mast.components.TrashFileSystem({ outlet : '#content'});
+		// 	}
+		// });
 
 	},
 
+	restoreFile: function(){
 
+
+
+	},
 
 	comment: function(e) {
 		this.select(e);
