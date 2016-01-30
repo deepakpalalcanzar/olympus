@@ -51,6 +51,59 @@ Deletedlist = Model.extend({
 	        }).success(function (resultSet) {
 				cb(null, resultSet);
     	    });
+		},
+
+		
+		deleted : function(options, cb){
+
+console.log('88888888888888888888888888888');
+console.log(options.account_id);
+			async.parallel({
+
+				orphanDirectories: function(cb) {
+					// var options = { accountId: req.session.Account.id };
+					var sql 	= 	"SELECT del.directory_id, del.permission, d.* from deletedlist del "+
+									"INNER JOIN directory d ON d.id = del.deleted_id "+
+									"where del.account_id=? and del.type=2";
+	    			sql 		= Sequelize.Utils.format([ sql, options.account_id ]);
+	    			sequelize.query(sql, Directory).done(cb);
+				},
+
+				orphanFiles: function(cb){
+					// var options = { accountId: req.session.Account.id };
+					var sql 	= 	"SELECT del.directory_id, del.permission, f.* from deletedlist del "+
+									"INNER JOIN file f ON f.id = del.deleted_id "+
+									"where del.account_id=? and del.type=1 and directory_id != 0";
+	    			sql 		= Sequelize.Utils.format([ sql, options.account_id ]);
+	    			sequelize.query(sql, File).done(cb);
+				}
+
+			}, afterward);
+
+
+			function afterward(err, results) {
+
+				if (err) return res.send(500,err);
+				var response = [];
+				if (results.orphanDirectories) {
+					// _.each(results.orphanDirectories,function(v,k) { // Subscribe to workgroups
+					// 	v.subscribe(req);
+					// });
+					response = response.concat(APIService.Directory.deleted(results.orphanDirectories));
+				}
+
+				if (results.orphanFiles) {
+					// _.each(results.orphanFiles,function(v,k) { // Subscribe to workgroups
+					// 	v.subscribe(req);
+					// });
+					response = response.concat(APIService.File.deleted(results.orphanFiles));
+				}
+
+				cb(null, response);
+				// res.json(response);
+
+			}
+
 		}
 	}
 });

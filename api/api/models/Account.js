@@ -101,10 +101,11 @@ module.exports = {
             this.deleteDate = new Date();
             this.save(function (err) {
                 if (err) return cb(err);
-                deleteUtils.recursiveDelete(self.id, function (err) {
-                    if (err) return cb(err);
-                    cb(null, self);
-                });
+                // deleteUtils.recursiveDelete(self.id, function (err) {
+                //     if (err) return cb(err);
+                //     cb(null, self);
+                // });
+                cb(null, self);
             });
         },
 

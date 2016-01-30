@@ -44,6 +44,9 @@ var TrashController = {
 	},
 
 	deletePermanent : function(req, res){
+        console.log('NMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNM');
+        console.log(req);
+        console.log('NMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNM');
 		Deletedlist.restore({
 	        file_id : req.param('id'),
 			type 	: req.param('type')
@@ -71,6 +74,10 @@ var TrashController = {
 			directory_id 	: req.param('directory_id')
 		};
 
+        console.log("optionsoptionsoptionsoptionsoptionsoptionsoptionsoptionsoptionsoptions");
+        console.log(options);
+        console.log("optionsoptionsoptionsoptionsoptionsoptionsoptionsoptionsoptionsoptions");
+
         request(options, function (err, response, body) {
             if(typeof body === 'undefined'){
                 return res.json(err);
@@ -90,7 +97,78 @@ var TrashController = {
 
     checkForFile : function(){
 
-    }
+    },
+
+    restoreFileAPI : function(req,res){
+        console.log(req.param('id'));
+
+        // Strip original headers of host and connection status
+        var headers = req.headers;
+        delete headers.host;
+        delete headers.connection;
+
+        var request = require('request');
+        var options = {
+            uri: 'http://localhost:1337/trash/restore/',
+            method: 'POST',
+            headers: headers
+        };
+
+        options.json = {
+            file_id : req.param('id'),
+            type    : req.param('type'),
+            directory_id : ( req.param('directory_id') != null )? req.param('directory_id') : ''
+        };
+
+        console.log("optionsoptionsoptionsoptionsoptionsoptionsoptionsoptionsoptionsoptions");
+        console.log(options);
+        console.log("optionsoptionsoptionsoptionsoptionsoptionsoptionsoptionsoptionsoptions");
+
+        request(options, function (err, response, body) {
+
+            if(typeof body === 'undefined'){
+                return res.json(err);
+            }else{
+                Deletedlist.restore({
+                    file_id : options.json.file_id,
+                    type    : options.json.type,
+                }, function(err, result){
+                    if (err)
+                        return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+                    res.json(body, response && response.statusCode);
+                });
+            }
+        });
+    },
+
+    file_directory_list: function(req, res){
+        // headers = req.headers;
+
+        var AccountId = null;
+        var sql = "SELECT c.account_id AS AccountId FROM accountdeveloper c WHERE c.access_token=?";
+        sql = Sequelize.Utils.format([sql, req.param('id')]);
+        console.log(sql);
+        sequelize.query(sql, null, {
+            raw: true
+        }).success(function (accounts) {
+            // console.log(comments[0].AccountId);
+            AccountId = accounts[0].AccountId;
+
+            Deletedlist.deleted({
+                account_id : AccountId,//req.param('id'),
+                // file_id : req.param('id'),
+                // type    : req.param('type')
+            }, function(err, result){
+                if (err)
+                    return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+
+                res.json(result, 200);
+                // res.json(200);
+            });
+            // res.json(comments, 200);
+        });
+
+    },
 
 };
 _.extend(exports, TrashController);

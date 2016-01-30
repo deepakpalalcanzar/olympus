@@ -10,7 +10,7 @@ _.extend(module.exports,{
 
 	// Get the top level directories and files for this user
 	topLevel: function (req,res) {
-
+console.log('4444444444444444444444444444444444444444444444444444444444444444');
 		// New Sails 1.0 db-agnostic relational methodology:
 
 		// Get all files and directories accessible to the user that are
@@ -20,6 +20,8 @@ _.extend(module.exports,{
 		async.parallel({
 			
 			orphanDirectories: function(cb) {
+
+				console.log('5555555555555555555555555555555555555555555555555555555555555');
 				var options = {accountId: req.session.Account.id};
 				var basicSet = ["SELECT p.type AS permission, d.id AS pk, d.* "+
 							"FROM directory d "+
@@ -37,6 +39,8 @@ _.extend(module.exports,{
 				});
 			},
 			orphanFiles: function(cb){
+
+				console.log('66666666666666666666666666666666666666666666666666666666666666666');
 				var options = {accountId: req.session.Account.id};
 				var basicSet = ["SELECT p.type AS permission, f.id AS pk, f.* "+
 							"FROM file f "+

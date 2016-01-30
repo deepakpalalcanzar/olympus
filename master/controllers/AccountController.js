@@ -35,7 +35,6 @@ var AccountController = {
             res.json(APIService.Account.mini(accounts));
         });
     },
-
     createuploadlog: function (req, res) {
 
         var request = require('request');
@@ -60,20 +59,22 @@ var AccountController = {
         }
 
         opts.json = {
-            user_id     : req.session.Account.id,
-            text_message: 'has Uploaded a File ' + req.params.name,
-            activity    : 'Uploaded',
-            on_user     : req.session.Account.id,
-            ip          : req.session.Account.ip === 'undefined' ? req.headers['Ip'] : req.session.Account.ip,
-            platform    : user_platform,
+		user_id: req.session.Account.id,
+	        text_message: 'has Uploaded a File ' + req.params.name,
+	        activity: 'Uploaded',
+            	on_user: req.session.Account.id,
+//            ip: req.session.Account.ip,
+		ip: typeof req.session.Account.ip === 'undefined' ? req.headers['ip'] : req.session.Account.ip,
+		platform: user_platform,
         };
+
+
 
         request(opts, function (err1) {
 
         });
         /*Create logging*/
     },
-
     searchdate: function (req, res) {
 
         var sdate = "'" + req.params.from + "'";
@@ -106,7 +107,6 @@ var AccountController = {
             throw new Error(e);
         });
     },
-
     search: function (req, res) {
 // If this is a private deployment, just send back a 403. We dont want to search for users.
         if (sails.config.privateDeployment) {
@@ -152,7 +152,6 @@ var AccountController = {
             }
         }
     },
-
     register: function (req, res) {
 
         var request = require('request');
@@ -193,7 +192,6 @@ var AccountController = {
         });
 
     },
-
     /* @By Alcanzar */
 
     listMembers: function (req, res) {
@@ -203,18 +201,16 @@ var AccountController = {
             res.json(accounts, 200);
         });
     },
-
-
-
     listEnterprisesMembers: function (req, res) {
+
         Account.findAll({
             where: ['deleted = 0 AND created_by = ' + req.params.id],
         }).success(function (accounts) {
             res.json(accounts, 200);
         });
-    },
 
-    listUsers: function (req, res) {
+    },
+listUsers: function (req, res) {
 
         var userId;
         if ((typeof req.param('id') != 'undefined') && (typeof req.param('isAdmin') != 'undefined')) {
@@ -371,9 +367,6 @@ var AccountController = {
         });
 
     },
-
-
-
     getNestedWorkgroups: function (req, res) {
         Directory.findAll({
             where: [' deleted != 1 AND DirectoryId = ' + dir.id],
@@ -429,9 +422,10 @@ var AccountController = {
                     user_id: req.session.Account.id,
                     text_message: 'has updated a user.',
                     activity: 'update',
-                    on_user: req.params.id,
-                    // ip: req.session.Account.ip
-                    ip: req.session.Account.ip === 'undefined' ? req.headers['Ip'] : req.session.Account.ip,
+                    	on_user: req.params.id,
+                   // ip: req.session.Account.ip
+			ip: typeof req.session.Account.ip === 'undefined' ? req.headers['ip'] : req.session.Account.ip,
+
                 };
 
                 request(options, function (err, response, body) {
@@ -479,7 +473,9 @@ var AccountController = {
             accId: req.session.Account.id, //for logging
             accName: req.session.Account.name, //for logging
             ipadd: req.param('ipadd'),
-            ip: req.session.Account.ip
+//            ip: req.session.Account.ip
+		ip: req.session.Account.ip === 'undefined' ? req.headers['ip'] : req.session.Account.ip,
+
         };
 
         request(options, function (err, response, body) {
@@ -541,8 +537,7 @@ var AccountController = {
                                         text_message: 'has deleted ' + req.param('workgroup_name') + ' from ' + req.param('user_name') + '\'s account.',
                                         activity: 'delete',
                                         on_user: req.param('user_id'),
-                                        // id: req.session.Account.ip
-                                        ip: req.session.Account.ip === 'undefined' ? req.headers['Ip'] : req.session.Account.ip,
+                                        id: req.session.Account.ip
                                     };
 
                                     request(options, function (err, response, body) {
@@ -577,8 +572,9 @@ var AccountController = {
                                                         text_message: req.session.Account.name + ' has deleted file' + applicant.name + ' located in ' + req.param('workgroup_name') + ' from ' + req.param('user_name') + '\'s account.',
                                                         activity: 'delete',
                                                         on_user: req.param('user_id'),
-                                                        // ip: req.session.Account.ip
-                                                        ip: req.session.Account.ip === 'undefined' ? req.headers['Ip'] : req.session.Account.ip,
+                                                       // ip: req.session.Account.ip
+							ip: typeof req.session.Account.ip === 'undefined' ? req.headers['ip'] : req.session.Account.ip,
+
                                                     };
 
                                                     request(options, function (err, response, body) {
@@ -658,8 +654,8 @@ var AccountController = {
                     text_message: 'has changed own password.',
                     activity: 'change',
                     on_user: req.session.Account.id,
-                    // ip: req.session.Account.ip
-                    ip: req.session.Account.ip === 'undefined' ? req.headers['Ip'] : req.session.Account.ip,
+//                    ip: req.session.Account.ip
+		ip: typeof req.session.Account.ip === 'undefined' ? req.headers['ip'] : req.session.Account.ip,
 
                 };
 
@@ -697,9 +693,7 @@ var AccountController = {
                     text_message: 'has changed ' + model.name + '\'s password.',
                     activity: 'change',
                     on_user: req.param('id'),
-                    // ip: req.session.Account.ip
-                    ip: req.session.Account.ip === 'undefined' ? req.headers['Ip'] : req.session.Account.ip,
-
+                   ip: typeof req.session.Account.ip === 'undefined' ? req.headers['ip'] : req.session.Account.ip,
                 };
 
                 request(options, function (err, response, body) {
@@ -742,8 +736,9 @@ var AccountController = {
                     text_message: 'has updated own account.',
                     activity: 'update',
                     on_user: req.session.Account.id,
-                    // ip: req.session.Account.ip
-                    ip: req.session.Account.ip === 'undefined' ? req.headers['Ip'] : req.session.Account.ip,
+//                    ip: req.session.Account.ip
+		ip: typeof req.session.Account.ip === 'undefined' ? req.headers['ip'] : req.session.Account.ip,
+
                 };
 
                 request(options, function (err, response, body) {
@@ -817,15 +812,16 @@ var AccountController = {
                 binaryData = new Buffer(base64Data, 'base64').toString('binary');
 
                 if (picUploadType === 'enterprise') {
-                    
-                    fsx.writeFile("/var/www/html/olympus/olympus1/master/public/images/enterprises/" + enterpriseName, binaryData, 'binary', function (err) {
+
+
+                    fsx.writeFile("/var/www/html/olympus/master/public/images/enterprises/" + enterpriseName, binaryData, 'binary', function (err) {
                     });
                     account.enterprise_fsname = enterpriseName;
                     account.enterprise_mimetype = filetype;
 
                 } else if (picUploadType === 'profile') {
                  
-                    fsx.writeFile("/var/www/html/olympus/olympus1/master/public/images/profile/" + enterpriseName, binaryData, 'binary', function (err) {
+                    fsx.writeFile("/var/www/html/olympus/master/public/images/profile/" + enterpriseName, binaryData, 'binary', function (err) {
                     });
 
                     account.avatar_image = enterpriseName;
@@ -847,99 +843,103 @@ var AccountController = {
 
     readCSVFile: function (req, res) {
 
+        //var temp = require('temp');
+
         var sql = "SELECT subscription_id FROM account WHERE id=?";
         sql = Sequelize.Utils.format([sql, req.session.Account.id]);
         sequelize.query(sql, null, {
             raw: true
         }).success(function (account) {
 
+
             var sql = "SELECT id FROM directory WHERE OwnerId=?";
             sql = Sequelize.Utils.format([sql, req.session.Account.id]);
-
             sequelize.query(sql, null, {
                 raw: true
             }).success(function (directory) {
 
                 var i = 0;
                 var request = require('request');
-                var stream = fsx.createReadStream('/var/www/html/olympus/olympus1/master/public/Testdata1.csv');
+                //console.log(req.params.filepath);
+                var stream = fsx.createReadStream('/var/www/html/olympus/master/public/Testdata1.csv');
+		
                 csv.fromStream(stream).on("data", function (data) {
 
-                    console.log("datadatadatadatadatadatadatadatadatadata");
-                    console.log(data);
-                    console.log("datadatadatadatadatadatadatadatadatadata");
-                    
-                    if (i != 0) {
+                            if (i != 0) {
 
-                        var options = {
-                            uri: 'http://localhost:1337/account/register/',
-                            method: 'POST',
-                        };
-
-                        options.json = {
-                            name        : data[0] + ' ' + data[1],
-                            email       : data[2],
-                            isVerified  : true,
-                            isAdmin     : false,
-                            password    : data[3],
-                            created_by  : req.session.Account.id,
-                            workgroup   : directory[0]['id'],
-                            title       : data[3],
-                            subscription: account[0]['subscription_id'],
-                        };
-
-                        request(options, function (err, response, body) {
-
-                            if (err)
-                                return res.json({error: err.message, type: 'error'}, response && response.statusCode);
-
-                            //	Resend using the original response statusCode
-                            //	Use the json parsing above as a simple check we got back good stuff
-
-                            Subscription.find({
-                                where: {id: '1'}
-                            }).done(function (err, subscription) {
-
-                                // Save to transactionDetails table
-                                var tran_options = {
-                                    uri: 'http://localhost:1337/transactiondetails/register/',
+                                var options = {
+                                    uri: 'http://localhost:1337/account/register/',
                                     method: 'POST',
                                 };
 
-                                var created_date = new Date();
-                                tran_options.json = {
-                                    trans_id: (req.session.Account.isSuperAdmin === 1) ? 'superadmin' : 'workgroupadmin',
-                                    account_id: body.account.id,
-                                    created_date: created_date,
-                                    users_limit: subscription.users_limit,
-                                    quota: subscription.quota,
-                                    plan_name: subscription.features,
-                                    price: subscription.price,
-                                    duration: subscription.duration,
-                                    paypal_status: '',
+                                options.json = {
+                                    name: data[0] + ' ' + data[1],
+                                    email: data[2],
+                                    isVerified: true,
+                                    isAdmin: false,
+                                    password: data[3],
+                                    created_by: req.session.Account.id,
+                                    workgroup: directory[0]['id'],
+                                    title: data[3],
+                                    subscription: account[0]['subscription_id'],
                                 };
 
-                                request(tran_options, function (err1, response1, body1) {
-                                    if (err1)
-                                        return res.json({error: err1.message, type: 'error'}, response1 && response1.statusCode);
+                                request(options, function (err, response, body) {
+                                    //console.log(options);
+
+                                    if (err)
+                                        return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+
+                                    //	      Resend using the original response statusCode
+                                    //	      use the json parsing above as a simple check we got back good stuff
+
+                                    Subscription.find({
+                                        where: {id: '1'}
+                                    }).done(function (err, subscription) {
+
+                                        // Save to transactionDetails table
+                                        var tran_options = {
+                                            uri: 'http://localhost:1337/transactiondetails/register/',
+                                            method: 'POST',
+                                        };
+
+                                        var created_date = new Date();
+                                        tran_options.json = {
+                                            trans_id: (req.session.Account.isSuperAdmin === 1) ? 'superadmin' : 'workgroupadmin',
+                                            account_id: body.account.id,
+                                            created_date: created_date,
+                                            users_limit: subscription.users_limit,
+                                            quota: subscription.quota,
+                                            plan_name: subscription.features,
+                                            price: subscription.price,
+                                            duration: subscription.duration,
+                                            paypal_status: '',
+                                        };
+
+                                        request(tran_options, function (err1, response1, body1) {
+                                            if (err1)
+                                                return res.json({error: err1.message, type: 'error'}, response1 && response1.statusCode);
+                                        });
+
+                                    });
+
                                 });
+                            }
+                            i++;
 
-                            });
+                        })
+                        .on("end", function (count) {
+                            console.log('Number of lines: ' + count - 1);
+
+                        })
+                        .on('error', function (error) {
+                            console.log(error.message);
                         });
-                    }
 
-                    i++;
 
-                }).on("end", function (count) {
-                    console.log('Number of lines: ' + count - 1);
-                }).on('error', function (error) {
-                    console.log(error.message);
-                });
             });
         });
     },
-
-
     /*****************************************************************************************
      Post Registration CSV Data
      @Auth : Avneesh
@@ -989,55 +989,55 @@ var AccountController = {
                 res.json(body, response && response.statusCode);
             }
 
-            var sql = "SELECT dir.*, dp.type FROM directory dir JOIN directorypermission dp ON dir.id = dp.DirectoryId  where dp.AccountId =?";
-            sql = Sequelize.Utils.format([sql, req.param('id')]);
-            sequelize.query(sql, null, {
-                raw: true
-            }).success(function (directorys) {
-                if (directorys != null) {
-                    directorys.forEach(function (diry) {
-                        var sql = "Delete FROM directorypermission where DirectoryId = ?";
-                        sql = Sequelize.Utils.format([sql, diry.id]);
-                        sequelize.query(sql, null, {
-                            raw: true
-                        }).success(function (dirs) {
-                            console.log("Delete permission of id ------------" + diry.id);
+            // var sql = "SELECT dir.*, dp.type FROM directory dir JOIN directorypermission dp ON dir.id = dp.DirectoryId  where dp.AccountId =?";
+            // sql = Sequelize.Utils.format([sql, req.param('id')]);
+            // sequelize.query(sql, null, {
+            //     raw: true
+            // }).success(function (directorys) {
+            //     if (directorys != null) {
+            //         directorys.forEach(function (diry) {
+            //             var sql = "Delete FROM directorypermission where DirectoryId = ?";
+            //             sql = Sequelize.Utils.format([sql, diry.id]);
+            //             sequelize.query(sql, null, {
+            //                 raw: true
+            //             }).success(function (dirs) {
+            //                 console.log("Delete permission of id ------------" + diry.id);
 
 
-                            var sql = "SELECT * FROM file where DirectoryId =?";
-                            sql = Sequelize.Utils.format([sql, diry.id]);
-                            sequelize.query(sql, null, {
-                                raw: true
-                            }).success(function (files) {
-                                if (files != null) {
-                                    var dt = new Date();
-                                    var datetime = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate() + " " + dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
+            //                 var sql = "SELECT * FROM file where DirectoryId =?";
+            //                 sql = Sequelize.Utils.format([sql, diry.id]);
+            //                 sequelize.query(sql, null, {
+            //                     raw: true
+            //                 }).success(function (files) {
+            //                     if (files != null) {
+            //                         var dt = new Date();
+            //                         var datetime = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate() + " " + dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
 
-                                    files.forEach(function (file) {
-                                        var deleted = "Deleted" + file.fsName;
-                                        var sql = "UPDATE file SET deleted='1', deleteDate='" + datetime + "',fsName='" + deleted + "' where id = ?";
-                                        console.log(sql);
-                                        sql = Sequelize.Utils.format([sql, file.id]);
-                                        sequelize.query(sql, null, {
-                                            raw: true
-                                        }).success(function (fls) {
-                                            console.log("Delete file of id : " + file.id);
-                                        });
-                                    });
-                                }
-                                res.json(directorys, 200);
-                            }).error(function (e) {
-                                throw new Error(e);
-                            });
+            //                         files.forEach(function (file) {
+            //                             var deleted = "Deleted" + file.fsName;
+            //                             var sql = "UPDATE file SET deleted='1', deleteDate='" + datetime + "',fsName='" + deleted + "' where id = ?";
+            //                             console.log(sql);
+            //                             sql = Sequelize.Utils.format([sql, file.id]);
+            //                             sequelize.query(sql, null, {
+            //                                 raw: true
+            //                             }).success(function (fls) {
+            //                                 console.log("Delete file of id : " + file.id);
+            //                             });
+            //                         });
+            //                     }
+            //                     res.json(directorys, 200);
+            //                 }).error(function (e) {
+            //                     throw new Error(e);
+            //                 });
 
 
-                        });
-                    });
-                }
-                res.json(directorys, 200);
-            }).error(function (e) {
-                throw new Error(e);
-            });
+            //             });
+            //         });
+            //     }
+            //     res.json(directorys, 200);
+            // }).error(function (e) {
+            //     throw new Error(e);
+            // });
         });
     },
     'delete' : INodeService["delete"],

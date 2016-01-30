@@ -77,6 +77,7 @@ Mast.registerTree('FileSystem',{
 		this.collection.fetch({
 			success: function (collection, res) {
 				self.set('loading', false);
+				Mast.Session.length= res.length;
 				// $('.fileSystem-template .loading-spinner').remove();
 				collection.reset(_.map(res, Mast.models.INode.prototype.marshal));
 			}

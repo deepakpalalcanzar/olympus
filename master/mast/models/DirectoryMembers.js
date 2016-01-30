@@ -17,6 +17,9 @@ Mast.models.DirectoryMembers = Mast.Collection.extend({
 		Mast.Socket.request('/directory/ls',{
 			id: thisDir.get('id')
 		}, function(res) {
+
+			console.log(res);
+			
 			if (_.isArray(res)) {
 				self.reset(_.map(res, function(i) {
 					return _.extend({},Mast.models.INode.prototype.marshal(i),{

@@ -13,6 +13,10 @@ Mast.registerComponent('DetailsSidebar',{
 		'click .close-sidebar'               : 'dismiss',
 		'click input.public_link_enabled'    : 'enablePublicLink',
 		'click input.public_sublinks_enabled': 'enablePublicSublinks',
+		'click input.link_password_enabled'  : 'enableLinkPassword',
+		'enter input.link_password'     	 : 'changeLinkPassword',//requires enter plugin
+		'keyup input.link_password'     	 : 'changeLinkPassword',
+		'click input.link_password'     	 : 'changeLinkPassword',
 		'gPressEscape'                       : 'dismiss',
 		'clickoutside'                       : 'dismiss',
 		'pressEnter'                         : 'rename'
@@ -63,6 +67,8 @@ Mast.registerComponent('DetailsSidebar',{
 	// Update the UI for enabling / disabling public links
 	updatePublicLinkOptions: function() {
 
+		console.log(this.iNode.model);
+
 		// For files, check that the public link is enabled,
 		// and that the directory its in has public sublinks enabled.
 		if (this.iNode.get('type')=='file') {
@@ -78,6 +84,18 @@ Mast.registerComponent('DetailsSidebar',{
 				this.$('.public-link-option').hide();
 			}
 
+			if (this.iNode.model.attributes.showLinkPassword()) {
+				this.$('.link-password').show();
+			} else {
+				this.$('.link-password').hide();
+			}
+
+			if (this.iNode.model.attributes.showLinkPasswordOption()) {
+				this.$('.link-password-option').show();
+			} else {
+				this.$('.link-password-option').hide();
+			}
+
 			this.$('.public-sublinks-option').hide();
 		}
 
@@ -85,6 +103,9 @@ Mast.registerComponent('DetailsSidebar',{
 		else {
 			this.$('.public-link').hide();
 			this.$('.public-link-option').hide();
+
+			this.$('.link-password').hide();
+			this.$('.link-password-option').hide();
 			if (this.iNode.model.attributes.showPublicSublinksOption()) {
 				this.$('.public-sublinks-option').show();
 			} else {
@@ -158,6 +179,10 @@ Mast.registerComponent('DetailsSidebar',{
 			}
 			if (this.model.get('public_sublinks_enabled')) {
 				this.$el.find('input.public_sublinks_enabled').attr('checked','checked');
+			}
+			if (this.model.get('link_password_enabled')) {
+				this.$el.find('input.link_password_enabled').attr('checked','checked');
+				this.$el.find('div.link-password').hide();
 			}
 			this.updatePublicLinkOptions();
 		}
@@ -246,6 +271,15 @@ Mast.registerComponent('DetailsSidebar',{
 				}
 				if (this.model.get('public_sublinks_enabled')) {
 					this.$el.find('input.public_sublinks_enabled').attr('checked','checked');
+				}
+				if (this.model.get('link_password_enabled')) {
+					this.$el.find('input.link_password_enabled').attr('checked','checked');
+					// this.$el.find('div.link-password-option').show();
+					this.$el.find('div.link-password').show();
+				}else{
+					// this.$el.find('input.link_password_enabled').attr('checked','checked');
+					// this.$el.find('div.link-password-option').hide();
+					this.$el.find('div.link-password').hide();
 				}
 				break;
 
@@ -368,6 +402,33 @@ Mast.registerComponent('DetailsSidebar',{
 			id			: this.get('id'),		// inode id
 			enable	: $('input.public_sublinks_enabled')[0].checked
 		});
+	},
+
+	enableLinkPassword : function() {
+		if($('input.link_password_enabled')[0].checked){
+			$('.link-password').slideDown();
+		}else{
+			$('.link-password').slideUp();
+		}
+
+		Mast.Socket.request('/file/enableLinkPassword',
+		{
+			id 			: this.get('id'),
+			enable 		: $('input.link_password_enabled')[0].checked
+		});
+	},
+
+	changeLinkPassword : function(event) {
+		if(event.keyCode == 13){
+
+	        if($('input.link_password_enabled')[0].checked){
+				Mast.Socket.request('/file/changeLinkPassword',
+				{
+					id 			: this.get('id'),
+					password 	: $('input.link_password').val()
+				});
+			}
+	    }
 	}
 
 });

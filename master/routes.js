@@ -399,17 +399,22 @@ module.exports = {
         action: 'restore'
     },
 
+    '/trash/restore/:id/:type': {
+        controller: 'trash',
+        action: 'restoreFileAPI'
+    },
 
-    '/auth/resetPassword/:emailid': {
-        controller: 'auth',
-        action: 'resetPassword'
+    '/trash/restore/:id/:type/:directory_id': {
+        controller: 'trash',
+        action: 'restoreFileAPI'
+    },
+
+    'trash/file_directory_list/:id': {
+        controller: 'trash',
+        action: 'file_directory_list'
     },
 
 
- '/auth/forgetPassword/:emailid': {
-        controller: 'auth',
-        action: 'forgetPassword'
-    },
     /*
      // this doesn't seem to work.
      // ~mike, july 22nd
@@ -574,9 +579,20 @@ module.exports = {
         action: 'publicDownload'
     },
 
-    '/theme/getThemeConfiguration/:id': {
+   '/theme/getThemeConfiguration/:id': {
         controller: 'theme',
         action: 'getThemeConfiguration'
+    },
+
+
+'/auth/resetPassword/:emailid': {
+        controller: 'auth',
+        action: 'resetPassword'
+    },
+
+ '/auth/forgetPassword/:emailid': {
+        controller: 'auth',
+        action: 'forgetPassword'
     },
 //  
 //  '/log/:page': {

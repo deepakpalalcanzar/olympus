@@ -31,6 +31,8 @@ Mast.models.INode = Mast.Model.extend({
 			editing     : false,
 			workgroup   : false,
 			public_link_enabled	: true,
+			link_password_enabled : false,
+			link_password : '',			
 			url	: null,
 
 			dropdownItems: [{
@@ -61,10 +63,12 @@ Mast.models.INode = Mast.Model.extend({
 
 	// Marshal server-side model into presentable format
 	marshal: function(i) {
-
-		console.log(i);
 		return _.extend(i, {
 			
+			test	   : this.link_password_enabled,
+			testin		: this.link_password,
+			test2		:i['link_password'],
+			testin2		:i['link_password_enabled'],
 			urlRoot    : "/" + i['type'] + "/",
 			numActive  : i['num_active'],
 			numComments: i['num_comments'],
@@ -120,6 +124,14 @@ Mast.models.INode = Mast.Model.extend({
 // Determine whether to show the public link for a file / folder in the UI
 			showPublicLink: function() {
 				return (this.allowPublicDownloads() && this.type=='file' && (this.public_link_enabled || this.permission == 'admin'));
+			},
+			
+			showLinkPassword: function() {
+				return (this.type=='file' && this.link_password_enabled && (this.permission == 'admin'));
+			},
+
+			showLinkPasswordOption: function() {
+				return (this.type=='file' && (this.permission == 'admin'));
 			}
 		});
 	}

@@ -43,6 +43,7 @@ class Configuration {
 					$_SESSION['password']	  = $postData['password'];
 					$_SESSION['serverName']	  = $postData['server_hostname'];
 					$_SESSION['protocal']	  = $postData['protocal'];
+					
 					$url = "http://".$_SESSION['serverName']."/olympus/installer/mandrill.php";
 					echo '<script>window.location.href="'.$url.'"</script>';
 

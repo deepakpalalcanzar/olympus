@@ -8,7 +8,6 @@ var TrashController = {
 			directory_id : req.param('directory_id')
 		};
 
-
 		if(req.param('type') === 'file'){
 			
 			DeletedList.restore(options, function(err, account){
@@ -48,18 +47,23 @@ var TrashController = {
                             deleted_id   : null,
                             directory_id : null 
                         }).then(function(per){
+
                         });
+
+                        
                     });
 
 					DeletedList.restoreParent(options, function(err, account){
 						// if(err) return;
 						// return res.send(200);
 					});
-					
 				});
+
 			});
+
 		}
 	}
+	
 };
 
 module.exports = TrashController;

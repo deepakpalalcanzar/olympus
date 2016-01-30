@@ -24,6 +24,7 @@ exports.API.mini = exports.API;
 var Directory = function(model) { // Directory
 	return _.extend(File(model), {
 		num_children: (+model.num_dir_children + +model.num_file_children) || 0,
+		//num_children: 10,
 		type: 'directory',
 		mimetype: null,
 		size: model.size,
@@ -72,6 +73,8 @@ var File = function(model) { // File
 				type: 'directory'
 			},
 			public_link_enabled: model.public_link_enabled,
+			link_password_enabled: model.link_password_enabled,
+			link_password: model.link_password,
 			fsName: model.fsName,
 			permission: model.permission,
 			// the type of permission the current account has on the inode
@@ -87,6 +90,77 @@ var File = function(model) { // File
 	};
 exports.File = apiTransform(File);
 exports.File.mini = exports.File;
+
+var deletedDirectory = function(model) { // Directory
+		return _.extend(deletedFile(model), {
+			num_children: (+model.num_dir_children + +model.num_file_children) || 0,
+			type: 'directory',
+			mimetype: null,
+			size: model.size,
+			sizeString: model.size &&
+						model.size > 1000000000 ? (Math.round((model.size/10000000))/100) + " GB" :
+						model.size > 1000000 ? (Math.round((model.size/10000))/100)  + " MB":
+						model.size > 1000 ? (Math.round((model.size/10))/100) + " KB":
+						model.size + " bytes",
+			quota: model.quota,
+			public_sublinks_enabled: model.public_sublinks_enabled
+		});
+	};
+exports.deletedDirectory = apiTransform(deletedDirectory);
+exports.Directory.deleted = exports.deletedDirectory;
+
+
+var deletedFile = function(model) { // File
+
+	console.log(model);
+	console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
+		return {
+			id: model.id,
+			name: model.name,
+			num_comments: model.num_comments || 0,
+			num_active: (model.getNumActiveUsers && model.getNumActiveUsers()) || 0,
+			modified_at: model.updatedAt,
+			modified_by: {
+				id: model.AccountId,
+				name: model.AccountName,
+				login: model.AccountLogin,
+				// avatar: '/images/' + model.AccountId + '.png',
+				avatar: getAvatarImage(model.AccountId),
+				type: 'account'
+			},
+			created_at: model.createdAt,
+			created_by: {
+				id: model.AccountId,
+				name: model.AccountName,
+				login: model.AccountLogin,
+				// avatar: '/images/' + model.AccountId + '.png',
+				avatar: getAvatarImage(model.AccountId),
+				type: 'account'
+			},
+			parent: {
+				id: model.directory_id,//model.directoryId,
+				name: null,
+				// TODO: in Box.net api, but not necessary for our 1.0 client
+				type: 'directory'
+			},
+			public_link_enabled: model.public_link_enabled,
+			link_password_enabled: model.link_password_enabled,
+			link_password: model.link_password,
+			fsName: model.fsName,
+			permission: model.permission,
+			// the type of permission the current account has on the inode
+			mimetype: model.mimetype !== null ? model.mimetype : mime.lookup(model.name),
+			size: model.size,
+			sizeString: model.size &&
+						model.size > 1000000000 ? (Math.round((model.size/10000000))/100) + " GB" :
+						model.size > 1000000 ? (Math.round((model.size/10000))/100)  + " MB":
+						model.size > 1000 ? (Math.round((model.size/10))/100) + " KB":
+						model.size + " bytes",
+			type: 'file'
+		};
+	};
+exports.deletedFile = apiTransform(deletedFile);
+exports.File.deleted = exports.deletedFile;
 
 // Account
 var Account = function(model) {
