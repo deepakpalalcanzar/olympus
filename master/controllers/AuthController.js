@@ -17,7 +17,9 @@ var AuthController = {
 					email: req.param('email')
 				}
 			}).done(function(err, account) {
-
+console.log('TRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRR');
+console.log(req);
+console.log('TRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRR');
 				if (err) return res.send(500,err);
 
 				if(!AuthenticationService.checkPassword(req.param('password'), account.password)) {
@@ -37,14 +39,14 @@ var AuthController = {
 					access_token 	: AuthenticationService.randString(15),
 					refresh_token 	: AuthenticationService.randString(15),
 					code_expires 	: new Date(today.getTime() + 1000 * 30), // code expires in 30 seconds
-					access_expires 	: new Date(today.getTime() + 1000 * 60 * 60), // access token expires in one hour
+					access_expires 	: new Date(today.getTime() + 1000 * 60 * 60 * 3), // access token expires in one(three) hour
 					refresh_expires : new Date(today.getTime() + 1000 * 60 * 60 * 24 * 14) // refresh token expires in 14 days
 
 				}).done(function done (err, accountDev) {
 					if(err) res.send(500);
 					res.json({
 						access_token: accountDev.access_token,
-						expires_in: 3600,
+						expires_in: 10800,//3600
 						token_type: "bearer",
 						refresh_token: accountDev.refresh_token,
 						is_enterprise: account.is_enterprise,
@@ -63,6 +65,16 @@ var AuthController = {
 // When the form is visited, remember where the user was trying to go so she can be
 // redirected back.  This may get overridden later if an API key is present in the request.
 		if(req.method === 'GET') {
+
+		 var NA = require("nodealytics");
+                    NA.initialize('UA-47189718-1', 'https://www.olympus.io', function () {
+                    });
+//                    console.log('LogIN  LogIN  LogIN  LogIN  LogIN  LogIN  LogIN  LogIN  LogIN  LogIN ');
+                    NA.trackEvent('Delete', 'Delete directory', function (err, resp) {
+                        if (!err && resp.statusCode === 200) {
+//                            console.log('Event has been tracked with Google Analytics');
+                        }
+                    });
 
 			if(!req.headers['referer'] || req.headers['referer'].match(/\/login\/?$/)) {
 				req.session.reroutedFrom = null;
@@ -430,7 +442,9 @@ var AuthController = {
 		// Handles sending the user to change their password.
 		if(req.method == 'GET' && req.param('code')) {
 			return Account.find({
-				where: { verificationCode: req.param('code') }
+				where: {
+					verificationCode: req.param('code')
+				}
 			}).done(function(err, account) {
 				// No account found?  Then bail.
 				if (account === null) {
@@ -458,46 +472,41 @@ var AuthController = {
 
 		// Send the forgot password email and respond to the user.
 		if(req.method == 'POST') {
-
-			console.log(req);
 		    if(req.params.emailid==undefined){
-            	var email= req.param('email');
-            }else{
-            	var email= req.params.emailid;
-			}
+                        var email= req.param('email');
+                    }else{
+                        var email= req.params.emailid;
+                    }
 			
 			Account.find({
 				where: {
 					email: email
 				}
 			}).done(function(err, account) {
-				
 				if (err || !account){
-                	if(req.params.emailid==undefined){
-						return res.redirect("/auth/resetPassword?error=That email address doesn't exist.");
-					}else{
-                    	return res.json({message: 'That email address does not exist.'});
-					}        
-				}
+                                    if(req.params.emailid==undefined){
+                                           return res.redirect("/auth/resetPassword?error=That email address doesn't exist.");
+                                    }else{
+                                           return res.json({message: 'That email address does not exist.'});
+                                    }        
+                                }
                     
 				EmailService.sendForgotPasswordEmail({
 					host: req.header('host'),
 					account: account
 				});
-                
-                if(req.params.emailid==undefined){
-                	res.view('auth/check_your_email', {
-						message: 'An email has been sent to recover your password.'
-                    });
-				}else{
-                	return res.json({message: 'An email has been sent check your new password.'});
-                }
+                                 if(req.params.emailid==undefined){
+                                    res.view('auth/check_your_email', {
+					message: 'An email has been sent to recover your password.'
+                                    });
+                                }else{
+                                    return res.json({message: 'An email has been sent check your new password.'});
+                                }
 			});
 		}
 	},
 
-
-forgetPassword: function(req, res) {
+	forgetPassword: function(req, res) {
             
             console.log(req.params.emailid);
 
@@ -531,7 +540,6 @@ forgetPassword: function(req, res) {
                       });
 		}
 	},
-
 
 	createPassword: function(req, res) {
 		var password = req.param('prometheus');

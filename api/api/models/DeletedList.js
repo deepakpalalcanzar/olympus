@@ -124,8 +124,12 @@ module.exports = {
                 }
             });
         });
+
+
     },
 
+
+    
 
     updateFile : function(options, cb){
 
@@ -164,9 +168,12 @@ module.exports = {
                         }).then(function(per){
 
                         });
+
+
                     });
                 });
             }
+
         }, function(err, result){
             if (err) cb(null ,err);
             cb(null, result);

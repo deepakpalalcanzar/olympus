@@ -310,6 +310,14 @@ module.exports = {
         controller: 'file',
         action: 'enablePublicLink'
     },
+    '/file/enableLinkPassword': {
+        controller: 'file',
+        action: 'enableLinkPassword'
+    },
+    '/file/changeLinkPassword': {
+        controller: 'file',
+        action: 'changeLinkPassword'
+    },
     '/tempaccount/dataSync/:access_token/:lastsync': {
         controller: 'tempaccount',
         action: 'dataSyncing'

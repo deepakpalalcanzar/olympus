@@ -794,6 +794,133 @@ payment: function(req, res){
         });
     },
 
+
+
+    /* for check Delete it after check*/ 
+    billingPlan: function(req, res){
+
+        var d = new Date();
+        var y = d.getFullYear(); 
+        var nn = y+parseInt('2');
+
+        var request     = require('request');
+        var paypal_sdk  = require('paypal-rest-sdk');
+
+        paypal_sdk.configure({
+            'host': 'api.sandbox.paypal.com',
+            'client_id': 'Acp-phDclj-YRVsO7Id0BPSqvV3KkjqwkMbGxgA1fY2kIJVsWztWmB19XJlI',
+            'client_secret': 'EBCNCRCjlhhTBUaHNv6ViNx5O2VsHmuu7veONAKw-t7hxtLqqQBu3rd_RUIr' 
+        });
+
+        paypal_sdk.generate_token(function(error, token){
+            if(error){
+                console.log('***token11 error**');
+                console.error(error);
+            } else {
+                console.log('***token11 success**');
+                console.log(token);
+            }
+        });
+
+        var billingPlanAttributes = {
+            "description": "Create Plan for Regular",
+            "merchant_preferences": {
+                "auto_bill_amount": "yes",
+                "cancel_url": "http://www.cancel.com",
+                "initial_fail_amount_action": "continue",
+                "max_fail_attempts": "1",
+                "return_url": "http://www.success.com",
+                "setup_fee": {
+                    "currency": "USD",
+                    "value": "25"
+                }
+            },
+            "name": "Testing1-Regular1",
+            "payment_definitions": [
+                {
+                    "amount": {
+                        "currency": "USD",
+                        "value": "100"
+                    },
+                    "charge_models": [
+                        {
+                            "amount": {
+                                "currency": "USD",
+                                "value": "10.60"
+                            },
+                            "type": "SHIPPING"
+                        },
+                        {
+                            "amount": {
+                                "currency": "USD",
+                                "value": "20"
+                            },
+                            "type": "TAX"
+                        }
+                    ],
+                    "cycles": "0",
+                    "frequency": "MONTH",
+                    "frequency_interval": "1",
+                    "name": "Regular 1",
+                    "type": "REGULAR"
+                },
+                {
+                    "amount": {
+                        "currency": "USD",
+                        "value": "20"
+                    },
+                    "charge_models": [
+                        {
+                            "amount": {
+                                "currency": "USD",
+                                "value": "10.60"
+                            },
+                            "type": "SHIPPING"
+                        },
+                        {
+                            "amount": {
+                                "currency": "USD",
+                                "value": "20"
+                            },
+                            "type": "TAX"
+                        }
+                    ],
+                    "cycles": "4",
+                    "frequency": "MONTH",
+                    "frequency_interval": "1",
+                    "name": "Trial 1",
+                    "type": "TRIAL"
+                }
+            ],
+            "type": "INFINITE"
+        };
+
+        paypal_sdk.billingPlan.create(billingPlanAttributes, function (error, billingPlan) {
+            if (error) {
+                console.log(error);
+                throw error;
+            } else {
+                console.log("Create Billing Plan Response");
+                console.log(billingPlan);
+            }
+        });
+
+
+        res.view('subscription/confirm',{
+            payment_id  : 'aaaa',
+            create_time : 'bbbbb',
+            state       : 'cccc',
+            amount      : '122',
+            email       : 'darren@gmail.com',
+        });
+
+    },
+    /* end check*/
+
+
+
+
+
 /* for check Delete it after check*/ 
 confirm: function(req, res){
   var d = new Date();
