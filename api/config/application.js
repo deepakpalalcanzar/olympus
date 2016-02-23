@@ -12,7 +12,7 @@ module.exports = {
   environment: process.env.NODE_ENV || 'development',
 
   // Used for sending emails
-  hostName: 'localhost',
+  hostName: 'dev1.olympus.io',
   protocol: 'https://',
 
   // TODO: make this an adapter config

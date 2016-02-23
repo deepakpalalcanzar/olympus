@@ -12,18 +12,13 @@ Mast.registerComponent('AppearanceComponent',{
 		navigation_color	: '#4f7ba9',
 		body_background		: '#f9f9f9',
 		footer_background	: '#f9f9f9',
-		font_color			: '#547aa4',
-		font_family			: 'ProzimanovaRegular, Helvetica, Ariel, sans-serif'
+		font_color		: '#547aa4',
+		font_family		: 'ProzimanovaRegular, Helvetica, Ariel, sans-serif'
 	}, 
 
 	finalizeHeaderColor: function(){
-		
 		var workArea = $('.colpick_submit').parent().parent().attr('class');
 		var x = $('.colpick_hex_field > input').val();
-
-		console.log(workArea);
-		console.log(x);
-
 		if(workArea == 'olympusHeader'){
 			$("#top-nav").css({ 'background-color' : "#"+x });
 		}else if (workArea == 'olympusBody'){
@@ -38,14 +33,12 @@ Mast.registerComponent('AppearanceComponent',{
 	},
 
 	saveConfiguration: function(){
-
 		var themeChanges = this.getThemeColors();
 		Mast.Socket.request('/theme/updateColor', themeChanges, function(req, err){
 			if(req.type === 'success'){
 				alert("Theme updated successfully.");
 			}
 		});
-
 	},
 
 	// get theme changes 

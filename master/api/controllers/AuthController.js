@@ -64,16 +64,6 @@ var AuthController = {
 // redirected back.  This may get overridden later if an API key is present in the request.
 		if(req.method === 'GET') {
 
-		 var NA = require("nodealytics");
-                    NA.initialize('UA-47189718-1', 'https://www.olympus.io', function () {
-                    });
-//                    console.log('LogIN  LogIN  LogIN  LogIN  LogIN  LogIN  LogIN  LogIN  LogIN  LogIN ');
-                    NA.trackEvent('Delete', 'Delete directory', function (err, resp) {
-                        if (!err && resp.statusCode === 200) {
-//                            console.log('Event has been tracked with Google Analytics');
-                        }
-                    });
-
 			if(!req.headers['referer'] || req.headers['referer'].match(/\/login\/?$/)) {
 				req.session.reroutedFrom = null;
 			} else {
@@ -470,71 +460,20 @@ var AuthController = {
 
 		// Send the forgot password email and respond to the user.
 		if(req.method == 'POST') {
-		     if(req.params.emailid==undefined){
-                        var email= req.param('email');
-                    }else{
-                        var email= req.params.emailid;
-                    }
 			Account.find({
 				where: {
-					email: email
+					email: req.param('email')
 				}
 			}).done(function(err, account) {
-				if (err || !account){
-                                    if(req.params.emailid==undefined){
-                                           return res.redirect("/auth/resetPassword?error=That email address doesn't exist.");
-                                    }else{
-                                           return res.json({message: 'That email address does not exist.'});
-                                    }        
-                                }
-                    
+				if (err || !account) return res.redirect("/auth/resetPassword?error=That email address doesn't exist.");
 				EmailService.sendForgotPasswordEmail({
 					host: req.header('host'),
 					account: account
 				});
-                                 if(req.params.emailid==undefined){
-                                    res.view('auth/check_your_email', {
+				res.view('auth/check_your_email', {
 					message: 'An email has been sent to recover your password.'
-                                    });
-                                }else{
-                                    return res.json({message: 'An email has been sent check your new password.'});
-                                }
-			});
-		}
-	},
-
-	forgetPassword: function(req, res) {
-            
-            console.log(req.params.emailid);
-
-		// Send the forgot password email and respond to the user.
-		if(req.method == 'POST') {
-			Account.find({
-				where: {
-					email: req.params.emailid
-				}
-			}).done(function(err, account) {
-				if (err || !account) return res.json({message: 'That email address does not exist.'});
-                                
-                               var randPassword = AuthenticationService.randString(6);
-                               var hashPassword =  AuthenticationService.hashPassword(randPassword);
-                                
-                                 var sql = "UPDATE account SET password=? WHERE email=?";
-                                    sql = Sequelize.Utils.format([sql, hashPassword , req.params.emailid]);
-
-
-                                    sequelize.query(sql, null, {
-                                        raw: true
-                                    }).success(function (accountdetails) {
-                                
-				EmailService.sendForgotPassword({
-					host: req.header('host'),
-					account: account,
-					randPassword: randPassword,
 				});
-				return res.json({message: 'An email has been sent check your new password.'});
 			});
-                      });
 		}
 	},
 

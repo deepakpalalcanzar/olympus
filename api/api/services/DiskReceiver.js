@@ -2,14 +2,24 @@ var path = require('path');
 var fsx = require('fs-extra');
 var UUIDGenerator = require('node-uuid');
 
-var easyimg = require('easyimage');
-
 module.exports = {
 
 
 	newEmitterStream: function newEmitterStream (options) {
+
 		sails.log('Downloading '+options.id+' using from Disk.');
-		return blobAdapter.read({ id : path.resolve(sails.config.uploadPath||'files', options.id) });
+		//return blobAdapter.read({id: path.resolve(sails.config.uploadPath||'files', options.id)});
+
+		if(options.thumb === '1'){
+			return blobAdapter.read({
+				id: path.resolve(sails.config.uploadPath||'files', 'thumbnail-'+options.id),
+			});
+		}else{
+			return blobAdapter.read({
+				id: path.resolve(sails.config.uploadPath||'files', options.id),
+			});
+		}
+
 	},
 
 
@@ -34,6 +44,7 @@ module.exports = {
 	/**
 	 * Build a mock writable stream that handles incoming files.
 	 * (used for file uploads)
+	 * 
 	 * @return {Stream.Writable}
 	 */
 	
@@ -48,15 +59,14 @@ module.exports = {
 		receiver__._write = function onFile (__newFile, encoding, next) {
 
 		    // Create a unique(?) filename
-		    var fsName 		= UUIDGenerator.v1();
+		    var fsName = UUIDGenerator.v1();
 		    __newFile.extra = {fsName:fsName};
 
 	    	// var fsName = uuid + "." + _.str.fileExtension(__newFile.filename);
 
-			log(('Receiver DISK: Received file `'+__newFile.filename+'` from an Upstream.').grey);
+			log(('Receiver: Received file `'+__newFile.filename+'` from an Upstream.').grey);
 
 			var outs = blobAdapter.touch({id: path.resolve(sails.config.uploadPath||'files', fsName)});
-			
 			outs.written = 0;
 
 			__newFile.on('readable', readFromStream);
@@ -97,9 +107,8 @@ module.exports = {
 				log(('Receiver: Finished writing `'+__newFile.filename+'`').grey);
 				next();
 			});
-
 			outs.on('error', function (err) {
-				log(('Receiver Disk: Error writing `'+__newFile.filename+'`:: '+ require('util').inspect(err)+' :: Cancelling upload and cleaning up already-written bytes...').red);
+				log(('Receiver: Error writing `'+__newFile.filename+'`:: '+ require('util').inspect(err)+' :: Cancelling upload and cleaning up already-written bytes...').red);
 				
 				// Garbage-collects the already-written bytes for this file.
 				blobAdapter.rm({id: path.resolve(sails.config.uploadPath||'files', fsName)}, function (rmErr) {
@@ -131,13 +140,14 @@ var blobAdapter = {
 	},
 
 	read: function (options) {
-
-		var id 			= options.id;
-		var filePath 	= id;
+		var id = options.id;
+		var filePath = id;
 
 		// TODO: validate/normalize file path
+
 		return fsx.createReadStream(filePath, 'utf8');
 	},
+
 
 	generateThumb: function(options){
 		var id 			= options.id;

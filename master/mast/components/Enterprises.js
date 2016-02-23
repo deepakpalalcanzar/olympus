@@ -87,6 +87,7 @@ Mast.registerTree('EnterprisesTable', {
 		var item = this.collection.get(id);
 		if(typeof item !== 'undefined'){
 			if(confirm('Are you sure ?')){
+				
 				Mast.Socket.request('/enterprises/deleteEnterprises', { id: id}, function(res, err){
 					if(res.error_msg){
 						alert(res.error_msg);		
@@ -94,10 +95,10 @@ Mast.registerTree('EnterprisesTable', {
 						self.remove(id);
 					}
 				});
+				
 			}
 		}
 	},
-
 });
 
 
@@ -128,7 +129,7 @@ Mast.registerComponent('EnterprisesRow', {
 
 		Mast.Socket.request('/enterprises/impersonate', options, function(req, err) {
 			if(req == 200){
-				window.open('https://dev.olympus.io/', '_blank');
+				 window.open('https://dev.olympus.io/', '_blank');
 				//window.open('https://localhost/', '_blank');
 				window.focus();
 			}		

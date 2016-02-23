@@ -1,12 +1,12 @@
 <!-- details template -->
 <div class="user-details-template account-page-container">
-    <div style="width:100%;background: none repeat scroll 0 0 #dee6f5;color: #636c78;padding: 10px;">
+  <div style="width:100%;background: none repeat scroll 0 0 #dee6f5;color: #636c78;padding: 10px;">
         <h1>User Detail</h1>
-    </div> 
-    <div style="padding: 10px;">
+  </div> 
+  <div style="padding: 10px;">
         <h1> Using {{size/1000000}} MB of {{ quota/1000000000 }} GB</h1>
     </div> 
-    <div style="width:98%;">&nbsp;</div>
+  <div style="width:98%;">&nbsp;</div>
 
   <div class="user-details-container clearfix">
     
@@ -26,11 +26,9 @@
         <input id="email" name="email" type="text" value="{{email}}" />
         <label for="phone">Phone number</label>
         <input id="phone" name="phone" placeHolder = "Phone Number" type="text" value="{{phone}}" />
-        
-        <input id="phone" name="user_id" type="hidden" value="{{id}}" />
-
-     
-
+        <input id="user_id" name="user_id" type="hidden" value="{{id}}" />
+        <div class="subscription_id"> <label>Subscription</label></div>
+	<select id="subscription_id" name="subscription_id" class="new-user-select user-subscription"></select>
       </fieldset>
     </form>
 

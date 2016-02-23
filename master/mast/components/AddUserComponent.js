@@ -71,7 +71,7 @@ Mast.registerComponent('AddUserComponent',{
 					alert('You have not subscribed any plan yet!');
 					Mast.navigate('#account/subscription');
 				}else{
-					if(re.error){
+					if(re.error && Mast.Session.Account.isSuperAdmin!= true){//superdmin check:Rishabh-Superadmin have no limits on creating accounts
 						alert('You have reaced maximum limit of creating users');
 					}else{
 						Mast.Socket.request('/enterprises/getQuota', {sub_id:userData.subscription}, function(reso, erro){

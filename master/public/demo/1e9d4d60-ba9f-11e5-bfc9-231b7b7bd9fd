@@ -1,0 +1,55 @@
+<html>
+    <head>
+        <title> Olympus | Sharing The Cloud | Licence Agreement </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="css/stylesheet.css">
+       	<script type="text/javascript" src="lib/air/jquery-1.11.2.min.js"></script>
+	    <script type="text/javascript" src="lib/air/AIRAliases.js"></script>
+	    <script type="text/javascript" src="dbconnection/connection.js"></script>
+        <script type="text/javascript" src="lib/air/AIRIntrospector.js"></script>  
+        <script type="text/javascript" src="lib/air/global.js"></script>
+    </head>
+
+    <body style="background-color:#383f4f;">
+        <div class="container center_div">
+            <div style='display: block; height: 50px'>&nbsp;</div>
+            <div id='to-be-sized'>&nbsp;</div>
+            <div class="row clearfix">
+            	<div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12"></div>
+                        <div align="center">
+                        	<img src="/images/installation_1_05.png" WIDTH="406" HEIGHT="46" vspace="10" hspace="10">
+                    	</div>
+                     	<div class="col-lg-12 col-md-12 col-sm-12">&nbsp;</div>
+                       	<div align="center">
+                       		<div id="msg">&nbsp;</div>
+                    		<label for="aboutDescription" id="aboutHeading"></label>
+               				<textarea rows="7" cols="60" id="aboutDescription" style="resize: none">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</textarea>
+                  			<a id="imageURLId" target="_blank"></a>
+                		</div>
+                   		<div class="col-lg-12 col-md-12 col-sm-12">&nbsp;</div>
+               			<div style="margin-left: 80px; margin-top: -15px;">
+                  			<input type="checkbox" id="checkme" name="accept_agreement">
+               				<label for="terms" style="color:#FFF;">
+                    			I agree to the license terms and conditions
+              				</label>&nbsp;&nbsp;
+           				</div>
+					   				
+               			<div class="col-sm-12">&nbsp;</div>
+						
+                  		<div align="center">
+                   			<a href="#" onClick="return acceptAgreement();">
+                   				<input type="image"id="install" src="/images/installation_0_b_07.png" class="thumbnails">
+							</a>&nbsp;&nbsp;
+                	  		<a href="index.html">
+                	  			<input type="image"id="cancel" src="/images/installation_0_b_09.png" class="thumbnails">
+							</a>
+                    	</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+
+</html>

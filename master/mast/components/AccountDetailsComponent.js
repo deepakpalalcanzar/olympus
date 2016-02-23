@@ -27,8 +27,6 @@ Mast.registerComponent('AccountDetails', {
 		if (Mast.isTouch) {
 			this.$('.change-profile-pic').remove();
 		}
-
-		this.attach('.quotas-outlet', 'QuotasComponent');
 	},
 
 	// set model to the mast session account attributes. Useful for placing the attributes as
@@ -56,14 +54,28 @@ Mast.registerComponent('AccountDetails', {
 	updateAccountDetails: function() {
 		
 		var self = this;
+		console.log("aaaaaaaaaaaaaaaaaaaaa");
+		console.log(fileData);
+		
 		if(fileData !== 'undefined'){
 
 			var file = fileData[0];
 			var img = cropper.getDataURL();
 			$('.cropped_profile_image').html('');
 			$('.cropped_profile_image').append('<img src="'+img+'">');
+
+			console.log("popopopopopoppopoppopopopopopopoppppopopopopopopoppopoppop");
+				console.log(file);
+			console.log("popopopopopoppopoppopopopopopopoppppopopopopopopoppopoppop");
+
+
 			Mast.Socket.request('/account/imageUpload', { name:file.name, type:file.type, size:file.size, binary: img, pic_type : 'profile' }, function(req, res, next) {
+				console.log("responseresponseresponseresponseresponseresponse");
+					console.log(req);
+					console.log(res);
+				console.log("responseresponseresponseresponseresponseresponse");				
 			});
+			
 			alert('Your account has been updated.');
 			$('.user-avatar').attr('src', img);
 

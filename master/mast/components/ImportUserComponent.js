@@ -17,8 +17,11 @@ Mast.registerComponent('ImportUserComponent', {
 
         var self = this;
         var userData = this.getFormData();
+
         if (self.validateForm()) {
+
             Mast.Socket.request('/profile/checkUsersLimit', null, function (re, er) {
+
                 if (re.not_subscriber && Mast.Session.Account.isSuperAdmin != true) {
                     alert('You have not subscribed any plan yet!');
                     Mast.navigate('#account/subscription');
@@ -34,7 +37,6 @@ Mast.registerComponent('ImportUserComponent', {
                     } else {
 
                         Mast.Socket.request('/account/readCSVFile', { filepath: userData.filepath }, function (reso, er) {
-
                             if (reso) {
                                 self.clearForm();
                                 $("#msgid").html("");

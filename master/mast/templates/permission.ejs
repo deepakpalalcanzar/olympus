@@ -21,6 +21,14 @@
 		<div class="public-link">
 			<input type="text" value="{{link}}" />
 		</div>
+		<div class="link-password-option">
+			<label for="link_password_enabled">Make link password protected?</label>
+
+			<input type="checkbox" class="link_password_enabled" name="link_password_enabled" value="no"/>
+		</div>
+		<div class="link-password">
+			<input type="password" class="link_password" name="link_password" placeholder="Enter password here" value="" />
+		</div>
 	</div>
 
 	  <div class="sharing-form">
@@ -36,7 +44,7 @@
 	  <input class="accounts" placeholder="Enter name or email address" />
 	</div>
 	<div class="comment-form-fix" style="float:right;">
-	  <img class="addSharedUser-button" src="/images/SendInvite_button.png" />
+	  <img class="addSharedUser-button"  onclick="ga('send', 'event', 'Shared', 'Shared','Shared');" src="/images/SendInvite_button.png" />
 	</div>
   </div>
 

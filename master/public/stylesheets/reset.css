@@ -64,6 +64,7 @@ html, body {
 }
 
 .btn-primary{
+    margin-left:5;
     border-radius: 4px;color: #fff;
     background-color: #428bca;
     border-color: #357ebd;    

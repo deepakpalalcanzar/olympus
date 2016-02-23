@@ -28,6 +28,8 @@ var easyimg = require('easyimage');
 
 var encryptedData = {};
 
+
+
 var FileController = {
     /**
      * POST /files/:id/copy
@@ -101,12 +103,12 @@ var FileController = {
     },
     share: function (req, res) {
 
-      NA.trackEvent('Share', 'Share', function (err, resp) {
+	  NA.trackEvent('Share', 'Share', function (err, resp) {
             if (!err && resp.statusCode === 200) {
                 console.log('Event has been tracked with Google Analytics');
             }
         });
-    
+	
 
         var fileId = req.params.id;
         var emails = req.param('emails', []);
@@ -290,21 +292,16 @@ var FileController = {
             res.json(file, 200);
         });
     },
-
     download: function (req, res) {
-        
-        NA.trackEvent('Download', 'Download File', function (err, resp) {});
-        
-        var emitter =   global[sails.config.receiver + 'Receiver'].newEmitterStream({
-                            id: req.param('id'), 
-                            stream: res
-                        });
-
-        emitter.on('finish', function () { res.end(); });
+	  NA.trackEvent('Download', 'Download File', function (err, resp) {});
+        var emitter = global[sails.config.receiver + 'Receiver'].newEmitterStream({id: req.param('id'), stream: res});
+        emitter.on('finish', function () {
+            res.end();
+        });
         emitter.pipe(res);
     },
     
-    thumbnaildownload: function (req, res) {
+ thumbnaildownload: function (req, res) {
 
         var thumb   = path.resolve(sails.config.uploadPath||'files', 'thumbnail-'+req.param('id'));
         var mainFile= path.resolve(sails.config.uploadPath||'files', req.param('id'));
@@ -320,13 +317,13 @@ var FileController = {
 
                 if(sails.config.receiver === 'Disk'){
                     easyimg.resize({
-                        src: '/var/www/html/olympus/olympus1/api/files/'+req.param('id'), 
-                        dst: '/var/www/html/olympus/olympus1/api/files/thumbnail-'+req.param('id'), width: 150, height: 150
+                        src: '/var/www/html/olympus/api/files/'+req.param('id'), 
+                        dst: '/var/www/html/olympus/api/files/thumbnail-'+req.param('id'), width: 150, height: 150
                     }).then(
                         function(image) {
                             easyimg.resize({
-                                src: '/var/www/html/olympus/olympus1/api/files/'+req.param('id'), 
-                                dst: '/var/www/html/olympus/olympus1/master/public/images/thumbnail-'+req.param('id'), width: 150, height: 150
+                                src: '/var/www/html/olympus/api/files/'+req.param('id'), 
+                                dst: '/var/www/html/olympus/master/public/images/thumbnail-'+req.param('id'), width: 150, height: 150
                             });
                             console.log('Resized and cropped: ' + image.width + ' x ' + image.height);
                         },
@@ -344,6 +341,8 @@ var FileController = {
 
         });
     },
+
+
 
     upload: function (req, res) {
 
@@ -367,7 +366,21 @@ var FileController = {
             data = {parent: {id: req.param('id')}};
         } else if (req.param('parent_id')) {
             data = {parent: {id: req.param('parent_id')}};
+        }else{
+            return res.end(500, {"error": "no data retrieved."});
         }
+
+// console.log('LLLLLLLLLLLLLLLLLLLLLLLLHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH');
+// console.log(req);
+// console.log('LLLLLLLLLLLLLLLLLLLLLLLLHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH');
+
+        if (req.headers['user-agent'].indexOf('AdobeAIR') > -1) {
+            var user_platform = "desktopApp";
+        } else {
+            var user_platform = req.headers['user-agent'];
+        }
+        console.log(user_platform);
+        console.log('user-agent');
 
         //  Get the current workgroup size
         Directory.workgroup({id: data.parent.id}, function (err, workgroup) {
@@ -377,20 +390,49 @@ var FileController = {
                 totalUploadSize: req.headers['content-length']
             });
 
+
+            console.log(sails.config.receiver + 'Receiver');
+            console.log(global[sails.config.receiver + 'Receiver']);
+
             receiver.on('progress', function (progressData) {
+                console.log('22222222222222222222222222222222222222222222');
                 progressData.parentId = typeof req.param('data') == 'undefined' ? req.param('parent_id') : data.parent.id;
                 res.write(JSON.stringify(progressData), 'utf8')
+            }).on('error', function(err){
+                console.log('hththththhthththththththhthththththththhthththththththhththt');
+                return res.end(JSON.stringify({error: 'dashgdjashgdjsajdg'}), 'utf8');
             });
 
-            uploadStream.upload(receiver, function (err, files) {
+console.log('kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk');
 
+//Rishabh
+// In a FileController.js or similar controller...
+
+var d = require('domain').create()
+
+// Intentional noop - only fired when a file upload is aborted and the actual
+// error will be properly passed to the function callback below
+d.on('error', function (err) {console.log('testOOOtestOOOtestOOOtestOOOtestOOOtestOOOtestOOO');
+    return res.end(JSON.stringify({error: 'dashgdjashgdjsajdg1'}), 'utf8');})
+//Rishabh
+
+d.run(function safelyUpload () {//Rishabh
+            uploadStream.upload(receiver, function (err, files) {
+                console.log('333333333333333333333333333333333333333333');
                 if (err) {
-                    return res.write(JSON.stringify({error: err}), 'utf8');
+                    console.log('jhonjhonjhonjhonjhonjhonjhonjhonjhonjhonjhonjhonjhonjhon');
+                    console.log(err);
+                    console.log('jhon22jhon22jhon22jhon22jhon22jhon22jhon22jhon22jhon22jhon22');
+                    return res.end(JSON.stringify({error: 'dashgdjashgdjsajdg2'}), 'utf8');
+                }
+                else if(files.length === 0){
+                    // proceed without files
+                    return res.end(500, {"error": "no file uploaded"});
                 }
 
                 var file = files[0];
                 if (file === undefined) {
-                    return res.write(JSON.stringify({error: err}), 'utf8');
+                    return res.end(JSON.stringify({error: 'dashgdjashgdjsajdg3'}), 'utf8');
                 }
 
                 // Find the file with the same name in a database             
@@ -399,7 +441,7 @@ var FileController = {
                     DirectoryId: data.parent.id,
                 }).exec(function (err, fileData) {
                     // If File exist in a database then find the maximum version of that file 
-
+console.log('44444444444444444444444444444444444444');
                     if (fileData) {
 
                         var versionData = new Array();
@@ -408,20 +450,39 @@ var FileController = {
                         Version.find({
                             parent_id: fileData.id
                         }).done(function (err, maxData) {
-
+console.log('55555555555555555555555555555555555555');
                             if (maxData.length == '0') {
 
                                 if (fileData.size == file.size) {
                                     streamAdaptor.firstFile(
                                             {first: fileData.fsName, second: file.extra.fsName}, function (rmErr) {
+                                                console.log('666666666666666666666666666666666');
                                         var parsedResponse = JSON.parse(rmErr)
-                                        if (parsedResponse.first === parsedResponse.second) {
-                                            // fsx.unlink('/var/www/html/olympus/api/files/' + file.extra.fsName);
-                                            // fsx.unlink('/home/alcanzar/api/files/'+file.extra.fsName);
-                                            return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
+                                        if(rmErr.error === false){//Rishabh: check for error
+                                            if (parsedResponse.first === parsedResponse.second) {
+                                                // fsx.unlink('/var/www/html/olympus/api/files/' + file.extra.fsName);
+                                                // fsx.unlink('/home/alcanzar/api/files/'+file.extra.fsName);
+                                                if(user_platform == 'desktopApp'){
+                                                    return res.end(JSON.stringify({error: "FileExist",filedata:fileData}), 'utf8');
+                                                }else{
+                                                    return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
+                                                }
+                                            }
+                                        }else{
+                                            res.end(JSON.stringify({
+                                                origParams: req.params.all(),
+                                                name: file.filename,
+                                                size: file.size,
+                                                fsName: file.extra.fsName,
+                                                mimetype: file.type,
+                                                version: parseInt(findMax) + 1,
+                                                oldFile: fileData.id,
+                                                thumbnail: "1",
+                                            }), 'utf8');
                                         }
                                     });
                                 } else {
+                                    console.log('77777777777777777777777777777777777');
                                     res.end(JSON.stringify({
                                         origParams: req.params.all(),
                                         name: file.filename,
@@ -434,29 +495,60 @@ var FileController = {
                                     }), 'utf8');
                                 }
                             } else {
-
+console.log('888888888888888888888888888888888888');
                                 maxData.forEach(function (applicant) {
                                     versionData.push(applicant.version);
                                     fileVersionData.push(applicant.FileId);
                                 });
-
+console.log(versionData);
+console.log('fileVersionData');
+console.log(fileVersionData);
                                 var findMax = Math.max.apply(Math, versionData);
                                 var maxElementIndex = versionData.indexOf(Math.max.apply(Math, versionData));
-
+console.log('masElementIndex');
+console.log(maxElementIndex);
                                 File.findOne({
                                     id: fileVersionData[maxElementIndex]
                                 }).done(function (err, latestFile) {
+
+                                    if (err) {
+                                        return res.write(JSON.stringify({error: err}), 'utf8');
+                                    }
+                                    console.log('999999999999999999999999999999');
+                                    console.log(file);
+                                    console.log('747474747474747474747474747474');
+                                    console.log(latestFile);
                                     if (latestFile.size == file.size) {
                                         streamAdaptor.firstFile(
                                                 {first: latestFile.fsName, second: file.extra.fsName}, function (rmErr) {
+                                                    console.log('1010101010101010101010101010101010');
+                                                    console.log(rmErr);
                                             var parsedResponse = JSON.parse(rmErr)
-                                            if (parsedResponse.first === parsedResponse.second) {
-                                                //fsx.unlink('/var/www/html/olympus/api/files/' + file.extra.fsName);
-                                                // fsx.unlink('/home/alcanzar/api/files/'+file.extra.fsName);
-                                                return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
+                                            if(rmErr.error === false){//Rishabh: check for error
+                                                if (parsedResponse.first === parsedResponse.second) {
+                                                    //fsx.unlink('/var/www/html/olympus/api/files/' + file.extra.fsName);
+                                                    // fsx.unlink('/home/alcanzar/api/files/'+file.extra.fsName);
+                                                    if(user_platform == 'desktopApp'){
+                                                        return res.end(JSON.stringify({error: "FileExist",filedata:latestFile}), 'utf8');
+                                                    }else{
+                                                        return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
+                                                    }
+                                                }
+                                            }else{
+                                                res.end(JSON.stringify({
+                                                    origParams: req.params.all(),
+                                                    name: file.filename,
+                                                    size: file.size,
+                                                    fsName: file.extra.fsName,
+                                                    mimetype: file.type,
+                                                    version: parseInt(findMax) + 1,
+                                                    oldFile: fileData.id,
+                                                    thumbnail: "1",
+                                                }), 'utf8');
                                             }
                                         });
                                     } else {
+                                        console.log('1212121212121212121212121212121212');
                                         res.end(JSON.stringify({
                                             origParams: req.params.all(),
                                             name: file.filename,
@@ -473,6 +565,7 @@ var FileController = {
                         });
 
                     } else {
+                        console.log('13131313131313131313131313131313');
                         res.end(JSON.stringify({
                             origParams: req.params.all(),
                             name: file.filename,
@@ -487,35 +580,53 @@ var FileController = {
 
 
                     if (file.type == "image/png" || file.type == "image/jpg" || file.type == "image/jpeg") {
-                        
+                        console.log('1414141414141414141414141414141414');
                         if (sails.config.receiver == "S3") {
                         }  else {
-
-                            easyimg.resize({src: '/var/www/html/olympus/olympus1/api/files/' + file.extra.fsName, dst: '/var/www/html/olympus/api/files/thumbnail-' + file.extra.fsName, width: 150, height: 150}, function (err, stdout, stderr) {
-                                if (err)
-                                    throw err;
-                                console.log('Resized to 100x100');
+console.log('151515151515151515151515151515151515151515151515151515151515151515151515');
+                            easyimg.resize({src: '/var/www/html/olympus/api/files/' + file.extra.fsName, dst: '/var/www/html/olympus/api/files/thumbnail-' + file.extra.fsName, width: 150, height: 150}, function (err, stdout, stderr) {
+                                if (err){
+                                    // throw err;
+                                    // return res.write(JSON.stringify({error: "ImageResizeError",desc: err}), 'utf8');
+                                    console.log('Image not Resized to api/files/');
+                                }else{
+                                    console.log('Resized to 100x100');
+                                }
                             });
 
-                            easyimg.resize({src: '/var/www/html/olympus/olympus1/api/files/' + file.extra.fsName, dst: '/var/www/html/olympus/master/public/images/thumbnail/'+file.filename, width: 150, height: 150}, function (err, stdout, stderr) {
-                                if (err)
-                                    throw err;
-                                console.log('Resized to 100x100');
+
+			                 easyimg.resize({src: '/var/www/html/olympus/api/files/' + file.extra.fsName, dst: '/var/www/html/olympus/master/public/images/thumbnail/'+file.filename, width: 150, height: 150}, function (err, stdout, stderr) {
+                                if (err){
+                                    // throw err;
+                                    // return res.write(JSON.stringify({error: "ImageResizeError",desc: err}), 'utf8');
+                                    console.log('Image not Resized to master/public/images/thumbnail/');
+                                }else{
+                                    console.log('Resized to 100x100');
+                                }
                             });
+
                         }
-                        
                     }
+
 
                 });
             });
+})//end d.run-Rishabh
+
+
+
         });
+
+
     }
+
+
 };
 
 var streamAdaptor = {
     firstFile: function (options, cb) {
         var hash = crypto.createHash('md5');
-        var s = fsx.createReadStream('/var/www/html/olympus/olympus1/api/files/' + options.first);
+        var s = fsx.createReadStream('/var/www/html/olympus/api/files/' + options.first);
         s.on('readable', function () {
             var chunk;
             while (null !== (chunk = s.read())) {
@@ -523,10 +634,29 @@ var streamAdaptor = {
             }
         }).on('end', function () {
             encryptedData["first"] = hash.digest('hex');
+
+            ///Rishabh
+            var hs = crypto.createHash('md5');
+            var nw = fsx.ReadStream('/var/www/html/olympus/api/files/' + options.second);
+            nw.on('readable', function () {
+                var chunk;
+                while (null !== (chunk = nw.read())) {
+                    hs.update(chunk);
+                }
+            }).on('end', function () {
+                encryptedData["second"] = hs.digest('hex');
+                return cb(JSON.stringify(encryptedData));
+            }).on('error', function(){
+                return cb(JSON.stringify({error:'Latest file is missing.'}));
+            });
+            ///end-Rishabh
+            
+        }).on('error', function(){
+            return cb(JSON.stringify({error:'Old file is missing.'}));
         });
 
-        var hs = crypto.createHash('md5');
-        var nw = fsx.ReadStream('/var/www/html/olympus/olympus1/api/files/' + options.second);
+        /*var hs = crypto.createHash('md5');
+        var nw = fsx.ReadStream('/var/www/html/olympus/api/files/' + options.second);
         nw.on('readable', function () {
             var chunk;
             while (null !== (chunk = nw.read())) {
@@ -534,8 +664,10 @@ var streamAdaptor = {
             }
         }).on('end', function () {
             encryptedData["second"] = hs.digest('hex');
+        }).on('error', function(){
+            return cb(JSON.stringify({error:'Latest file is missing.'}));
         });
-        return cb(JSON.stringify(encryptedData));
+        return cb(JSON.stringify(encryptedData));*/
     }
 };
 

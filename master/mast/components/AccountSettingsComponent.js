@@ -13,7 +13,7 @@ Mast.registerComponent('AccountSettingsComponent',{
 		'click a.account-details'      : 'displayAccountDetails',
 		'click a.account-password'     : 'displayAccountPassword',
 		'click a.account-notifications': 'displayAccountNotifications',
-		'click a.account-subscription' : 'displaySubscribedPlan'
+		'click a.account-subscription': 'displaySubscribedPlan'
 	},
 
 	bindings: {

@@ -6,14 +6,18 @@ var EnterprisesController = {
 
 	listEnterprises: function(req, res){
 
-		var sql = "SELECT e.*,a.id AS account,a.name AS acc_name,a.email AS acc_email,s.id AS sub_id,"+
+		var sql = "SELECT e.*,a.id AS account,a.name AS acc_name,a.email AS acc_email,s.id AS sub_id, dir.size, dir.quota, "+
 		" td.plan_name AS features,td.users_limit FROM enterprises e "+
 		"INNER JOIN account a ON a.id = e.account_id "+
 		"INNER JOIN subscription s ON s.id = a.subscription_id "+
-		"INNER JOIN transactiondetails td ON td.account_id = a.id "+
+        "INNER JOIN transactiondetails td ON td.account_id = a.id "+
+		"INNER JOIN directory dir ON dir.OwnerId = a.id "+
 		" WHERE e.is_active=1 AND td.is_deleted = 0";
-        
-        
+
+        console.log("sqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsql");
+        console.log(sql);
+        console.log("sqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsql");
+
 		sql = Sequelize.Utils.format([sql]);
 		sequelize.query(sql, null, {
 			raw: true
@@ -68,14 +72,21 @@ var EnterprisesController = {
                     "INNER JOIN account a ON a.id = e.account_id "+
                     "INNER JOIN subscription s ON s.id = a.subscription_id "+
                     "INNER JOIN transactiondetails td ON td.account_id = a.id "+
+			"INNER JOIN directory dir ON dir.OwnerId = a.id "+
                     " WHERE e.is_active=1 AND td.is_deleted = 0 LIMIT " + range + " ";
         
-        
+        console.log("#########################################");
+console.log(sql);
+console.log("#########################################");
                                 sql = Sequelize.Utils.format([sql]);
                                 sequelize.query(sql, null, {
                                         raw: true
                                 }).success(function(enterprises) {
                                          if(enterprises.length){ // check for no records exists
+
+console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+console.log(enterprises);
+console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
 
                                         res.json(enterprises, 200);
                                     }else{

@@ -31,6 +31,13 @@ module.exports = {
             defaultsTo: true
         },
 
+        link_password_enabled: {
+          type: 'boolean',
+          defaultsTo: false
+        },
+
+        link_password: 'string',
+
         replaceFileId: 'integer',
 
         DirectoryId: 'integer',
@@ -185,7 +192,5 @@ module.exports = {
                 cb();
             });
         },
-
-        
     }
 };

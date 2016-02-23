@@ -3,7 +3,7 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 	events: {
 		'dblclick'              : 'download',
 		'click'                 : 'select',
-		'clickoutside'          : 'deselect',
+		//'clickoutside'          : 'deselect',
 		'mouseenter >.inode-row': 'displayActionButtons',
 		'mouseleave >.inode-row': 'hideActionButtons',
 		'click .dropdown-button': 'showDropdownAtArrow',
@@ -33,10 +33,25 @@ Mast.components.INodeComponent = Mast.Tree.extend({
     	this.set({ url :  String( window.location ).replace( /#/, "" ) });
         var self = this;
 
-		/*Mast.on('UPLOAD_PROGRESS', function(data) {
+	 if (this.get('type') != "file" && Mast.Session.directory != "Selected") {
+            if (Mast.Session.length !== undefined) {
+                Mast.Session.directory = "Selected";
+                Olympus.ui.fileSystem.get('selectedInode') && Olympus.ui.fileSystem.get('selectedInode').deselect();
+                Olympus.ui.fileSystem.set({selectedInode: this}, {silent: true});
+                this.set({selected: true});
+                if (this.get('type') === 'file') {
+                    Olympus.ui.fileSystem.cd(this.parent);
+                } else {
+                    Olympus.ui.fileSystem.cd(this);
+                }
+            }
+        }
+
+
+		Mast.on('UPLOAD_PROGRESS', function(data) {
 
 	        if (data.files[0].name == self.model.get('name') && self.model.get('parent') && self.model.get('parent').id == data.parentId) {
-	        	console.log("dsaaaaaaaaaaaaaaaa");
+	        	
 	            self.$('.information-stats').hide();
 	            self.$('.progress-bar').show();
 	            progress = Math.round((data.loaded/data.total*100)) + '%';
@@ -44,7 +59,7 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 	            self.$('.bar').css('width', progress);
 	            self.$('.progress .number').html(progress);
 	        }
-		});*/
+		});
 
         Mast.on('NEW_UPLOADING_CHILD', function(data) {
             if (data.id == self.model.id) {
@@ -60,9 +75,8 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 				marshaledData.mimeClass = marshaledData.type.replace('/','-');
 				marshaledData.type = "file";
 
-				console.log(marshaledData);
-
 				self.afterRender();
+
 				// add new marshaled inode to this inodes collecton
 				data.files[0].inodeModel = new self.collection.model(marshaledData);
 				self.collection.add(data.files[0].inodeModel);
@@ -72,7 +86,6 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 				});
 			}
         });
-
 		Mast.on('CANCEL_UPLOAD', function(data) {
 			// Remove the component for the uploading file from the collection
 			if (data.id == self.model.id && self.model.get('type') == 'directory') { 
@@ -199,11 +212,23 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 		'~ITEM_CREATE': function(event) {
 
 			console.log("ITEM_CREATE");
+			// console.log(event);
 
 			if (event && event.source && event.source.parent && event.source.parent.id && 
 				event.source.parent.id == this.get('id')) {
 
+				// console.log(event.source.parent.id ,"+++++ ITEM_CREATE ");
 				var newDir = event.source;
+				// console.log('new dir', newDir);
+				// alert(newDir.name);
+				
+				// var removeFile = newDir.name.replace(/ *\([^)]*\) */g, '');
+				// alert(removeFile);
+				// if($('span:contains("'+removeFile+'")').length > '1') {
+//$('span:contains("'+removeFile+'")').parents().eq(3)
+					// $('.branchOutlet').first().css('background-color', 'blue');
+				// }
+
 				// If this is on the account who created the directory, just update the id
 				if (this.collection.where({id: undefined}).length !== 0) {
 
@@ -222,10 +247,9 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 				else {
 					// creating the new inode and marshaling the data. We then want to 
 					// add 1 to depth to so setPadding will have work properly
-
 					var marshaledData = new Mast.models.INode().marshal(_.extend(newDir, {
-						depth 	: 0,
-						parent 	: _.extend({}, this.model, { model:this.model }) // Hack to get public link visibility working...
+						depth: this.get('depth')+1,
+						parent: _.extend({}, this.model, {model:this.model}) // Hack to get public link visibility working...
 					}));
 
 					if (event.source.created_by.id == Mast.Session.Account.id) {
@@ -249,10 +273,11 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 				Mast.Socket.request('/'+event.source.type+'/subscribe',{
 					id: event.source.id
 				});
-
-				// this.collection.reset();
-				this.collection.fetchMembers(this,function(){
-				});
+					
+				if (event.source.type === "file") {
+					// this.collection.reset();
+					this.collection.fetchMembers(this,function(){});
+				}
 			}
 		},
 
@@ -601,6 +626,7 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 
 	// shows the dropdown menu for inode button
 	showDropdownAtArrow: function(e) {
+
 		this.select(e);
 		Olympus.util.dropdownHelper.showDropdownAt(this.$(".dropdown-button"),-126,24,e,this,this.get('dropdownItems'));
 	},
@@ -614,24 +640,29 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 	displayActionButtons: function(e) {
 		e.preventDefault();
 		e.stopPropagation();
+		
 		// Check if there's an inode being dragged, by checking if a draggable helper element is in the DOM.
 		// If we're doing a drag n' drop, we don't want the action buttons to appear for the row.
 		//
 		// Better: abstract this into a method.
 		if ($('.activeInodeDrag').length > 0) {
+
 			// Files aren't droppable, so add a class that prevents them from being highlighted at all.
 			if (this.model.get('type')=='file') {
 				this.$el.addClass('inode-inactive-on-drag');
 			}
+
 			Olympus.ui.fileSystem.currentHighlightedBranch = this;
 			return;
 		}
+
 		this.$el.closest_descendant('.dropdown-button').show();
 		this.$el.closest_descendant('.sidebar-button').show();
 	},
 	
 	// hide both action buttons for this inode
 	hideActionButtons: function(e) {
+
 		// Make sure the directory is no longer set to "active" for drag n' drop purposes.
 		this.active = false;
 		this.$el.removeClass('inode-inactive-on-drag');
@@ -648,6 +679,7 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 		// that was already created has already been edited so it is no longer auto focused
 		this.$el.closest_descendant('input.inode-name-input').select();
 
+		// ??
 		Olympus.ui.fileSystem.set({
 			renaming: false
 		}, {silent: true});
@@ -674,6 +706,7 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 				id: typeid,
 				name: inodeName
 			}, function(response){
+			self.parent.collection.fetchMembers(self.parent, function () {});
 				if (response === 403) {
 					self.cancel();
 					alert('Permission denied. You do not have sufficient permissions to rename this item.');
@@ -724,22 +757,22 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 
 		// Generate component
 		var compo = model.get('type') === 'file' ? Mast.components.FileComponent : Mast.components.DirectoryComponent;
-
 		var r = new compo({
-			parent 		: this,
-			autoRender 	: false,
-			model 		: model,
-			outlet 		: this.$branchOutlet
+			parent: this,
+			autoRender: false,
+			model: model,
+			outlet: this.$branchOutlet
 		});
 
 		// Add at a position
 		if (options && !_.isUndefined(options.at)) {
 			r.insert(options.at);
 			// Push or splice branch component to stack for garbage collection
-			this._branchStack.splice(options.at, 0, r);
-		} else { // or append to the end
+			this._branchStack.splice(options.at,0,r);
+		}
+		// or append to the end
+		else {
 			r.append();
-			// this.$el.prepend("<p>My Name is Abhishek</p>");  
 			// Push or splice branch component to stack for garbage collection
 			this._branchStack.push(r);
 		}
@@ -749,18 +782,36 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 
 	// Download a file
 	download	: function(e) {
-		var curid = this.get('id');
-		var url = "/file/download/"+curid;
-        var iframe;
-        iframe = document.getElementById("hiddenDownloader");
-        if (iframe === null){
+
+		/*var url = "/file/download/"+this.get('id');
+		var iframe;
+		iframe = document.getElementById("hiddenDownloader");
+		if (iframe === null)
+		{
 			iframe = document.createElement('iframe');
 			iframe.id = "hiddenDownloader";
 			iframe.style.visibility = 'hidden';
 			document.body.appendChild(iframe);
-    	}
-      	iframe.src = url;
-        e.stopPropagation();
+		}
+		iframe.src = url;
+		
+		e.stopPropagation();*/
+
+                var curid = this.get('id');
+				var url = "/file/download/"+curid;
+		        var iframe;
+		        iframe = document.getElementById("hiddenDownloader");
+		        if (iframe === null)
+		         {
+				iframe = document.createElement('iframe');
+				iframe.id = "hiddenDownloader";
+				iframe.style.visibility = 'hidden';
+				document.body.appendChild(iframe);
+		      }
+		      iframe.src = url;
+                     e.stopPropagation();
+                   //}, "jsonp");              
+
 	},
 
 	open : function(e) {
@@ -805,6 +856,7 @@ Mast.components.INodeComponent = Mast.Tree.extend({
         
 		Mast.Socket.request('/'+type+'/delete',{
 			id:  id
+			//ipadd : ipadd,
 		}, function(response){
 			if (response===403) {
 				alert('Permission denied. You do not have sufficient permissions to delete this item.');
@@ -813,6 +865,8 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 				});
 			}
 		});
+
+		//}, "jsonp");
 
 	},
 

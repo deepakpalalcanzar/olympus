@@ -38,9 +38,9 @@ Mast.registerTree('ThumbnailFileSystem',{
 
 		loading: function(newVal) {
 			if (newVal) {
-				$('.fileSystem-template .loading-spinner').show();
+				$('.thumbnailFileSystem-template .loading-spinner').show();
 			} else {
-				$('.fileSystem-template .loading-spinner').hide();
+				$('.thumbnailFileSystem-template .loading-spinner').hide();
 			}
 		}
 	},
@@ -48,10 +48,10 @@ Mast.registerTree('ThumbnailFileSystem',{
 	computePath	: function() {return '/';},
 
 	emptyHTML	: '<div class="loading-spinner"></div>',
-	template	: '.fileSystem-template',
+	template	: '.thumbnailFileSystem-template',
 	collection	: 'Workgroups',
 	branchComponent	: 'DirectoryComponent',
-	branchOutlet	: '#fileSystem-outlet',
+	branchOutlet	: '#thumbnailfileSystem-outlet',
 
 	afterRender: function(e) {
 		// this.$el.disableSelection();

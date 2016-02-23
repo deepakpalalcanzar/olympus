@@ -570,6 +570,14 @@ module.exports = {
         controller: 'subscription',
         action: 'free'
     },
+    '/subscription/freeapi/:id/:temp': {
+        controller: 'subscription',
+        action: 'freeapi'
+    },
+    '/subscription/freeapi/:id/:temp/:type': {
+        controller: 'subscription',
+        action: 'freeapi'
+    },
     '/subscription/paid/:id/:temp': {
         controller: 'subscription',
         action: 'paid'

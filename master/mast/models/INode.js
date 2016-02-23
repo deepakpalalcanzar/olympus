@@ -65,6 +65,10 @@ Mast.models.INode = Mast.Model.extend({
 	marshal: function(i) {
 		return _.extend(i, {
 			
+			test	   : this.link_password_enabled,
+			testin		: this.link_password,
+			test2		:i['link_password'],
+			testin2		:i['link_password_enabled'],
 			urlRoot    : "/" + i['type'] + "/",
 			numActive  : i['num_active'],
 			numComments: i['num_comments'],

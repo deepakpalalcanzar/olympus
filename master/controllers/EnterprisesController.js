@@ -12,13 +12,12 @@ var EnterprisesController = {
         "INNER JOIN transactiondetails td ON td.account_id = a.id "+
 		"INNER JOIN directory dir ON dir.OwnerId = a.id "+
 		" WHERE e.is_active=1 AND td.is_deleted = 0";
-
 		sql = Sequelize.Utils.format([sql]);
 		sequelize.query(sql, null, {
 			raw: true
 		}).success(function(enterprises) {
 			if(enterprises.length){ // check for no records exists
-                res.json(enterprises, 200);
+            	res.json(enterprises, 200);
             }else{
                 res.json({
                     name: 'error_123',
@@ -122,38 +121,38 @@ var EnterprisesController = {
         sequelize.query(sql, null, {
         	raw: true
        	}).success(function(dirs) {
-       		
-            Enterprises.find({
+       		Enterprises.find({
             	where: { id: req.params.id }
             }).done(function(err, ent) {
-
             	var sql = "UPDATE account SET deleted=1 where id = ?";
         		sql = Sequelize.Utils.format([sql, ent.account_id]);
         		sequelize.query(sql, null, {
             		raw: true
         		}).success(function(response) {
-                    /*Create logging*/
-                    var options = {
-                        uri: 'http://localhost:1337/logging/register/' ,
-                        method: 'POST',
-                    };
+        			console.log(response);
 
-                    options.json =  {
-                        user_id     : req.session.Account.id,
-                        text_message: 'has deleted '+ent.name+' enterprise.',
-                        activity    : 'delete',
-                        on_user     : req.params.id,
-                        ip          : req.session.Account.ip,
-                        platform    : req.headers.user_platform,
-                    };
+                  /*Create logging*/
+                  var options = {
+                    uri: 'http://localhost:1337/logging/register/' ,
+                    method: 'POST',
+                  };
 
-                    request(options, function(err, response, body) {
-                        
-                        if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
-                            res.json({'success':'1'});
+                 options.json =  {
+                      user_id     : req.session.Account.id,
+                      text_message: 'has deleted '+ent.name+' enterprise.',
+                      activity    : 'delete',
+                      on_user     : req.params.id,
+                      ip: typeof req.session.Account.ip === 'undefined' ? req.headers['ip'] : req.session.Account.ip,
+                      platform    : req.headers.user_platform,
+                  };
+
+                  request(options, function(err, response, body) {
+                    if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
+                        res.json({'success':'1'});
                     });
-                    /*End logging*/
-                });
+                  /*End logging*/
+        			
+				        });
             });
        	});
     },
@@ -260,7 +259,7 @@ var EnterprisesController = {
                         text_message: 'has updated an enterprise.',
                         activity    : 'update',
                         on_user     : req.params.ent_id,
-                        ip          : req.session.Account.ip,
+                        ip: typeof req.session.Account.ip === 'undefined' ? req.headers['ip'] : req.session.Account.ip,
                          platform    : req.headers.user_platform,
                     };
 

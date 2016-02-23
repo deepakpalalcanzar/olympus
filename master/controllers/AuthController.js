@@ -40,7 +40,7 @@ console.log('TRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRR');
 					refresh_token 	: AuthenticationService.randString(15),
 					code_expires 	: new Date(today.getTime() + 1000 * 30), // code expires in 30 seconds
 					access_expires 	: new Date(today.getTime() + 1000 * 60 * 60 * 30), // access token expires in one(three) hour
-					// access_expires 	: new Date(today.getTime() + 1000 * 60 * 2), // access token expires in 2 minutes
+					// access_expires 	: new Date(today.getTime() + 1000 * 60 * 5), // access token expires in 2 minutes
 					refresh_expires : new Date(today.getTime() + 1000 * 60 * 60 * 24 * 14) // refresh token expires in 14 days
 
 				}).done(function done (err, accountDev) {

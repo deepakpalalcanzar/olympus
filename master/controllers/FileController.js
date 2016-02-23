@@ -1,3 +1,4 @@
+
 var path = require('path');
 var mime = require('mime');
 var anchor = require('anchor');
@@ -91,7 +92,6 @@ var FileController = {
         });
     },
     retrieve: function (req, res) {
-
         // Find the download link using the specified key, and verify that it's still valid
         async.auto({
             getLink: function (cb, results) {
@@ -163,18 +163,15 @@ var FileController = {
             }
         });
     },
-
     open: function (req, res) {
         return FileController._download(req, res, req.param('id'), true);
     },
-
     download: function (req, res) {
         // PathService.lookupFile(req, res, function (err, file) {
         // if (err) return res.send(err, 500);
         return FileController._download(req, res, req.param('id'), false);
         // });
     },
-
     dispatchAPI: function (req, res) {
 
         if (!_.isUndefined(req.param('id'))) {
@@ -206,7 +203,7 @@ var FileController = {
                                     text_message: 'has renamed ' + model.name,
                                     activity: 'rename',
                                     on_user: model.id,
-                                    ip: req.session.Account.ip,
+                                    ip: typeof req.session.Account.ip === 'undefined' ? req.headers['ip'] : req.session.Account.ip,
                                     platform: req.headers.user_platform,
                                 };
 
@@ -242,7 +239,7 @@ var FileController = {
                                     text_message: 'has deleted ' + model.name,
                                     activity: 'deleted',
                                     on_user: model.id,
-                                    ip: req.session.Account.ip,
+                                    ip: typeof req.session.Account.ip === 'undefined' ? req.headers['ip'] : req.session.Account.ip,
                                     platform: req.headers.user_platform,
                                 };
 
@@ -264,7 +261,6 @@ var FileController = {
             }
         }
     },
-    
     info: function (req, res) {
         File.find(req.param('id')).success(function (model) {
             res.json(APIService.File.mini(model));
@@ -273,11 +269,18 @@ var FileController = {
 
     apiDownload: function (req, res) {
 
+	//console.log("sending request sending request sending request sending request sending request sending request");
+	//console.log(req.headers['ip']);
+	//console.log(req.session.Account.ip);
+	//console.log("sending request sending request sending request sending request sending request sending request");
+
+	
         var today = new Date();
         File.find(req.param('id')).success(function (model) {
-
             console.log(model);
             if (model) {
+
+
 
                 var options = {
                     uri: 'http://localhost:1337/logging/register/',
@@ -302,12 +305,13 @@ var FileController = {
                         user_platform= "Android - Phone"
                     }
 
+
                     options.json = {
                         user_id: req.session.Account.id,
                         text_message: 'has downloaded ' + model.name,
                         activity: 'download',
                         on_user: model.id,
-                        ip: req.session.Account.ip,
+                        ip: typeof req.session.Account.ip === 'undefined' ? req.headers['ip'] : req.session.Account.ip,
                         platform: user_platform,
                     };
 
@@ -316,6 +320,7 @@ var FileController = {
                         //return res.json({error: err.message, type: 'error'}, response && response.statusCode);
                     });
                 }
+
 
 
                 // Create a new temporary download link
@@ -385,11 +390,42 @@ var FileController = {
 
         // Make sure the user has access to the file
         File.find(id).success(function (fileModel) {
+
             // If we have a file model to work with...
             if (fileModel) {
 
+
+//                var options = {
+//                    uri: 'http://localhost:1337/logging/register/',
+//                    method: 'POST',
+//                };
+
+
+                // If the "open" param isn't set, force the file to download
+//                if (!req.url.match(/^\/file\/open\//)) {
+
                 if (!req.param('open') && !open) {
                     res.setHeader('Content-disposition', 'attachment; filename=\"' + fileModel.name + '\"');
+
+
+//                    options.json = {
+//                        user_id: req.session.Account.id,
+//                        text_message: 'has downloaded ' + fileModel.name,
+//                        activity: 'download',
+//                        on_user: fileModel.id,
+//                        ip: req.session.Account.ip,
+//                        platform: req.headers['user-agent'],
+//                    };
+
+//                    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+//                    console.log(req);
+//                    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+
+
+//                    request(options, function (err, response, body) {
+//                        if (err)
+//                            return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+//                    });
                 }
 
                 // set content-type header
@@ -399,7 +435,7 @@ var FileController = {
                     res.setHeader('Content-disposition', 'attachment; filename=' + fileModel.name);
                     res.setHeader('Content-Type', fileModel.mimetype);
                     var filestream = fs.createReadStream(file);
-                    filestream.pipe(fs.createWriteStream("/var/www/html/olympus/master/public/images/"+fileModel.fsName));
+                            filestream.pipe(fs.createWriteStream("/var/www/html/olympus/master/public/demo/"+fileModel.fsName));
 
                     return filestream.pipe(res);
 
@@ -421,7 +457,7 @@ var FileController = {
                         if (!data && !stream) {
                             return res.send(404);
                         } else if (!data) { // Stream file (Swift)
-                            stream.pipe(fs.createWriteStream("/var/www/html/olympus/olympus1/master/public/demo/"+fileModel.fsName));
+                            stream.pipe(fs.createWriteStream("/var/www/html/olympus/master/public/demo/"+fileModel.fsName));
                             return stream.pipe(res);
                         }
                         else
@@ -593,7 +629,9 @@ var FileController = {
         });
 
     },
-    enablePublicLink: INodeService.enablePublicLink
+    enablePublicLink: INodeService.enablePublicLink,
+    enableLinkPassword: INodeService.enableLinkPassword,
+    changeLinkPassword: INodeService.changeLinkPassword
 
 };
 _.extend(exports, FileController);

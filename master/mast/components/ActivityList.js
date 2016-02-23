@@ -34,15 +34,16 @@ Mast.registerTree('ActivityList', {
 	subscriptions: {
 		'~COMMENT_CREATE': function (comment) {
 
-			console.log("comment comment comment comment commentcomment");
-			console.log(comment);
-			console.log(Mast.Session);
-			console.log(Mast.Session.Account.avatar_image);
-
+                        if(Mast.Session.Account.avatar_image==null){
+                           var avatar_image="/images/avatar_anonymous.png";
+                        }else{
+                         var avatar_image=  '/images/profile/'+Mast.Session.Account.avatar_image
+                        }
+                   
 			if (comment && comment.source && comment.source.item &&
 				comment.source.item.id == this.get('id') &&
 				comment.source.item.type == this.get('type')) {
-				comment.source.created_by.avatar = '/images/profile/'+Mast.Session.Account.avatar_image;
+				comment.source.created_by.avatar = avatar_image;
 				this.collection.add(comment.source);
 				this.scrollToBottom();
 			}
@@ -64,6 +65,13 @@ Mast.registerTree('ActivityList', {
 			self.scrollToBottom();
 		});
 		$(window).on('resize', this.resizeCommentSection);
+
+		Mast.Socket.request('/account/getImage', {pic_type: 'profile'}, function (res, err, next) {
+                       if (res.avatar !== '' && res.avatar !== null) {
+                            Mast.Session.Account.avatar_image= res.avatar;
+                       }
+                });
+
 	},
 
 	afterRender: function() {

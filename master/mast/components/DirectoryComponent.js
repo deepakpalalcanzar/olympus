@@ -20,19 +20,24 @@ Mast.registerTree('DirectoryComponent',{
 		this.set('state','loading');
 		this.collection.reset();
 
+
 		this.collection.fetchMembers(this,function(){
 			self.set('state','expanded');
 			self.$el.find('.shared_peop').not(":first").hide();// hide numbershared for files
 		});
 	
-		if (e) { e.stopPropagation(); }
+		if (e) {
+			e.stopPropagation();
+		}
 		
 	},
 	
 	// Collapse this directory and hide its contents
 	collapse: function (e) {
+		
 		this.set('state','');
-		if (e) { e.stopPropagation(); }
+		if (e) {
+			e.stopPropagation();
+		}
 	}
-
 });

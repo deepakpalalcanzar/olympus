@@ -3,6 +3,7 @@ Mast.registerComponent('UpdateEnterprise', {
 	template: '.update-enterprise-template',
 	outlet: '#content',
 	model: {
+
 		name : 'ent',
 		sub_id : '1',
 		is_active	: '1',
@@ -11,6 +12,7 @@ Mast.registerComponent('UpdateEnterprise', {
 		acc_name : 'afzal',
 		acc_email	: 'a@gmail.com',
 		subscription:1,
+
 	},
 	
 	events:{
@@ -25,7 +27,6 @@ Mast.registerComponent('UpdateEnterprise', {
 	afterConnect: function() {
 		myData = Mast.Session.enterprises;
 		Mast.Socket.request('/subscription/getSubscription', null, function(res, err){
-
 			if(res){
 				var options;
 				$.each( res, function( i, val ) {
@@ -56,12 +57,25 @@ Mast.registerComponent('UpdateEnterprise', {
 		var self = this;
 		var entData = this.getFormData();
 		entData.id = myData.account_id;
-		Mast.Socket.request('/enterprises/updateEnterprise', entData, function(res, err){
+		// console.log(entData);
+		// return; 
+		
+                /*Mast.Socket.request('/enterprises/updateEnterprise', entData, function(res, err){
+			if(res.type==="error"){
+				alert(res.error);
+			}
+			Mast.navigate('#enterprises');			
+		});*/
+
+                  /*$.get("https://ipinfo.io", function(response) {
+                  entData.ipadd = response.ip;*/
+                  Mast.Socket.request('/enterprises/updateEnterprise', entData, function(res, err){
 			if(res.type==="error"){
 				alert(res.error);
 			}
 			Mast.navigate('#enterprises');			
 		});	
+               /* }, "jsonp");*/
 
 	},
 

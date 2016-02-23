@@ -1,11 +1,23 @@
-<div class="import-user-template" align="center" style="background-clip: padding-box;border-radius: 7px;box-shadow: 0 1px 5px #b3bac4;margin: 40px 2%;padding: 10px;">
+<div class="import-user-template" align="center" 
+     style="background-clip: padding-box;border-radius: 7px;box-shadow: 0 1px 5px #b3bac4;margin: 40px 2%;padding: 10px;">
     <br/>
+    <div class="subscription-title title-mod" style="height: 50px;">
+        <div class="title-fix">
+            <span style="">Import Users</span>
+            
+            <div class="clear"></div>
+        </div>
+        <a class="tooltips" href="images/User_Import_csv_sample.csv" style="float: right; margin-bottom: 100px;">
+            <img src="images/FAQ.png">
+            <span >Click here to download Sample csv File</span>
+        </a>
+    </div>
     <form action="/account/register" method="POST" enctype="multipart/form-data">
         <div class="center-mod">
-            <h3 class="company-details">Import Users</h3>
+            <!--<h3 class="company-details">Import Users</h3>-->
             <div class="file">
                 <div class="company-name"><label>  </label></div>
-                <input type="file" name="file"  class="new-user-fields user-file">
+                <input type="file" name="file" id="file"  class="new-user-fields user-file">
             </div>
         </div>
         <div id="msgid"></div>

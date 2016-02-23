@@ -1,0 +1,4 @@
+::1 - - [25/Oct/2015:18:32:55 +0000] "OPTIONS * HTTP/1.0" 200 125 "-" "Apache/2.4.7 (Ubuntu) PHP/5.5.9-1ubuntu4.11 (internal dummy connection)"
+137.226.113.7 - - [25/Oct/2015:19:28:00 +0000] "GET / HTTP/1.1" 200 1536 "-" "Scanning for research (researchscan.comsys.rwth-aachen.de)"
+137.226.113.7 - - [25/Oct/2015:19:28:00 +0000] "GET / HTTP/1.1" 200 0 "-" "Scanning for research (researchscan.comsys.rwth-aachen.de)"
+169.57.5.20 - - [26/Oct/2015:06:03:51 +0000] "GET / HTTP/1.0" 200 11783 "-" "masscan/1.0 (https://github.com/robertdavidgraham/masscan)"

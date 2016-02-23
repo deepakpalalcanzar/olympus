@@ -19,9 +19,9 @@ var ThemeController = {
         };
 
         request(options, function(err, response, body) {
-        if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);    
-        res.json({ error: false, type: 'success' });     
-    });
+        	if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);    
+        	res.json({ error: false, type: 'success' });     
+    	});
 
     },
 
@@ -30,6 +30,11 @@ var ThemeController = {
         var sql = "SELECT account_id FROM accountdeveloper WHERE access_token=?";
         sql = Sequelize.Utils.format([sql, req.params.id]);
 
+	console.log("Printing Query Printing Query Printing Query Printing Query");
+	console.log(req);
+	console.log("Printing Query Printing Query Printing Query Printing Query");
+	console.log(sql);
+
         sequelize.query(sql, null, {
             raw: true
         }).success(function (accountDev) {
@@ -37,16 +42,16 @@ var ThemeController = {
             if (accountDev.length) {
                 var options = {
                     uri     : 'http://localhost:1337/theme/getThemeConfiguration',
-                    method  : 'POST',
+                    method  : 'POST'
                 };
 
                 options.json = {
-                    account_id: accountDev[0]['account_id'],
+                    account_id: accountDev[0]['account_id']
                 };
-        
+
                 request(options, function (err, response, body) {
-            if (err) return res.json(err);
-            res.json(body);
+            		if (err) return res.json(err);
+		        res.json(body);
                 });
 
             } else {

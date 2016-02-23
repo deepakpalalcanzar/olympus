@@ -205,6 +205,7 @@ var AccountController = {
         });
 
     },
+
     listUsers: function (req, res) {
 
         var userId;
@@ -217,20 +218,22 @@ var AccountController = {
         if (req.session.Account.isSuperAdmin === 1) {
 
             var sql = "SELECT account.*, subscription.features, " +
-                    "adminuser.admin_profile_id, adminuser.id as adminuser_id, enterprises.name as enterprise_name, enterprises.id as enterprises_id FROM account " +
+                    "adminuser.admin_profile_id, adminuser.id as adminuser_id, enterprises.name as enterprise_name, enterprises.id as enterprises_id, dir.size, dir.quota FROM account " +
                     "LEFT JOIN subscription ON account.subscription_id=subscription.id " +
                     "LEFT JOIN adminuser ON account.id=adminuser.user_id " +
                     "LEFT JOIN enterprises ON account.created_by=enterprises.account_id " +
+                    "LEFT JOIN directory dir ON dir.OwnerId = account.id " +
                     "WHERE account.is_enterprise=0 and account.deleted != 1";
             sql = Sequelize.Utils.format([sql]);
 
         } else {
 
             var sql = "SELECT account.*,subscription.features, adminuser.admin_profile_id, " +
-                    "adminuser.id as adminuser_id , enterprises.name as enterprise_name, enterprises.id as enterprises_id FROM account " +
+                    "adminuser.id as adminuser_id , enterprises.name as enterprise_name, enterprises.id as enterprises_id, dir.size, dir.quota FROM account " +
                     "LEFT JOIN subscription ON account.subscription_id=subscription.id " +
                     "LEFT JOIN adminuser ON account.id=adminuser.user_id " +
                     "LEFT JOIN enterprises ON account.created_by=enterprises.account_id " +
+                    "LEFT JOIN directory dir ON dir.OwnerId = account.id " +
                     "WHERE account.is_enterprise=0 and account.deleted != 1 and account.created_by=?";
             sql = Sequelize.Utils.format([sql, userId]);
         }
@@ -241,9 +244,9 @@ var AccountController = {
             if (accounts.length) {
 
                 var totalpage = (accounts.length / 50) + 1;
-                var range = ((req.param('id') * 50) - 50) + "," + 50;
-
-
+                var Endlogdata = req.param('id') * 50;
+                var Startlogdata = Endlogdata - 50;
+                var range = Startlogdata + "," + Endlogdata;
 
                 var boostrapPaginator = new pagination.TemplatePaginator({
                     prelink: '/', current: req.param('id'), rowsPerPage: 1,
@@ -286,23 +289,29 @@ var AccountController = {
                 if (req.session.Account.isSuperAdmin === 1) {
 
                     var sql = "SELECT account.*, subscription.features, " +
-                            "adminuser.admin_profile_id, adminuser.id as adminuser_id, enterprises.name as enterprise_name, enterprises.id as enterprises_id, " + '"' + Paginator + '" ' + " as Paginator  FROM account " +
+                            "adminuser.admin_profile_id, adminuser.id as adminuser_id, enterprises.name as enterprise_name, dir.size, dir.quota, enterprises.id as enterprises_id, " + '"' + Paginator + '" ' + " as Paginator  FROM account " +
                             "LEFT JOIN subscription ON account.subscription_id=subscription.id " +
                             "LEFT JOIN adminuser ON account.id=adminuser.user_id " +
                             "LEFT JOIN enterprises ON account.created_by=enterprises.account_id " +
+                            "LEFT JOIN directory dir ON dir.OwnerId = account.id " +
                             "WHERE account.is_enterprise=0 and account.deleted != 1  LIMIT " + range + " ";
-
+                    
+                     console.log(sql);
+                     
                     sql = Sequelize.Utils.format([sql]);
 
                 } else {
 
                     var sql = "SELECT account.*,subscription.features, adminuser.admin_profile_id, " +
-                            "adminuser.id as adminuser_id , enterprises.name as enterprise_name, enterprises.id as enterprises_id, " + '"' + Paginator + '" ' + " as Paginator  FROM account " +
+                            "adminuser.id as adminuser_id , enterprises.name as enterprise_name, dir.size, dir.quota, enterprises.id as enterprises_id, " + '"' + Paginator + '" ' + " as Paginator  FROM account " +
                             "LEFT JOIN subscription ON account.subscription_id=subscription.id " +
                             "LEFT JOIN adminuser ON account.id=adminuser.user_id " +
                             "LEFT JOIN enterprises ON account.created_by=enterprises.account_id " +
+                            "LEFT JOIN directory dir ON dir.OwnerId = account.id " +
                             "WHERE account.is_enterprise=0 and account.deleted != 1 and account.created_by=?  LIMIT " + range + "";
-
+                    
+                    console.log(sql);
+                    
                     sql = Sequelize.Utils.format([sql, userId]);
                 }
 
@@ -325,6 +334,11 @@ var AccountController = {
                     throw new Error(e);
                 });
 
+
+
+
+
+
                 //res.json(accounts, 200);
             } else {
                 res.json({
@@ -337,6 +351,7 @@ var AccountController = {
             throw new Error(e);
         });
     },
+
     listWorkgroup: function (req, res) {
 
         if (req.session.Account.isSuperAdmin) {

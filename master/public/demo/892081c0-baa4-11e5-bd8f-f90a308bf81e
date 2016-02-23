@@ -1,0 +1,18 @@
+aspect_ratio: '16:9'
+canvas_main: ''
+cover_art: ''
+deploy_files:
+- mapping_table.json
+deployed: Never
+engine_version: '0.28'
+flash_main: ''
+has_notifications: false
+is_multiplayer: false
+is_temp: false
+mapping_table: mapping_table.json
+modified: 18:56 | 29/05/2015
+path: C:/dev/app2
+plugin_main: ''
+slug: app-2
+title: App 2
+title_logo: ''

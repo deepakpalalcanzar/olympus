@@ -23,8 +23,9 @@ Mast.registerComponent('TrashRestoreComponent', {
 			item_id  : file_id
 		}, function(res, err){
 
-			console.log("resresresresresresresresres");
+			console.log("resresresresresresresresresresresresresresres");
 			console.log(res);
+			console.log("resresresresresresresresresresresresresresres");
 
 			if(res[0].deleted == null){
 				self.closeDialog();
@@ -69,7 +70,7 @@ Mast.registerComponent('TrashRestoreComponent', {
 	},
 
 	updateRestore : function(){
-
+		var self = this;
 		var selectedElem 	= $('input[name=fileselected]:checked').attr('id');
 		var element 		= selectedElem.split("-");
 		var element_id 		= element[element.length-1];
@@ -82,8 +83,9 @@ Mast.registerComponent('TrashRestoreComponent', {
 			if (response===403) {
 				alert('Permission denied. You do not have sufficient permissions to delete this item.');
 			} else {
+				self.closeDialog();
 				$("#content").empty();
-				// var trash = new Mast.components.TrashFileSystem({ outlet : '#content'});
+				var trash = new Mast.components.TrashFileSystem({ outlet : '#content'});
 			}
 		});
 	},

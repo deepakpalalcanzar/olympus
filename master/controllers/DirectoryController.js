@@ -1,8 +1,8 @@
-var mime    = require('mime');
+var mime = require('mime');
 var easyimg = require('easyimage');
 var fsx     = require('fs-extra');
-var async     = require('async');
-var policy  = sails.policies;
+var policy = sails.policies;
+var count_img = 0;
 
 var DirectoryController = {
     // Return information about the directory in question
@@ -30,7 +30,7 @@ var DirectoryController = {
             activity: 'uploaded',
             on_user: req.session.Account.id,
             client_ip: req.params.ip,
-            ip: req.session.Account.ip,
+            ip: typeof req.session.Account.ip === 'undefined' ? req.headers['ip'] : req.session.Account.ip,
             platform: req.headers.user_platform,
         };
 
@@ -211,20 +211,68 @@ var DirectoryController = {
     },
 
 
+/*
+
     items: function (req, res) {
+
+        
+        var tasks = [];
+        // If the "name" is set, attempt to rename the dir
+        tasks.push(function (cb) {
+            DirectoryController.fileDownload(req, res, cb);
+        });
+
+        // If the "parent" is set, attempt a move
+        tasks.push(function (cb) {
+            DirectoryController.response(req, res, cb);
+        });
+
+        // Try to perform all the changes. If an error occurs at any point,
+        // the error message will be sent back.  Otherwise, the updated
+        // API object will be sent back.
+        async.series(tasks, function (err, results) {
+            if (err) {
+                res.json(err, err.status);
+            } else {
+                res.json(results, err.status);
+            }
+        });
+
+        // var response = {
+        //     "item_collection": {
+        //         "total_count": items.length,
+        //         "limit": items.length,
+        //         "offset": "0",
+        //         "entries": items
+        //     }
+        // };
+        // res.json(response);
+
+       
+    },
+
+
+    response: function(req, res, cb){
+        DirectoryController.ls(req, res, function (items) {
+            var response = {
+                "item_collection": {
+                    "total_count": items.length,
+                    "limit": items.length,
+                    "offset": "0",
+                    "entries": items
+                }
+            };
+            cb(response);
+        });
+    },
+
+    fileDownload: function(req, res, cb){
+
+        var today = new Date();
 
 
         DirectoryController.ls(req, res, function (items) {
-            var count = 0;
-            console.log("items itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems itemsitems");
-                console.log(items.length);
-            console.log("items itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems itemsitems");
-
-            _.each(items, function (item, index) {
-
-                console.log("printingprintingprintingprintingprintingprintingprintingprinting");
-                console.log(count);
-                count++;
+            async.eachSeries(items, function (item, index) {
 
                 mimetype = item.mimetype;
 
@@ -236,8 +284,8 @@ var DirectoryController = {
 
                     if(fileType[0] === 'image'){
 
-                        var imgPath = '/var/www/html/olympus/olympus1/public/images/demo/'+item.fsName; 
-                        var thumbImgPath = '/var/www/html/olympus/olympus1/public/images/demo/thumbnail-'+item.fsName; 
+                        var imgPath = '/var/www/html/olympus/public/images/demo/'+item.fsName; 
+                        var thumbImgPath = '/var/www/html/olympus/public/images/demo/thumbnail-'+item.fsName; 
 
                         fsx.exists(imgPath , function(exists) { 
 
@@ -249,8 +297,8 @@ var DirectoryController = {
                                         fsx.unlink(imgPath);
                                     }else{
                                         easyimg.resize({
-                                            src: "/var/www/html/olympus/olympus1/master/public/demo/"+item.fsName+"."+fileType[1], 
-                                            dst: '/var/www/html/olympus/olympus1/master/public/demo/thumbnail-'+item.fsName+"."+fileType[1], width: 150, height: 150
+                                            src: "/var/www/html/olympus/master/public/demo/"+item.fsName+"."+fileType[1], 
+                                            dst: '/var/www/html/olympus/master/public/demo/thumbnail-'+item.fsName+"."+fileType[1], width: 150, height: 150
                                         }).then(
                                             function(image) {
                                                 fsx.unlink(imgPath);
@@ -287,11 +335,11 @@ var DirectoryController = {
                                         return res.send(404);
                                     } else if (!data) { // Stream file (Swift)
 
-                                        stream.pipe(fs.createWriteStream("/var/www/html/olympus/olympus1/master/public/demo/"+item.fsName+"."+fileType[1]));
+                                        stream.pipe(fs.createWriteStream("/var/www/html/olympus/master/public/demo/"+item.fsName+"."+fileType[1]));
                                         stream.on('end', function() {
                                             easyimg.resize({
-                                                src: "/var/www/html/olympus/olympus1/master/public/demo/"+item.fsName+"."+fileType[1], 
-                                                dst: '/var/www/html/olympus/olympus1/master/public/demo/thumbnail-'+item.fsName+"."+fileType[1], width: 150, height: 150
+                                                src: "/var/www/html/olympus/master/public/demo/"+item.fsName+"."+fileType[1], 
+                                                dst: '/var/www/html/olympus/master/public/demo/thumbnail-'+item.fsName+"."+fileType[1], width: 150, height: 150
                                             }).then(
                                                 function(image) {
                                                     console.log('Resized and cropped: ' + image.width + ' x ' + image.height);
@@ -308,61 +356,14 @@ var DirectoryController = {
                     }
                 }
 
-                console.log("itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems");
-                console.log(items.length);
-                console.log("itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems");
-                console.log(count);
-                console.log("itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems");
-                if(items.length === count){
-                    DirectoryController.response();
-                }
+            }, function(err){
+		cb();
 
-
-            });
-
-            
-
-
-
+		});
         });
-        
-        // var tasks = [];
-
-        // // If the "parent" is set, attempt a move
-        // tasks.push(function (cb) {
-        //     DirectoryController.response(req, res, cb);
-        // });
-
-        // // If the "name" is set, attempt to rename the dir
-        // tasks.push(function (cb) {
-        //     DirectoryController.fileDownload(req, res, cb);
-        // });
-
-
-
-        // // Try to perform all the changes. If an error occurs at any point,
-        // // the error message will be sent back.  Otherwise, the updated
-        // // API object will be sent back.
-        // async.series(tasks, function (err, results) {
-        //     if (err) {
-        //         res.json(err, err.status);
-        //     } else {
-        //         res.json(results, err.status);
-        //     }
-        // });
-
-        // var response = {
-        //     "item_collection": {
-        //         "total_count": items.length,
-        //         "limit": items.length,
-        //         "offset": "0",
-        //         "entries": items
-        //     }
-        // };
-        // res.json(response);
-
-       
     },
+
+
 
     response: function(req, res, cb){
         DirectoryController.ls(req, res, function (items) {
@@ -374,108 +375,301 @@ var DirectoryController = {
                     "entries": items
                 }
             };
-           cb(response);
+ res.json(response);
+            
+        });
+    },
+*/
+
+    /*response: function(req, res, cb){
+        DirectoryController.ls(req, res, function (items) {
+            var response = {
+                "item_collection": {
+                    "total_count": items.length,
+                    "limit": items.length,
+                    "offset": "0",
+                    "entries": items
+                }
+            };
+        res.json(response);
+            
         });
     },
 
-    fileDownload: function(req, res, cb){
+     items: function (req, res) {
 
         var today = new Date();
-
-
+        var count = 0;
         DirectoryController.ls(req, res, function (items) {
-
-            console.log("items itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems itemsitems");
-                console.log(items[0].length);
-            console.log("items itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems itemsitems");
-
+		console.log('UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU');
+            DirectoryController.check_thumbnail(items[0],function(){
+                console.log('YYHYYHYYHYYHYYHYYHYYHYYHYYHYYHYYHYYHYYHYYHYYHYYHYYHYYH');
+            });
             _.each(items, function (item, index) {
+		 
 
-
-
-                // mimetype = item.mimetype;
-
-                // if(mimetype == null){
-                //     return;
-                // }else{
+                mimetype = item.mimetype;
+		
+                if(mimetype == null){
+                    return;
+        			count_img++;
+        			count++;
+        			response_ready(req, res);
+                }else{
                     
-                //     var fileType = mimetype.split("/");
+                    var fileType = mimetype.split("/");
 
-                //     if(fileType[0] === 'image'){
+                    if(fileType[0] === 'image'){
 
-                //         var imgPath = '/var/www/html/olympus/olympus1/public/images/demo/'+item.fsName; 
-                //         var thumbImgPath = '/var/www/html/olympus/olympus1/public/images/demo/thumbnail-'+item.fsName; 
+                        var imgPath = '/var/www/html/olympus/public/images/demo/'+item.fsName; 
+                        var thumbImgPath = '/var/www/html/olympus/public/images/demo/thumbnail-'+item.fsName; 
+		
+                        fsx.exists(imgPath , function(exists) { 
 
-                //         fsx.exists(imgPath , function(exists) { 
+                            console.log(exists);
+                            if(exists){
 
-                //             console.log(exists);
-                //             if(exists){
+                                fsx.exists(thumbImgPath , function(exists) { 
+                                    if(exists){
+                                        fsx.unlink(imgPath);
+                                    }else{
+                                        easyimg.resize({
+                                            src: "/var/www/html/olympus/master/public/demo/"+item.fsName+"."+fileType[1], 
+                                            dst: '/var/www/html/olympus/master/public/demo/thumbnail-'+item.fsName+"."+fileType[1], width: 150, height: 150
+                                        }).then(
+                                            function(image) {
+                                                fsx.unlink(imgPath);
+                                                console.log('Resized and cropped: ' + image.width + ' x ' + image.height);
+                                            },
+                                            function (err) {
+                                                console.log(err);
+                                            }
+                                        );
+                                    }
+                                });
+                				count++;
+                                count_img++;
+                                response_ready(req, res);
 
-                //                 fsx.exists(thumbImgPath , function(exists) { 
-                //                     if(exists){
-                //                         fsx.unlink(imgPath);
-                //                     }else{
-                //                         easyimg.resize({
-                //                             src: "/var/www/html/olympus/olympus1/master/public/demo/"+item.fsName+"."+fileType[1], 
-                //                             dst: '/var/www/html/olympus/olympus1/master/public/demo/thumbnail-'+item.fsName+"."+fileType[1], width: 150, height: 150
-                //                         }).then(
-                //                             function(image) {
-                //                                 fsx.unlink(imgPath);
-                //                                 console.log('Resized and cropped: ' + image.width + ' x ' + image.height);
-                //                             },
-                //                             function (err) {
-                //                                 console.log(err);
-                //                             }
-                //                         );
-                //                     }
-                //                 });
+                            }else{
 
-                //             }else{
+                                // Download and serve file from s3 and swift
+                                FileAdapter.download({
+                                    name: item.fsName
+                                }, function (err, data, contentLength, stream) {
 
-                //                 // Download and serve file from s3 and swift
-                //                 FileAdapter.download({
-                //                     name: item.fsName
-                //                 }, function (err, data, contentLength, stream) {
-
-                //                     if (err)
-                //                         return res.send(500, err);
+                                    if (err)
+                                        return res.send(500, err);
                                     
-                //                     var fileMimeType = mime.lookup(item.name);
-                //                     var mimeFile     = fileMimeType.split("/");
+                                    var fileMimeType = mime.lookup(item.name);
+                                    var mimeFile     = fileMimeType.split("/");
 
-                //                     // Set content-length header
-                //                     res.setHeader('Content-Length', item.size);
+                                    // Set content-length header
+                                    res.setHeader('Content-Length', item.size);
 
-                //                     // set content-type header
-                //                     res.setHeader('Content-Type', fileMimeType);
+                                    // set content-type header
+                                    res.setHeader('Content-Type', fileMimeType);
 
-                //                     // No data available
-                //                     if (!data && !stream) {
-                //                         return res.send(404);
-                //                     } else if (!data) { // Stream file (Swift)
+                                    // No data available
+                                    if (!data && !stream) {
+                                        return res.send(404);
+                                    } else if (!data) { // Stream file (Swift)
 
-                //                         stream.pipe(fs.createWriteStream("/var/www/html/olympus/olympus1/master/public/demo/"+item.fsName+"."+fileType[1]));
-                //                         stream.on('end', function() {
-                //                             easyimg.resize({
-                //                                 src: "/var/www/html/olympus/olympus1/master/public/demo/"+item.fsName+"."+fileType[1], 
-                //                                 dst: '/var/www/html/olympus/olympus1/master/public/demo/thumbnail-'+item.fsName+"."+fileType[1], width: 150, height: 150
-                //                             }).then(
-                //                                 function(image) {
-                //                                     console.log('Resized and cropped: ' + image.width + ' x ' + image.height);
-                //                                 },
-                //                                 function (err) {
-                //                                     console.log(err);
-                //                                 }
-                //                             );
-                //                         });
-                //                     }
-                //                 });
-                //             }
-                //         });
-                //     }
-                // }
+                                        stream.pipe(fs.createWriteStream("/var/www/html/olympus/master/public/demo/"+item.fsName+"."+fileType[1]));
+                                        stream.on('end', function() {
+                                            easyimg.resize({
+                                                src: "/var/www/html/olympus/master/public/demo/"+item.fsName+"."+fileType[1], 
+                                                dst: '/var/www/html/olympus/master/public/demo/thumbnail-'+item.fsName+"."+fileType[1], width: 150, height: 150
+                                            }).then(
+                                                function(image) {
+                                                    count++;
+                                                    count_img++;
+                                                    console.log('Resized and cropped: ' + image.width + ' x ' + image.height);
+                        						    console.log(count+'  HH  '+count_img);
+                        							//response_ready(req, res);
+                                                    if(items.length === (count_img + 1) ){
+                                                       console.log("RESPONDING NOW with "+items.length);
+                                                       DirectoryController.response(req, res);
+                                                        console.log("count is : "+count);
+                                                    }
+                                                },
+                                                function (err) {
+                                                    count++;
+                                                    count_img++;
+                                                    console.log(err);
+                                                    console.log(count+'  HH  '+count_img);
+                                                    response_ready(req, res);
+                                                }
+                                            );
+                                        });
+                                    }
+                                });
+				
+                            }
+                        });
+			//count++;
+			//count_img++;
+                    }
+                }
+
+		        // console.log("itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems");
+          //       console.log(items.length);
+          //       console.log("itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems");
+          //       console.log(count);
+          //       console.log("itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems");
+          //       if(items.length === (count + 1) ){
+          //           DirectoryController.response(req, res);
+          //       }
 
             });
+        });
+    },
+
+    check_thumbnail: function(item, cb){
+        // _.each(items, function (item, index) {
+         
+console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+                mimetype = item.mimetype;
+        
+                if(mimetype == null){
+                    return;
+                    count_img++;
+                    count++;
+                    response_ready(req, res);
+                }else{
+                    
+                    var fileType = mimetype.split("/");
+
+                    if(fileType[0] === 'image'){
+
+                        var imgPath = '/var/www/html/olympus/public/images/demo/'+item.fsName; 
+                        var thumbImgPath = '/var/www/html/olympus/public/images/demo/thumbnail-'+item.fsName; 
+        
+                        fsx.exists(imgPath , function(exists) { 
+
+                            console.log(exists);
+                            if(exists){
+
+                                fsx.exists(thumbImgPath , function(exists) { 
+                                    if(exists){
+                                        fsx.unlink(imgPath);
+                                    }else{
+                                        easyimg.resize({
+                                            src: "/var/www/html/olympus/master/public/demo/"+item.fsName+"."+fileType[1], 
+                                            dst: '/var/www/html/olympus/master/public/demo/thumbnail-'+item.fsName+"."+fileType[1], width: 150, height: 150
+                                        }).then(
+                                            function(image) {
+                                                fsx.unlink(imgPath);
+                                                console.log('Resized and cropped: ' + image.width + ' x ' + image.height);
+                                            },
+                                            function (err) {
+                                                console.log(err);
+                                            }
+                                        );
+                                    }
+                                });
+                                count++;
+                                count_img++;
+                                response_ready(req, res);
+
+                            }else{
+
+                                // Download and serve file from s3 and swift
+                                FileAdapter.download({
+                                    name: item.fsName
+                                }, function (err, data, contentLength, stream) {
+
+                                    if (err)
+                                        return res.send(500, err);
+                                    
+                                    var fileMimeType = mime.lookup(item.name);
+                                    var mimeFile     = fileMimeType.split("/");
+
+                                    // Set content-length header
+                                    res.setHeader('Content-Length', item.size);
+
+                                    // set content-type header
+                                    res.setHeader('Content-Type', fileMimeType);
+
+                                    // No data available
+                                    if (!data && !stream) {
+                                        return res.send(404);
+                                    } else if (!data) { // Stream file (Swift)
+
+                                        stream.pipe(fs.createWriteStream("/var/www/html/olympus/master/public/demo/"+item.fsName+"."+fileType[1]));
+                                        stream.on('end', function() {
+                                            easyimg.resize({
+                                                src: "/var/www/html/olympus/master/public/demo/"+item.fsName+"."+fileType[1], 
+                                                dst: '/var/www/html/olympus/master/public/demo/thumbnail-'+item.fsName+"."+fileType[1], width: 150, height: 150
+                                            }).then(
+                                                function(image) {
+                                                    count++;
+                                                    count_img++;
+                                                    console.log('Resized and cropped: ' + image.width + ' x ' + image.height);
+                                                    console.log(count+'  HH  '+count_img);
+                                                    //response_ready(req, res);
+                                                    if(items.length === (count_img + 1) ){
+                                                       console.log("RESPONDING NOW with "+items.length);
+                                                       DirectoryController.response(req, res);
+                                                        console.log("count is : "+count);
+                                                    }
+                                                },
+                                                function (err) {
+                                                    count++;
+                                                    count_img++;
+                                                    console.log(err);
+                                                    console.log(count+'  HH  '+count_img);
+                                                    response_ready(req, res);
+                                                }
+                                            );
+                                        });
+                                    }
+                                });
+                
+                            }
+                        });
+            //count++;
+            //count_img++;
+                    }
+                }
+
+        //console.log("itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems");
+                //console.log(items.length);
+                //console.log("itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems");
+                //console.log(count);
+                //console.log("itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems");
+                //if(items.length === (count + 1) ){
+                //    DirectoryController.response(req, res);
+                //}
+
+            // });
+    },
+
+    response_ready: function(req, res){
+	   console.log("itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems");
+ //        console.log(items.length);
+ //        console.log("itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems");
+ //        console.log(count_img);
+ //        console.log("itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems itemsitemsitems");
+        if(items.length === (count_img + 1) ){
+	       console.log("RESPONDING NOW with "+items.length);
+           DirectoryController.response(req, res);
+            console.log("count is : "+count);
+        }
+    },*/
+
+
+    items: function (req, res) {
+        DirectoryController.ls(req, res, function (items) {
+            var response = {
+                "item_collection": {
+                    "total_count": items.length,
+                    "limit": items.length,
+                    "offset": "0",
+                    "entries": items
+                }
+            };
+            res.json(response);
         });
     },
 
@@ -514,7 +708,7 @@ var DirectoryController = {
                     text_message: 'has created a ' + results.newDirectory.name + ' directory.',
                     activity: 'create',
                     on_user: req.session.Account.id,
-                    ip: req.session.Account.ip,
+                    ip: typeof req.session.Account.ip === 'undefined' ? req.headers['ip'] : req.session.Account.ip,
                     platform: req.headers.user_platform,
                 };
 
@@ -611,7 +805,7 @@ var DirectoryController = {
                         text_message: 'has created a sub directory named ' + results.newDirectory.name + ' inside root ' + dirModel.name + ' directory.',
                         activity: 'create',
                         on_user: req.session.Account.id,
-                        ip: req.session.Account.ip,
+                        ip: typeof req.session.Account.ip === 'undefined' ? req.headers['ip'] : req.session.Account.ip,
                         platform: req.headers.user_platform,
                     };
 
