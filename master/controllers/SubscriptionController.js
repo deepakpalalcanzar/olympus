@@ -203,11 +203,13 @@ var SubscriptionController = {
             request(options, function(err, response, body) {
                 
                 if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
+
+                if(body.type == 'error') return res.json({ error: body.error, type: 'error' }, response && response.statusCode);
                 //  Resend using the original response statusCode
                 //  Use the json parsing above as a simple check we got back good stuff
                 //  Save data to transactiondetails table
 console.log('YGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGT');
-console.log(response);
+console.log(err);
 console.log(body);
 console.log('YGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGT');
                 Subscription.find({
@@ -287,6 +289,236 @@ console.log('YGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGT');
         });
     },
 
+    freeapi: function(req, res){
+
+        var request = require('request');
+        var sub_id  = req.params.id;
+        var temp_id = req.params.temp;
+if(req.params.type == 'buynow'){//signup
+// req.session.tempId  use this as tempaccount id 
+        var sql = "SELECT * from tempaccount where id = ?";
+        sql     = Sequelize.Utils.format([sql,temp_id]);
+
+        sequelize.query(sql, null, {
+            raw: true
+        }).success(function(account) {
+console.log(sql);
+console.log('U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7');
+console.log(account);
+console.log('U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7U7');
+            var options = {
+                uri: 'http://localhost:1337/account/register/' ,
+                method: 'POST',
+            };
+
+            options.json =  {
+                name             : account[0].first_name+' '+account[0].last_name,
+                email            : account[0].email,
+                isVerified       : true,
+                isAdmin          : account[0].is_enterprise== '1' ? true : false,
+                password         : account[0].password,
+                created_by       : '',
+                is_enterprise    : account[0].is_enterprise,
+                subscription     : sub_id,
+            };
+
+            if(account[0].is_enterprise == '1'){
+                options.json.enterprise_name =account[0].enterprise_name
+            }
+
+            request(options, function(err, response, body) {
+                
+                if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
+
+                if(body.type == 'error') return res.json({ error: body.error, type: 'error' }, response && response.statusCode);
+                //  Resend using the original response statusCode
+                //  Use the json parsing above as a simple check we got back good stuff
+                //  Save data to transactiondetails table
+console.log('YGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGT');
+console.log(err);
+console.log(body);
+console.log('YGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGT');
+                Subscription.find({
+                    where: { id: sub_id }
+                }).done(function(err, subscription) {
+
+                    if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
+
+                    // Save to transactionDetails table
+                    var tran_options = {
+                        uri: 'http://localhost:1337/transactiondetails/register/' ,
+                        method: 'POST',
+                    };
+
+                    var created_date = new Date();  
+                    tran_options.json =  {
+                        trans_id        : 'Free',
+                        account_id      : body.account.id,
+                        created_date    : created_date,
+                        users_limit     : subscription.users_limit,
+                        quota           : subscription.quota,
+                        plan_name       : subscription.features,
+                        price           : subscription.price,
+                        duration        : subscription.duration,
+                        paypal_status   : '',
+                    };
+
+                    request(tran_options, function(err1, response1, body1) {
+                        if(err1) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
+                        //  Resend using the original response statusCode
+                        //  Use the json parsing above as a simple check we got back good stuff
+                        /* Check is enterprise save data to enterprise table*/
+                        if(account[0].is_enterprise == '1'){
+         
+                            var ent_options = {
+                                uri: 'http://localhost:1337/enterprises/register/' ,
+                                method: 'POST',
+                            };
+
+                            ent_options.json =  {
+                                account_id              : body.account.id,
+                                enterprises_name        : account[0].name,
+                                error                   : '',
+                            };
+
+                            request(ent_options, function(err11, response11, body11) {
+
+                                EmailService.sendSupportMail({
+                                    account: account[0]
+                                });
+
+                                if(err11) return res.json({ error: err11.message, type: 'error' }, response11 && response11.statusCode);
+                                    /* Redirect to dashboard code */
+
+                                Account.find({
+                                    where: { email: account[0].email, }
+                                }).done(function(err, account) {
+                                    if (err) return res.send(500,err);
+                                    AuthenticationService.session.link(req, account);
+                                    res.json({
+                                      success : true,  
+                                    });
+                                    // res.redirect('/');
+                                });
+                            });
+
+                        }else{
+
+                        /*End checking*/
+                        /* Redirect to dashboard code */
+
+                            Account.find({
+                                where: { email: account[0].email,}
+                            }).done(function(err, account) {
+                                if (err) return res.send(500,err);
+                                AuthenticationService.session.link(req, account);
+                                res.json({
+                                  success : true,  
+                                });
+                                // res.redirect('/');
+                            });
+                        }
+                    });
+                }); // end transaction history
+            });
+        });
+}else{//upgrade
+        var sql = "SELECT * from account where id = ?";
+        sql     = Sequelize.Utils.format([sql,temp_id]);
+
+        sequelize.query(sql, null, {
+            raw: true
+        }).success(function(account) {
+console.log(sql);
+console.log('U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8');
+console.log(account);
+console.log('U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8U8');
+            Subscription.find({
+                where: { id: sub_id }
+            }).done(function(err, subscription) {
+
+                if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
+
+                // Save to transactionDetails table
+                var tran_options = {
+                    uri: 'http://localhost:1337/transactiondetails/register/' ,
+                    method: 'POST',
+                };
+
+                var created_date = new Date();  
+                tran_options.json =  {
+                    trans_id        : 'Free',
+                    account_id      : account[0].id,
+                    created_date    : created_date,
+                    users_limit     : subscription.users_limit,
+                    quota           : subscription.quota,
+                    plan_name       : subscription.features,
+                    price           : subscription.price,
+                    duration        : subscription.duration,
+                    paypal_status   : '',
+                };
+
+                request(tran_options, function(err1, response1, body1) {
+                    if(err1) return res.json({ error: err1.message, type: 'error' }, response1 && response1.statusCode);
+                    //  Resend using the original response statusCode
+                    //  Use the json parsing above as a simple check we got back good stuff
+                    /* Check is enterprise save data to enterprise table*/
+                    if(account[0].is_enterprise == '1'){
+     
+                        var ent_options = {
+                            uri: 'http://localhost:1337/enterprises/register/' ,
+                            method: 'POST',
+                        };
+
+                        ent_options.json =  {
+                            account_id              : body.account.id,
+                            enterprises_name        : account[0].name,
+                            error                   : '',
+                        };
+
+                        request(ent_options, function(err11, response11, body11) {
+
+                            EmailService.sendSupportMail({
+                                account: account[0]
+                            });
+
+                            if(err11) return res.json({ error: err11.message, type: 'error' }, response11 && response11.statusCode);
+                                /* Redirect to dashboard code */
+
+                            Account.find({
+                                where: { email: account[0].email, }
+                            }).done(function(err, account) {
+                                if (err) return res.send(500,err);
+                                AuthenticationService.session.link(req, account);
+                                res.json({
+                                  success : true,  
+                                });
+                                // res.redirect('/');
+                            });
+                        });
+
+                    }else{
+
+                    /*End checking*/
+                    /* Redirect to dashboard code */
+
+                        Account.find({
+                            where: { email: account[0].email,}
+                        }).done(function(err, account) {
+                            if (err) return res.send(500,err);
+                            AuthenticationService.session.link(req, account);
+                            res.json({
+                              success : true,  
+                            });
+                            // res.redirect('/');
+                        });
+                    }
+                });
+            }); // end transaction history
+        });
+}
+    },
+
 	/*paid: function(req, res){
 
 		Subscription.findAll({
@@ -321,44 +553,67 @@ console.log('YGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGTYGT');
 			where: { id: req.params.id }
 		}).done(function(err, subscription) {
 
-            Account.findAll({
-                where: { id: req.params.temp }
-            }).done(function(err, acc){
+            // console.log('PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP');
+            // console.log(req.params.type);
+            // console.log('PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP');
 
-                if(acc.length > 0){
+            if(req.params.type == 'buynow'){//signup
+                TempAccount.findAll({
+                    where: { id: req.params.temp }
+                }).done(function(error, tempaccount) {
+
                     res.view('subscription/paid',{
                         id              : req.params.id,
                         amount          : subscription[0].price,
                         temp            : req.params.temp,
-                        f_name          : acc[0].name,
-                        l_name          : acc[0].name,
-                        email           : acc[0].email,
+                        f_name          : tempaccount[0].first_name,
+                        l_name          : tempaccount[0].last_name,
+                        email           : tempaccount[0].email,
                         duration        : subscription[0].duration,
-                        is_enterprise   : acc[0].is_enterprise,
+                        is_enterprise   : tempaccount[0].is_enterprise,
                         sub_name        : subscription[0].features,
                     });
+                });
+            }
+            else{//upgrade
+                Account.findAll({
+                    where: { id: req.params.temp }
+                }).done(function(err, acc){
 
-                }else{
-                    TempAccount.findAll({
-                        where: { id: req.params.temp }
-                    }).done(function(error, tempaccount) {
-
+                    if(acc.length > 0){
                         res.view('subscription/paid',{
                             id              : req.params.id,
                             amount          : subscription[0].price,
                             temp            : req.params.temp,
-                            f_name          : tempaccount[0].first_name,
-                            l_name          : tempaccount[0].last_name,
-                            email           : tempaccount[0].email,
+                            f_name          : acc[0].name,
+                            l_name          : acc[0].name,
+                            email           : acc[0].email,
                             duration        : subscription[0].duration,
-                            is_enterprise   : tempaccount[0].is_enterprise,
+                            is_enterprise   : acc[0].is_enterprise,
                             sub_name        : subscription[0].features,
                         });
-                    });
-                }
 
+                    }else{
+                        TempAccount.findAll({
+                            where: { id: req.params.temp }
+                        }).done(function(error, tempaccount) {
 
-            });  
+                            res.view('subscription/paid',{
+                                id              : req.params.id,
+                                amount          : subscription[0].price,
+                                temp            : req.params.temp,
+                                f_name          : tempaccount[0].first_name,
+                                l_name          : tempaccount[0].last_name,
+                                email           : tempaccount[0].email,
+                                duration        : subscription[0].duration,
+                                is_enterprise   : tempaccount[0].is_enterprise,
+                                sub_name        : subscription[0].features,
+                            });
+                        });
+                    }
+
+                });
+            }  
 		});
 
 	},
@@ -581,6 +836,7 @@ payment: function(req, res){
 	var paypal_sdk  = require('paypal-rest-sdk');
 	var sub_id      = req.body.sub_id;
 	var temp_id     = req.body.temp;
+    var temp_email  = req.body.email;//Rishabh
 	var sub_name    = req.body.sub_name;
 	var dd          = new Date();
 	var d           = dd.toLocaleDateString();
@@ -651,11 +907,23 @@ payment: function(req, res){
 
                 if(payment.state === 'approved'){
 
-                    var sql = "SELECT * from account where id = ?";
-                    sql = Sequelize.Utils.format([sql,temp_id]);
+                    // var sql = "SELECT * from account where id = ?";
+                    // sql = Sequelize.Utils.format([sql,temp_id]);
+
+                    //Rishabh
+                    var sql = "SELECT * from account where email = ?";
+                    sql = Sequelize.Utils.format([sql,temp_email]);
+
+                    console.log('CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC');
+                    console.log(sql);
+                    console.log('CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC');
                     sequelize.query(sql, null, {
                         raw: true
                     }).success(function(account) {
+
+                        console.log('DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD');
+                        console.log(account);
+                        console.log('DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD');
 
                         if(account.length > 0){
 
@@ -703,9 +971,18 @@ payment: function(req, res){
 
                             var sql = "SELECT * from tempaccount where id = ?";
                             sql = Sequelize.Utils.format([sql,temp_id]);
+
+                            console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+                            console.log(sql);
+                            console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+
                             sequelize.query(sql, null, {
                                 raw: true
                             }).success(function(account) {
+
+                                console.log('BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB');
+                                console.log(account);
+                                console.log('BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB');
                                 
                                 var options = {
                                     uri: 'http://localhost:1337/account/register/' ,
@@ -713,7 +990,8 @@ payment: function(req, res){
                                 };
 
                                 options.json =  {
-                                    name            : account[0].name,
+                                    //name            : account[0].name,
+                                    name            : account[0].first_name+' '+account[0].last_name,
                                     email           : account[0].email,
                                     isVerified      : true,
                                     isAdmin         : account[0].is_enterprise=='1'?true:false,
@@ -726,7 +1004,10 @@ payment: function(req, res){
                                 request(options, function(err, response, body) {
                                     
                                     if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
-
+console.log(options);
+console.log('QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ');
+console.log(body);
+console.log('QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ');
                                     Subscription.find({
                                         where: { id: sub_id }
                                     }).done(function(err, subscription) {
@@ -794,133 +1075,6 @@ payment: function(req, res){
         });
     },
 
-
-
-    /* for check Delete it after check*/ 
-    billingPlan: function(req, res){
-
-        var d = new Date();
-        var y = d.getFullYear(); 
-        var nn = y+parseInt('2');
-
-        var request     = require('request');
-        var paypal_sdk  = require('paypal-rest-sdk');
-
-        paypal_sdk.configure({
-            'host': 'api.sandbox.paypal.com',
-            'client_id': 'Acp-phDclj-YRVsO7Id0BPSqvV3KkjqwkMbGxgA1fY2kIJVsWztWmB19XJlI',
-            'client_secret': 'EBCNCRCjlhhTBUaHNv6ViNx5O2VsHmuu7veONAKw-t7hxtLqqQBu3rd_RUIr' 
-        });
-
-        paypal_sdk.generate_token(function(error, token){
-            if(error){
-                console.log('***token11 error**');
-                console.error(error);
-            } else {
-                console.log('***token11 success**');
-                console.log(token);
-            }
-        });
-
-        var billingPlanAttributes = {
-            "description": "Create Plan for Regular",
-            "merchant_preferences": {
-                "auto_bill_amount": "yes",
-                "cancel_url": "http://www.cancel.com",
-                "initial_fail_amount_action": "continue",
-                "max_fail_attempts": "1",
-                "return_url": "http://www.success.com",
-                "setup_fee": {
-                    "currency": "USD",
-                    "value": "25"
-                }
-            },
-            "name": "Testing1-Regular1",
-            "payment_definitions": [
-                {
-                    "amount": {
-                        "currency": "USD",
-                        "value": "100"
-                    },
-                    "charge_models": [
-                        {
-                            "amount": {
-                                "currency": "USD",
-                                "value": "10.60"
-                            },
-                            "type": "SHIPPING"
-                        },
-                        {
-                            "amount": {
-                                "currency": "USD",
-                                "value": "20"
-                            },
-                            "type": "TAX"
-                        }
-                    ],
-                    "cycles": "0",
-                    "frequency": "MONTH",
-                    "frequency_interval": "1",
-                    "name": "Regular 1",
-                    "type": "REGULAR"
-                },
-                {
-                    "amount": {
-                        "currency": "USD",
-                        "value": "20"
-                    },
-                    "charge_models": [
-                        {
-                            "amount": {
-                                "currency": "USD",
-                                "value": "10.60"
-                            },
-                            "type": "SHIPPING"
-                        },
-                        {
-                            "amount": {
-                                "currency": "USD",
-                                "value": "20"
-                            },
-                            "type": "TAX"
-                        }
-                    ],
-                    "cycles": "4",
-                    "frequency": "MONTH",
-                    "frequency_interval": "1",
-                    "name": "Trial 1",
-                    "type": "TRIAL"
-                }
-            ],
-            "type": "INFINITE"
-        };
-
-        paypal_sdk.billingPlan.create(billingPlanAttributes, function (error, billingPlan) {
-            if (error) {
-                console.log(error);
-                throw error;
-            } else {
-                console.log("Create Billing Plan Response");
-                console.log(billingPlan);
-            }
-        });
-
-
-        res.view('subscription/confirm',{
-            payment_id  : 'aaaa',
-            create_time : 'bbbbb',
-            state       : 'cccc',
-            amount      : '122',
-            email       : 'darren@gmail.com',
-        });
-
-    },
-    /* end check*/
-
-
-
-
-
 /* for check Delete it after check*/ 
 confirm: function(req, res){
   var d = new Date();
@@ -940,12 +1094,19 @@ confirm: function(req, res){
 /* end check*/
 
 impersonate: function(req, res){
+    console.log('EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE');
+    // console.log(req);
+    console.log('EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE');
+    console.log(req.body.email);
     Account.find({
         where: {
           email: req.body.email
         }
     }).done(function(err, account) {
       if (err) return res.send(500,err);
+      console.log('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF');
+    console.log(account);
+      console.log('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF');
       AuthenticationService.session.link(req, account);
       res.redirect('/#dashboard');
     });

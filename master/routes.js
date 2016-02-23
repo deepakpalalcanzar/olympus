@@ -310,14 +310,6 @@ module.exports = {
         controller: 'file',
         action: 'enablePublicLink'
     },
-    '/file/enableLinkPassword': {
-        controller: 'file',
-        action: 'enableLinkPassword'
-    },
-    '/file/changeLinkPassword': {
-        controller: 'file',
-        action: 'changeLinkPassword'
-    },
     '/tempaccount/dataSync/:access_token/:lastsync': {
         controller: 'tempaccount',
         action: 'dataSyncing'
@@ -509,6 +501,10 @@ module.exports = {
         controller: 'redirect',
         action: 'redirect'
     },
+    '/files/check': {
+        controller: 'redirect',
+        action: 'redirect'
+    },
     // '/files/content': {
     // controller: 'fileupload',
     //  action: 'upload'
@@ -575,6 +571,11 @@ module.exports = {
         action: 'free'
     },
     '/subscription/paid/:id/:temp': {
+        controller: 'subscription',
+        action: 'paid'
+    },
+
+    '/subscription/paid/:id/:temp/:type': {
         controller: 'subscription',
         action: 'paid'
     },

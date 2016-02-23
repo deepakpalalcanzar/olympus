@@ -2,12 +2,15 @@
  * Redirect New API Methods to New Server
  */
 var request = require('request');
-var path = require('path');
-var mime = require('mime');
 
 var RedirectController = {
-    
     redirect: function (req, res) {
+
+
+	//console.log("sending request sending request sending request sending request sending request sending request");
+	//console.log(req.headers['ip']);
+	//console.log(req.session.Account.ip);
+	//console.log("sending request sending request sending request sending request sending request sending request");
 
 // hack the session bro
         var _session = {
@@ -29,12 +32,55 @@ var RedirectController = {
 
         if (req.method === 'POST' && req.url == '/files/content') {
 
-            options.uri += "?_session=" + JSON.stringify(_session);
+// console.log('|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||');
+// console.log(req);
+// console.log('TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT');
+// console.log(options);
+// console.log('IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII');
+
             var proxyReq = req.pipe(request.post(options));
             proxyReq.on('data', function (data) {
 
-                console.log(" Printing Data ");
-                console.log(data);
+                try {
+                    data = JSON.parse(data.toString('utf8'));
+                } catch (e) {
+                    data = {error: 'unknown error'};
+                }
+
+                if (data.error) {
+                    return res.json(data, 500);
+                }
+                if (data.origParams) {
+                    return afterUpload(data);
+                }
+// Get dir subscribers
+                var subscribers = Directory.roomName(data.parentId);
+
+// Broadcast a message to everyone watching this INode to update accordingly.
+                SocketService.broadcast('UPLOAD_PROGRESS', subscribers, {
+                    id: data.parentId,
+                    filename: data.name,
+                    percent: data.percent
+                });
+
+            });
+
+
+            proxyReq.on('error', function (err) {
+                return res.send(500);
+            });
+            return;
+        }
+        else if (req.method === 'POST' && req.url == '/files/check') {
+
+// console.log('|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||');
+// console.log(req);
+// console.log('TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT');
+// console.log(options);
+// console.log('IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII');
+
+            var proxyReq = req.pipe(request.post(options));
+            proxyReq.on('data', function (data) {
 
                 try {
                     data = JSON.parse(data.toString('utf8'));
@@ -87,33 +133,32 @@ var RedirectController = {
                             var user_platform = req.headers['user-agent'];
                         }
 
+
+
                         /* Logging Of File Download */
                         options.json = {
                             user_id: req.session.Account.id,
                             text_message: 'has downloaded ' + fileModel.name,
                             activity: 'download',
                             on_user: fileModel.id,
-                            ip: req.session.Account.ip === 'undefined' ? req.headers['Ip'] : req.session.Account.ip,
+                            ip: typeof req.session.Account.ip === 'undefined' ? req.headers['ip'] : req.session.Account.ip,
                             platform: user_platform,
                         };
                         
-
                         request(options, function (err, response, body) {
                             if (err)
                                 return res.json({error: err.message, type: 'error'}, response && response.statusCode);
                         });
                     }
 
+//                    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&  FS name  &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+//                    console.log(req.url);
+//                    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&& FS name &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+
                     // set content-type header
                     res.setHeader('Content-Type', fileModel.mimetype);
                     options.uri = "http://localhost:1337/file/download/" + fileModel.fsName + "?_session=" + JSON.stringify(_session);
-
-                    var filestream = fs.createReadStream(res);
-                    console.log(path.resolve("/var/www/html/olympus/olympus1/master/public/demo/", fileModel.fsName)) ;                   
-                    filestream.pipe(fs.createWriteStream(path.resolve("/var/www/html/olympus/olympus1/master/public/demo/", fileModel.fsName)));
-
                     var proxyReq = request.get(options).pipe(res);
-
                     proxyReq.on('error', function (err) {
                         res.send(err, 500)
                     });
@@ -125,12 +170,23 @@ var RedirectController = {
             return;
         } else if (req.url.match(/^\/file\/thumbnail\//)) {
 
+ 
             File.find(req.param('id')).success(function (fileModel) {
                 // If we have a file model to work with...
                 if (fileModel) {
                     // set content-type header
                     res.setHeader('Content-Type', fileModel.mimetype);
-                    var fsNamethumbanil = fileModel.fsName;
+                    
+                 if (sails.config.fileAdapter.adapter == "s3") {
+                        var fsNamethumbanil = fileModel.fsName;
+                    } else {
+                        if (fileModel.thumbnail == "1") {
+                            var fsNamethumbanil = "thumbnail-" + fileModel.fsName;
+                        } else {
+                            var fsNamethumbanil = fileModel.fsName;
+                        }
+                    }
+                    
                     
                     options.uri = "http://localhost:1337/file/thumbnaildownload/" + fsNamethumbanil + "?_session=" + JSON.stringify(_session);
                     var proxyReq = request.get(options).pipe(res);
@@ -173,7 +229,8 @@ var RedirectController = {
             // use the json parsing above as a simple check we got back good stuff
             res.json(body, response && response.statusCode);
 
-        };
+        }
+        ;
 
         function afterUpload(body) {
 
@@ -223,7 +280,69 @@ var RedirectController = {
 
             });
         }
+        ;
 
+        function afterUploadCheck(body) {
+
+            var preFile = body.oldFile;
+            var parsedFormData;
+            if (body.origParams.data) {
+                parsedFormData = JSON.parse(body.origParams.data);
+            }
+            else if (body.origParams.id) {
+                parsedFormData = {
+                    parent: {
+                        id: body.origParams.id,
+                    }
+                };
+            }
+            // API parameters
+            else if (body.origParams.parent_id) {
+                parsedFormData = {
+                    parent: {
+                        id: body.origParams.parent_id,
+                    }
+                };
+            }
+
+            File.find(req.param('id')).success(function (fileModel) {
+                // If we have a file model to work with...
+                if (fileModel) {
+console.log('GTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGT');
+console.log(fileModel);
+console.log('GTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGT');
+res.send(fileModel);
+                }
+
+            }).error(function (err) {
+                res.send(err, 500);
+            });
+
+            /*File.handleUpload({
+                name: body.name,
+                size: body.size,
+                type: body.mimetype,
+                fsName: body.fsName,
+                oldFile: preFile,
+                version: body.version,
+                parentId: parsedFormData.parent.id,
+                replaceFileId: req.param('replaceFileId'),
+                account_id: req.session.Account.id, // AF
+                thumbnail: "1",
+
+            }, function (err, resultSet) {
+
+                if (err)
+                    return res.send(err, 500);
+                var response = {
+                    total_count: resultSet.length,
+                    entries: resultSet
+                };
+                res.json(response);
+
+
+            });*/
+        }
     },
     redirectQuota: function (req, res) {
         req.path = '/folders/quota';

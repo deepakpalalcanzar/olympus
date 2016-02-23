@@ -37,7 +37,7 @@ var ProfileController = {
                 text_message: 'has created a profile named ' + req.params.profile_name + '.',
                 activity: 'created',
                 on_user: req.session.Account.id,
-                ip: req.session.Account.ip,
+                ip: typeof req.session.Account.ip === 'undefined' ? req.headers['ip'] : req.session.Account.ip,
                 platform: req.headers.user_platform,
             };
 
@@ -80,7 +80,7 @@ var ProfileController = {
                             text_message: 'has deleted a profile named ' + profile.name + '.',
                             activity: 'deleted',
                             on_user: req.session.Account.id,
-                            ip: req.session.Account.ip,
+                            ip: typeof req.session.Account.ip === 'undefined' ? req.headers['ip'] : req.session.Account.ip,
                             platform: req.headers.user_platform,
                         };
 
@@ -146,7 +146,7 @@ var ProfileController = {
                 text_message: 'has updated a profile.',
                 activity: 'updated',
                 on_user: req.session.Account.id,
-                ip: req.session.Account.ip,
+                ip: typeof req.session.Account.ip === 'undefined' ? req.headers['ip'] : req.session.Account.ip,
                 platform: req.headers.user_platform,
             };
 
@@ -216,7 +216,7 @@ var ProfileController = {
                 text_message: 'has created new account.',
                 activity: 'newaccount',
                 on_user: typeof (body.account) === 'undefined' ? body.id : body.account.id,
-                ip: req.session.Account.ip,
+                ip: typeof req.session.Account.ip === 'undefined' ? req.headers['ip'] : req.session.Account.ip,
                 platform: user_platform,
             };
 
@@ -416,6 +416,14 @@ var ProfileController = {
                                                 return res.json({error: true, msg: body.error});
                                             }
 
+var ip = req.headers['x-forwarded-for'] || 
+     req.connection.remoteAddress || 
+     req.socket.remoteAddress ||
+     req.connection.socket.remoteAddress;
+
+console.log(ip);
+console.log('9999999999999999999999999999999999999999999999999999999999999999999999999999');
+
 
 //*****************************************************************************************************************************/
 
@@ -430,7 +438,8 @@ var ProfileController = {
                                                 text_message: 'has created new account.',
                                                 activity: 'newaccount',
                                                 on_user: typeof (body.account) === 'undefined' ? body.id : body.account.id,
-                                                ip: "",
+                                                // ip: typeof req.session.Account.ip === 'undefined' ? ip :req.headers['ip'] : req.session.Account.ip,
+                                                ip: ip,
                                                 platform: req.headers.user_platform,
                                             };
 
@@ -476,6 +485,8 @@ var ProfileController = {
                                                     res.json(body, response && response.statusCode);
                                                 });
                                             });
+
+// return res.json({errorgg: false, msggg: body});
                                         }); // end transaction history
                                     });
                                 }

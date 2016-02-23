@@ -25,20 +25,20 @@ var AccountController = {
             if (err) return res.json({
                 error: 'Error creating email',
                 type: 'error'
-            });
+            },400);
 
             if (account) return res.json({
                 error: 'Account with that email already exists',
                 type: 'error',
                 id: account.id,
-                email_msg : 'email_exits',
-            });
+                email_msg : 'email_exist',
+            },400);
 
             if(req.param('isVerified') && !req.param('password')) {
                 return res.json({
                     error: 'Account cannot be verified without a password',
                     type: 'error'
-                });
+                },400);
             }
             publicIp(function (err, ip) {
 
@@ -63,6 +63,9 @@ var AccountController = {
                 Account.createAccount(options, function(err, account) {
 
                     if (err) return res.json({
+                        /*console.log('SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSs');
+                        console.log(err);
+                        console.log('SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSs');*/
                         error: 'Error creating account',
                         type: 'error'
                     });

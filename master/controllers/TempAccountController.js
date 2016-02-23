@@ -194,7 +194,9 @@ var TempAccountController = {
 
             var response = [];
             var sql, sqlFile;
-
+console.log('444477777444477777444477777444477777444477777444477777444477777');
+console.log(accounts);
+console.log('444477777444477777444477777444477777444477777444477777444477777');
             if(lastSync === '0'){
                 sql = "SELECT * from deletedlist where account_id = ?";
                 sql = Sequelize.Utils.format([sql, accounts[0].account_id]);
@@ -250,6 +252,10 @@ var TempAccountController = {
         var sqlcheck = "SELECT dl.deleted_id, dl.directory_id, d.name, d.id, d.deleted, d.DirectoryId FROM  `deletedlist` dl JOIN directory d ON dl.directory_id = d.id WHERE dl.deleted_id =?"
         sqlcheck = Sequelize.Utils.format([ sqlcheck, req.params.item_id ]);
 
+        console.log("sqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlcheck");
+        console.log(sqlcheck);
+        console.log("sqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlcheck");
+ 
         sequelize.query(sqlcheck, null, {
             raw: true
         }).success(function(checkFile) {
@@ -266,6 +272,11 @@ var TempAccountController = {
                     sql     = Sequelize.Utils.format([ sql, req.session.Account.id, req.params.dir_type ]);
                 }
 
+
+        console.log("sqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlcheck");
+        console.log(sql);
+        console.log("sqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlcheck");
+
                 sequelize.query(sql, null, {
                     raw: true
                 }).success(function(deletedlist) {
@@ -274,5 +285,4 @@ var TempAccountController = {
             }
         });
     }
-
 };_.extend(exports, TempAccountController);

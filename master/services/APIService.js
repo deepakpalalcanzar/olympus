@@ -112,7 +112,7 @@ exports.Directory.deleted = exports.deletedDirectory;
 
 var deletedFile = function(model) { // File
 
-	console.log(model);
+	console.log(model.mimetype);
 	console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
 		return {
 			id: model.id,
