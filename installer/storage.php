@@ -6,6 +6,11 @@
 <body>
 
 	<header>&nbsp;</header>
+	<style>
+	.error{
+		border: 1px solid red !important;
+	}
+	</style>
 	<div class="container center_div">
 		<div class="col-lg-12">&nbsp;</div>
 		<div class="col-lg-12">&nbsp;</div>
@@ -30,13 +35,13 @@
 
 					<div class="radio">
 				  		<label>
-					    	<input type="radio" name="storage" value="S3"> Amazon S3
+					    	<input type="radio" name="storage" <?php echo (isset($_SESSION['storage']) && $_SESSION['storage'] == 'S3' ) ? 'checked="checked"' : ''; ?> value="S3"> Amazon S3
 					  	</label>
 					</div>
 					
 					<div class="radio">
 						<label>
-					    	<input type="radio" name="storage" value="swift"> Swift
+					    	<input type="radio" name="storage" <?php echo (isset($_SESSION['storage']) && $_SESSION['storage'] == 'swift' ) ? 'checked="checked"' : ''; ?> value="swift"> Swift
 					  	</label>
 					</div>
 
@@ -46,7 +51,7 @@
 					  	</label>
 					</div>
 
-					<div style="display:none" id="s3Detail">
+					<div style="<?php echo (isset($_SESSION['storage']) && $_SESSION['storage'] == 'S3' ) ? '' : 'display:none'; ?>" id="s3Detail">
 
 						<hr style="border:2px solid #CCC;">
 						<div class="login-box-head">
@@ -54,34 +59,34 @@
 							<img src="img/help.png" tabindex="0" data-toggle="popover" data-html="true" data-trigger="hover" data-original-title="Amazon S3 Credentials" data-content="Please create the bucket and region in your amazon web services portal. After your bucket has been created enter the credentials here." style="cursor:pointer;">
 						</div>
 						<label for="email"> Access Key: </label>
-						<input type="text" class="login-input-field server-hostname" placeholder="Please enter your access key" name="api_key">
+						<input type="text" class="login-input-field server-hostname <?php echo $_SESSION['storage'] == 'S3' && ( !$_SESSION['selectedStorage']['api_key'] || trim( $_SESSION['selectedStorage']['api_key'] ) == '' )?'error':''; ?>" placeholder="Please enter your access key" name="api_key" value="<?php echo $_SESSION['storage'] == 'S3' && isset($_SESSION['selectedStorage']['api_key'])?$_SESSION['selectedStorage']['api_key']:''; ?>">
 						
 						<label for="database_name"> Access Secret Key: </label>
-						<input type="text" class="login-input-field database-name" placeholder="Please enter your access secret key" name="api_secret_key">
+						<input type="text" class="login-input-field database-name <?php echo $_SESSION['storage'] == 'S3' && ( !$_SESSION['selectedStorage']['api_secret_key'] || trim( $_SESSION['selectedStorage']['api_secret_key'] ) == '' )?'error':''; ?>" placeholder="Please enter your access secret key" name="api_secret_key" value="<?php echo $_SESSION['storage'] == 'S3' && isset($_SESSION['selectedStorage']['api_secret_key'])?$_SESSION['selectedStorage']['api_secret_key']:''; ?>">
 						
 						<label for="database_hostname"> Bucket: </label>
-						<input type="text" class="login-input-field database-hostname" placeholder="Please enter your bucket name" name="bucket">
+						<input type="text" class="login-input-field database-hostname <?php echo $_SESSION['storage'] == 'S3' && ( !$_SESSION['selectedStorage']['bucket'] || trim( $_SESSION['selectedStorage']['bucket'] ) == '' )?'error':''; ?>" placeholder="Please enter your bucket name" name="bucket" value="<?php echo $_SESSION['storage'] == 'S3' && isset($_SESSION['selectedStorage']['bucket'])?$_SESSION['selectedStorage']['bucket']:''; ?>">
 						
 						<label for="username"> Region: </label>
-						<input type="text" class="login-input-field username" placeholder="Please neter your region name" name="region">
+						<input type="text" class="login-input-field username <?php echo $_SESSION['storage'] == 'S3' && ( !$_SESSION['selectedStorage']['region'] || trim( $_SESSION['selectedStorage']['region'] ) == '' )?'error':''; ?>" placeholder="Please neter your region name. (such as 'US_EAST_1' OR 'EU_WEST_1' OR 'AP_NORTHEAST_1' etc. )" name="region" value="<?php echo $_SESSION['storage'] == 'S3' && isset($_SESSION['selectedStorage']['region'])?$_SESSION['selectedStorage']['region']:''; ?>">
 
 					</div>
 
-					<div style="display:none" id="swiftDetail">
+					<div style="<?php echo (isset($_SESSION['storage']) && $_SESSION['storage'] == 'swift' ) ? '' : 'display:none'; ?>" id="swiftDetail">
 
 						<hr style="border:2px solid #CCC;">
 						<div class="login-box-head">Swift Credentials</div>
 						<label for="email"> Swift Host: </label>
-						<input type="text" class="login-input-field server-hostname" placeholder="Please enter your login email" name="host">
+						<input type="text" class="login-input-field server-hostname <?php echo $_SESSION['storage'] == 'swift' && ( !$_SESSION['selectedStorage']['host'] || trim( $_SESSION['selectedStorage']['host'] ) == '' )?'error':''; ?>" placeholder="Please enter your login email" name="host" value="<?php echo isset($_SESSION['selectedStorage']['host'])?$_SESSION['selectedStorage']['host']:''; ?>">
 						
 						<label for="database_name"> Swift Port: </label>
-						<input type="text" class="login-input-field database-name" placeholder="Confirm email" name="port">
+						<input type="text" class="login-input-field database-name <?php echo $_SESSION['storage'] == 'swift' && ( !$_SESSION['selectedStorage']['post'] || trim( $_SESSION['selectedStorage']['port'] ) == '' )?'error':''; ?>" placeholder="Confirm email" name="port" value="<?php echo isset($_SESSION['selectedStorage']['port'])?$_SESSION['selectedStorage']['port']:''; ?>">
 						
 						<label for="database_hostname"> Swift Hash: </label>
-						<input type="text" class="login-input-field database-hostname" placeholder="Please enter your login password" name="serviceHash">
+						<input type="text" class="login-input-field database-hostname <?php echo $_SESSION['storage'] == 'swift' && ( !$_SESSION['selectedStorage']['serviceHash'] || trim( $_SESSION['selectedStorage']['serviceHash'] ) == '' )?'error':''; ?>" placeholder="Please enter your login password" name="serviceHash" value="<?php echo isset($_SESSION['selectedStorage']['serviceHash'])?$_SESSION['selectedStorage']['serviceHash']:''; ?>">
 						
 						<label for="username"> Swift Container: </label>
-						<input type="text" class="login-input-field username" placeholder="Please neter your username" name="container">
+						<input type="text" class="login-input-field username <?php echo $_SESSION['storage'] == 'swift' && ( !$_SESSION['selectedStorage']['container'] || trim( $_SESSION['selectedStorage']['container'] ) == '' )?'error':''; ?>" placeholder="Please neter your username" name="container" value="<?php echo isset($_SESSION['selectedStorage']['container'])?$_SESSION['selectedStorage']['container']:''; ?>">
 					</div>
 
 					<div style="display:none" id="diskInfo">

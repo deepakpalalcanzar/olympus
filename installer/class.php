@@ -101,9 +101,23 @@ class Configuration {
 
 		$fileAdapter 			= '';
 		$localConfigFileAdaptor = '';
+		$_SESSION['error']		= false;
 		switch($selectedStorage['storage']){
 
 			case 'S3' :
+
+			$selectedStorage['host'] = $selectedStorage['port'] = $selectedStorage['serviceHash'] = $selectedStorage['container'] = '';
+
+			if( !$selectedStorage['api_key'] || trim( $selectedStorage['api_key'] ) == '' ||
+				!$selectedStorage['api_secret_key'] || trim( $selectedStorage['api_secret_key'] ) == '' ||
+				!$selectedStorage['bucket'] || trim( $selectedStorage['bucket'] ) == '' ||
+				!$selectedStorage['region'] || trim( $selectedStorage['region'] ) == '' )
+				{
+					$_SESSION['msg'] = "Please Fill in all the details.";
+				 	$_SESSION['storage'] = 'S3';
+				 	$_SESSION['selectedStorage'] = $selectedStorage;
+				 	header("Location:storage.php");
+				}
 
 // File store adapter configuration
 				$fileAdapter = "fileAdapter: { \n
@@ -157,6 +171,19 @@ class Configuration {
 			
 
 			case 'swift' :
+
+				$selectedStorage['api_key'] = $selectedStorage['api_secret_key'] = $selectedStorage['bucket'] = $selectedStorage['region'] = '';
+
+				if( !$selectedStorage['host'] || trim( $selectedStorage['host'] ) == '' ||
+				!$selectedStorage['port'] || trim( $selectedStorage['port'] ) == '' ||
+				!$selectedStorage['serviceHash'] || trim( $selectedStorage['serviceHash'] ) == '' ||
+				!$selectedStorage['container'] || trim( $selectedStorage['container'] ) == '' )
+				{
+					$_SESSION['msg'] = "Please Fill in all the details.";
+				 	$_SESSION['storage'] = 'swift';
+				 	$_SESSION['selectedStorage'] = $selectedStorage;
+				 	header("Location:storage.php");
+				}
 
 // File store adapter configuration
 				$fileAdapter = "fileAdapter: { \n // Which adapter to use \n
