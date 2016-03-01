@@ -1,6 +1,6 @@
 <div class="image-uploader-template change-profile-pic clearfix">
   <div class="container">
-        <div class="avatarBox" style="{% if (Mast.Session.Account.avatar_image !== null){ %} background-image: url(https://dev1.olympus.io/images/profile/{{ Mast.Session.Account.avatar_image }}); {% } else { %} background-image: url(https://dev1.olympus.io/images/avatar_anonymous.png); {% } %} background-size: 100%; background-position: 0px 0px; background-repeat: no-repeat;">
+        <div class="avatarBox" style="{% if (Mast.Session.Account.avatar_image !== null){ %} background-image: url({{ Mast.Socket.baseurl }}/images/profile/{{ Mast.Session.Account.avatar_image }}); {% } else { %} background-image: url({{ Mast.Socket.baseurl }}/images/avatar_anonymous.png); {% } %} background-size: 100%; background-position: 0px 0px; background-repeat: no-repeat;">
 		<div class="thumbBox"></div>
 	</div>
         <div class="action">

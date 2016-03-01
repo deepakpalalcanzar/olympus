@@ -225,18 +225,28 @@ console.log('444477777444477777444477777444477777444477777444477777444477777');
 
     createComment: function(req, res){
 
-        var request = require('request');
-        var options = {
-            uri: 'http://localhost:1337/file/postComment/' ,
-            method: 'POST',
-        };
+        //Start Rishabh
+        var authHeader = req.headers['authorization'].split(' ');
+        var authType = authHeader[0];
+        if (authType != 'Bearer') {
+            // Return error here?
+            return res.json({ error: 'invalid auth token type', type: 'error' }, 403);
+        }
+        var access_token = authHeader[1];
+        //end-Rishabh
 
-        var access_token = req.param('account_id');
-        options.json =  {
-            file_id     : req.param('file_id'),
-            comment     : req.param('comment'),
-            account_id  : req.param('account_id'),
-        };
+            var request = require('request');
+            var options = {
+                uri: 'http://localhost:1337/file/postComment/' ,
+                method: 'POST',
+            };
+
+            // var access_token = req.param('account_id');
+            options.json =  {
+                file_id     : req.param('file_id'),
+                comment     : req.param('comment'),
+                account_id  : access_token,//req.param('account_id'),
+            };
 
         request(options, function(err, response, body) {
             if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);

@@ -1,6 +1,3 @@
-<?php 
-	echo "a;;lasdl;as;ldas;ldas;ldaskl;asl;dk";
-echo exec("lsb_release -i | cut -f2"); ?>
 <?php  session_start(); ?>
 <!DOCTYPE html>
 <html>

@@ -6,7 +6,20 @@ class Configuration {
 	var $adaptor_Configuration; 
 	var $mandrill_Configuration; 
 	var $localConfig; 
-	var $path; 
+	var $path;
+	var $url_base = '/olympus/installer'; 
+
+	function __construct() {
+
+		$url_base = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+		$urlparts = explode('/', $url_base); // explode on slash
+		array_pop($urlparts); // remove last part
+		$url_base = implode($urlparts, '/'); // put it back together
+
+		if( $url_base != '' ){
+			$this->url_base = $url_base;
+		}//else default '/olympus/installer'
+    }
 	
 
 /**
@@ -31,7 +44,7 @@ class Configuration {
 				 header("Location:index.php");
 			}else{
 
-		    // If we couldn't, then it either doesn't exist, or we can't see it.
+		    	// If we couldn't, then it either doesn't exist, or we can't see it.
 				$query="CREATE DATABASE IF NOT EXISTS $postData[database_name]";
 
 				if (mysql_query($query)) {
@@ -43,12 +56,12 @@ class Configuration {
 					$_SESSION['password']	  = $postData['password'];
 					$_SESSION['serverName']	  = $postData['server_hostname'];
 					$_SESSION['protocal']	  = $postData['protocal'];
-					$url = "http://".$_SESSION['serverName']."/olympus/installer/mandrill.php";
+					$url = "http://".$_SESSION['serverName'] . $this->url_base . "/mandrill.php";
 					echo '<script>window.location.href="'.$url.'"</script>';
 
 				} else {
 					$_SESSION['msg'] = "Error in creating database.";
-					$url = "http://".$_SESSION['serverName']."/olympus/installer/index.php";
+					$url = "http://".$_SESSION['serverName'] . $this->url_base . "/index.php";
 					//echo '<script>window.location.href="'.$url.'"</script>';
 
 				}
@@ -67,7 +80,7 @@ class Configuration {
 	function saveMandrill($mandrillConfig){
 		$_SESSION['mandrill_api_key'] = $mandrillConfig['mandrill_key'];
 		// print_r($_SESSION['serverName']);
-		$url = "http://".$_SESSION['serverName']."/olympus/installer/admin-login.php";
+		$url = "http://".$_SESSION['serverName'] . $this->url_base . "/admin-login.php";
 		echo '<script>window.location.href="'.$url.'"</script>';
 	}
 
@@ -80,7 +93,7 @@ class Configuration {
 	function adminLogin($adminLogin){
 		$_SESSION['login_email'] 		= $adminLogin['email'];
 		$_SESSION['login_password'] 	= $adminLogin['password'];
-		$url = "http://".$_SESSION['serverName']."/olympus/installer/storage.php";
+		$url = "http://".$_SESSION['serverName'] . $this->url_base . "/storage.php";
 		echo '<script>window.location.href="'.$url.'"</script>';
 
 	}
@@ -91,7 +104,11 @@ class Configuration {
 	function saveStorageLocation($selectedStorage){
 
 		$distribution_version 	=  exec("lsb_release -r | cut -f2"); 
-		if($distribution_version == '12.04'){
+
+		if(null !== dirname(__FILE__)){
+			$path = dirname(__FILE__).'/../..';//Note- last '/' is skipped deliberately as per behaviour of the code below
+		}
+		elseif($distribution_version == '12.04'){
 			$path = "/var/www";
 		}else if ($distribution_version == '14.04'){
 			$path = "/var/www/html";
@@ -522,8 +539,7 @@ class Configuration {
  								], function(err, results) {bootstrap_cb && bootstrap_cb();});\n
 							};";
 
-
-		$apiConfigApplicationJs = "module.exports = { \n
+	$apiConfigApplicationJs = "module.exports = { \n
   // Port this Sails application will live on\n
   port: process.env.PORT || 1337,\n
   // The environment the app is deployed in\n
@@ -551,16 +567,26 @@ class Configuration {
 
 
 //  API ADAPTERS FILE 
+		exec("sudo chmod 777 $path/olympus/api/config/bootstrap.js");
 		$bootstrapFile = fopen("$path/olympus/api/config/bootstrap.js", "w");
 		fwrite($bootstrapFile, $apiBootstrapConfig);
 		fclose($bootstrapFile);	
 
+//  API CONFIG local JS FILE 
+		// exec("sudo chmod 777 $path/olympus/api/config/local.js");
+		// $applicationFile = fopen("$path/olympus/api/config/local.js", "w");
+		// echo 'Writing local.js<br>';
+		// echo fwrite($applicationFile, $apiConfigLocalJs);
+		// fclose($applicationFile);
+
 //  API CONFIG APPLICATION JS FILE 
-		$applicationFile = fopen("$path/olympus/api/config/local.js", "w");
+		exec("sudo chmod 777 $path/olympus/api/config/application.js");
+		$applicationFile = fopen("$path/olympus/api/config/application.js", "w");
 		fwrite($applicationFile, $apiConfigApplicationJs);
-		fclose($applicationFile);			
+		fclose($applicationFile);	
 
 //  Database config
+		exec("sudo chmod 777 $path/olympus/api/config/localConfig.js");
 		$myfile = fopen("$path/olympus/master/config/localConfig.js", "w");
 		fwrite($myfile, $dataBaseConfiguration);
 		fclose($myfile);			
@@ -605,10 +631,11 @@ class Configuration {
 //  Local config
 		exec("sudo chmod 777 $path/olympus/api/config/local.js");
 		$apiLocal = fopen("$path/olympus/api/config/local.js", "w");
-		fwrite($apiLocal, $apiLocalConfig);
+		echo 'Writin api local.js<br>';
+		echo fwrite($apiLocal, $apiLocalConfig);
 		fclose($apiLocal);	
 
-		$url = "http://".$_SESSION['serverName']."/olympus/installer/ssl.php";
+		$url = "http://".$_SESSION['serverName'] . $this->url_base . "/ssl.php";
 		echo '<script>window.location.href="'.$url.'"</script>';
 
 	}
@@ -629,14 +656,14 @@ class Configuration {
 			foreach($files['ssl_cert']['name'] as $key => $val){
 				if($files['ssl_cert']['name']['0'] != 'gd_bundle.crt'){
 					$_SESSION['msg'] = "Please upload valid gd_bundle crt file.";
-					$url = "http://".$_SESSION['serverName']."/olympus/installer/ssl.php";
+					$url = "http://".$_SESSION['serverName'] . $this->url_base . "/ssl.php";
 					echo '<script>window.location.href="'.$url.'"</script>';
 					return;
 				}
 
 				if($files['ssl_cert']['name']['1'] != 'olympus.crt'){
 					$_SESSION['msg'] = "Please upload valid crt file.";
-					$url = "http://".$_SESSION['serverName']."/olympus/installer/ssl.php";
+					$url = "http://".$_SESSION['serverName'] . $this->url_base . "/ssl.php";
 					echo '<script>window.location.href="'.$url.'"</script>';
 					return;
 				}
@@ -644,7 +671,7 @@ class Configuration {
 				if($files['ssl_cert']['name']['2'] != 'olympus.key'){
 
 					$_SESSION['msg'] = "Please upload valid olympus key file.";
-					$url = "http://".$_SESSION['serverName']."/olympus/installer/ssl.php";
+					$url = "http://".$_SESSION['serverName'] . $this->url_base . "/ssl.php";
 					echo '<script>window.location.href="'.$url.'"</script>';
 
 					return;
@@ -658,7 +685,7 @@ class Configuration {
 		}
 
 		echo exec('$path/olympus/installer/lift_olympus.sh');
-		$url = "http://".$_SESSION['serverName']."/olympus/installer/theme_setup.php";
+		$url = "http://".$_SESSION['serverName'] . $this->url_base . "/theme_setup.php";
 		echo '<script>window.location.href="'.$url.'"</script>';
 
 	}
@@ -733,7 +760,7 @@ class Configuration {
 	            }
 	        }
 	        
-			$url = "http://".$_SESSION['serverName']."/olympus/installer/preview.php";
+			$url = "http://".$_SESSION['serverName'] . $this->url_base . "/preview.php";
 			echo '<script>window.location.href="'.$url.'"</script>';
 		}
 	}

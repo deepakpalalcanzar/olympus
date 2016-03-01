@@ -67,7 +67,7 @@ var File = function(model) { // File
 				type: 'account'
 			},
 			parent: {
-				id: model.directoryId,
+				id: ( model.directoryId ==null ) ? (typeof model.DirectoryId !== 'undefined'?model.DirectoryId:null) : model.directoryId,//model.directoryId
 				name: null,
 				// TODO: in Box.net api, but not necessary for our 1.0 client
 				type: 'directory'
