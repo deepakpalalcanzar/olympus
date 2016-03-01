@@ -130,8 +130,8 @@
     			}
 
     			if(selectedButton === 'Disk'){
-    				//document.getElementById('s3Detail').style.display = "none";
-    				//document.getElementById('swiftDetail').style.display = "none";
+    				document.getElementById('s3Detail').style.display = "none";
+    				document.getElementById('swiftDetail').style.display = "none";
     			}
 			});
 
