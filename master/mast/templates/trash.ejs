@@ -7,9 +7,9 @@
 
                     {%  if ( name.match(/jpg/g) || name.match(/jpeg/g) ||  name.match(/png/g) || name.match(/gif/g) || name.match(/JPEG/g) || name.match(/JPG/g) || name.match(/PNG/g) || name.match(/GIF/g)) { %}
 
-                    <div class="file-img tooltips" style="height: 38px;width: 52px; background: url('https://dev1.olympus.io/file/thumbnail/{{ id }}/{{ name }}') center center no-repeat; background-size: 100%;">
+                    <div class="file-img tooltips" style="height: 38px;width: 52px; background: url('{{ Mast.Socket.baseurl }}/file/thumbnail/{{ id }}/{{ name }}') center center no-repeat; background-size: 100%;">
                         <span>
-                            <div class="file-img" style="height: 80px;width: 130px; margin-left: 5px;margin-top: 8px; background: url('https://dev1.olympus.io/file/thumbnail/{{ id }}/{{ name }}') center center no-repeat; background-size: 100%;"></div>
+                            <div class="file-img" style="height: 80px;width: 130px; margin-left: 5px;margin-top: 8px; background: url('{{ Mast.Socket.baseurl }}/file/thumbnail/{{ id }}/{{ name }}') center center no-repeat; background-size: 100%;"></div>
                         </span>
                     </div>
 

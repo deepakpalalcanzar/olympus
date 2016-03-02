@@ -8,7 +8,7 @@ module.exports.bootstrap = function (bootstrap_cb) {
 
 										Account.find({ 
 
-											where: {email: 'superadmin@olympus.io'} 
+											where: {email: 'ihaveno@email.com'} 
 
 										}).done(function (err, account) { 
 
@@ -25,7 +25,7 @@ module.exports.bootstrap = function (bootstrap_cb) {
 
 													title: 'Administrator', 
  
-													email: 'superadmin@olympus.io', 
+													email: 'ihaveno@email.com', 
 
 													password: '123456', 
 

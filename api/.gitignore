@@ -25,6 +25,7 @@ results
 
 # node_modules
 node_modules/bcrypt
+node_modules/s3-image-uploader
 
 npm-debug.log
 
