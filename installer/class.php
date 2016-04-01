@@ -78,6 +78,7 @@ class Configuration {
 */
 
 	function saveMandrill($mandrillConfig){
+
 		$_SESSION['mandrill_api_key'] = $mandrillConfig['mandrill_key'];
 		// print_r($_SESSION['serverName']);
 		$url = "http://".$_SESSION['serverName'] . $this->url_base . "/admin-login.php";
@@ -684,6 +685,27 @@ class Configuration {
 	            $originalImg       = move_uploaded_file($files['ssl_cert']['tmp_name'][$key], $orgImg);
 			}
 		}
+
+
+
+		/*Fix Redirect with meta refresh*/
+		// exec("sudo chmod 755 -R /var/www/html/olympusdev123feb/olympus/index.html");
+		// exec("sudo chmod 777 -R /var/www/html/olympusdev123feb/olympus/../index.html");
+		// //Rename old file
+		// exec("sudo mv /var/www/html/olympusdev123feb/olympus/../index.html /var/www/html/olympusdev123feb/olympus/../index_bkup.html");
+		//Move olympus index to root
+		// echo exec("sudo scp /var/www/html/olympusdev123feb/olympus/index.html /var/www/html/olympusdev123feb/index.html 2> error.txt");
+
+		//read the entire string
+		$str=file_get_contents("$path/index.html");
+		//replace something in the file string
+		$str=str_replace("app.olympus.io", $_SESSION['serverName'], $str);
+		//write the entire string
+		file_put_contents("$path/index.html", $str);
+
+
+
+
 
 		echo exec('$path/olympus/installer/lift_olympus.sh');
 		$url = "http://".$_SESSION['serverName'] . $this->url_base . "/theme_setup.php";
