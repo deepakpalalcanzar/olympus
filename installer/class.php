@@ -631,8 +631,9 @@ class Configuration {
 //  Local config
 		exec("sudo chmod 777 $path/olympus/api/config/local.js");
 		$apiLocal = fopen("$path/olympus/api/config/local.js", "w");
-		echo 'Writin api local.js<br>';
-		echo fwrite($apiLocal, $apiLocalConfig);
+		// echo 'Writin api local.js<br>';
+		// echo fwrite($apiLocal, $apiLocalConfig);
+		fwrite($apiLocal, $apiLocalConfig);
 		fclose($apiLocal);	
 
 		$url = "http://".$_SESSION['serverName'] . $this->url_base . "/ssl.php";
