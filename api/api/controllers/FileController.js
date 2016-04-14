@@ -367,7 +367,7 @@ var FileController = {
         } else if (req.param('parent_id')) {
             data = {parent: {id: req.param('parent_id')}};
         }else{
-            return res.end(500, {"error": "no data retrieved."});
+            return res.end(JSON.stringify({error: "no data retrieved."}), 'utf8');
         }
 
 // console.log('LLLLLLLLLLLLLLLLLLLLLLLLHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH');
@@ -389,10 +389,6 @@ var FileController = {
                 maxBytes: workgroup.quota - workgroup.size,
                 totalUploadSize: req.headers['content-length']
             });
-
-
-            console.log(sails.config.receiver + 'Receiver');
-            console.log(global[sails.config.receiver + 'Receiver']);
 
             receiver.on('progress', function (progressData) {
                 console.log('22222222222222222222222222222222222222222222');
@@ -523,8 +519,10 @@ console.log(maxElementIndex);
                                                 {first: latestFile.fsName, second: file.extra.fsName}, function (rmErr) {
                                                     console.log('1010101010101010101010101010101010');
                                                     console.log(rmErr);
-                                            var parsedResponse = JSON.parse(rmErr)
-                                            if(rmErr.error === false){//Rishabh: check for error
+                                            var parsedResponse = JSON.parse(rmErr);
+                                            console.log(parsedResponse.error);
+                                            if(parsedResponse.error === undefined){//Rishabh: check for error
+                                                console.log('567567567567567567567567567567567567567567567');
                                                 if (parsedResponse.first === parsedResponse.second) {
                                                     //fsx.unlink('/var/www/html/olympus/api/files/' + file.extra.fsName);
                                                     // fsx.unlink('/home/alcanzar/api/files/'+file.extra.fsName);
@@ -535,7 +533,8 @@ console.log(maxElementIndex);
                                                     }
                                                 }
                                             }else{
-                                                res.end(JSON.stringify({
+                                                console.log('234234234234234234234234234234234234234234234');
+                                                return res.end(JSON.stringify({
                                                     origParams: req.params.all(),
                                                     name: file.filename,
                                                     size: file.size,
@@ -636,7 +635,7 @@ var streamAdaptor = {
             encryptedData["first"] = hash.digest('hex');
 
             ///Rishabh
-            var hs = crypto.createHash('md5');
+            /*var hs = crypto.createHash('md5');
             var nw = fsx.ReadStream('/var/www/html/olympus/api/files/' + options.second);
             nw.on('readable', function () {
                 var chunk;
@@ -648,14 +647,15 @@ var streamAdaptor = {
                 return cb(JSON.stringify(encryptedData));
             }).on('error', function(){
                 return cb(JSON.stringify({error:'Latest file is missing.'}));
-            });
+            });*/
             ///end-Rishabh
             
-        }).on('error', function(){
+        }).on('error', function(e){
+            console.log(e);
             return cb(JSON.stringify({error:'Old file is missing.'}));
         });
 
-        /*var hs = crypto.createHash('md5');
+        var hs = crypto.createHash('md5');
         var nw = fsx.ReadStream('/var/www/html/olympus/api/files/' + options.second);
         nw.on('readable', function () {
             var chunk;
@@ -664,10 +664,11 @@ var streamAdaptor = {
             }
         }).on('end', function () {
             encryptedData["second"] = hs.digest('hex');
-        }).on('error', function(){
+        }).on('error', function(e){
+            console.log(e);
             return cb(JSON.stringify({error:'Latest file is missing.'}));
         });
-        return cb(JSON.stringify(encryptedData));*/
+        return cb(JSON.stringify(encryptedData));
     }
 };
 

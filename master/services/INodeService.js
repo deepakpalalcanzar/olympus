@@ -867,7 +867,8 @@ exports.addPermission = function (req, res) {
                             console.log("ACCOUNT CREATED");
                             console.log(newAccount);
 
-                            var options = {
+                            //Now account is created after account is verified so that no workgroup is created with email value but only with username
+                            /*var options = {
                                 uri: 'http://localhost:1337/directory/createWorkgroup/',
                                 method: 'POST',
                             };
@@ -880,7 +881,7 @@ exports.addPermission = function (req, res) {
                             request(options, function (err, response, body) {
                                 if (err)
                                     return res.json({error: err.message, type: 'error'}, response && response.statusCode); 			      			// res.send(200);
-                            });
+                            });*/
                             callback(null, inode, newAccount);
                         });
                     }

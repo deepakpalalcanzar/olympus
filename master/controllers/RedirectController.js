@@ -51,62 +51,34 @@ var RedirectController = {
                     data = {error: 'unknown error'};
                 }
 
-                if (data.error) {
-                    return res.json(data, 500);
-                }
-                if (data.origParams) {
-                    return afterUpload(data);
-                }
-// Get dir subscribers
-                var subscribers = Directory.roomName(data.parentId);
+                try{
+                    if (data.error) {
+                        req.unpipe();
+                        proxyReq.end();
+                        //req.end();//[TypeError: Object #<IncomingMessage> has no method 'end']
+                        console.log('RETURNING DATA 777 ERROR RETURNING DATA ERROR RETURNING DATA ERROR ');
+                        // return res.json({error: 'unknown error555', type: 'error'},500);
+                        return res.send(500);
+                    }
 
-// Broadcast a message to everyone watching this INode to update accordingly.
-                SocketService.broadcast('UPLOAD_PROGRESS', subscribers, {
-                    id: data.parentId,
-                    filename: data.name,
-                    percent: data.percent
-                });
-
-            });
-
-
-            proxyReq.on('error', function (err) {
-                return res.send(500);
-            });
-            return;
-        }
-        else if (req.method === 'POST' && req.url == '/files/check') {
-
-// console.log('|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||');
-// console.log(req);
-// console.log('TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT');
-// console.log(options);
-// console.log('IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII');
-
-            var proxyReq = req.pipe(request.post(options));
-            proxyReq.on('data', function (data) {
-
-                try {
-                    data = JSON.parse(data.toString('utf8'));
+                    if (data.origParams) {
+                        return afterUpload(data);
+                    }
+    // Get dir subscribers
+                    var subscribers = Directory.roomName(data.parentId);
+    // Broadcast a message to everyone watching this INode to update accordingly.
+                    SocketService.broadcast('UPLOAD_PROGRESS', subscribers, {
+                        id: data.parentId,
+                        filename: data.name,
+                        percent: data.percent
+                    });
+                    console.log('FORWARD SIX FORWARD SIX FORWARD SIX FORWARD SIX FORWARD SIX FORWARD SIX');
                 } catch (e) {
+                    console.log('FORWARD ONE FORWARD ONE FORWARD ONE FORWARD ONE FORWARD ONE FORWARD ONE');
+                    console.log(e);
                     data = {error: 'unknown error'};
+                    return res.json({error: 'unknown error555', type: 'error'},500);
                 }
-
-                if (data.error) {
-                    return res.json(data, 500);
-                }
-                if (data.origParams) {
-                    return afterUpload(data);
-                }
-// Get dir subscribers
-                var subscribers = Directory.roomName(data.parentId);
-
-// Broadcast a message to everyone watching this INode to update accordingly.
-                SocketService.broadcast('UPLOAD_PROGRESS', subscribers, {
-                    id: data.parentId,
-                    filename: data.name,
-                    percent: data.percent
-                });
 
             });
 

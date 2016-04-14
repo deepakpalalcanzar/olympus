@@ -69,7 +69,9 @@ $(window).load(function() {
         imgSrc: 'avatar.png'
     }
 
-	cropper = $('.imageBox').cropbox(options);
+    if($('.imageBox').length){
+		cropper = $('.imageBox').cropbox(options);
+	}
         
 });
 

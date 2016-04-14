@@ -572,6 +572,8 @@ console.log('TRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRR');
 			return res.send('No verification code given!',500);
 		}
 
+		var request = require('request');
+
 		Account.find({
 			where: {
 				verificationCode: req.param('code')
@@ -634,6 +636,27 @@ console.log('TRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRRTRRR');
 			// Otherwise, update their account, send them a proper welcome email,
 			// log them in and redirect them to their new home!
 			else {
+
+				var options = {
+                    uri: 'http://localhost:1337/directory/createWorkgroup/',
+                    method: 'POST',
+                };
+
+                options.json = {
+                    account_name: req.param('full_name'),
+                    account_id: account.id
+                };
+
+                request(options, function (err, response, body) {
+                    if (err)
+                        return res.json({error: err.message, type: 'error'}, response && response.statusCode); 			      			// res.send(200);
+                    console.log('9999999999999999999999999999999999999999');
+                });
+                // callback(null, inode, newAccount);
+
+
+
+
 				account.name = req.param('full_name');
 				account.password = AuthenticationService.hashPassword(req.param('password'));
 				account.title = req.param('job_title');
