@@ -838,14 +838,17 @@ exports.addPermission = function (req, res) {
             // If we've been given the email address of a user, attempt to look the up
             if (req.param('email')) {
 
-                Account.find({
-                    where: {email: req.param('email')}
-                }).success(function (account) {
-                    console.log("CREATING NEW ACCOUNT");
-                    // If we find them, move on to the next step (granting the permission)
-                    if (account) {
-                        callback(null, inode, account);
-                    }
+                var emails = req.param('email');
+
+                var accounts = emails.map(function(email) {
+                    Account.find({
+                        where: {email: email}
+                    }).success(function (account) {
+                        console.log("CREATING NEW ACCOUNT");
+                        // If we find them, move on to the next step (granting the permission)
+                        if (account) {
+                            callback(null, inode, account);
+                        }
 
                     // Otherwise, create an account using this email, and create a verification
                     // code for them.  Then grant permissions to this new user
@@ -856,13 +859,13 @@ exports.addPermission = function (req, res) {
                         UUIDGenerator.v1(null, password, 0);
                         password = UUIDGenerator.unparse(password);
 
-                        Account.create({
-                            name: req.param('email'),
-                            email: req.param('email'),
-                            password: password,
-                            verified: false,
-                            verificationCode: verificationCode
-                        }).success(function (newAccount) {
+                            Account.create({
+                                name: email,
+                                email: email,
+                                password: password,
+                                verified: false,
+                                verificationCode: verificationCode
+                            }).success(function (newAccount) {
 
                             console.log("ACCOUNT CREATED");
                             console.log(newAccount);
@@ -878,13 +881,14 @@ exports.addPermission = function (req, res) {
                                 account_id: newAccount.id
                             };
 
-                            request(options, function (err, response, body) {
-                                if (err)
-                                    return res.json({error: err.message, type: 'error'}, response && response.statusCode); 			      			// res.send(200);
-                            });*/
-                            callback(null, inode, newAccount);
-                        });
-                    }
+                                request(options, function (err, response, body) {
+                                    if (err)
+                                        return res.json({error: err.message, type: 'error'}, response && response.statusCode); 			      			// res.send(200);
+                                });*/
+                                callback(null, inode, newAccount);
+                            });
+                        }
+                    });
                 });
             }
 
