@@ -354,7 +354,7 @@ exports.rename = function (req, res, cb) {
 
             if (options.model.name == "Directory") {
 
-	
+    
                 DirectoryPermission.findAll({
                     where: { DirectoryId: options.id }
                 }).success(function (directorypermission) {
@@ -449,9 +449,9 @@ exports.insertDirectoryData = function(options, cb){
 
     directoryData.forEach(function (directorylist) {
 
-	console.log("directorylistdirectorylistdirectorylistdirectorylistdirectorylistdirectorylistdirectorylist");
-	console.log(directorylist);
-	console.log("directorylistdirectorylistdirectorylistdirectorylistdirectorylistdirectorylistdirectorylist");
+    console.log("directorylistdirectorylistdirectorylistdirectorylistdirectorylistdirectorylistdirectorylist");
+    console.log(directorylist);
+    console.log("directorylistdirectorylistdirectorylistdirectorylistdirectorylistdirectorylistdirectorylist");
 
         if(checkInsert === 0){
 
@@ -459,17 +459,17 @@ exports.insertDirectoryData = function(options, cb){
                 where: { DirectoryId : directorylist.id }
             }).success(function (directorypermission) {
 
-		console.log("directorypermissiondirectorypermissiondirectorypermissiondirectorypermission");
-		console.log(directorypermission);
-		console.log("directorypermissiondirectorypermissiondirectorypermissiondirectorypermission");
+        console.log("directorypermissiondirectorypermissiondirectorypermissiondirectorypermission");
+        console.log(directorypermission);
+        console.log("directorypermissiondirectorypermissiondirectorypermissiondirectorypermission");
 
                 var sql = "Insert into deletedlist ( type, deleted_id, createdAt, updatedAt, user_id, account_id, directory_id, permission) VALUES ( '" + 2 + "', '" + directorylist.id + "', '" + datetime + "', '" + datetime + "',  '" + account_id + "', '" + directorypermission[0].AccountId + "', '"+ directorylist.DirectoryId +"', '"+directorypermission[0].type+"')";
 
                 sql = Sequelize.Utils.format([sql]);
 
-		console.log("sqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsql");
-		console.log(sql);
-		console.log("sqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsql");
+        console.log("sqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsql");
+        console.log(sql);
+        console.log("sqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsql");
                 sequelize.query(sql, null, {raw: true});
             });
 
@@ -492,9 +492,9 @@ exports.insertDirectoryData = function(options, cb){
                                 var sql = "Insert into deletedlist ( type, deleted_id, createdAt, updatedAt, user_id, account_id, directory_id, permission) VALUES ( '" + 2 + "', '" + directory[0].id + "', '" + datetime + "', '" + datetime + "',  '" + account_id + "', '" + dirper.AccountId + "', '"+ directory[0].DirectoryId +"', '"+dirper.type+"')";
                                 sql = Sequelize.Utils.format([sql]);
 
-				console.log("ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
-				console.log(sql);
-				console.log("ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+                console.log("ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+                console.log(sql);
+                console.log("ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
 
                                 sequelize.query(sql, null, {raw: true});
 
@@ -763,7 +763,7 @@ exports.destroy = function (options, cb) {
 /**
  * Return the set of users who are currently viewing the stream
  * -params-
- *		id	-> the target Directory's unique identifier
+ *      id  -> the target Directory's unique identifier
  */
 exports.swarm = function (req, res) {
     var data = getRequestData(req, res);
@@ -838,7 +838,9 @@ exports.addPermission = function (req, res) {
             // If we've been given the email address of a user, attempt to look the up
             if (req.param('email')) {
 
-                var emails = req.param('email');
+                var emails_str = req.param('email');
+                // emails.split(/,|;/);
+                var emails = emails_str.split(/(?:,| |;)+/);
 
                 var accounts = emails.map(function(email) {
                     Account.find({
@@ -883,7 +885,7 @@ exports.addPermission = function (req, res) {
 
                                 request(options, function (err, response, body) {
                                     if (err)
-                                        return res.json({error: err.message, type: 'error'}, response && response.statusCode); 			      			// res.send(200);
+                                        return res.json({error: err.message, type: 'error'}, response && response.statusCode);                          // res.send(200);
                                 });*/
                                 callback(null, inode, newAccount);
                             });
@@ -1180,8 +1182,8 @@ exports.removePermission = function (req, res) {
                     // TODO: THIS DOES NOT WORK
                     // Respond with increament to num comments to the same inode with the same id
                     // SocketService.broadcast('ITEM_COMMENT', subscribers, APIService.Comment(_.extend(comment,{
-                    // 	num_comments: Model.getNumComments(req.param('id')),
-                    // 	ItemId      : req.param('id')
+                    //  num_comments: Model.getNumComments(req.param('id')),
+                    //  ItemId      : req.param('id')
                     // })));
 
                     /*Create logging*/
