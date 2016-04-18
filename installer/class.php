@@ -700,6 +700,7 @@ class Configuration {
 		$str=file_get_contents("$path/index.html");
 		//replace something in the file string
 		$str=str_replace("app.olympus.io", $_SESSION['serverName'], $str);
+		$str=str_replace("app.olympus.io", $_SESSION['domain_name'], $str);
 		//write the entire string
 		file_put_contents("$path/index.html", $str);
 
