@@ -699,8 +699,8 @@ class Configuration {
 		//read the entire string
 		$str=file_get_contents("$path/index.html");
 		//replace something in the file string
-		$str=str_replace("app.olympus.io", $_SESSION['serverName'], $str);
-		$str=str_replace("app.olympus.io", $_SESSION['domain_name'], $str);
+		//$str=str_replace("app.olympus.io", $_SESSION['serverName'], $str);
+		$str=str_replace("app.olympus.io", $_SESSION['domain_name'], $str);//pick domain name instead ip
 		//write the entire string
 		file_put_contents("$path/index.html", $str);
 
