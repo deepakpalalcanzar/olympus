@@ -843,7 +843,16 @@ listUsers: function (req, res) {
 
     readCSVFile: function (req, res) {
 
-        //var temp = require('temp');
+        var users = req.param('users');
+        console.log('usersusersusersusersusersusersusersusersusers');
+        console.log(users);
+        // var filename = 'testinnnn.csv';
+        // var base64Data = binaryData.replace(/^data:image\/(png|gif|jpeg);base64,/, "");
+        // base64Data += base64Data.replace('+', ' ');
+        // binaryData = new Buffer(base64Data, 'base64').toString('binary');
+
+        // fsx.writeFile("/var/www/html/olympus/master/public/" + filename, filedata, 'binary', function (err) {
+        // });
 
         var sql = "SELECT subscription_id FROM account WHERE id=?";
         sql = Sequelize.Utils.format([sql, req.session.Account.id]);
@@ -860,35 +869,106 @@ listUsers: function (req, res) {
 
                 var i = 0;
                 var request = require('request');
-                //console.log(req.params.filepath);
-                var stream = fsx.createReadStream('/var/www/html/olympus/master/public/Testdata1.csv');
-		
-                csv.fromStream(stream).on("data", function (data) {
+                console.log(req.params.filepath);
 
-                            if (i != 0) {
+                // var uploadStream = req.file(req.params.filepath);
+                // var stream = fsx.createReadStream('/var/www/html/olympus/master/public/Testdata1.csv');
+
+                // fsx.readFile(req.params.filepath, function (err, stream) {
+                    // ...
+                    // console.log(stream);
+                    // console.log(err);
+                    // console.log('data receiveddata receiveddata receiveddata receiveddata received');
+                    // var newPath = __dirname + "/uploads/uploadedFileName";
+                    // fs.writeFile(newPath, data, function (err) {
+                    //   res.redirect("back");
+                    // });
+                
+
+                    // var stream = fsx.createReadStream(uploadStream);
+    		
+                    // csv.fromStream(stream).on("data", function (data) {
+
+                        var responseData = new Array();
+                        // console.log(data[2]);
+                        for (i = 0; i < users.length; i++) {
+                            console.log('checking user ' + users[i]);
+                            data = users[i];
+
+                                // if (i != 0) {
 
                                 var options = {
                                     uri: 'http://localhost:1337/account/register/',
                                     method: 'POST',
                                 };
 
-                                options.json = {
-                                    name: data[0] + ' ' + data[1],
-                                    email: data[2],
-                                    isVerified: true,
-                                    isAdmin: false,
-                                    password: data[3],
-                                    created_by: req.session.Account.id,
-                                    workgroup: directory[0]['id'],
-                                    title: data[3],
-                                    subscription: account[0]['subscription_id'],
-                                };
+                                    options.json = {
+                                        name: data[0] + ' ' + data[1],
+                                        email: data[2],
+                                        isVerified: true,
+                                        isAdmin: false,
+                                        password: data[3],
+                                        created_by: req.session.Account.id,
+                                        workgroup: req.param('workgroup'),//directory[0]['id'],
+                                        title: data[3],
+                                        subscription: account[0]['subscription_id'],
+                                        //req.param('role')//
+                                    };
 
-                                request(options, function (err, response, body) {
-                                    //console.log(options);
+                                    request(options, function (err, response, body) {
+                                        
 
-                                    if (err)
-                                        return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+
+                                        if(err || body.error){
+                                            if (err)
+                                                // return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+                                                responseData.push({error: err.message, type: 'error'});
+                                                if(users.length == responseData.length){
+                                                    console.log('ResponseSentResponseSentResponseSentResponseSent');
+                                                    return res.json({body: responseData, type: 'success'},200);
+                                                }else{
+                                                    console.log(responseData.length+' out of '+ users.length +' account done.');
+                                                }
+                                            if (body.error)
+                                                // return res.json({error: body.error, type: 'error'}, response && response.statusCode);
+                                                responseData.push({body: body, error: body.error, type: 'error'});
+                                                if(users.length == responseData.length){
+                                                    console.log('ResponseSentResponseSentResponseSentResponseSent');
+                                                    return res.json({body: responseData, type: 'success'},200);
+                                                }else{
+                                                    console.log(responseData.length+' out of '+ users.length +' account done.');
+                                                }
+                                        }else{
+
+
+                                            // req.param('workgroup')
+                                            // req.param('role')
+
+                                            // INodeService.addPermission;
+
+                                            var options = {
+                                                uri: 'http://localhost:1337/adminuser/register/' ,
+                                                method: 'POST',
+                                            };
+
+                                            options.json =  {
+                                                user_id             : body.account.id,
+                                                admin_profile_id    : '2',
+                                                email_msg :         (res.email_msg == 'email_exits') ?'email_exits':' ',
+                                            };
+
+                                            request(options, function(err, response, body) {
+                                                console.log('START adminuser/register');
+                                                console.log(body);
+                                                if(err) console.log(err.message);
+                                                console.log('END adminuser/register');
+                                                // if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
+                                    //  Resend using the original response statusCode
+                                    //  use the json parsing above as a simple check we got back good stuff
+                                                // res.json(body, response && response.statusCode);
+                                            });
+
+
 
                                     //	      Resend using the original response statusCode
                                     //	      use the json parsing above as a simple check we got back good stuff
@@ -916,30 +996,57 @@ listUsers: function (req, res) {
                                             paypal_status: '',
                                         };
 
-                                        request(tran_options, function (err1, response1, body1) {
-                                            if (err1)
-                                                return res.json({error: err1.message, type: 'error'}, response1 && response1.statusCode);
-                                        });
+                                                request(tran_options, function (err1, response1, body1) {
+                                                    if(typeof req.params == 'undefined'){
+                                                        req.params = new Array();
+                                                    }
+                                                    req.params.owned_by = {id: body.account.id};
+                                                    req.params.permission = req.param('role');
 
+                                                    AccountController.assignPermission(req, res, function (err, resp) {
+                                                        // res.json(body, response && response.statusCode);
+                                                    });
+                                                    if (err1){
+                                                        // return res.json({error: err1.message, type: 'error'}, response1 && response1.statusCode);
+                                                        responseData.push({error: err1.message, type: 'error'});
+                                                        if(users.length == responseData.length){
+                                                            console.log('ResponseSentResponseSentResponseSentResponseSent');
+                                                            return res.json({body: responseData, type: 'success'},200);
+                                                        }else{
+                                                            console.log(responseData.length+' out of '+ users.length +' account done.');
+                                                        }
+                                                    }else{
+                                                        // return res.json({body: body.account, type: 'success'}, response1 && response1.statusCode);
+                                                        responseData.push({body: body.account, type: 'success'});
+                                                        if(users.length == responseData.length){
+                                                            console.log('ResponseSentResponseSentResponseSentResponseSent');
+                                                            return res.json({body: responseData, type: 'success'},200);
+                                                        }else{
+                                                            console.log(responseData.length+' out of '+ users.length +' account done.');
+                                                        }
+                                                    }
+                                                });
+
+                                            });
+                                        }
                                     });
+                                // }
+                                // i++;
+                        }
 
-                                });
-                            }
-                            i++;
-
-                        })
-                        .on("end", function (count) {
-                            console.log('Number of lines: ' + count - 1);
-
-                        })
-                        .on('error', function (error) {
-                            console.log(error.message);
-                        });
-
+                    // })
+                    // .on("end", function (count) {
+                    //     console.log('Number of lines: ' + count - 1);
+                    // })
+                    // .on('error', function (error) {
+                    //     console.log(error.message);
+                    // });
+                // });//fsx.readfile end
 
             });
         });
     },
+    assignPermission: INodeService.addPermission,
     /*****************************************************************************************
      Post Registration CSV Data
      @Auth : Avneesh

@@ -12,20 +12,43 @@
             <span >Click here to download Sample csv File</span>
         </a>
     </div>
-    <form action="/account/register" method="POST" enctype="multipart/form-data">
-        <div class="center-mod">
-            <!--<h3 class="company-details">Import Users</h3>-->
-            <div class="file">
-                <div class="company-name"><label>  </label></div>
-                <input type="file" name="file" id="file"  class="new-user-fields user-file">
+    <!--<form action="/account/register" method="POST" enctype="multipart/form-data">-->
+    <div style="width:75%" align="center">
+        <div align="left">
+            <div class="center-mod">
+                <!--<h3 class="company-details">Import Users</h3>-->
+                <div class="file">
+                    <div class="company-name"><label>  </label></div>
+                    <input type="file" name="file" id="file"  class="user-file">
+                </div>
+            </div>
+            {% if (!superadmin) { %}
+                <div class="userWorkgroup">
+                    <div class="company-name"><label>WorkGroup Name</label></div>
+                    <select name="workgroup" id="list_workgroup" class='new-user-select user-workgroup'></select>
+                </div>  
+
+                <div class="userRole">
+                    <div class="company-name"><label>Role</label></div>
+                    <select name="role" class="new-user-select user-role">
+                        <option value="">Select Role</option>
+                        <option value="admin">Is Admin</option>
+                        <option value="write">Can Edit</option>
+                        <option value="comment">Can Comment</option>
+                    </select>   
+                </div>  
+
+            {% } %} 
+            <div id="msgid"></div>
+            <div class="">
+                <a class="setting-save-button">
+                    <img src="/images/button_save@2x.png" />
+                </a>
             </div>
         </div>
-        <div id="msgid"></div>
-        <div class="">
-            <a class="setting-save-button">
-                <img src="/images/button_save@2x.png" />
-            </a>
-        </div>
-    </form>
+    </div>
+    <!--</form>-->
+    <div class="csv-user-import-status" align="left" style="width:75%">
+    </div>
     <div class="clear"></div>
 </div>

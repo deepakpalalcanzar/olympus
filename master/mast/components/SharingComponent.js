@@ -204,7 +204,7 @@ Mast.registerTree('PermissionList',{
 	},
 
 	afterCreate: function() {
-		this.$el.disableSelection();
+		// this.$el.disableSelection();
 	},
 
 	searchAccounts: function(req, callback) {
