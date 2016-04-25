@@ -1000,12 +1000,15 @@ listUsers: function (req, res) {
                                                     if(typeof req.params == 'undefined'){
                                                         req.params = new Array();
                                                     }
-                                                    req.params.owned_by = {id: body.account.id};
-                                                    req.params.permission = req.param('role');
+                                                    if(req.param('workgroup')){//assigns permisssion for workgroup if selected
+                                                        req.params.id = req.param('workgroup');
+                                                        req.params.owned_by = {id: body.account.id};
+                                                        req.params.permission = req.param('role')?req.param('role'):'comment';
 
-                                                    AccountController.assignPermission(req, res, function (err, resp) {
-                                                        // res.json(body, response && response.statusCode);
-                                                    });
+                                                        AccountController.assignPermission(req, res, function (err, resp) {
+                                                            // res.json(body, response && response.statusCode);
+                                                        });
+                                                    }
                                                     if (err1){
                                                         // return res.json({error: err1.message, type: 'error'}, response1 && response1.statusCode);
                                                         responseData.push({error: err1.message, type: 'error'});
