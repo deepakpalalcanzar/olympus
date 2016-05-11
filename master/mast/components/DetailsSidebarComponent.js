@@ -14,9 +14,10 @@ Mast.registerComponent('DetailsSidebar',{
 		'click input.public_link_enabled'    : 'enablePublicLink',
 		'click input.public_sublinks_enabled': 'enablePublicSublinks',
 		'click input.link_password_enabled'  : 'enableLinkPassword',
-		'enter input.link_password'     	 : 'changeLinkPassword',//requires enter plugin
-		'keyup input.link_password'     	 : 'changeLinkPassword',
-		'click input.link_password'     	 : 'changeLinkPassword',
+		// 'enter input.link_password'     	 : 'changeLinkPassword',//requires enter plugin
+		// 'keyup input.link_password'     	 : 'changeLinkPassword',
+		// 'click input.link_password'     	 : 'changeLinkPassword',
+		'click .addLinkPassword-button'		 : 'changeLinkPassword',
 		'gPressEscape'                       : 'dismiss',
 		'clickoutside'                       : 'dismiss',
 		'pressEnter'                         : 'rename'
@@ -419,16 +420,22 @@ Mast.registerComponent('DetailsSidebar',{
 	},
 
 	changeLinkPassword : function(event) {
-		if(event.keyCode == 13){
+		// if(event.keyCode == 13){//in case of press enter, removed after save button added
 
 	        if($('input.link_password_enabled')[0].checked){
 				Mast.Socket.request('/file/changeLinkPassword',
 				{
 					id 			: this.get('id'),
 					password 	: $('input.link_password').val()
+				},function(res, err){
+					// alert('Password saved for the file.');
+					console.log('res4444444444444444444444444444444444444');
+					console.log(res);
+					console.log(err);
+					console.log('err4444444444444444444444444444444444444');
 				});
 			}
-	    }
+	    // }
 	}
 
 });

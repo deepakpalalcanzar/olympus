@@ -79,7 +79,7 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 
 				// add new marshaled inode to this inodes collecton
 				data.files[0].inodeModel = new self.collection.model(marshaledData);
-				self.collection.add(data.files[0].inodeModel);
+				self.collection.add(data.files[0].inodeModel, { at: 0 });
 				// Update myself (parent directory) to take into account the new num_children
 				self.set({
 				    num_children: self.get('num_children')+1
@@ -445,7 +445,7 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 		}
 		this.resizeLabel();
 		$(window).on('resize', this.resizeLabel);
-		this.$el.disableSelection();
+		//this.$el.disableSelection();
 	},
 
 	// When an iNode is dropped over something droppable, alert the world so that we can perform a
