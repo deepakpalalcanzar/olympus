@@ -79,8 +79,17 @@ class Configuration {
 
 	function saveMandrill($mandrillConfig){
 
-		$_SESSION['mandrill_api_key'] = $mandrillConfig['mandrill_key'];
-		// print_r($_SESSION['serverName']);
+		$_SESSION['mail_service'] = $mandrillConfig['mail_service'];
+
+		if( $mandrillConfig['mail_service'] == 'mandrill' ){
+			$_SESSION['mandrill_api_key'] = $mandrillConfig['mandrill_key'];
+			// print_r($_SESSION['serverName']);
+		}else{//internal
+			$_SESSION['smtp_host'] = $mandrillConfig['smtp_host'];
+			$_SESSION['smtp_port'] = $mandrillConfig['smtp_port'];
+			$_SESSION['smtp_user'] = $mandrillConfig['smtp_user'];
+			$_SESSION['smtp_pass'] = $mandrillConfig['smtp_pass'];
+		}
 		$url = "http://".$_SESSION['serverName'] . $this->url_base . "/admin-login.php";
 		echo '<script>window.location.href="'.$url.'"</script>';
 	}
@@ -316,7 +325,14 @@ class Configuration {
 
 			$masterConfigFile ="module.exports = {\n
 									specialAdminCode: 'ad8h4FJADSLJah34ajsdajchALz2494gasdasdhjasdhj23bn',\n
+									mailService: '".$_SESSION['mail_service']."',
 									mandrillApiKey: '".$_SESSION['mandrill_api_key']."',\n
+									smtpDetails: { \n
+											host: '".$_SESSION['smtp_host']."', \n
+											port: '".$_SESSION['smtp_port']."', \n
+											user: '".$_SESSION['smtp_user']."', \n
+											pass: '".$_SESSION['smtp_pass']."' \n
+										}, \n
 									bootstrap: function(bootstrap_cb) { \n
 										if(bootstrap_cb) bootstrap_cb(); \n
 									},\n
@@ -389,7 +405,14 @@ class Configuration {
 
 						$masterConfigFile ="module.exports = {\n
 									specialAdminCode: 'ad8h4FJADSLJah34ajsdajchALz2494gasdasdhjasdhj23bn',\n
+									mailService: '".$_SESSION['mail_service']."',
 									mandrillApiKey: '".$_SESSION['mandrill_api_key']."',\n
+									smtpDetails: { \n
+											host: '".$_SESSION['smtp_host']."', \n
+											port: '".$_SESSION['smtp_port']."', \n
+											user: '".$_SESSION['smtp_user']."', \n
+											pass: '".$_SESSION['smtp_pass']."' \n
+										}, \n
 									bootstrap: function(bootstrap_cb) { \n
 										if(bootstrap_cb) bootstrap_cb(); \n
 									},\n
@@ -553,9 +576,16 @@ class Configuration {
   hostName: '".$_SESSION['domain_name']."',\n
   protocol: 'https://',\n
   // TODO: make this an adapter config\n
+  mailService: '".$_SESSION['mail_service']."',
   mandrill: {\n
     token: '".$_SESSION['mandrill_api_key']."'\n
-  }\n
+  }, \n
+  smtpDetails: { \n
+	host: '".$_SESSION['smtp_host']."', \n
+	port: '".$_SESSION['smtp_port']."', \n
+	user: '".$_SESSION['smtp_user']."', \n
+	pass: '".$_SESSION['smtp_pass']."' \n
+  },\n
 };";
 
 

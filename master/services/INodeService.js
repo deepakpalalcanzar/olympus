@@ -955,7 +955,12 @@ exports.addPermission = function (req, res) {
                         controller: req.param('controller')
                     };
 
-                    EmailService.sendInviteEmail(options);
+                    // EmailService.sendInviteEmail(options);
+                    // EmailService.sendInviteEmailwithNodemailer(options);
+                    // EmailService.sendInviteEmailwithSendgrid(options);
+                    // EmailServices.sendInviteEmailwithSmtp(options);
+
+                    EmailServices.sendEmail('invite', options);
 
                     // Create a response function--we're not quite ready with the response object yet though...
                     var respond = function (response) {
@@ -1570,7 +1575,8 @@ exports.assignPermission = function (req, res) {
                         port: req.port,
                         controller: req.param('controller')
                     };
-                    EmailService.sendInviteEmail(options);
+                    // EmailService.sendInviteEmail(options);
+                    EmailServices.sendEmail('invite', options);
 
                     // Create a response function--we're not quite ready with the response object yet though...
                     var respond = function (response) {

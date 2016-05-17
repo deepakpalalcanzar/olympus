@@ -11,6 +11,44 @@
 		</div>
 	</div> -->
 
+	<!--site domain setting -->
+	<div class="domain-mod">
+		<label>Change Domain name</label>
+		<input id="domainname" type="text" name="domainname" value="test" placeholder="Enter domain (i.e. www.domain.com -no http:// or https://)" /><br>
+	    <input type="button" id="saveDomain" value="Save">
+		<br><br>
+	</div>
+	<!-- -->
+
+	<hr><br>
+
+	<!--Email Service Settings -->
+	<div class="domain-mod">
+		<label>Email Service Settings</label>
+		<input id="mail_service" type="radio" name="mail_service" value="mandrill" /> Use Mandrill
+		<input id="mail_service" type="radio" name="mail_service" value="internal" /> Use Internal Email Setup
+		<br><br>
+		<div id="mandrill_details">
+			<label> Mandrill Api Key: </label>
+			<input type="text" class="login-input-field mandrill-key" placeholder="" value="" id="mandrill_key" name="mandrill_key">
+		</div>
+		<div id="inernal_email_details" style="display:none;">
+			<label> SMTP Server(Host) :</label>
+			<input type="text" class="smtp-host" placeholder="" value="" id="smtp_host" name="smtp_host">
+			<label> Port :</label>
+			<input type="text" class="smtp-port" placeholder="" value="" id="smtp_port" name="smtp_port">
+			<label> Username :</label>
+			<input type="text" class="smtp-user" placeholder="" value="" id="smtp_user" name="smtp_user">
+			<label> Password :</label>
+			<input type="password" class="smtp-pass" placeholder="" value="" id="smtp_pass" name="smtp_pass"><br>
+		</div>
+	    <input type="button" id="saveEmail" value="Save">
+		<br><br>
+	</div>
+	<!-- -->
+
+	<hr><br>
+
 	<!-- settings content -->
 	<div class="main-mod" id="main-mod"> 
 		<!-- company details section -->

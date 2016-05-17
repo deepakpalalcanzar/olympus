@@ -265,6 +265,24 @@
 
             <!-- footer -->
             <div id="footer" class="portal-only clearfix" style="background-color:<%= footer_background %>">
+
+                <!-- Domain Information -->
+                <div id="domaininfo" style="display:none;"><%= sails.config.host %></div>
+                <div id="emailservice" style="display:none;"><%= sails.config.mailService %></div>
+                <div id="mandrillkey" style="display:none;"><%= sails.config.mandrillApiKey %></div>
+                <div id="smtphost" style="display:none;"><%= (typeof sails.config.smtpDetails != 'undefined')?sails.config.smtpDetails.host:'' %></div>
+                <div id="smtpport" style="display:none;"><%= (typeof sails.config.smtpDetails != 'undefined')?sails.config.smtpDetails.port:'' %></div>
+                <div id="smtpuser" style="display:none;"><%= (typeof sails.config.smtpDetails != 'undefined')?sails.config.smtpDetails.user:'' %></div>
+                <div id="smtppass" style="display:none;"><%= (typeof sails.config.smtpDetails != 'undefined')?sails.config.smtpDetails.pass:'' %></div>
+                <script type="text/javascript">
+                    /*console.log(sails_config.express);
+                    console.log(sails_config.session);
+                     sails_config.express = null %>
+                     sails_config.session = null %>
+                    sailsConfig = JSON.parse(JSON.parse(JSON.stringify($('<div/>').html(" (JSON.stringify(sails_config))%>").text())));*/
+                    // console.log(sailsConfig);
+                </script>
+
                 <div id="copyright-info">
                     <img id="footer-logo" class="footer-logo-class" src="/images/Branding_12.png" />
                     <span class="copyright-info"><%= sails.config.organization.copyright %></span>

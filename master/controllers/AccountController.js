@@ -367,6 +367,315 @@ listUsers: function (req, res) {
         });
 
     },
+    changeDomainname: function (req, res) {
+
+    var domainname;
+    var mail_service;
+    var mandrill_key;
+    var smtp_host;
+    var smtp_port;
+    var smtp_user;
+    var smtp_pass;
+    console.log(req.params);
+    console.log(req.param);
+
+if( req.param('formaction') == 'save_domain_info' ){
+    domainname = req.param('newdomain');
+    mail_service = sails.config.mailService;
+    mandrill_key = sails.config.mandrillApiKey;
+    smtp_host    = sails.config.smtpDetails.host;
+    smtp_port    = sails.config.smtpDetails.port;
+    smtp_user    = sails.config.smtpDetails.user;
+    smtp_pass    = sails.config.smtpDetails.pass;
+}else if( req.param('formaction') == 'save_email_info' ){
+    mail_service = req.param('mail_service');
+    if(mail_service == 'internal'){
+        mandrill_key = sails.config.mandrillApiKey;
+        smtp_host    = req.param('smtp_host');
+        smtp_port    = req.param('smtp_port');
+        smtp_user    = req.param('smtp_user');
+        smtp_pass    = req.param('smtp_pass');
+    }else if(mail_service == 'mandrill'){
+        mandrill_key = req.param('mandrill_key');
+        smtp_host    = sails.config.smtpDetails.host;
+        smtp_port    = sails.config.smtpDetails.port;
+        smtp_user    = sails.config.smtpDetails.user;
+        smtp_pass    = sails.config.smtpDetails.pass;
+    }
+}
+
+//START master_config_config content
+master_config_config = '\
+module.exports = { \r\n\
+    specialAdminCode: \''+sails.config.specialAdminCode+'\', \r\n\
+    mailService: \''+mail_service+'\', \r\n\
+    mandrillApiKey: \''+mandrill_key+'\', \r\n\
+    smtpDetails: { \r\n\
+            host: \''+smtp_host+'\', \r\n\
+            port: \''+smtp_port+'\', \r\n\
+            user: \''+smtp_user+'\', \r\n\
+            pass: \''+smtp_pass+'\' \r\n\
+        }, \r\n\
+    bootstrap: function(bootstrap_cb) { \r\n\
+        if(bootstrap_cb) bootstrap_cb(); \r\n\
+        }, \r\n\
+    fileAdapter: {  \r\n\
+        // Which adapter to use  \r\n\
+        adapter: \''+sails.config.fileAdapter.adapter+'\', \r\n\
+        // Amazon S3 API credentials \r\n\
+            s3: {  \r\n\
+                accessKeyId     : \''+sails.config.fileAdapter.s3.accessKeyId+'\', \r\n\
+                secretAccessKey : \''+sails.config.fileAdapter.s3.secretAccessKey+'\', \r\n\
+                bucket          : \''+sails.config.fileAdapter.s3.bucket+'\', \r\n\
+                region          : \''+sails.config.fileAdapter.s3.region+'\' \r\n\
+            }, \r\n\
+        // OpenStack Swift API credentials \r\n\
+            swift: { \r\n\
+                host        : \''+sails.config.fileAdapter.swift.host+'\', \r\n\
+                port        : \''+sails.config.fileAdapter.swift.port+'\', \r\n\
+                serviceHash : \''+sails.config.fileAdapter.swift.serviceHash+'\', \r\n\
+                container   : \''+sails.config.fileAdapter.swift.container+'\', \r\n\
+            }, \r\n\
+        // Keystone API credentials \r\n\
+            keystone: { \r\n\
+                host    : \''+sails.config.fileAdapter.keystone.host+'\', \r\n\
+                port    : \''+sails.config.fileAdapter.keystone.port+'\', \r\n\
+                tenant  : \''+sails.config.fileAdapter.keystone.tenant+'\', // tenant === \'project\' in Horizon dashboard \r\n\
+                username: \''+sails.config.fileAdapter.keystone.username+'\', \r\n\
+                password: \''+sails.config.fileAdapter.keystone.password+'\' \r\n\
+            } \r\n\
+        }, \r\n\
+        // Default title for layout \r\n\
+            appName: \''+sails.config.appName+'\', \r\n\
+        // App hostname \r\n\
+            host: \''+domainname+'\', \r\n\
+        // App root path \r\n\
+            appPath: __dirname + \'\/..\', \r\n\
+        // Port to run the app on \r\n\
+            port: \''+sails.config.port+'\', //5008, \r\n\
+            express: { \r\n\
+                serverOptions: { \r\n\
+                    ca: fs.readFileSync(__dirname + \'/../../ssl/gd_bundle.crt\'), \r\n\
+                    key: fs.readFileSync(__dirname + \'/../../ssl/olympus.key\'), \r\n\
+                    cert: fs.readFileSync(__dirname + \'/../../ssl/olympus.crt\') \r\n\
+            } \r\n\
+        }, \r\n\
+        // Development or production environment \r\n\
+            environment: \''+sails.config.environment+'\', \r\n\
+        // Path to the static web root for serving images, css, etc. \r\n\
+            staticPath: \'./public\', \r\n\
+        // Rigging configuration (automatic asset compilation) \r\n\
+            rigging: { \r\n\
+                outputPath: \''+sails.config.rigging.outputPath+'\', \r\n\
+                sequence: '+JSON.stringify(sails.config.rigging.sequence)+' \r\n\
+            }, \r\n\
+        // Prune the session before returning it to the client over socket.io \r\n\
+            sessionPruneFn: function(session) { \r\n\
+                var avatar = (session.Account && session.Account.id === 1) ? \'/images/\' + session.Account.id + \'.png\' : \'/images/avatar_anonymous.png\'; \r\n\
+                var prunedSession = { \r\n\
+                    Account: _.extend(session.Account || {}, { \r\n\
+                        avatar: avatar \r\n\
+                    }) \r\n\
+                }; \r\n\r\n\
+                return prunedSession; \r\n\
+            }, \r\n\
+        // API token \r\n\
+            apiToken: \''+sails.config.apiToken+'\', \r\n\
+        // Information about your organization \r\n\
+            organization: { \r\n\
+                name: \''+sails.config.organization.name+'\', \r\n\
+                copyright: \''+sails.config.organization.copyright+'\', \r\n\
+                squareLogoSrc: \''+sails.config.organization.squareLogoSrc+'\', \r\n\
+            // Configurable footer link endpoints \r\n\
+                links: { \r\n\
+                    termsOfUse: \''+sails.config.organization.links.termsOfUse+'\', \r\n\
+                    privacyPolicy: \''+sails.config.organization.links.privacyPolicy+'\', \r\n\
+                    help: \''+sails.config.organization.links.help+'\' \r\n\
+                } \r\n\
+            }, \r\n\
+            publicLinksEnabledByDefault: \''+sails.config.publicLinksEnabledByDefault+'\', \r\n\
+        // NOTE: This is just to test for privateDevelopment feature. Need to figure out \r\n\
+        // what determines this config options and implement that. \r\n\
+            privateDeployment: false, \r\n\
+};';//END master_config_config
+
+if( req.param('formaction') == 'save_domain_info' ){
+
+//START master_config_localConfig content
+master_config_localConfig = '\
+exports.datasource = { \r\n\
+    database: \''+sails.config.datasource.database+'\', \r\n\
+    username: \''+sails.config.datasource.username+'\', \r\n\
+    password: \''+sails.config.datasource.password+'\' \r\n\
+// Choose a SQL dialect, one of sqlite, postgres, or mysql (default mysql) \r\n\
+// dialect:  \'mysql\', \r\n\
+// Choose a file storage location (sqlite only) \r\n\
+//storage:  \':memory:\', \r\n\
+// mySQL only \r\n\
+// pool: { maxConnections: 5, maxIdleTime: 30} \r\n\
+}; \r\n\r\n\
+// Self-awareness of hostname \r\n\
+exports.host = \''+domainname+'\'; \r\n\
+port: \''+sails.config.port+'\', // change to 80 if you\'re not using SSL \r\n\
+exports.fileAdapter = { \r\n\
+// Choose a file adapter for uploads / downloads \r\n\
+    adapter: \''+sails.config.fileAdapter.adapter+'\', \r\n\
+    // Amazon s3 credentials \r\n\
+    s3: { \r\n\
+        accessKeyId     : \''+sails.config.fileAdapter.s3.accessKeyId+'\', \r\n\
+        secretAccessKey : \''+sails.config.fileAdapter.s3.secretAccessKey+'\', \r\n\
+        bucket          : \''+sails.config.fileAdapter.s3.bucket+'\', \r\n\
+        region          : \''+sails.config.fileAdapter.s3.region+'\' \r\n\
+    }, \r\n\r\n\
+    // OpenStack Swift API credentials \r\n\
+    swift: { \r\n\
+        host: \''+sails.config.fileAdapter.swift.host+'\', \r\n\
+        port: \''+sails.config.fileAdapter.swift.port+'\', \r\n\
+        serviceHash: \''+sails.config.fileAdapter.swift.serviceHash+'\', \r\n\
+        container: \''+sails.config.fileAdapter.swift.container+'\', \r\n\
+    }, \r\n\
+}';
+//END master_config_localConfig content
+
+//START root's index.html content
+root_index_html = '\
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> \r\n\
+<html xmlns="http://www.w3.org/1999/xhtml"> \r\n\
+  <head> \r\n\
+    <meta http-equiv="refresh" content="0; URL=\'https://'+domainname+'\'" /> \r\n\
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> \r\n\
+    <title>Redirecting to Olympus</title> \r\n\
+    <style type="text/css" media="screen"> \r\n\
+      * { \r\n\
+          margin: 0; \r\n\
+          padding: 0; \r\n\
+      } \r\n\
+      body,html,div.validator{ \r\n\
+        height: 100%; \r\n\
+      } \r\n\
+      div.login-page { \r\n\
+          background: #3c4151 none repeat scroll 0 0; \r\n\
+          height: 100%; \r\n\
+          width: 100%; \r\n\
+      } \r\n\
+      div.login-container { \r\n\
+          margin: 0 auto; \r\n\
+          padding-top: 5%; \r\n\
+      } \r\n\
+      div.login-page img { \r\n\
+          margin: 0 auto !important; \r\n\
+          padding-top: 7%; \r\n\
+          max-width: 100%; \r\n\
+      } \r\n\
+      img { \r\n\
+          display: block; \r\n\
+      } \r\n\
+      div.login-template { \r\n\
+          background: #f0f0f0 none repeat scroll 0 0; \r\n\
+          border-radius: 8px; \r\n\
+          margin: 0 auto; \r\n\
+          width: 450px !important; \r\n\
+          max-width: 100% !important; \r\n\
+      } \r\n\
+      div.login-template div.login-box-head { \r\n\
+          color: #636c78; \r\n\
+          font-size: 1.25em; \r\n\
+          padding: 20px 0; \r\n\
+          text-align: center; \r\n\
+      } \r\n\
+    </style> \r\n\
+  </head> \r\n\
+  <body> \r\n\
+    <div class="validator"> \r\n\
+      <div class="login-page portal-only"> \r\n\
+      <img src="logo_loginScreen.png"> \r\n\
+      <div class="login-outlet login-container"> \r\n\
+      <div class="login-template"> \r\n\
+      <div class="login-box-head">Please wait while we redirect you to the secure login page...</div> \r\n\
+    </div> \r\n\
+  </body> \r\n\
+</html>';
+//END root's index.html content
+
+        var request = require('request');
+        /*Create logging*/
+        var opts = {
+            uri: 'http://localhost:1337/account/changeDomainname/',
+            method: 'POST',
+        };
+
+        opts.json = {
+            newdomainname: domainname
+        };
+
+        request(opts, function (err, response, body) {
+
+            if (err){
+                console.log(err);
+                return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+            }
+
+            configjs = __dirname + '/../config/config.js';
+            fsx.writeFile(configjs, master_config_config, 'utf8', function (err) {
+                if (err) return console.log(err);
+            });
+
+
+            localconfigjs = __dirname + '/../config/localConfig.js';
+            // fsx.readFile(localconfigjs, 'utf8', function (err,data) {
+            //   if (err) {
+            //     return console.log(err);
+            //   }
+
+            //   // var replaced_host_string = data.replace(/host:,/g, req.param('newdomain'));
+            //   var replaced_host_string = data.replace(/(exports.host)(.+?)(?= \;)/, 'exports.host = \'newdomain\'');
+            // console.log(replaced_host_string);
+            //   fsx.writeFile(localconfigjs, replaced_host_string, 'utf8', function (err) {
+            //     if (err) return console.log(err);
+            //   });
+            // });
+
+            fsx.writeFile(localconfigjs, master_config_localConfig, 'utf8', function (err) {
+                if (err) return console.log(err);
+            });
+
+            indexpage = __dirname + '/../../../index.html';
+            fsx.writeFile(indexpage, root_index_html, 'utf8', function (err) {
+                if (err) return console.log(err);
+            });
+
+            console.log('sails.config.host');
+            console.log(sails.config.host);
+            sails.config.host = domainname;
+            console.log(sails.config.host);
+
+            res.json(body, response && response.statusCode);
+            console.log(response);
+        });
+}else if( req.param('formaction') == 'save_email_info' ){
+
+    configjs = __dirname + '/../config/config.js';
+    fsx.writeFile(configjs, master_config_config, 'utf8', function (err) {
+        if (err) return console.log(err);
+    });
+
+    sails.config.mailService = mail_service;
+    sails.config.mandrillApiKey = mandrill_key;
+    if(typeof sails.config.smtpDetails != 'undefined'){
+        sails.config.smtpDetails.host = smtp_host;
+        sails.config.smtpDetails.port = smtp_port;
+        sails.config.smtpDetails.user = smtp_user;
+        sails.config.smtpDetails.pass = smtp_pass;
+    }else{
+        sails.config.smtpDetails = { 
+            host: smtp_host, 
+            port: smtp_port, 
+            user: smtp_user,
+            pass: smtp_pass
+        };
+    }
+}
+    },
     getNestedWorkgroups: function (req, res) {
         Directory.findAll({
             where: [' deleted != 1 AND DirectoryId = ' + dir.id],

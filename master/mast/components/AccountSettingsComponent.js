@@ -13,7 +13,7 @@ Mast.registerComponent('AccountSettingsComponent',{
 		'click a.account-details'      : 'displayAccountDetails',
 		'click a.account-password'     : 'displayAccountPassword',
 		'click a.account-notifications': 'displayAccountNotifications',
-		'click a.account-subscription': 'displaySubscribedPlan'
+		'click a.account-subscription' : 'displaySubscribedPlan'
 	},
 
 	bindings: {
@@ -39,6 +39,22 @@ Mast.registerComponent('AccountSettingsComponent',{
 	afterRender: function(){
 		console.log(Mast.Session.Account);
 		if(Mast.Session.Account.isAdmin && (Mast.Session.Account.isSuperAdmin === 1 || Mast.Session.Account.isSuperAdmin === null || Mast.Session.Account.isSuperAdmin===0)){
+			$('#domainname').val($('#domaininfo').html());//Rishabh
+			// $('#mail_service').val($('#emailservice').html());
+			$('input[name="mail_service"][value="' + $('#emailservice').html() + '"]').prop('checked', true);
+			if($('#emailservice').html() == 'mandrill'){
+				$('#mandrill_details').show();
+				$('#inernal_email_details').hide();
+			}else{
+				$('#mandrill_details').hide();
+				$('#inernal_email_details').show();
+			}
+			console.log($('input[name="mail_service"]').val());
+			$('#mandrill_key').val($('#mandrillkey').html());
+			$('#smtp_host').val($('#smtphost').html());
+			$('#smtp_port').val($('#smtpport').html());
+			$('#smtp_user').val($('#smtpuser').html());
+			$('#smtp_pass').val($('#smtppass').html());
 			this.set('showSetting', true);
 			this.set('showSubscription', true);
 		}else if (Mast.Session.Account.isEnterprise === 0){
