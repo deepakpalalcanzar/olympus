@@ -48,7 +48,7 @@ if(sails.config.mailService == 'mandrill'){
             var email = {
                 from: 'info@olympus.io',
                 to: account.email,
-                subject: "New2 Welcome to Olympus",
+                subject: "Welcome to Olympus",
                 text: "Dear " + account.name + ",\n\nWelcome to the Olympus file sharing system!  Your account details are: \n\nUser Name: " + account.email + "\nPassword : " + options.password + "\n\nTo log in to Olympus, go to " + protocol + host + "\n\nTo access it please log onto " + protocol + host + " Or you can download the olympus mobile app from: \n\n iOS: <a href='https://itunes.apple.com/us/app/olympus.io/id778404078?mt=8'>https://itunes.apple.com/us/app/olympus.io/id778404078?mt=8</a> \n Android: <a href='https://play.google.com/store/apps/details?id=com.Olympus'>https://play.google.com/store/apps/details?id=com.Olympus</a>\n\nSincerely,\nThe Olympus Team",
                 html: "Dear " + account.name + ",<br/><br/>Welcome to the Olympus file sharing system!  Your account details are: <br/><br/>User Name: " + account.email + "<br/>Password : " + options.password + "<br/><br/>To log in to Olympus, <a href='" + protocol + host + "'>click here.</a><br/><br/>To access it please log onto " + protocol + host + " Or you can download the olympus mobile app from: <br/><br/> iOS: <a href='https://itunes.apple.com/us/app/olympus.io/id778404078?mt=8'>https://itunes.apple.com/us/app/olympus.io/id778404078?mt=8</a> <br/> Android: <a href='https://play.google.com/store/apps/details?id=com.Olympus'>https://play.google.com/store/apps/details?id=com.Olympus</a><br/><br/>Sincerely,<br/>The Olympus Team"
             };
