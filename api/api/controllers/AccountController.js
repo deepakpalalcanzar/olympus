@@ -299,6 +299,76 @@ var AccountController = {
                 res.json(account, 200);
             });
         });
+    },
+
+    /**
+   * PUT /account/:id/lock
+   *
+   * Locks/unlocks an account and all directories and files under workgroups the account
+   * is owner of.
+   *
+   * ACL should be done at the policy level before getting here
+   * so we can just use the id param in the Account Query
+   */
+
+    changeDomainname: function (req, res) {
+
+        if(typeof req.param('newdomainname') != 'undefined' && req.param('newdomainname'))
+        {
+            fsx = require('fs-extra');
+
+            applicationjs = __dirname + '/../../config/application.js';
+            fsx.readFile(applicationjs, 'utf8', function (err,data) {
+              if (err){
+                return res.json({
+                        error: err,
+                        type: 'error'
+                    }, 400);
+            }
+
+
+//START- content for olympus/api/config/applicatio.js
+api_application = '\
+module.exports = { \r\n\
+    // Port this Sails application will live on \r\n\r\n\
+    port: process.env.PORT || 1337, \r\n\r\n\
+    // The environment the app is deployed in \r\n\
+    // (`development` or `production`) \r\n\
+    // In `production` mode, all css and js are bundled up and minified \r\n\
+    // And your views and templates are cached in-memory.  Gzip is also used. \r\n\
+    // The downside?  Harder to debug, and the server takes longer to start. \r\n\r\n\
+    environment: process.env.NODE_ENV || \'development\', \r\n\r\n\
+    // Used for sending emails \r\n\r\n\
+    hostName: \''+req.param('newdomainname')+'\', \r\n\
+    protocol: \'https://\', \r\n\
+    // TODO: make this an adapter config \r\n\
+    mandrill: { \r\n\
+        token: \''+sails.config.mandrill.token+'\' \r\n\
+    } \r\n\
+};';
+//END- content for olympus/api/config/applicatio.js
+
+              fsx.writeFile(applicationjs, api_application, 'utf8', function (err) {
+                 if (err) return res.json({
+                    error: err,
+                    type: 'error'
+                 }, 400);
+
+                console.log('************************************************');
+                console.log('API:Domain changed to '+req.param('newdomainname'));
+                console.log('************************************************');
+
+                console.log('sails.config.host API API');
+                console.log(sails.config.host);
+                sails.config.host = req.param('newdomain');
+                console.log(sails.config.host);
+
+                return res.json({ status: 'ok'}, 200);
+              });
+            });
+        }else{
+            return res.json({error: 'Some error occurred.', type: 'error' }, 400);
+        }
     }
 };
 module.exports = AccountController;
