@@ -313,7 +313,7 @@ var AccountController = {
 
     changeDomainname: function (req, res) {
 
-        if(typeof req.param('newdomainname') != 'undefined' && req.param('newdomainname'))
+        if(typeof req.param('formaction') != 'undefined' && req.param('formaction') )
         {
             fsx = require('fs-extra');
 
@@ -325,7 +325,23 @@ var AccountController = {
                         type: 'error'
                     }, 400);
             }
-
+if(req.param('formaction') == 'save_domain_info'){
+    newdomainname = req.param('newdomainname');
+    mail_service  = sails.config.mailService;
+    mandrill_key  = sails.config.mandrill.token;
+    smtp_host     = sails.config.smtpDetails.host;
+    smtp_port     = sails.config.smtpDetails.port;
+    smtp_user     = sails.config.smtpDetails.user;
+    smtp_pass     = sails.config.smtpDetails.pass;
+}else{//save_email_info
+    newdomainname = sails.config.hostName;
+    mail_service  = req.param('mailservice');
+    mandrill_key  = req.param('mandrillkey');
+    smtp_host     = req.param('smtphost');
+    smtp_port     = req.param('smtpport');
+    smtp_user     = req.param('smtpuser');
+    smtp_pass     = req.param('smtppass');
+}
 
 //START- content for olympus/api/config/applicatio.js
 api_application = '\
@@ -339,11 +355,18 @@ module.exports = { \r\n\
     // The downside?  Harder to debug, and the server takes longer to start. \r\n\r\n\
     environment: process.env.NODE_ENV || \'development\', \r\n\r\n\
     // Used for sending emails \r\n\r\n\
-    hostName: \''+req.param('newdomainname')+'\', \r\n\
+    hostName: \''+newdomainname+'\', \r\n\
     protocol: \'https://\', \r\n\
     // TODO: make this an adapter config \r\n\
+    mailService: \''+mail_service+'\', \r\n\
     mandrill: { \r\n\
-        token: \''+sails.config.mandrill.token+'\' \r\n\
+        token: \''+mandrill_key+'\' \r\n\
+    }, \r\n\
+    smtpDetails: { \r\n\
+        host: \''+smtp_host+'\', \r\n\
+        port: \''+smtp_port+'\', \r\n\
+        user: \''+smtp_user+'\', \r\n\
+        pass: \''+smtp_pass+'\', \r\n\
     } \r\n\
 };';
 //END- content for olympus/api/config/applicatio.js

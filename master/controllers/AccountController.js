@@ -499,7 +499,7 @@ module.exports = { \r\n\
             privateDeployment: false, \r\n\
 };';//END master_config_config
 
-if( req.param('formaction') == 'save_domain_info' ){
+// if( req.param('formaction') == 'save_domain_info' ){
 
 //START master_config_localConfig content
 master_config_localConfig = '\
@@ -596,6 +596,7 @@ root_index_html = '\
   </body> \r\n\
 </html>';
 //END root's index.html content
+// }
 
         var request = require('request');
         /*Create logging*/
@@ -605,7 +606,14 @@ root_index_html = '\
         };
 
         opts.json = {
-            newdomainname: domainname
+            newdomainname: domainname,
+            formaction   : req.param('formaction'),
+            mandrillkey  : mandrill_key,
+            mailservice  : mail_service,
+            smtphost     : smtp_host,
+            smtpport     : smtp_port,
+            smtpuser     : smtp_user,
+            smtppass     : smtp_pass
         };
 
         request(opts, function (err, response, body) {
@@ -620,61 +628,55 @@ root_index_html = '\
                 if (err) return console.log(err);
             });
 
+            if( req.param('formaction') == 'save_domain_info' ){
+                localconfigjs = __dirname + '/../config/localConfig.js';
+                // fsx.readFile(localconfigjs, 'utf8', function (err,data) {
+                //   if (err) {
+                //     return console.log(err);
+                //   }
 
-            localconfigjs = __dirname + '/../config/localConfig.js';
-            // fsx.readFile(localconfigjs, 'utf8', function (err,data) {
-            //   if (err) {
-            //     return console.log(err);
-            //   }
+                //   // var replaced_host_string = data.replace(/host:,/g, req.param('newdomain'));
+                //   var replaced_host_string = data.replace(/(exports.host)(.+?)(?= \;)/, 'exports.host = \'newdomain\'');
+                // console.log(replaced_host_string);
+                //   fsx.writeFile(localconfigjs, replaced_host_string, 'utf8', function (err) {
+                //     if (err) return console.log(err);
+                //   });
+                // });
 
-            //   // var replaced_host_string = data.replace(/host:,/g, req.param('newdomain'));
-            //   var replaced_host_string = data.replace(/(exports.host)(.+?)(?= \;)/, 'exports.host = \'newdomain\'');
-            // console.log(replaced_host_string);
-            //   fsx.writeFile(localconfigjs, replaced_host_string, 'utf8', function (err) {
-            //     if (err) return console.log(err);
-            //   });
-            // });
+                fsx.writeFile(localconfigjs, master_config_localConfig, 'utf8', function (err) {
+                    if (err) return console.log(err);
+                });
 
-            fsx.writeFile(localconfigjs, master_config_localConfig, 'utf8', function (err) {
-                if (err) return console.log(err);
-            });
+                indexpage = __dirname + '/../../../index.html';
+                fsx.writeFile(indexpage, root_index_html, 'utf8', function (err) {
+                    if (err) return console.log(err);
+                });
 
-            indexpage = __dirname + '/../../../index.html';
-            fsx.writeFile(indexpage, root_index_html, 'utf8', function (err) {
-                if (err) return console.log(err);
-            });
-
-            console.log('sails.config.host');
-            console.log(sails.config.host);
-            sails.config.host = domainname;
-            console.log(sails.config.host);
+                console.log('sails.config.host');
+                console.log(sails.config.host);
+                sails.config.host = domainname;
+                console.log(sails.config.host);
+            }else{//save_email_info
+                sails.config.mailService = mail_service;
+                sails.config.mandrillApiKey = mandrill_key;
+                if(typeof sails.config.smtpDetails != 'undefined'){
+                    sails.config.smtpDetails.host = smtp_host;
+                    sails.config.smtpDetails.port = smtp_port;
+                    sails.config.smtpDetails.user = smtp_user;
+                    sails.config.smtpDetails.pass = smtp_pass;
+                }else{
+                    sails.config.smtpDetails = { 
+                        host: smtp_host, 
+                        port: smtp_port, 
+                        user: smtp_user,
+                        pass: smtp_pass
+                    };
+                }
+            }
 
             res.json(body, response && response.statusCode);
             console.log(response);
         });
-}else if( req.param('formaction') == 'save_email_info' ){
-
-    configjs = __dirname + '/../config/config.js';
-    fsx.writeFile(configjs, master_config_config, 'utf8', function (err) {
-        if (err) return console.log(err);
-    });
-
-    sails.config.mailService = mail_service;
-    sails.config.mandrillApiKey = mandrill_key;
-    if(typeof sails.config.smtpDetails != 'undefined'){
-        sails.config.smtpDetails.host = smtp_host;
-        sails.config.smtpDetails.port = smtp_port;
-        sails.config.smtpDetails.user = smtp_user;
-        sails.config.smtpDetails.pass = smtp_pass;
-    }else{
-        sails.config.smtpDetails = { 
-            host: smtp_host, 
-            port: smtp_port, 
-            user: smtp_user,
-            pass: smtp_pass
-        };
-    }
-}
     },
     getNestedWorkgroups: function (req, res) {
         Directory.findAll({

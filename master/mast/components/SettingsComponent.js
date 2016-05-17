@@ -100,7 +100,7 @@ Mast.components.SettingsComponent  = Mast.Component.extend({
 				// console.log(res);
 				if((typeof res.status != 'undefined') && res.status == 'ok'){
 					$('#domaininfo').html($('#domainname').val());
-					alert('Domain updated successfully. Now restart forevers.')
+					alert('Email Settings Updated.')
 				}else if(typeof res.error != 'undefined'){
 					alert(res.error);
 				}else{
