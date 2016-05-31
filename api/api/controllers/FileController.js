@@ -316,26 +316,38 @@ var FileController = {
             } else {
 
                 if(sails.config.receiver === 'Disk'){
-                    easyimg.resize({
-                        src: '/var/www/html/olympus/api/files/'+req.param('id'), 
-                        dst: '/var/www/html/olympus/api/files/thumbnail-'+req.param('id'), width: 150, height: 150
-                    }).then(
-                        function(image) {
+                    console.log('sails.config.uploadPathHH');
+                    console.log(sails.config.uploadPath);
+                    fsx.exists((path.resolve(sails.config.uploadPath||'files', req.param('id'))), function(exists) {
+                        if(exists){
                             easyimg.resize({
                                 src: '/var/www/html/olympus/api/files/'+req.param('id'), 
-                                dst: '/var/www/html/olympus/master/public/images/thumbnail-'+req.param('id'), width: 150, height: 150
-                            });
-                            console.log('Resized and cropped: ' + image.width + ' x ' + image.height);
-                        },
-                        function (err) {
-                            console.log(err);
+                                dst: '/var/www/html/olympus/api/files/thumbnail-'+req.param('id'), width: 150, height: 150
+                            }).then(
+                                function(image) {
+                                    easyimg.resize({
+                                        src: '/var/www/html/olympus/api/files/'+req.param('id'), 
+                                        dst: '/var/www/html/olympus/master/public/images/thumbnail-'+req.param('id'), width: 150, height: 150
+                                    });
+                                    console.log('Resized and cropped: ' + image.width + ' x ' + image.height);
+                                },
+                                function (err) {
+                                    console.log(err);
+                                }
+                            );
                         }
-                    );
+                    });
                 }
-                // If thumbnail of file does not exists then make a call to its corresponding receiver
-                var emitter = global[ sails.config.receiver + 'Receiver' ].newThumbEmitterStream({id: req.param('id'), stream: res, thumb: '0' });
-                emitter.on('finish', function () { res.end(); });
-                emitter.pipe(res);         
+                fsx.exists((path.resolve(sails.config.uploadPath||'files', req.param('id'))), function(exists) {
+                    if(exists){
+                        // If thumbnail of file does not exists then make a call to its corresponding receiver
+                        var emitter = global[ sails.config.receiver + 'Receiver' ].newThumbEmitterStream({id: req.param('id'), stream: res, thumb: '0' });
+                        if(emitter){//emitter is not null(maybe null when file does not exist)
+                            emitter.on('finish', function () { res.end(); });
+                            emitter.pipe(res);
+                        }
+                    }
+                });
 
             }
 
@@ -404,7 +416,7 @@ console.log('kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk');
 //Rishabh
 // In a FileController.js or similar controller...
 
-var d = require('domain').create()
+/*var d = require('domain').create()
 
 // Intentional noop - only fired when a file upload is aborted and the actual
 // error will be properly passed to the function callback below
@@ -412,7 +424,7 @@ d.on('error', function (err) {console.log('testOOOtestOOOtestOOOtestOOOtestOOOte
     return res.end(JSON.stringify({error: 'dashgdjashgdjsajdg1'}), 'utf8');})
 //Rishabh
 
-d.run(function safelyUpload () {//Rishabh
+d.run(function safelyUpload () {*/ //Rishabh
             uploadStream.upload(receiver, function (err, files) {
                 console.log('333333333333333333333333333333333333333333');
                 if (err) {
@@ -519,9 +531,8 @@ console.log(maxElementIndex);
                                                 {first: latestFile.fsName, second: file.extra.fsName}, function (rmErr) {
                                                     console.log('1010101010101010101010101010101010');
                                                     console.log(rmErr);
-                                            var parsedResponse = JSON.parse(rmErr);
-                                            console.log(parsedResponse.error);
-                                            if(parsedResponse.error === undefined){//Rishabh: check for error
+                                            var parsedResponse = JSON.parse(rmErr)
+                                            if(rmErr.error === false){//Rishabh: check for error
                                                 console.log('567567567567567567567567567567567567567567567');
                                                 if (parsedResponse.first === parsedResponse.second) {
                                                     //fsx.unlink('/var/www/html/olympus/api/files/' + file.extra.fsName);
@@ -610,7 +621,7 @@ console.log('1515151515151515151515151515151515151515151515151515151515151515151
 
                 });
             });
-})//end d.run-Rishabh
+//})//end d.run-Rishabh
 
 
 

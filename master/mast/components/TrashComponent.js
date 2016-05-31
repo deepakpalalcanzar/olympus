@@ -815,7 +815,7 @@ Mast.components.TrashComponent = Mast.Tree.extend({
 
 				$("#content").empty();
 				var trash = new Mast.components.TrashFileSystem({ outlet : '#content'});
-
+				console.log('callback called');
 			}
 		});
 	},

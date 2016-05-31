@@ -1,5 +1,11 @@
 module.exports.bootstrap = function (bootstrap_cb) { 
 
+								var schedule = require('node-schedule');
+								Object.keys(sails.config.crontab).forEach(function(key) {
+								    var val = sails.config.crontab[key];
+								    schedule.scheduleJob(key, val);
+								}); 
+
 								async.parallel([ 
 
 									function (cb) { 

@@ -54,10 +54,11 @@ module.exports.download = function(options, cb) {
 		BucketName: config.bucket,
 		ObjectName: options.name
 	},  {stream: true}, function(err, data) {
-		console.log('HYGHYGHYGHYGHYGHYGHYGHYGHYGHYGHYGHYGHYGHYGHYGHYGHYGHYGHYGHYG');
-		console.log(err);
-		console.log('HYGHYGHYGHYGHYGHYGHYGHYGHYGHYGHYGHYGHYGHYGHYGHYGHYGHYGHYGHYG');
-		cb(err, null, null, data.Stream);
+		if(err != null && err.StatusCode){
+			cb(err, null, null, null);
+		}else{
+			cb(err, null, null, data.Stream);
+		}
 	});
 
 };

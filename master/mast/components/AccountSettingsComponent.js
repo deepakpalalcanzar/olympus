@@ -2,6 +2,7 @@ Mast.registerComponent('AccountSettingsComponent',{
 
 	model: {
 		selectedTab 	 : 'accountDetails',
+		showAppearence   : false,
 		showSubscription : false,
 		showSetting 	 : false
 	},
@@ -37,8 +38,9 @@ Mast.registerComponent('AccountSettingsComponent',{
 	},
 
 	afterRender: function(){
-		console.log(Mast.Session.Account);
-		if(Mast.Session.Account.isAdmin && (Mast.Session.Account.isSuperAdmin === 1 || Mast.Session.Account.isSuperAdmin === null || Mast.Session.Account.isSuperAdmin===0)){
+		// console.log(Mast.Session.Account);
+		// if(Mast.Session.Account.isAdmin && (Mast.Session.Account.isSuperAdmin === 1 || Mast.Session.Account.isSuperAdmin === null || Mast.Session.Account.isSuperAdmin===0))
+		if(Mast.Session.Account.isSuperAdmin === 1){
 			$('#domainname').val($('#domaininfo').html());//Rishabh
 			// $('#mail_service').val($('#emailservice').html());
 			$('input[name="mail_service"][value="' + $('#emailservice').html() + '"]').prop('checked', true);
@@ -49,17 +51,32 @@ Mast.registerComponent('AccountSettingsComponent',{
 				$('#mandrill_details').hide();
 				$('#inernal_email_details').show();
 			}
-			console.log($('input[name="mail_service"]').val());
+
+			// console.log($('input[name="mail_service"]').val());
+
 			$('#mandrill_key').val($('#mandrillkey').html());
 			$('#smtp_host').val($('#smtphost').html());
 			$('#smtp_port').val($('#smtpport').html());
 			$('#smtp_user').val($('#smtpuser').html());
 			$('#smtp_pass').val($('#smtppass').html());
+
+			$('input[name="trash_setting"][value="' + $('#trashopt').html() + '"]').prop('checked', true);
+
+			if($('#trashopt').html() == 'auto'){
+				$('#trash_auto_setting').show();
+				trashoptdays = $('#trashoptdays').html();
+				$('#trash_setting_days').val(trashoptdays);
+				$('#trash_setting_days option[value='+trashoptdays+']').attr('selected','selected');
+			}else{
+				$('#trash_auto_setting').hide();
+			}
+
+			this.set('showAppearence', true);
 			this.set('showSetting', true);
-			this.set('showSubscription', true);
-		}else if (Mast.Session.Account.isEnterprise === 0){
-			this.set('showSubscription', true);
+		}else if (Mast.Session.Account.isEnterprise === 1){
+			this.set('showAppearence', true);
 		}
+		this.set('showSubscription', true);//show to all
 	},
 
 

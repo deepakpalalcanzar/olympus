@@ -49,8 +49,8 @@ var uniqueName = function(modelClass, origName, dirId, cb, replaceFile) {
 				}
 				copyString += ')';
 				if(dotLoc > -1) {
-					// fileName = origName.substr(0, dotLoc) + copyString + origName.substr(dotLoc);
-					fileName = origName + copyString; // by alcanzar
+					fileName = origName.substr(0, dotLoc) + copyString + origName.substr(dotLoc);
+					// fileName = origName + copyString; // by alcanzar
 				} else {
 					fileName = origName + copyString;
 				}

@@ -26,9 +26,9 @@ module.exports = {
 	newThumbEmitterStream: function newThumbEmitterStream (options) {
 
 		sails.log('Downloading Thumb'+options.id+' using from Disk.');
-		sails.log(options);
+		// sails.log(options);
 		if(options.thumb === '0'){ // thumb 0 means thumbnail does not exists in system
-			return blobAdapter.generateThumb({ 
+		  	return blobAdapter.generateThumb({
 				id : path.resolve(sails.config.uploadPath||'files', options.id), 
 				filename : options.id
 			});
@@ -122,6 +122,37 @@ module.exports = {
 		};
 		
 		return receiver__;
+	},
+
+	/**
+	 * Build a mock readable stream that emits incoming files.
+	 * (used for file downloads)
+	 * 
+	 * @return {Stream.Readable}
+	 */
+	deleteobject: function newEmitterStream (options,cb) {
+
+		sails.log('Deleting '+options.id+' using from Disk.');
+
+		sails.log(options);
+
+		fsx.unlink('/var/www/html/olympus/api/files/' + options.id, function(err){
+          // if (err) console.log(err);
+        });
+        fsx.unlink('/var/www/html/olympus/api/files/thumbnail-' + options.id, function(err){
+          // if (err) console.log(err);
+        });
+        fsx.unlink('/var/www/html/olympus/api/files/thumbnail-thumbnail-' + options.id, function(err){
+          // if (err) console.log(err);
+        });
+        // fs.unlink('/var/www/html/olympus/master/public/images/thumbnail/'+fileModel.name, function(err){
+          // if (err) console.log(err);
+        // });
+        fsx.unlink('/var/www/html/olympus/master/public/images/thumbnail-thumbnail-'+options.id, function(err){
+          // if (err) console.log(err);
+        });
+
+		cb();
 	}
 };
 

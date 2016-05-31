@@ -376,19 +376,33 @@ listUsers: function (req, res) {
     var smtp_port;
     var smtp_user;
     var smtp_pass;
+    var trash_setting;
+    var trash_setting_days;
+
+console.log('777777777777777777777777777777777');
     console.log(req.params);
     console.log(req.param);
 
 if( req.param('formaction') == 'save_domain_info' ){
-    domainname = req.param('newdomain');
-    mail_service = sails.config.mailService;
-    mandrill_key = sails.config.mandrillApiKey;
-    smtp_host    = sails.config.smtpDetails.host;
-    smtp_port    = sails.config.smtpDetails.port;
-    smtp_user    = sails.config.smtpDetails.user;
-    smtp_pass    = sails.config.smtpDetails.pass;
+
+    domainname         = req.param('newdomain');
+    mail_service       = sails.config.mailService;
+    mandrill_key       = sails.config.mandrillApiKey;
+    smtp_host          = sails.config.smtpDetails.host;
+    smtp_port          = sails.config.smtpDetails.port;
+    smtp_user          = sails.config.smtpDetails.user;
+    smtp_pass          = sails.config.smtpDetails.pass;
+    trash_setting      = sails.config.trash_setting;
+    trash_setting_days = sails.config.trash_setting_days;
+
 }else if( req.param('formaction') == 'save_email_info' ){
+
+    domainname         = sails.config.host;
+    trash_setting      = sails.config.trash_setting;
+    trash_setting_days = sails.config.trash_setting_days;
+
     mail_service = req.param('mail_service');
+
     if(mail_service == 'internal'){
         mandrill_key = sails.config.mandrillApiKey;
         smtp_host    = req.param('smtp_host');
@@ -402,6 +416,17 @@ if( req.param('formaction') == 'save_domain_info' ){
         smtp_user    = sails.config.smtpDetails.user;
         smtp_pass    = sails.config.smtpDetails.pass;
     }
+}else if( req.param('formaction') == 'save_trash_setting' ){
+    domainname   = sails.config.host;
+    mail_service = sails.config.mailService;
+    mandrill_key = sails.config.mandrillApiKey;
+    smtp_host    = sails.config.smtpDetails.host;
+    smtp_port    = sails.config.smtpDetails.port;
+    smtp_user    = sails.config.smtpDetails.user;
+    smtp_pass    = sails.config.smtpDetails.pass;
+
+    trash_setting      = req.param('trash_setting');
+    trash_setting_days = req.param('trash_setting_days');
 }
 
 //START master_config_config content
@@ -497,6 +522,8 @@ module.exports = { \r\n\
         // NOTE: This is just to test for privateDevelopment feature. Need to figure out \r\n\
         // what determines this config options and implement that. \r\n\
             privateDeployment: false, \r\n\
+            trash_setting: \''+trash_setting+'\', \r\n\
+            trash_setting_days: \''+trash_setting_days+'\', \r\n\
 };';//END master_config_config
 
 // if( req.param('formaction') == 'save_domain_info' ){
@@ -613,8 +640,13 @@ root_index_html = '\
             smtphost     : smtp_host,
             smtpport     : smtp_port,
             smtpuser     : smtp_user,
-            smtppass     : smtp_pass
+            smtppass     : smtp_pass,
+            trash_setting   : trash_setting,
+            days            : trash_setting_days
         };
+
+console.log('33333333333333333333333333333333333');
+        console.log(opts);
 
         request(opts, function (err, response, body) {
 
@@ -656,7 +688,7 @@ root_index_html = '\
                 console.log(sails.config.host);
                 sails.config.host = domainname;
                 console.log(sails.config.host);
-            }else{//save_email_info
+            }else if(req.param('formaction') == 'save_email_info'){
                 sails.config.mailService = mail_service;
                 sails.config.mandrillApiKey = mandrill_key;
                 if(typeof sails.config.smtpDetails != 'undefined'){
@@ -672,10 +704,43 @@ root_index_html = '\
                         pass: smtp_pass
                     };
                 }
+            }else{
+                //save_trash_setting
             }
 
             res.json(body, response && response.statusCode);
             console.log(response);
+        });
+    },
+    saveTrashSetting: function (req, res) {
+console.log('999999999999999999999999999999999999');
+    var trash_setting;
+    var trash_setting_days;
+
+    console.log(req.params);
+    console.log(req.param);
+
+        var request = require('request');
+        /*Create logging*/
+        var opts = {
+            uri: 'http://localhost:1337/account/changeDomainname/',
+            method: 'POST',
+        };
+
+        opts.json = {
+            trash_setting   : req.param('trash_setting'),
+            days            : req.param('trash_setting_days')
+        };
+console.log(opts);
+        request(opts, function (err, response, body) {
+
+            if (err){
+                console.log(err);
+                return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+            }
+
+            res.json(body, response && response.statusCode);
+            // console.log(response);
         });
     },
     getNestedWorkgroups: function (req, res) {

@@ -14,7 +14,8 @@ var AccountController = {
 
         if (!req.param('email')) return res.json({
             error: 'No email provided',
-            type: 'error'
+            type: 'error',
+            email: req.param('email')
         }, 400);
 
 // If the requested account already exists, return it
@@ -24,7 +25,8 @@ var AccountController = {
 
             if (err) return res.json({
                 error: 'Error creating email',
-                type: 'error'
+                type: 'error',
+                email: req.param('email')
             },400);
 
             if (account) return res.json({
@@ -32,6 +34,7 @@ var AccountController = {
                 type: 'error',
                 id: account.id,
                 email_msg : 'email_exist',
+                email: req.param('email')
             },400);
 
             if(req.param('isVerified') && !req.param('password')) {
@@ -67,7 +70,8 @@ var AccountController = {
                         console.log(err);
                         console.log('SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSs');*/
                         error: 'Error creating account',
-                        type: 'error'
+                        type: 'error',
+                        email: req.param('email')
                     });
 
                     if (!req.param('isVerified')) {
@@ -78,7 +82,8 @@ var AccountController = {
 
                             if (err) return res.json({
                                 error: 'Error sending verification email',
-                                type: 'error'
+                                type: 'error',
+                                email: req.param('email')
                             });
 
                             return res.json({
@@ -97,7 +102,8 @@ var AccountController = {
 
                             if (err) return res.json({
                                 error: 'Error sending welcome email',
-                                type: 'error'
+                                type: 'error',
+                                email: req.param('email')
                             });
 
                             return res.json({
@@ -315,6 +321,9 @@ var AccountController = {
 
         if(typeof req.param('formaction') != 'undefined' && req.param('formaction') )
         {
+
+            console.log('111111111111111111111111111111111111');
+            console.log(req.param('formaction'));
             fsx = require('fs-extra');
 
             applicationjs = __dirname + '/../../config/application.js';
@@ -333,7 +342,7 @@ if(req.param('formaction') == 'save_domain_info'){
     smtp_port     = sails.config.smtpDetails.port;
     smtp_user     = sails.config.smtpDetails.user;
     smtp_pass     = sails.config.smtpDetails.pass;
-}else{//save_email_info
+}else if(req.param('formaction') == 'save_email_info'){
     newdomainname = sails.config.hostName;
     mail_service  = req.param('mailservice');
     mandrill_key  = req.param('mandrillkey');
@@ -341,6 +350,116 @@ if(req.param('formaction') == 'save_domain_info'){
     smtp_port     = req.param('smtpport');
     smtp_user     = req.param('smtpuser');
     smtp_pass     = req.param('smtppass');
+}else{//save_trash_setting
+    newdomainname = sails.config.hostName;
+    mail_service  = sails.config.mailService;
+    mandrill_key  = sails.config.mandrill.token;
+    smtp_host     = sails.config.smtpDetails.host;
+    smtp_port     = sails.config.smtpDetails.port;
+    smtp_user     = sails.config.smtpDetails.user;
+    smtp_pass     = sails.config.smtpDetails.pass;
+
+    crontab_html = '';
+
+            trash_setting = req.param('trash_setting');
+            temp_days          = req.param('days');
+
+    if(trash_setting == 'auto'){
+
+        cron_asterisk_str = '';
+        console.log('temp_days');
+        console.log(temp_days);
+        // year      = parseInt(temp_days/365);
+        // temp_days = temp_days%365;
+        // console.log(temp_days);
+        // month     = parseInt(temp_days/30);
+        // console.log(temp_days%30);
+        // days      = parseInt(temp_days%30);
+
+        // year_str  = (year > 1 )?'*/'+year:'*';
+        
+        // if(year_str == 1){
+        //     month_str = 1;
+        // }else{
+        //     month_str = (month > 1 )?'*/'+month:'*';
+        //     if(month_str == 1){
+        //         days_str = 1;
+        //     }else{
+        //         days_str  = (days > 1)?'*/'+days:'*';
+        //     }
+        // }
+
+        // if((year >0) || (month >0) || (days >0)){
+        //     cron_asterisk_str = '0 0 0 '+days_str+' '+month_str+' '+year_str;
+        // }
+        switch(temp_days){//https://en.wikipedia.org/wiki/Cron#Predefined_scheduling_definitions
+            case 'hourly':
+                cron_asterisk_str = '0 0 * * * *';
+            break;
+            case 'daily':
+                cron_asterisk_str = '0 0 0 * * *';
+            break;
+            case 'weekly':
+                cron_asterisk_str = '0 0 0 * * 0';
+            break;
+            case 'monthly':
+                cron_asterisk_str = '0 0 0 1 * *';
+            break;
+            case 'yearly':
+                cron_asterisk_str = '0 0 0 1 1 *';
+            break;
+        }
+
+    if(cron_asterisk_str != ''){
+        crontab_html = '\
+        var path = require(\'path\'); \r\n\
+        var fsx = require(\'fs-extra\'); \r\n\
+        var UUIDGenerator = require(\'node-uuid\'); \r\n\
+         \r\n\
+        module.exports.crontab = { \r\n\
+         \r\n\
+          /* \r\n\
+           * The asterisks in the key are equivalent to the \r\n\
+           * schedule setting in crontab, i.e. \r\n\
+           * minute hour day month day-of-week year \r\n\
+           * so in the example below it will run every minute \r\n\
+           */ \r\n\
+        \''+cron_asterisk_str+'\'\: function(){ \r\n\
+         \r\n\
+            // require(\'../crontab/mycooljob.js\').run(); \r\n\
+            sails.controllers.trash.deleteTrashContent(); \r\n\
+          } \r\n\
+        };';
+        }
+
+
+
+    }else{
+        //else make the file empty
+    }
+
+        crontabjs = __dirname + '/../../config/crontab.js';
+        fsx.readFile(crontabjs, 'utf8', function (err,data) {
+          if (err){
+            return res.json({
+                    error: err,
+                    type: 'error'
+                }, 400);
+          }
+
+          fsx.writeFile(crontabjs, crontab_html, 'utf8', function (err) {
+             if (err) return res.json({
+                error: err,
+                type: 'error'
+             }, 400);
+
+            console.log('************************************************');
+            console.log('API:Cron Setting changed to ');
+            console.log('************************************************');
+
+            return res.json({ status: 'ok'}, 200);
+          });
+        });
 }
 
 //START- content for olympus/api/config/applicatio.js
@@ -390,8 +509,114 @@ module.exports = { \r\n\
               });
             });
         }else{
+            console.log('222222222222222222222222222222222');
             return res.json({error: 'Some error occurred.', type: 'error' }, 400);
         }
+    },
+    saveTrashSetting: function (req, res) {
+
+            fsx = require('fs-extra');
+            crontab_html = '';
+
+            trash_setting = req.param('trash_setting');
+            temp_days          = req.param('days');
+
+if(trash_setting == 'auto'){
+
+    cron_asterisk_str = '';
+    console.log('temp_days');
+    console.log(temp_days);
+    // year      = parseInt(temp_days/365);
+    // temp_days = temp_days%365;
+    // console.log(temp_days);
+    // month     = parseInt(temp_days/30);
+    // console.log(temp_days%30);
+    // days      = parseInt(temp_days%30);
+
+    // year_str  = (year > 1 )?'*/'+year:'*';
+    
+    // if(year_str == 1){
+    //     month_str = 1;
+    // }else{
+    //     month_str = (month > 1 )?'*/'+month:'*';
+    //     if(month_str == 1){
+    //         days_str = 1;
+    //     }else{
+    //         days_str  = (days > 1)?'*/'+days:'*';
+    //     }
+    // }
+
+    // if((year >0) || (month >0) || (days >0)){
+    //     cron_asterisk_str = '0 0 0 '+days_str+' '+month_str+' '+year_str;
+    // }
+    switch(temp_days){//https://en.wikipedia.org/wiki/Cron#Predefined_scheduling_definitions
+        case 'hourly':
+            cron_asterisk_str = '0 * * * *';
+        break;
+        case 'daily':
+            cron_asterisk_str = '0 0 * * *';
+        break;
+        case 'weekly':
+            cron_asterisk_str = '0 0 * * 0';
+        break;
+        case 'monthly':
+            cron_asterisk_str = '0 0 1 * *';
+        break;
+        case 'yearly':
+            cron_asterisk_str = '0 0 1 1 *';
+        break;
     }
+
+if(cron_asterisk_str != ''){
+crontab_html = '\
+var path = require(\'path\'); \r\n\
+var fsx = require(\'fs-extra\'); \r\n\
+var UUIDGenerator = require(\'node-uuid\'); \r\n\
+ \r\n\
+module.exports.crontab = { \r\n\
+ \r\n\
+  /* \r\n\
+   * The asterisks in the key are equivalent to the \r\n\
+   * schedule setting in crontab, i.e. \r\n\
+   * minute hour day month day-of-week year \r\n\
+   * so in the example below it will run every minute \r\n\
+   */ \r\n\
+\''+cron_asterisk_str+'\'\: function(){ \r\n\
+ \r\n\
+    // require(\'../crontab/mycooljob.js\').run(); \r\n\
+    sails.controllers.trash.deleteTrashContent(); \r\n\
+  } \r\n\
+};';
+}
+
+
+
+}else{
+    //else make the file empty
+}
+
+            crontabjs = __dirname + '/../../config/crontab.js';
+            fsx.readFile(crontabjs, 'utf8', function (err,data) {
+              if (err){
+                return res.json({
+                        error: err,
+                        type: 'error'
+                    }, 400);
+              }
+
+              fsx.writeFile(crontabjs, crontab_html, 'utf8', function (err) {
+                 if (err) return res.json({
+                    error: err,
+                    type: 'error'
+                 }, 400);
+
+                console.log('************************************************');
+                console.log('API:Cron Setting changed to ');
+                console.log('************************************************');
+
+                return res.json({ status: 'ok'}, 200);
+              });
+            });
+    },
 };
 module.exports = AccountController;

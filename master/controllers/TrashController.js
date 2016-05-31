@@ -1,4 +1,9 @@
 var mime = require('mime');
+var fs = require('fs');
+
+var path = require('path');
+var anchor = require('anchor');
+var request = require('request')
 
 var TrashController = {
 
@@ -44,19 +49,115 @@ var TrashController = {
 	},
 
 	deletePermanent : function(req, res){
+        console.log(req.param('type'));
+        console.log(req.param('type') === 'directory');
         console.log('NMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNM');
-        console.log(req);
-        console.log('NMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNMNM');
-		Deletedlist.restore({
-	        file_id : req.param('id'),
-			type 	: req.param('type')
-        }, function(err, result){
+        // console.log('deleting file from '+sails.config.uploadPath);
+        // console.log(req.param('file_id'));
 
-        	if (err)
-	            return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+        console.log(sails.config.fileAdapter.adapter);
 
-        	res.json(200);
-        });
+        if (req.param('type') === 'file'){
+            File.find(req.param('id')).success(function (fileModel) {
+                if (fileModel) {
+
+                    var request = require('request');
+                    var options = {
+                        uri: 'http://localhost:1337/trash/deletePermanent/',
+                        method: 'POST',
+                    };
+
+                    options.json = {
+                        file_id : req.param('id'),
+                        type    : req.param('type'),
+                        directory_id    : req.param('directory_id'),
+                        fsName  : fileModel.fsName
+                    };
+
+                    // console.log("optionsoptionsoptionsoptionsoptionsoptionsoptionsoptionsoptionsoptions");
+                    // console.log(options);
+                    console.log("optionsoptionsoptionsoptionsoptionsoptionsoptionsoptionsoptionsoptions");
+
+                    request(options, function (err, response, body) {
+                        console.log('CVCVCVCVCVCVCVCVCVCVCVCVCVCVCVCVCV');
+
+                        Deletedlist.restore({
+                         file_id : req.param('id'),
+                         type    : req.param('type')
+                        }, function(err, result){
+                            if (err)
+                                return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+
+                            fs.unlink('/var/www/html/olympus/api/files/' + fileModel.fsName, function(err){
+                              // if (err) console.log(err);
+                            });
+                            fs.unlink('/var/www/html/olympus/api/files/thumbnail-' + fileModel.fsName, function(err){
+                              // if (err) console.log(err);
+                            });
+                            fs.unlink('/var/www/html/olympus/api/files/thumbnail-thumbnail-' + fileModel.fsName, function(err){
+                              // if (err) console.log(err);
+                            });
+                            fs.unlink('/var/www/html/olympus/master/public/images/thumbnail/'+fileModel.name, function(err){
+                              // if (err) console.log(err);
+                            });
+                            fs.unlink('/var/www/html/olympus/master/public/images/thumbnail-thumbnail-'+fileModel.fsName, function(err){
+                              // if (err) console.log(err);
+                            });
+
+                            res.json(200);
+                        });
+
+                        console.log('CVCVCVCVCVCVCVCVCVCVCVCVCVCVCVCVCV');
+
+                        res.json(200);
+                    });
+
+                    // FileAdapter.deletefile({
+                    //     name: fileModel.fsName
+                    // }, function (err, data) {
+
+                    //     // TODO: delete the tmp file
+                    //     console.log('kashdkashdkashdkasjdlkasjldkjasldjlasdjl');
+                    //     console.log(err);
+                    //     console.log(data);
+                    //     console.log('kashdkashdkashdkasjdlkasjldkjasldjlasdjl');
+                    //     cb(err, data);
+                    // });
+                }else{
+                    // res.json({
+                    //     success: false,
+                    //     error: 'File could not be found.',
+                    //     message: 'File could not be found.'
+                    // });
+                    //do nothing
+                }
+            });
+        }else if (req.param('type') === 'directory'){
+
+            console.log("dududududududududududududududududududududududududududududududududududu");
+
+            var request = require('request');
+            var options = {
+                uri: 'http://localhost:1337/trash/deletePermanent/',
+                method: 'POST',
+            };
+
+            options.json = {
+                file_id         : req.param('id'),
+                type            : req.param('type'),
+                directory_id    : req.param('directory_id')
+            };
+
+            // console.log("optionsoptionsoptionsoptionsoptionsoptionsoptionsoptionsoptionsoptions");
+            // console.log(options);
+            console.log("optionsoptionsoptionsoptionsoptionsoptionsoptionsoptionsoptionsoptions");
+
+            request(options, function (err, response, body) {
+                console.log('CVCVCVCVCVCVCVCVCVCVCVCVCVCVCVCVCV');
+
+                res.json(200);
+            });
+        }
 
 	},
 

@@ -186,5 +186,35 @@ module.exports = {
 		};
 		
 		return receiver__;
-	}
+	},
+
+	/**
+	 * Build a mock readable stream that emits incoming files.
+	 * (used for file downloads)
+	 * 
+	 * @return {Stream.Readable}
+	 */
+	deleteobject: function newEmitterStream (options,cb) {
+
+		sails.log('Deleting '+options.id+' using from S3.');
+
+		sails.log(options);
+
+		var client = knox.createClient({
+			key: sails.config.adapters.s3.apiKey, 
+			secret: sails.config.adapters.s3.apiSecret,
+			bucket: sails.config.adapters.s3.bucket
+		});
+
+		client.deleteFile(options.id, function(err, res) {
+cb();
+			if(err){
+				sails.log(err);
+				// return res.send(500);
+			}
+			// return res.send(200);throwing TypeError: Object #<IncomingMessage> has no method 'send'
+			
+        });
+	},
+
 };

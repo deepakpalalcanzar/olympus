@@ -399,7 +399,8 @@ class Configuration {
 								// NOTE: This is just to test for privateDevelopment feature. Need to figure out \n
 								// what determines this config options and implement that. \n
 	    							privateDeployment: false, \n
-
+	    							trash_setting: 'manual', \n
+            						trash_setting_days: '', \n
 								};\n";
 		}else{
 
@@ -479,7 +480,8 @@ class Configuration {
 								// NOTE: This is just to test for privateDevelopment feature. Need to figure out \n
 								// what determines this config options and implement that. \n
 	    							privateDeployment: false, \n
-
+	    							trash_setting: 'manual', \n
+            						trash_setting_days: '', \n
 								};\n";
 
 		}

@@ -6,8 +6,10 @@ Mast.components.SettingsComponent  = Mast.Component.extend({
 		// 'click .setting-save-button' : 'saveCompanyInfo',
 		'click #saveDomain' : 'saveDomainInfo',
 		'click #saveEmail'  : 'saveEmailInfo',
+		'click #saveTrashSetting' : 'saveTrashSetting',
 		// 'click input[name="mail_service"]' : 'toggleMailService',
 		'change input[name="mail_service"]' : 'toggleMailService',
+		'change input[name="trash_setting"]' : 'toggleTrashSetting',
 	},
 
 	// saveCompanyInfo : function(){
@@ -22,6 +24,15 @@ Mast.components.SettingsComponent  = Mast.Component.extend({
 		}else{
 			$('#mandrill_details').hide();
 			$('#inernal_email_details').show();
+		}
+	},
+
+	toggleTrashSetting : function(){
+		console.log($('input[name="trash_setting"]:checked').val());
+		if( $('input[name="trash_setting"]:checked').val() == 'auto' ){
+			$('#trash_auto_setting').show();
+		}else{
+			$('#trash_auto_setting').hide();
 		}
 	},
 
@@ -101,6 +112,41 @@ Mast.components.SettingsComponent  = Mast.Component.extend({
 				if((typeof res.status != 'undefined') && res.status == 'ok'){
 					$('#domaininfo').html($('#domainname').val());
 					alert('Email Settings Updated.')
+				}else if(typeof res.error != 'undefined'){
+					alert(res.error);
+				}else{
+					alert('Some error occurred.');
+				}
+	        });
+	},
+
+	saveTrashSetting : function(){
+
+		var trash_setting 		= $('input[name="trash_setting"]:checked').val();
+		var days  				= $('select[name="trash_setting_days"]').val();
+console.log(trash_setting);
+console.log(days);
+		/*if( trash_setting == 'auto' ){
+
+			if( !isNaN(days) && parseInt(Number(days)) == days && !isNaN(parseInt(days, 10)) ){
+				//is Int
+			}else{
+				alert('Please enter number only.');
+				return false;
+			}
+
+		}*/
+		console.log('proceeding...');
+
+			Mast.Socket.request('/account/changeDomainname', {
+				'formaction'		: 'save_trash_setting',
+				'trash_setting'		: trash_setting,
+				'trash_setting_days': days
+			} , function(res, err){
+				console.log(res);
+				if((typeof res.status != 'undefined') && res.status == 'ok'){
+					$('#domaininfo').html($('#domainname').val());
+					alert('Trash Settings Updated.')
 				}else if(typeof res.error != 'undefined'){
 					alert(res.error);
 				}else{

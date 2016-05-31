@@ -52,21 +52,29 @@ Mast.registerComponent('TrashRestoreComponent', {
 	getWorkgroupChild: function(e){
 
 		var file_id = this.get('id');
-		var clickedElement 	= e.srcElement.htmlFor
+
+		//IE-e.srcElement
+		//other than IE-e.target
+		var clickedElement 	= (typeof e.srcElement != 'undefined')?e.srcElement.htmlFor:e.target.getAttribute('for');
+		console.log('clickedElementclickedElementclickedElement');
+		console.log(clickedElement);
 		var element 		= clickedElement.split("-");
 		var element_id 		= element[element.length-1];
-		Mast.Socket.request('/tempaccount/getWorkgroups', {
-			dir_type : element_id,
-			item_id  : file_id
-		}, function(res, err){
-			var htmlCotent = "<ul>";
-			$.each( res, function( i, val ) {
-				htmlCotent +="<li style='padding:7px;'><input type='radio' name='fileselected' id='item-0-"+val.id+"' /><label for='item-0-"+val.id+"' class='class-"+val.id+"'>"+ val.name +"</label> </li>";
-			});
-			htmlCotent +="</ul>";
-			$(".class-"+element_id).after(htmlCotent);
-		});
+		var container_ul = $(".class-"+element_id).parent('ul').find('ul');
+		if(container_ul.length == 0){
 
+			Mast.Socket.request('/tempaccount/getWorkgroups', {
+				dir_type : element_id,
+				item_id  : file_id
+			}, function(res, err){
+				var htmlCotent = "<ul>";
+				$.each( res, function( i, val ) {
+					htmlCotent +="<li style='padding:7px;'><input type='radio' name='fileselected' id='item-0-"+val.id+"' /><label for='item-0-"+val.id+"' class='class-"+val.id+"'>"+ val.name +"</label> </li>";
+				});
+				htmlCotent +="</ul>";
+				$(".class-"+element_id).after(htmlCotent);
+			});
+		}
 	},
 
 	updateRestore : function(){

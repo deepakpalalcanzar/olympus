@@ -49,6 +49,39 @@
 
 	<hr><br>
 
+	<!--trash setting -->
+	<div class="trash-mod">
+		<label>Trash Setting</label>
+		<div style="">
+			<input id="trash_setting" type="radio" name="trash_setting" value="manual"/ checked="checked"> Manually
+			<a class="tooltips" style=" vertical-align: middle; display: inline-block !important;">
+				<img src="images/FAQ.png">
+				<span> Files will only be deleted when a user manually deletes it from trash. </span>
+			</a>
+		</div><br>
+		<div style="">
+			<input id="trash_setting" type="radio" name="trash_setting" value="auto"/> Automatic
+			<a class="tooltips" style="vertical-align: middle; display: inline-block !important;">
+				<img src="images/FAQ.png">
+				<span>Duration for files to keep them in trash before deleting.</span>
+			</a>
+			<div id="trash_auto_setting">
+				Delete trash files <select id="trash_setting_days" name="trash_setting_days">
+					<option value="hourly">Hourly</option>
+					<option value="daily">Daily</option>
+					<option value="weekly">Weekly</option>
+					<option value="monthly">Monthly</option>
+					<option value="yearly">Yearly</option>
+				</select>
+			</div>
+		</div><br>
+	    <input type="button" id="saveTrashSetting" value="Save">
+		<br><br>
+	</div>
+	<!-- -->
+
+	<hr><br>
+
 	<!-- settings content -->
 	<div class="main-mod" id="main-mod"> 
 		<!-- company details section -->
