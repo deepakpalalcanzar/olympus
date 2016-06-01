@@ -1,5 +1,4 @@
-<?php ?>
-<?php  session_start(); ?>
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html>
 	<?php include "header.php"; ?>
@@ -53,6 +52,36 @@
 
 						</tr>
 					</table>
+					<?php
+						echo "<pre>";
+						echo "Checking Ubuntu Distribution:";
+						$output = shell_exec('lsb_release -r | cut -f2');
+						echo "$output";
+
+						$path = "var/www/html";
+						if($output == '12.04'){
+							$path = "/var/www";
+						}else if ($output == '14.04'){
+							$path = "/var/www/html";
+						}else{
+							$path = "/var/www/html";
+						}
+
+						echo "<br>-Stopping previous running forevers if any";
+						$output = shell_exec('sudo forever stopall');
+						echo "$output";
+						echo "<br>-Lifting app.js<br>";
+						$output = shell_exec('cd '.$path.'/olympus/api/
+							sudo forever start app.js');
+						echo "$output";
+
+						echo "<br>-Lifting olympus.js<br>";
+						$output = shell_exec('cd '.$path.'/olympus/master/
+							sudo forever start olympus.js');
+						echo "$output";
+
+						$output = shell_exec('sudo forever list');
+						echo "$output</pre>"; ?>
 				</form>
 	<!-- footer section -->
 				 <div class="login-box-footer clearfix">
