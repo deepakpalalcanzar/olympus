@@ -1,0 +1,94 @@
+<div class="system-settings-template">
+
+	<!-- upgrade header -->
+	<!-- <div class="title-mod">
+		<div class="title-fix">
+			<span>Need to expand your sharing, storage, and bandwidth capacity?</span>
+			<a class="setting-upgrade-button">
+				<img src="/images/button_upgrade@2x.png" />
+			</a>
+			<div class="clear"></div>
+		</div>
+	</div> -->
+
+	<!--site domain setting -->
+	<div class="domain-mod">
+		<label>Change Domain name</label>
+		<input id="domainname" type="text" name="domainname" value="test" placeholder="Enter domain (i.e. www.domain.com -no http:// or https://)" /><br>
+	    <input type="button" id="saveDomain" value="Save">
+		<br><br>
+	</div>
+	<!-- -->
+
+	<hr><br>
+
+	<!--Email Service Settings -->
+	<div class="domain-mod">
+		<label>Email Service Settings</label>
+		<input id="mail_service" type="radio" name="mail_service" value="mandrill" /> Use Mandrill
+		<input id="mail_service" type="radio" name="mail_service" value="internal" /> Use Internal Email Setup
+		<br><br>
+		<div id="mandrill_details">
+			<label> Mandrill Api Key: </label>
+			<input type="text" class="login-input-field mandrill-key" placeholder="" value="" id="mandrill_key" name="mandrill_key">
+		</div>
+		<div id="inernal_email_details" style="display:none;">
+			<label> SMTP Server(Host) :</label>
+			<input type="text" class="smtp-host" placeholder="" value="" id="smtp_host" name="smtp_host">
+			<label> Port :</label>
+			<input type="text" class="smtp-port" placeholder="" value="" id="smtp_port" name="smtp_port">
+			<label> Username :</label>
+			<input type="text" class="smtp-user" placeholder="" value="" id="smtp_user" name="smtp_user">
+			<label> Password :</label>
+			<input type="password" class="smtp-pass" placeholder="" value="" id="smtp_pass" name="smtp_pass"><br>
+		</div>
+	    <input type="button" id="saveEmail" value="Save">
+		<br><br>
+	</div>
+	<!-- -->
+
+	<hr><br>
+
+	<!--trash setting -->
+	<div class="trash-mod">
+		<label>Trash Setting</label>
+		<div style="">
+			<input id="trash_setting" type="radio" name="trash_setting" value="manual"/ checked="checked"> Manually
+			<a class="tooltips" style=" vertical-align: middle; display: inline-block !important;">
+				<img src="images/FAQ.png">
+				<span> Files will only be deleted when a user manually deletes it from trash. </span>
+			</a>
+		</div><br>
+		<div style="">
+			<input id="trash_setting" type="radio" name="trash_setting" value="auto"/> Automatic
+			<a class="tooltips" style="vertical-align: middle; display: inline-block !important;">
+				<img src="images/FAQ.png">
+				<span>Duration for files to keep them in trash before deleting.</span>
+			</a>
+			<div id="trash_auto_setting">
+				Delete trash files <select id="trash_setting_days" name="trash_setting_days">
+					<option value="hourly">Hourly</option>
+					<option value="daily">Daily</option>
+					<option value="weekly">Weekly</option>
+					<option value="monthly">Monthly</option>
+					<option value="yearly">Yearly</option>
+				</select>
+			</div>
+		</div><br>
+	    <input type="button" id="saveTrashSetting" value="Save">
+		<br><br>
+	</div>
+	<!-- -->
+
+	<hr><br>
+</div>
+
+
+
+
+
+
+
+
+
+

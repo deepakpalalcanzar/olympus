@@ -10,17 +10,23 @@
             <a href="#account/password" class="account-password"> Change Password </a>
         </li>
 
-        {% if ( showAppearence ) { %}
+        {% if ( showSetting ) { %}
+
             <li class="accountAppearance">
                 <a href="#account/appearance" class="account-appearance"> Appearance </a>
             </li>
-        {% } %}
-
-        {% if ( showSetting ) { %}
 
             <li class="settings">
                 <a href="#account/settings" class="account-notifications"> Settings</a>
             </li>
+        {% } %}
+
+        {% if ( showSystemSetting ) { %}
+
+            <li class="systemSettings">
+                <a href="#account/systemsettings" class="system-settings"> System Settings </a>
+            </li>
+
         {% } %}
         
         {% if (showSubscription) { %}

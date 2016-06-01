@@ -40,9 +40,9 @@ Mast.registerComponent('UserNavigationComponent', {
 		var d = this.get('dropdownItems');
 		//if(Mast.Session.Account.isAdmin && Mast.Session.Account.isSuperAdmin === 1)
 		if(Mast.Session.Account.isAdmin=="" && Mast.Session.Account.isSuperAdmin !== 1){ //Avneesh
-			d.splice('2', '2');
+			d.splice('2', '3');
 		}else if (Mast.Session.Account.isEnterprise === 1){
-			d.splice('2', '1');
+			d.splice('4', '1');
 		}
 	},
 
@@ -67,6 +67,10 @@ Mast.registerComponent('UserNavigationComponent', {
 
 	settings: function(){
 		Mast.navigate('#account/settings');
+	},
+
+	systemSettings: function(){
+		Mast.navigate('#account/systemsettings');
 	},
 
 	appearance: function(){

@@ -815,7 +815,7 @@ exports.addPermission = function (req, res) {
 
 //    console.log(req);
 
-    var INodeModel = ((req.param('controller') == "directory") || (req.param('controller') == "profile")) ? Directory : File;
+    var INodeModel = ((req.param('controller') == "directory") || (req.param('controller') == "account") || (req.param('controller') == "profile")) ? Directory : File;
 
 //    console.log(INodeModel);
 

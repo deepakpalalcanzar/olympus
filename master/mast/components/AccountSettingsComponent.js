@@ -2,7 +2,7 @@ Mast.registerComponent('AccountSettingsComponent',{
 
 	model: {
 		selectedTab 	 : 'accountDetails',
-		showAppearence   : false,
+		showSystemSetting: false,
 		showSubscription : false,
 		showSetting 	 : false
 	},
@@ -13,8 +13,9 @@ Mast.registerComponent('AccountSettingsComponent',{
 	events: {
 		'click a.account-details'      : 'displayAccountDetails',
 		'click a.account-password'     : 'displayAccountPassword',
-		'click a.account-notifications': 'displayAccountNotifications',
-		'click a.account-subscription' : 'displaySubscribedPlan'
+		'click a.account-notifications': 'displayAccountSettings',//'displayAccountNotifications',
+		'click a.account-subscription' : 'displaySubscribedPlan',
+		'click a.system-settings' 	   : 'displaySystemSettings'
 	},
 
 	bindings: {
@@ -40,7 +41,8 @@ Mast.registerComponent('AccountSettingsComponent',{
 	afterRender: function(){
 		// console.log(Mast.Session.Account);
 		// if(Mast.Session.Account.isAdmin && (Mast.Session.Account.isSuperAdmin === 1 || Mast.Session.Account.isSuperAdmin === null || Mast.Session.Account.isSuperAdmin===0))
-		if(Mast.Session.Account.isSuperAdmin === 1){
+		if(Mast.Session.Account.isSuperAdmin === 1)
+		{
 			$('#domainname').val($('#domaininfo').html());//Rishabh
 			// $('#mail_service').val($('#emailservice').html());
 			$('input[name="mail_service"][value="' + $('#emailservice').html() + '"]').prop('checked', true);
@@ -71,12 +73,19 @@ Mast.registerComponent('AccountSettingsComponent',{
 				$('#trash_auto_setting').hide();
 			}
 
-			this.set('showAppearence', true);
+			this.set('showSystemSetting', true);
 			this.set('showSetting', true);
+			this.set('showSubscription', true);
 		}else if (Mast.Session.Account.isEnterprise === 1){
-			this.set('showAppearence', true);
+			this.set('showSetting', true);
+			this.set('showSystemSetting', false);
+			this.set('showSubscription', true);
+		}else if (Mast.Session.Account.isEnterprise === 0){
+			this.set('showSetting', false);
+			this.set('showSystemSetting', false);
+			this.set('showSubscription', true);
 		}
-		this.set('showSubscription', true);//show to all
+		//show to all
 	},
 
 
@@ -104,6 +113,12 @@ Mast.registerComponent('AccountSettingsComponent',{
 		$('.upload-file').hide();
 		this.attach('.account-settings-page', 'SettingsComponent');
 		this.set('selectedTab', 'settings');
+	},
+
+	displaySystemSettings: function() {
+		$('.upload-file').hide();
+		this.attach('.account-settings-page', 'SystemSettingsComponent');
+		this.set('selectedTab', 'systemSettings');
 	},
 
 	displayAppearance: function() {

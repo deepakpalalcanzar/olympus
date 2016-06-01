@@ -57,7 +57,7 @@ Mast.registerComponent('AccountDetails', {
 		console.log("aaaaaaaaaaaaaaaaaaaaa");
 		console.log(fileData);
 		
-		if(fileData !== 'undefined'){
+		if(typeof fileData !== 'undefined'){
 
 			var file = fileData[0];
 			var img = cropper.getDataURL();

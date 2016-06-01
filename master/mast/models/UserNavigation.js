@@ -17,13 +17,18 @@ Mast.registerModel('UserNavigation', {
 					iconSrc	: '/images/icon_dropdown_download.png'
 				},
 				{
+					method	: 'appearance',
+					name	: 'Appearance',
+					iconSrc	: '/images/icon_dropdown_download.png'
+				},
+				{
 					method	: 'settings',
 					name	: 'Settings',
 					iconSrc	: '/images/icon_dropdown_download.png'
 				},
 				{
-					method	: 'appearance',
-					name	: 'Appearance',
+					method	: 'systemSettings',
+					name	: 'System Settings',
 					iconSrc	: '/images/icon_dropdown_download.png'
 				},
 				{
