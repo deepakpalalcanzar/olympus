@@ -11,7 +11,7 @@ exports.sendEmail = function(template, options) {
     // user, send them the verification link.  Otherwise, just send them an update.
     var opts = {"type":"messages","call":"send","message":
         {
-            "subject": "smtp.gmail.com ",
+            "subject": "",
             "from_email": "info@olympus.io",
             "from_name": "Olympus",
             "to":[
@@ -66,7 +66,7 @@ exports.sendEmail = function(template, options) {
             break;
     }
 
-    var service = 'smtp';//smtp|mandrill
+    var service = sails.config.mailService;//smtp|mandrill
 
     switch(service){
         case 'mandrill':

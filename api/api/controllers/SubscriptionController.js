@@ -8,7 +8,16 @@ var destroy = require('../services/lib/account/destroy'),
 var SubscriptionController = {
 
     register: function (req, res) {
-        Subscription.createSubscription(req.body, true, function(err, subscription) {
+        //Throws error when adding subscription from admin
+        // Subscription.createSubscription(req.body, true, function(err, subscription) {
+        //     if (err) return res.json({error: 'Error creating subscription',type: 'error'});
+        //     return  res.json({
+        //                 subscription: {id: subscription.id,}
+        //             });
+        // });
+
+        //Rishabh
+        Subscription.createSubscription(req.body, function(err, subscription) {
             if (err) return res.json({error: 'Error creating subscription',type: 'error'});
             return  res.json({
                         subscription: {id: subscription.id,}

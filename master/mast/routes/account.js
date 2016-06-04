@@ -32,6 +32,12 @@ Mast.routes['account/settings'] = function(query, page) {
 	account.displayAccountSettings();
 };
 
+Mast.routes['account/systemsettings'] = function(query, page) {
+	$("#content").empty();
+	var account = new Mast.components.AccountSettingsComponent();
+	account.displaySystemSettings();
+};
+
 Mast.routes['account/notifications'] = function(query, page) {
 	$("#content").empty();
 	var account = new Mast.components.AccountSettingsComponent();

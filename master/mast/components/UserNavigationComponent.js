@@ -43,6 +43,8 @@ Mast.registerComponent('UserNavigationComponent', {
 			d.splice('2', '3');
 		}else if (Mast.Session.Account.isEnterprise === 1){
 			d.splice('4', '1');
+		}else if (Mast.Session.Account.isSuperAdmin === 1){
+			d.splice('5', '1');//no subscriptions aplies to superadmin
 		}
 	},
 

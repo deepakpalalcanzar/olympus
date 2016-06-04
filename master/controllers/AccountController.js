@@ -782,6 +782,8 @@ console.log(opts);
                 account.phone = req.param('phone');
             if (req.param('title'))
                 account.title = req.param('title');
+            if (req.param('subscription_id'))
+                account.subscription_id = req.param('subscription_id');
             // Save the Account, returning a 200 response
             account.save().done(function (err) {
 

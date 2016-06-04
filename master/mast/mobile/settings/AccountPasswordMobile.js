@@ -22,7 +22,7 @@ Mast.registerComponent('AccountPasswordMobile', {
 		// Get the payload object and return it.
 		} else {
 			Mast.Socket.request('/account/changePassword', this.getPayloadInfo(), function() {
-				alert('Thank you! Your password was changed.');
+				alert('Thank you! Your password changed successfully.');
 				Mast.navigate('accountSettings');
 			});
 		}

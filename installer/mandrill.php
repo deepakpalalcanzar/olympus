@@ -43,19 +43,19 @@
 					</div>
 					<div id="inernal_email_details" style="display:none;">
 						<label for=""> SMTP Server(Host) :
-							<img src="img/help.png" tabindex="0" data-toggle="popover" data-html="true" data-trigger="hover" data-original-title="Mandrill Api Key" data-content="Olympus uses Mandrill for email operations to send email notifications. If you do not already have a key go to www.mandrill.com for your free account." style="cursor:pointer;">
+							<img src="img/help.png" tabindex="0" data-toggle="popover" data-html="true" data-trigger="hover" data-original-title="SMTP Server Host Name" data-content="Enter SMTP Outgoing server host name here such as smtp.gmail.com" style="cursor:pointer;">
 						</label>
 						<input type="text" class="login-input-field smtp-host" placeholder="" value="" name="smtp_host">
 						<label for=""> Port :
-							<img src="img/help.png" tabindex="0" data-toggle="popover" data-html="true" data-trigger="hover" data-original-title="Mandrill Api Key" data-content="Olympus uses Mandrill for email operations to send email notifications. If you do not already have a key go to www.mandrill.com for your free account." style="cursor:pointer;">
+							<img src="img/help.png" tabindex="0" data-toggle="popover" data-html="true" data-trigger="hover" data-original-title="SMTP Port" data-content="SMTP Port to be used such as SSL Port 465 is recommended for smtp.gmail.com." style="cursor:pointer;">
 						</label>
 						<input type="text" class="login-input-field smtp-port" placeholder="" value="" name="smtp_port">
 						<label for=""> Username :
-							<img src="img/help.png" tabindex="0" data-toggle="popover" data-html="true" data-trigger="hover" data-original-title="Mandrill Api Key" data-content="Olympus uses Mandrill for email operations to send email notifications. If you do not already have a key go to www.mandrill.com for your free account." style="cursor:pointer;">
+							<img src="img/help.png" tabindex="0" data-toggle="popover" data-html="true" data-trigger="hover" data-original-title="Username" data-content="Username for the SMTP account." style="cursor:pointer;">
 						</label>
 						<input type="text" class="login-input-field smtp-user" placeholder="" value="" name="smtp_user">
 						<label for=""> Password :
-							<img src="img/help.png" tabindex="0" data-toggle="popover" data-html="true" data-trigger="hover" data-original-title="Mandrill Api Key" data-content="Olympus uses Mandrill for email operations to send email notifications. If you do not already have a key go to www.mandrill.com for your free account." style="cursor:pointer;">
+							<img src="img/help.png" tabindex="0" data-toggle="popover" data-html="true" data-trigger="hover" data-original-title="Password" data-content="Password for the SMTP account." style="cursor:pointer;">
 						</label>
 						<input type="password" class="login-input-field smtp-pass" placeholder="" value="" name="smtp_pass">
 					</div>

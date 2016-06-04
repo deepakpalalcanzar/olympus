@@ -155,10 +155,12 @@ var TempAccountController = {
 				}
 
 				if(lastSync === '0'){
-				    sqlFile = "SELECT f.* from file f JOIN filepermission fp ON f.id = fp.FileId where (f.deleted IS NULL OR f.deleted=0) and fp.AccountId=?";
+				    // sqlFile = "SELECT f.* from file f JOIN filepermission fp ON f.id = fp.FileId where (f.deleted IS NULL OR f.deleted=0) and fp.AccountId=?";
+                    sqlFile = "SELECT f.*,fp.AccountId as fpacc, max(v.version), v.parent_id from file f LEFT JOIN version v ON f.id = v.FileId LEFT JOIN filepermission fp ON f.id = fp.FileId where (f.deleted IS NULL OR f.deleted=0) and fp.AccountId=? group by v.parent_id";
 				    sqlFile     = Sequelize.Utils.format([sqlFile, accounts[0].account_id]);
 				}else{
-				    sqlFile = "SELECT f.* from file f JOIN filepermission fp ON f.id = fp.FileId where (f.deleted IS NULL OR f.deleted=0) and fp.AccountId=? and f.createdAt>?";
+				    // sqlFile = "SELECT f.* from file f JOIN filepermission fp ON f.id = fp.FileId where (f.deleted IS NULL OR f.deleted=0) and fp.AccountId=? and f.createdAt>?";
+                    sqlFile = "SELECT f.*,fp.AccountId as fpacc, max(v.version), v.parent_id from file f LEFT JOIN version v ON f.id = v.FileId LEFT JOIN filepermission fp ON f.id = fp.FileId where (f.deleted IS NULL OR f.deleted=0) and fp.AccountId=? and f.createdAt>? group by v.parent_id";
 				    sqlFile = Sequelize.Utils.format([sqlFile, accounts[0].account_id, lastSync]);
 				}
 

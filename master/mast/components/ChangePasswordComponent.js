@@ -30,7 +30,7 @@ Mast.registerComponent('ChangePassword', {
 				
 				var payload = this.getPayloadInfo();
 				/*Mast.Socket.request('/account/changePassword', payload, function() {
-					alert('Thank you! Your password was changed.');
+					alert('Thank you! Your password changed successfully.');
 					Mast.navigate('accountSettings');
 					self.emptyForm();
 				});*/
@@ -38,7 +38,7 @@ Mast.registerComponent('ChangePassword', {
             				payload.ipadd =response.ip;*/
             				console.log(payload);
             				Mast.Socket.request('/account/changePassword', payload, function() {
-						alert('Thank you! Your password was changed.');
+						alert('Thank you! Your password changed successfully.');
 						Mast.navigate('accountSettings');
 						self.emptyForm();
 					});

@@ -439,9 +439,3 @@ Mast.registerComponent('DetailsSidebar',{
 	}
 
 });
-
-
-
-
-
-

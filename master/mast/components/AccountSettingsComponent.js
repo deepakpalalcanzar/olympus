@@ -75,7 +75,7 @@ Mast.registerComponent('AccountSettingsComponent',{
 
 			this.set('showSystemSetting', true);
 			this.set('showSetting', true);
-			this.set('showSubscription', true);
+			// this.set('showSubscription', true);//no subscription aplies to superadmin
 		}else if (Mast.Session.Account.isEnterprise === 1){
 			this.set('showSetting', true);
 			this.set('showSystemSetting', false);

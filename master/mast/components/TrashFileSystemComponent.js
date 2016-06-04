@@ -54,10 +54,14 @@ Mast.registerTree('TrashFileSystem',{
 	branchOutlet	: '#trashSystem-outlet',
 
 	afterRender: function(e) {
+		Olympus.ui.actionBar.updateButtonState();
 		/* For number shared*/
 		Mast.Socket.request('/tempaccount/sharedDirectory', null, function(res, err){
 			$.each(res, function( i, val ) {
 				Mast.Socket.request('/tempaccount/numSharedDirectory', { dirId: val.DirectoryId}, function(res, err){
+					
+					$('.trashSystem-template .loading-spinner').hide();
+
 					$('.num-shared-'+val.DirectoryId).html(res[0].num_shared);
 				});
 			});

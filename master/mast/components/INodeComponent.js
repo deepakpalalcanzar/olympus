@@ -3,7 +3,8 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 	events: {
 		'dblclick'              : 'download',
 		'click'                 : 'select',
-		//'clickoutside'          : 'deselect',
+		'clickoutside'          : 'deselect',//added to avoid having selected 2 rows(testcase not reproduced)
+		//'click'          		: 'cancel',
 		'mouseenter >.inode-row': 'displayActionButtons',
 		'mouseleave >.inode-row': 'hideActionButtons',
 		'click .dropdown-button': 'showDropdownAtArrow',

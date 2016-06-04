@@ -142,6 +142,7 @@ Mast.registerComponent('UploadSearchComponent',{
 	updateButtonState: function () {
 
 		if (window.location.hash !== '') {
+			this.set('uploadFileButton', false);
 			this.set('createFolderButton', false);
 		} else {
 
