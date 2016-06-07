@@ -56,7 +56,7 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 	            self.$('.information-stats').hide();
 	            self.$('.progress-bar').show();
 	            progress = Math.round((data.loaded/data.total*100)) + '%';
-	            console.log(progress);
+	            console.log('INODE22 '+progress);
 	            self.$('.bar').css('width', progress);
 	            self.$('.progress .number').html(progress);
 	        }
@@ -379,8 +379,9 @@ Mast.components.INodeComponent = Mast.Tree.extend({
         '~UPLOAD_PROGRESS': function(event) {
             if (event.source.filename == this.model.get('name') && this.model.get('parent') && this.model.get('parent').id == event.source.id && this.$('.progress-bar').is(':visible')) {
                 progress = event.source.percent + '%';
-                this.$('.bar').css('width', progress);
-                this.$('.progress .number').html(progress);
+                // this.$('.bar').css('width', progress);
+                console.log('INODE33 '+progress);
+                // this.$('.progress .number').html(progress);
             }
         }
 
