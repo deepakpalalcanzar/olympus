@@ -596,6 +596,11 @@ module.exports = {
         action: 'publicDownload'
     },
 
+    '/theme/getCurrentTheme': {
+        controller: 'theme',
+        action: 'getCurrentTheme'
+    },
+
    '/theme/getThemeConfiguration/:id': {
         controller: 'theme',
         action: 'getThemeConfiguration'

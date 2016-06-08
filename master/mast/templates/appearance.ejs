@@ -5,7 +5,7 @@
         <form action="/account/update" method="POST" class="">
             <fieldset>
 
-            <div style="width:100%;float:left;">
+            <div style="width: 90%; float: left; margin: 2% 5%;">
                 <div style="width:50%;float:left;cursor:pointer;">
                     <p class="olympusHeader"> Select color of your header </p>
                 </div>
@@ -16,7 +16,7 @@
 
             <div style="width:100%; float:left;">&nbsp;</div>
 
-            <div style="width:100%; float:left;">
+            <div style="width: 90%; float: left; margin: 2% 5%;">
                 <div style="width:50%;float:left;cursor:pointer;">
                     <p class="olympusBody">  Select color of your body </p>
                 </div>
@@ -27,13 +27,14 @@
 
             <div style="width:100%; float:left;">&nbsp;</div>
 
-            <div style="width:100%;">
+            <div style="width: 90%; margin: 2% 5%;">
                 <div style="width:50%;float:left;cursor:pointer;">
                     <p class="olympusFont">  Select font-color  </p>
                 </div>
                 <div style="width:50%;float:left;cursor:pointer;">
-                    <select name="fontFamily" class="fontfamily">
-                        <option value=''> Select </option>
+                    <p class=""> Select font-family </p>
+                    <select name="fontFamily" class="fontfamily" size="12">
+                        <!-- <option value=''> Select </option> -->
                         <option value="Georgia, serif"> Georgia, serif </option>
                         <option value="Palatino Linotype, Book Antiqua, Palatino, serif"> "Palatino Linotype", "Book Antiqua", Palatino, serif </option>
                         <option value="Times New Roman, Times, serif"> "Times New Roman", Times, serif </option>
@@ -56,7 +57,8 @@
             </fieldset>
         </form>
     </div>
-    
-    <div class="appearance-save-button submit-appearance" style="cursor:pointer;"> Save </div>
-
+    <div style="width: 90%; float: left; margin: 2% 8%;">
+        <button class="appearance-save-button submit-appearance" style="cursor:pointer;"> Save </button>
+        <button class="appearance-reset-button reset-appearance" style="cursor:pointer;"> Reset to default theme </button> 
+    </div>
 </div>
