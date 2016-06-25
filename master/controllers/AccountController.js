@@ -782,8 +782,42 @@ console.log(opts);
                 account.phone = req.param('phone');
             if (req.param('title'))
                 account.title = req.param('title');
-            if (req.param('subscription_id'))
+            if(req.param('subscription_id') && (account.subscription_id == req.param('subscription_id'))) {
                 account.subscription_id = req.param('subscription_id');
+            }else{
+                Subscription.find({
+                    where: [' id = ' + req.param('subscription_id')],
+                }).success(function (subscription) {
+                    // Save to transactionDetails table
+                    var tran_options = {
+                        uri: 'http://localhost:1337/transactiondetails/register/',
+                        method: 'POST',
+                    };
+                    var created_date = new Date();
+                    tran_options.json = {
+                        trans_id: (req.session.Account.isSuperAdmin === 1) ? 'superadmin' : 'workgroupadmin',
+                        account_id: account.id,
+                        created_date: created_date,
+                        users_limit: subscription.users_limit,
+                        quota: subscription.quota,
+                        plan_name: subscription.features,
+                        price: subscription.price,
+                        duration: subscription.duration,
+                        paypal_status: '',
+                    };
+
+                    request(tran_options, function (err1, response1, body1) {
+                        if (err1)
+                              console.log(err1);
+                        //    return res.json({error: err1.message, type: 'error'}, response1 && response1.statusCode);
+                        //        Resend using the original response statusCode
+                        //        use the json parsing above as a simple check we got back good stuff
+                        // res.json(body, response && response.statusCode);
+                        return;
+                    });
+                });
+                account.subscription_id = req.param('subscription_id');
+            }
             // Save the Account, returning a 200 response
             account.save().done(function (err) {
 

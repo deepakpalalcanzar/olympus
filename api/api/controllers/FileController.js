@@ -368,6 +368,8 @@ var FileController = {
         }
 
         uploadStream.on('error', function (err) {
+            console.log('APIERRORAPIERRORAPIERRORAPIERRORAPIERRORAPIERRORAPIERROR');
+            console.log(err);
             return res.end(JSON.stringify({error: err}), 'utf8');
         });
 
@@ -527,36 +529,51 @@ console.log(maxElementIndex);
                                     console.log('747474747474747474747474747474');
                                     console.log(latestFile);
                                     if (latestFile.size == file.size) {
-                                        streamAdaptor.firstFile(
-                                                {first: latestFile.fsName, second: file.extra.fsName}, function (rmErr) {
-                                                    console.log('1010101010101010101010101010101010');
-                                                    console.log(rmErr);
-                                            var parsedResponse = JSON.parse(rmErr)
-                                            if(rmErr.error === false){//Rishabh: check for error
-                                                console.log('567567567567567567567567567567567567567567567');
-                                                if (parsedResponse.first === parsedResponse.second) {
-                                                    //fsx.unlink('/var/www/html/olympus/api/files/' + file.extra.fsName);
-                                                    // fsx.unlink('/home/alcanzar/api/files/'+file.extra.fsName);
-                                                    if(user_platform == 'desktopApp'){
-                                                        return res.end(JSON.stringify({error: "FileExist",filedata:latestFile}), 'utf8');
-                                                    }else{
-                                                        return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
+                                        if(sails.config.receiver === 'Disk'){
+                                            streamAdaptor.firstFile(
+                                                    {first: latestFile.fsName, second: file.extra.fsName}, function (rmErr) {
+                                                        console.log('1010101010101010101010101010101010');
+                                                        console.log(rmErr);
+                                                var parsedResponse = JSON.parse(rmErr);
+                                                if(parsedResponse.error === undefined){//Rishabh: check for error
+                                                    console.log('567567567567567567567567567567567567567567567');
+                                                    if (parsedResponse.first === parsedResponse.second) {
+                                                        //fsx.unlink('/var/www/html/olympus/api/files/' + file.extra.fsName);
+                                                        // fsx.unlink('/home/alcanzar/api/files/'+file.extra.fsName);
+                                                        if(user_platform == 'desktopApp'){
+                                                            return res.end(JSON.stringify({error: "FileExist",filedata:latestFile}), 'utf8');
+                                                        }else{
+                                                            return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
+                                                        }
                                                     }
+                                                }else{
+                                                    console.log('234234234234234234234234234234234234234234234');
+                                                    return res.end(JSON.stringify({
+                                                        origParams: req.params.all(),
+                                                        name: file.filename,
+                                                        size: file.size,
+                                                        fsName: file.extra.fsName,
+                                                        mimetype: file.type,
+                                                        version: parseInt(findMax) + 1,
+                                                        oldFile: fileData.id,
+                                                        thumbnail: "1",
+                                                    }), 'utf8');
                                                 }
-                                            }else{
-                                                console.log('234234234234234234234234234234234234234234234');
-                                                return res.end(JSON.stringify({
-                                                    origParams: req.params.all(),
-                                                    name: file.filename,
-                                                    size: file.size,
-                                                    fsName: file.extra.fsName,
-                                                    mimetype: file.type,
-                                                    version: parseInt(findMax) + 1,
-                                                    oldFile: fileData.id,
-                                                    thumbnail: "1",
-                                                }), 'utf8');
-                                            }
-                                        });
+                                            });
+                                        }else{
+                                            // return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
+                                            console.log('1212121212121212121212121212121212');
+                                            res.end(JSON.stringify({
+                                                origParams: req.params.all(),
+                                                name: file.filename,
+                                                size: file.size,
+                                                fsName: file.extra.fsName,
+                                                mimetype: file.type,
+                                                version: parseInt(findMax) + 1,
+                                                oldFile: fileData.id,
+                                                thumbnail: "1",
+                                            }), 'utf8');
+                                        }
                                     } else {
                                         console.log('1212121212121212121212121212121212');
                                         res.end(JSON.stringify({

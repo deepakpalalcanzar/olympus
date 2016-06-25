@@ -15,7 +15,7 @@ var SubscriptionController = {
         //                 subscription: {id: subscription.id,}
         //             });
         // });
-
+        
         //Rishabh
         Subscription.createSubscription(req.body, function(err, subscription) {
             if (err) return res.json({error: 'Error creating subscription',type: 'error'});

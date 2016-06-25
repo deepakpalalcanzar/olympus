@@ -127,11 +127,11 @@ Mast.models.INode = Mast.Model.extend({
 			},
 			
 			showLinkPassword: function() {
-				return (this.type=='file' && this.link_password_enabled && (this.permission == 'admin'));
+				return (this.allowPublicDownloads() && this.type=='file' && this.link_password_enabled && (this.permission == 'admin'));
 			},
 
 			showLinkPasswordOption: function() {
-				return (this.type=='file' && (this.permission == 'admin'));
+				return (this.allowPublicDownloads() && this.type=='file' && (this.permission == 'admin'));
 			}
 		});
 	}

@@ -22,9 +22,9 @@ var RedirectController = {
         var headers = req.headers;
         delete headers.host;
         delete headers.connection;
-        if(req.url == '/files/content'){
+        if(req.url == '/files/content' || req.url.match(/^\/files\/content\//)){
             console.log('IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII');
-            console.log('http://localhost:1337' + req.path)
+            console.log('http://localhost:1337' + req.path);
             console.log('IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII');
         }
 // Build options for request
@@ -34,13 +34,19 @@ var RedirectController = {
             headers: headers
         };
 
-        if (req.method === 'POST' && req.url == '/files/content') {
+        if (req.method === 'POST' && (req.url == '/files/content' || req.url.match(/^\/files\/content\//))) {
 
-// console.log('|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||');
-// console.log(req);
-// console.log('TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT');
-// console.log(options);
-// console.log('IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII');
+options.uri = 'http://localhost:1337/files/content';
+options.name = req.param('name');
+options.parent_id = req.param('parent_id');
+console.log(req.params);
+console.log('|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||');
+console.log(req);
+console.log('headersheadersheadersheadersheadersheaders');
+console.log(headers);
+console.log('TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT');
+console.log(options);
+console.log('IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII');
 
             var proxyReq = req.pipe(request.post(options));
             proxyReq.on('data', function (data) {
@@ -48,6 +54,8 @@ var RedirectController = {
                 try {
                     data = JSON.parse(data.toString('utf8'));
                 } catch (e) {
+                    console.log('MASTERERRORMASTERERRORMASTERERRORMASTERERROR');
+                    console.log(e);
                     data = {error: 'unknown error'};
                 }
 
@@ -55,6 +63,7 @@ var RedirectController = {
                     if (data.error) {
                         req.unpipe();
                         proxyReq.end();
+                        console.log(data.error);
                         //req.end();//[TypeError: Object #<IncomingMessage> has no method 'end']
                         console.log('RETURNING DATA 777 ERROR RETURNING DATA ERROR RETURNING DATA ERROR ');
                         // return res.json({error: 'unknown error555', type: 'error'},500);

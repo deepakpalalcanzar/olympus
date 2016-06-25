@@ -1167,8 +1167,327 @@ impersonate: function(req, res){
                     font_color       : '#547aa4'
                 });
             }else{
+                    var md5 = 'p';
+                    if((fileModel.link_password_enabled == true) && (fileModel.link_password != '')){
+                        var crypto = require('crypto');
+                        md5 = crypto
+                                .createHash('md5')
+                                .update(fileModel.link_password)
+                                .digest('base64');
+                    }
+
+                    if(req.session.Account){
+
+                        /*Logged in user pages*/
+                        Account.find({
+                            where: { id: req.session.Account.id }
+                        }).done(function(err, account) {
+
+                            if (err) return res.send(500,err);
+                            
+                            Account.find({
+                                where: { id : account.created_by }
+                            }).done(function(errs, createdBy){
+                                
+                                if(createdBy){
+                                    if(createdBy.enterprise_fsname !== null && createdBy.enterprise_fsname !== '' ){
+                                        if(createdBy.isSuperAdmin !== 1){
+                                            enterpriseLogo = createdBy.enterprise_fsname;
+                                        }else{
+                                            enterpriseLogo = account.enterprise_fsname;
+                                        }
+
+                                    }else{
+
+                                        if(account.enterprise_fsname !== null && account.enterprise_fsname !== ''){
+                                            enterpriseLogo = account.enterprise_fsname;
+                                        }else{
+                                            enterpriseLogo = '';
+                                        }
+                                    }
+                                    hideSetting= 1;
+                                }else{
+
+                                    enterpriseLogo = account.enterprise_fsname;
+
+                                }
+
+                                if(account.isSuperAdmin){
+
+                                    Theme.find({
+                                        where : { account_id: req.session.Account.id  }
+                                    }).done(function(err, theme){
+                                        var sql = "SELECT (SUM(size)/1000000000) as total_space_used FROM directory";
+                                        sql = Sequelize.Utils.format([sql]);
+                                        sequelize.query(sql, null, {
+                                            raw: true
+                                        }).success(function(dir) {
+
+                                            if(theme === null){
+
+                                                res.view('meta/filesharepage',{
+                                                    is_super_admin  : '1',
+                                                    apps            : account.created_by,
+                                                    email           : account.email,
+                                                    enterprise_logo : enterpriseLogo,
+                                                    avatar          : account.avatar_image,
+                                                    // setting         : hideSetting,
+                                                    header_color     : '#FFFFFF',
+                                                    navigation_color : '#4f7ba9',
+                                                    body_background  : '#f9f9f9',
+                                                    footer_background: '#f9f9f9',
+                                                    font_family      : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif',
+                                                    font_color       : '#547aa4',
+                                                    total_space_used : dir[0].total_space_used,
+                                                        username         : account.name,
+                                                        fsName           : req.param('fsName'),
+                                                        mimetype         : fileModel.mimetype,
+                                                        name             : fileModel.name,
+                                                        dtoken           : md5,//page token for download
+                                                        fileid           : fileModel.id,
+                                                        title            : fileModel.name,
+                                                        header_color     : '#FFFFFF',
+                                                        navigation_color : '#4f7ba9',
+                                                        body_background  : '#f9f9f9',
+                                                        footer_background: '#f9f9f9',
+                                                        font_family      : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif',
+                                                        font_color       : '#547aa4'
+                                                });
+
+                                            }else{
+
+                                                res.view('meta/filesharepage',{
+                                                    is_super_admin  : '1',
+                                                    apps            : account.created_by,
+                                                    email           : account.email,
+                                                    enterprise_logo : enterpriseLogo,
+                                                    avatar          : account.avatar_image,
+                                                    // setting         : hideSetting,
+                                                    header_color     : theme.header_background  !== '' ? theme.header_background : '#FFFFFF',
+                                                    navigation_color : theme.navigation_color   !== '' ? theme.navigation_color : '#4f7ba9',
+                                                    body_background  : theme.body_background    !== '' ? theme.body_background : '#f9f9f9',
+                                                    footer_background: theme.footer_background  !== '' ? theme.footer_background : '#f9f9f9',
+                                                    font_family      : theme.font_family        !== '' ? theme.font_family : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif',
+                                                    font_color       : theme.font_color         !== '' ? theme.font_color : '#547aa4',
+                                                    total_space_used : dir[0].total_space_used,
+                                                        username         : account.name,
+                                                        fsName           : req.param('fsName'),
+                                                        mimetype         : fileModel.mimetype,
+                                                        name             : fileModel.name,
+                                                        dtoken           : md5,//page token for download
+                                                        fileid           : fileModel.id,
+                                                        title            : fileModel.name,
+                                                        header_color     : '#FFFFFF',
+                                                        navigation_color : '#4f7ba9',
+                                                        body_background  : '#f9f9f9',
+                                                        footer_background: '#f9f9f9',
+                                                        font_family      : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif',
+                                                        font_color       : '#547aa4'
+                                                });
+                                            }
+                                        });
+                                    });
+
+                                }else{
+
+                                    if(req.session.Account.isAdmin === true){
+
+                                        Theme.find({
+                                            where : { account_id: req.session.Account.id  }
+                                        }).done(function(err, theme){
+
+                                            if(theme === null){
+
+                                            res.view('meta/filesharepage',{
+                                                is_super_admin  : '0',
+                                                apps             : account.created_by,
+                                                email            : account.email,
+                                                enterprise_logo  : enterpriseLogo,
+                                                avatar           : account.avatar_image,
+                                                // setting          : hideSetting, 
+                                                header_color     : '#FFFFFF',
+                                                navigation_color : '#4f7ba9',
+                                                body_background  : '#f9f9f9',
+                                                footer_background: '#f9f9f9',
+                                                font_family      : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif',
+                                                font_color       : '#547aa4',
+                                                    username         : account.name,
+                                                    fsName           : req.param('fsName'),
+                                                    mimetype         : fileModel.mimetype,
+                                                    name             : fileModel.name,
+                                                    dtoken           : md5,//page token for download
+                                                    fileid           : fileModel.id,
+                                                    title            : fileModel.name,
+                                                    header_color     : '#FFFFFF',
+                                                    navigation_color : '#4f7ba9',
+                                                    body_background  : '#f9f9f9',
+                                                    footer_background: '#f9f9f9',
+                                                    font_family      : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif',
+                                                    font_color       : '#547aa4'
+                                            });
+                    
+                                            }else{
+                                                res.view('meta/filesharepage',{
+                                                    is_super_admin  : '0',
+                                                    apps             : account.created_by,
+                                                    email            : account.email,
+                                                    enterprise_logo  : enterpriseLogo,
+                                                    avatar           : account.avatar_image,
+                                                    // setting          : hideSetting, 
+                                                    header_color     : theme.header_background  !== '' ? theme.header_background : '#FFFFFF',
+                                                    navigation_color : theme.navigation_color   !== '' ? theme.navigation_color : '#4f7ba9',
+                                                    body_background  : theme.body_background    !== '' ? theme.body_background : '#f9f9f9',
+                                                    footer_background: theme.footer_background  !== '' ? theme.footer_background : '#f9f9f9',
+                                                    font_family      : theme.font_family        !== '' ? theme.font_family : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif',
+                                                    font_color       : theme.font_color         !== '' ? theme.font_color : '#547aa4',
+                                                        username         : account.name,
+                                                        fsName           : req.param('fsName'),
+                                                        mimetype         : fileModel.mimetype,
+                                                        name             : fileModel.name,
+                                                        dtoken           : md5,//page token for download
+                                                        fileid           : fileModel.id,
+                                                        title            : fileModel.name,
+                                                        header_color     : '#FFFFFF',
+                                                        navigation_color : '#4f7ba9',
+                                                        body_background  : '#f9f9f9',
+                                                        footer_background: '#f9f9f9',
+                                                        font_family      : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif',
+                                                        font_color       : '#547aa4'
+                                                });
+                                            }
+                                        });
 
 
+                                    }else{
+                /******profile condition******/
+                                        var sql = "SELECT au.*,p.* FROM adminuser au JOIN profile p on "+
+                                        "au.admin_profile_id=p.id WHERE user_id=?";
+                                        sql = Sequelize.Utils.format([sql, account.id]);
+                                        sequelize.query(sql, null, {
+                                            raw: true
+                                        }).success(function(adminuser) {
+
+
+                                            Theme.find({
+                                                where : { account_id: account.created_by  }
+                                            }).done(function(err, theme){
+                                                
+                                                if(theme === null){
+
+                                                    res.view('meta/filesharepage',{
+                                                        is_super_admin  : '0',
+                                                        apps             : account.created_by,
+                                                        email            : account.email,
+                                                        enterprise_logo  : enterpriseLogo,
+                                                        avatar           : account.avatar_image,
+                                                        profile          : adminuser,       
+                                                        // setting          : hideSetting, 
+                                                        header_color     : '#FFFFFF',
+                                                        navigation_color : '#4f7ba9',
+                                                        body_background  : '#f9f9f9',
+                                                        footer_background: '#f9f9f9',
+                                                        font_family      : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif',
+                                                        font_color       : '#547aa4',
+                                                            username         : account.name,
+                                                            fsName           : req.param('fsName'),
+                                                            mimetype         : fileModel.mimetype,
+                                                            name             : fileModel.name,
+                                                            dtoken           : md5,//page token for download
+                                                            fileid           : fileModel.id,
+                                                            title            : fileModel.name,
+                                                            header_color     : '#FFFFFF',
+                                                            navigation_color : '#4f7ba9',
+                                                            body_background  : '#f9f9f9',
+                                                            footer_background: '#f9f9f9',
+                                                            font_family      : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif',
+                                                            font_color       : '#547aa4'
+                                                    });
+                    
+                                                }else{
+                                                    
+                                                    res.view('meta/filesharepage',{
+                                                        is_super_admin  : '0',
+                                                        apps             : account.created_by,
+                                                        email            : account.email,
+                                                        enterprise_logo  : enterpriseLogo,
+                                                        avatar           : account.avatar_image,
+                                                        profile          : adminuser,
+                                                        // setting          : hideSetting, 
+                                                        header_color     : theme.header_background  !== '' ? theme.header_background : '#FFFFFF',
+                                                        navigation_color : theme.navigation_color   !== '' ? theme.navigation_color : '#4f7ba9',
+                                                        body_background  : theme.body_background    !== '' ? theme.body_background : '#f9f9f9',
+                                                        footer_background: theme.footer_background  !== '' ? theme.footer_background : '#f9f9f9',
+                                                        font_family      : theme.font_family        !== '' ? theme.font_family : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif',
+                                                        font_color       : theme.font_color         !== '' ? theme.font_color : '#547aa4',
+                                                            username         : account.name,
+                                                            fsName           : req.param('fsName'),
+                                                            mimetype         : fileModel.mimetype,
+                                                            name             : fileModel.name,
+                                                            dtoken           : md5,//page token for download
+                                                            fileid           : fileModel.id,
+                                                            title            : fileModel.name,
+                                                            header_color     : '#FFFFFF',
+                                                            navigation_color : '#4f7ba9',
+                                                            body_background  : '#f9f9f9',
+                                                            footer_background: '#f9f9f9',
+                                                            font_family      : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif',
+                                                            font_color       : '#547aa4'
+                                                    });
+                                                }
+                                            });
+                    
+                                            // res.view('meta/home',{
+                                            //  apps            : account.created_by,
+                                            //  email           : account.email,
+                                            //  profile         : adminuser,
+                                            //  enterprise_logo: enterpriseLogo,
+                                            //  avatar: account.avatar_image,
+                                            //  setting: hideSetting 
+
+                                            // });
+                    
+                                        }).error(function(e) {
+                                            throw new Error(e);
+                                        });
+                /******end profile condition******/
+                                    }
+                                }   
+                            });
+                        });
+                        /*Logged in user pages*/
+                    }else{
+      
+                        res.view('meta/filesharepage',{
+                            is_super_admin  : '1',
+                            apps            : 'account.created_by',
+                            email           : 'ANONYMOUS',
+                            enterprise_logo : '',
+                            avatar          : 'account.avatar_image',
+                            // setting         : 'hideSetting',
+                            header_color     : '#FFFFFF',
+                            navigation_color : '#4f7ba9',
+                            body_background  : '#f9f9f9',
+                            footer_background: '#f9f9f9',
+                            font_family      : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif',
+                            font_color       : '#547aa4',
+                            total_space_used : 'dir[0].total_space_used',
+                                username         : '',
+                                fsName           : req.param('fsName'),
+                                mimetype         : fileModel.mimetype,
+                                name             : fileModel.name,
+                                dtoken           : md5,//page token for download
+                                fileid           : fileModel.id,
+                                title            : fileModel.name,
+                                header_color     : '#FFFFFF',
+                                navigation_color : '#4f7ba9',
+                                body_background  : '#f9f9f9',
+                                footer_background: '#f9f9f9',
+                                font_family      : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif',
+                                font_color       : '#547aa4'
+                        });
+                    }
+
+/*
                   // If the "open" param isn't set, force the file to download
                     if (!req.url.match(/^\/file\/open\//)) {
                         res.setHeader('Content-disposition', 'attachment; filename=\"' + fileName.trim() + '\"');
@@ -1179,44 +1498,7 @@ impersonate: function(req, res){
                     res.setHeader('Content-Type', fileModel.mimetype);
                     options.uri = "http://localhost:1337/file/download/"+fileModel.fsName;
                     var proxyReq = request.get(options).pipe(res);
-
-                  /*  var file = '/var/www/html/olympus/api/files/'+fileName;
-                    var filename = path.basename(file);
-                    var mimetype = mime.lookup(file);
-
-                    res.setHeader('Content-disposition', 'attachment; filename=' + fileName);
-                    res.setHeader('Content-Type', fileModel.mimetype);
-
-                    var filestream = fs.createReadStream(file);
-                    filestream.pipe(res);*/
-
-
-
-                  /*Create logging*/
-                  /*var opts = {
-                    uri: 'http://localhost:1337/logging/register/' ,
-                    method: 'POST',
-                  };
-
-                  opts.json =  {
-                    user_id     : req.session.Account.id,
-                    text_message: 'has downloaded a file named '+fileModel.name+' from shared link.',
-                    activity    : 'download',
-                    on_user     : req.session.Account.id,
-                    ip          : req.session.Account.ip,
-                     platform    : req.headers.user_platform,
-
-                  };
-
-                  request(opts, function(err, response, body) {
-                  if(err) return res.json({ error: err.message, type: 'error' }, response && response.statusCode);
-                    
-                    proxyReq.on('error', function(err) {res.send(err, 500)});
-                  
-                  });*/
-                /*Create logging*/
-
-                  // proxyReq.on('error', function(err) {res.send(err, 500)});
+*/
 
             }
 
@@ -1227,10 +1509,149 @@ impersonate: function(req, res){
 
   },
 
+  pDownload: function(req, res){
+
+    var request = require('request');
+//    hack the session bro
+    var _session = {
+      authenticated: true,
+      Account: '1'
+    };
+
+// Strip original headers of host and connection status
+    var headers = req.headers;
+    delete headers.host;
+    delete headers.connection;
+
+// Build options for request
+    var options = {
+      uri: 'http://localhost:1337/file/download',
+      method: req.method,
+      headers: headers
+    };
+
+    File.find({where:{fsName:req.param('fsName')}}).success(function (fileModel) {
+
+        // If we have a file model to work with...
+        if (fileModel) {
+            //Remove verison (Vx) from the fileName added by abhishek
+            fileName = fileModel.name;
+            fileName = fileName.substr(0, fileName.lastIndexOf("("));
+
+            var md5 = 'p';
+            if((fileModel.link_password_enabled == true) && (fileModel.link_password != '')){
+                var crypto = require('crypto');
+                md5 = crypto
+                        .createHash('md5')
+                        .update(fileModel.link_password)
+                        .digest('base64');
+            }
+            
+            if((fileModel.link_password_enabled != true) || (fileModel.link_password == '') || (md5 == req.param('dtoken'))){
+              // If the "open" param isn't set, force the file to download
+                if (!req.url.match(/^\/file\/open\//)) {
+                    res.setHeader('Content-disposition', 'attachment; filename=\"' + fileName.trim() + '\"');
+                }
+
+              // set content-type header
+
+                res.setHeader('Content-Type', fileModel.mimetype);
+                options.uri = "http://localhost:1337/file/download/"+fileModel.fsName;
+                var proxyReq = request.get(options).pipe(res);
+            }else{
+                res.send(403);
+                // return res.json({error: 'File can not be accessed.', type: 'error'});
+            }
+        }else{
+            res.send(403);//Forbidden
+        }
+
+      }).error(function(err){res.send(err, 500);});
+
+
+  },
+
+  pPreview: function(req, res){
+
+    var request = require('request');
+
+// hack the session bro
+    var _session = {
+        authenticated: true,
+        Account: req.session.Account
+    };
+
+    File.find(req.param('id')).success(function (fileModel) {
+        // If we have a file model to work with...
+        if (fileModel) {
+
+            var md5 = 'p';
+            if((fileModel.link_password_enabled == true) && (fileModel.link_password != '')){
+                var crypto = require('crypto');
+                md5 = crypto
+                        .createHash('md5')
+                        .update(fileModel.link_password)
+                        .digest('base64');
+            }
+
+            if((fileModel.link_password_enabled != true) || (fileModel.link_password == '') || (md5 == req.param('dtoken'))){
+                var options = {
+                    uri: 'http://localhost:1337/logging/register/',
+                    method: 'POST',
+                };
+
+                if (!req.url.match(/^\/file\/pPreview\//)) {
+                    res.setHeader('Content-disposition', 'attachment; filename=\"' + fileModel.name + '\"');
+
+                    if (req.headers['user-agent'].indexOf('Linux') > -1 || req.headers['user-agent'].indexOf('Window') > -1 || req.headers['user-agent'].indexOf('Mac') > -1) {
+                        var user_platform = "Web Application";
+                    } else {
+                        var user_platform = req.headers['user-agent'];
+                    }
+
+
+
+                    /* Logging Of File Download */
+                    options.json = {
+                        user_id: req.session.Account?req.session.Account.id:'Anonymous',
+                        text_message: 'has downloaded ' + fileModel.name,
+                        activity: 'download',
+                        on_user: fileModel.id,
+                        ip: '',//req.session.Account ? req.headers['ip'] : req.session.Account.ip,
+                        platform: user_platform,
+                    };
+                    
+                    request(options, function (err, response, body) {
+                        if (err)
+                            return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+                    });
+                }
+    //                    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&  FS name  &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+    //                    console.log(req.url);
+    //                    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&& FS name &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+
+                // set content-type header
+                res.setHeader('Content-Type', fileModel.mimetype);
+                options.uri = "http://localhost:1337/file/download/" + fileModel.fsName + "?_session=" + JSON.stringify(_session);
+                var proxyReq = request.get(options).pipe(res);
+                proxyReq.on('error', function (err) {
+                    res.send(err, 500)
+                });
+            }else{
+                res.send(403);
+            }
+        }
+
+    }).error(function (err) {
+        res.send(err, 500);
+    });
+    return;
+  },
+
   subscribedPlan: function(req, res){
     
     var sql = "SELECT *,DATE_FORMAT(DATE(createdAt),'%d %b %y') AS acc_created, DATE_FORMAT(DATE_ADD(DATE(createdAt), INTERVAL duration MONTH),'%d %b %y') as expiryDate FROM transactiondetails "+
-              "WHERE is_deleted=0 AND account_id=?";
+              "WHERE is_deleted=0 AND account_id=? ORDER BY id DESC";
         sql = Sequelize.Utils.format([sql,req.session.Account.id]);
         sequelize.query(sql, null, {
           raw: true

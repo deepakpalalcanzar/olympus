@@ -433,6 +433,10 @@ var FileController = {
                     //Download and serve file from local Disk
                     var file = '/var/www/html/olympus/api/files/' + fileModel.fsName;
                     res.setHeader('Content-disposition', 'attachment; filename=' + fileModel.name);
+
+                        // Set content-length header: Rishabh
+                        res.setHeader('Content-Length', fileModel.size);
+
                     res.setHeader('Content-Type', fileModel.mimetype);
                     var filestream = fs.createReadStream(file);
                             filestream.pipe(fs.createWriteStream("/var/www/html/olympus/master/public/demo/"+fileModel.fsName));

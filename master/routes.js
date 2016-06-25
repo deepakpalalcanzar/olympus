@@ -328,10 +328,10 @@ module.exports = {
         controller: 'inode',
         action: 'topLevel'
     },
-    // '/folders/:id': {
-    //   controller: 'directory',
-    //   action: 'dispatchAPI'
-    // },
+    '/folders/:id': {
+      controller: 'directory',
+      action: 'dispatchAPI'
+    },
 
     '/folders/:id/items': {
         controller: 'directory',
@@ -501,6 +501,10 @@ module.exports = {
         controller: 'redirect',
         action: 'redirect'
     },
+    '/files/content/:parent_id/:name': {
+        controller: 'redirect',
+        action: 'redirect'
+    },
     '/files/check': {
         controller: 'redirect',
         action: 'redirect'
@@ -534,10 +538,10 @@ module.exports = {
         controller: 'redirect',
         action: 'redirect'
     },
-    '/folders/:id': {
-        controller: 'redirect',
-        action: 'redirect'
-    },
+    // '/folders/:id': {
+    //     controller: 'redirect',
+    //     action: 'redirect'
+    // },
     '/folders/quota': {
         controller: 'redirect',
         action: 'redirectQuota'
@@ -594,6 +598,16 @@ module.exports = {
     '/file/publicDownload/:fsName/:pubName': {
         controller: 'subscription',
         action: 'publicDownload'
+    },
+
+    '/file/pDownload/:dtoken/:fsName/:pubName': {
+        controller: 'subscription',
+        action: 'pDownload'
+    },
+
+    '/file/pPreview/:dtoken/:id/:filename': {
+        controller: 'subscription',
+        action: 'pPreview'
     },
 
     '/theme/getCurrentTheme': {

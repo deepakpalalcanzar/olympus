@@ -1448,6 +1448,9 @@ exports.changeLinkPassword = function(req, res) {
                 id: req.param('id'),
                 link_password: req.param('link_password')
             });
+            res.json({
+                "success": true
+            });
         });
     });
 };

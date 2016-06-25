@@ -139,10 +139,10 @@ var TempAccountController = {
 			var sql, sqlFile;
 
 			if(lastSync === '0'){
-				sql = "SELECT d.* from directory d JOIN directorypermission dp ON d.id = dp.DirectoryId where (d.deleted IS NULL OR d.deleted=0) and dp.AccountId =?";
+				sql = "SELECT d.*,dp.type as accesstype from directory d JOIN directorypermission dp ON d.id = dp.DirectoryId where (d.deleted IS NULL OR d.deleted=0) and dp.AccountId =?";
 				sql = Sequelize.Utils.format([sql, accounts[0].account_id]);
 			}else{
-				sql = "SELECT d.* from directory d JOIN directorypermission dp ON d.id = dp.DirectoryId where (d.deleted IS NULL OR d.deleted=0) and dp.AccountId =? and d.createdAt>?";
+				sql = "SELECT d.*,dp.type as accesstype from directory d JOIN directorypermission dp ON d.id = dp.DirectoryId where (d.deleted IS NULL OR d.deleted=0) and dp.AccountId =? and d.createdAt>?";
 				sql = Sequelize.Utils.format([sql, accounts[0].account_id, lastSync]);
 			}
 
@@ -156,11 +156,11 @@ var TempAccountController = {
 
 				if(lastSync === '0'){
 				    // sqlFile = "SELECT f.* from file f JOIN filepermission fp ON f.id = fp.FileId where (f.deleted IS NULL OR f.deleted=0) and fp.AccountId=?";
-                    sqlFile = "SELECT f.*,fp.AccountId as fpacc, max(v.version), v.parent_id from file f LEFT JOIN version v ON f.id = v.FileId LEFT JOIN filepermission fp ON f.id = fp.FileId where (f.deleted IS NULL OR f.deleted=0) and fp.AccountId=? group by v.parent_id";
+                    sqlFile = "SELECT f.*,fp.type as accesstype,fp.AccountId as fpacc, max(v.version), v.parent_id from file f LEFT JOIN version v ON f.id = v.FileId LEFT JOIN filepermission fp ON f.id = fp.FileId where (f.deleted IS NULL OR f.deleted=0) and fp.AccountId=? group by v.parent_id";
 				    sqlFile     = Sequelize.Utils.format([sqlFile, accounts[0].account_id]);
 				}else{
 				    // sqlFile = "SELECT f.* from file f JOIN filepermission fp ON f.id = fp.FileId where (f.deleted IS NULL OR f.deleted=0) and fp.AccountId=? and f.createdAt>?";
-                    sqlFile = "SELECT f.*,fp.AccountId as fpacc, max(v.version), v.parent_id from file f LEFT JOIN version v ON f.id = v.FileId LEFT JOIN filepermission fp ON f.id = fp.FileId where (f.deleted IS NULL OR f.deleted=0) and fp.AccountId=? and f.createdAt>? group by v.parent_id";
+                    sqlFile = "SELECT f.*,fp.type as accesstype,fp.AccountId as fpacc, max(v.version), v.parent_id from file f LEFT JOIN version v ON f.id = v.FileId LEFT JOIN filepermission fp ON f.id = fp.FileId where (f.deleted IS NULL OR f.deleted=0) and fp.AccountId=? and f.createdAt>? group by v.parent_id";
 				    sqlFile = Sequelize.Utils.format([sqlFile, accounts[0].account_id, lastSync]);
 				}
 
@@ -200,10 +200,10 @@ console.log('444477777444477777444477777444477777444477777444477777444477777');
 console.log(accounts);
 console.log('444477777444477777444477777444477777444477777444477777444477777');
             if(lastSync === '0'){
-                sql = "SELECT * from deletedlist where account_id = ?";
+                sql = "SELECT * from deletedlist where account_id = ? and deleted_id IS NOT NULL";
                 sql = Sequelize.Utils.format([sql, accounts[0].account_id]);
             }else{
-                sql = "SELECT * from deletedlist where account_id = ? and createdAt > ?";
+                sql = "SELECT * from deletedlist where account_id = ? and createdAt > ? and deleted_id IS NOT NULL";
                 sql = Sequelize.Utils.format([sql, accounts[0].account_id, lastSync]);
             }
 
@@ -261,12 +261,11 @@ console.log('444477777444477777444477777444477777444477777444477777444477777');
 
     getWorkgroups: function(req, res){
 
-        var sqlcheck = "SELECT dl.deleted_id, dl.directory_id, d.name, d.id, d.deleted, d.DirectoryId FROM  `deletedlist` dl JOIN directory d ON dl.directory_id = d.id WHERE dl.deleted_id =?"
-        sqlcheck = Sequelize.Utils.format([ sqlcheck, req.params.item_id ]);
+        var sqlcheck = "SELECT dl.deleted_id, dl.directory_id, dl.account_id, d.name, d.id, d.deleted, d.DirectoryId FROM  `deletedlist` dl JOIN directory d ON dl.directory_id = d.id WHERE dl.deleted_id =? AND dl.account_id = ?"
+        sqlcheck = Sequelize.Utils.format([ sqlcheck, req.params.item_id, req.session.Account.id ]);
 
         console.log("sqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlcheck");
         console.log(sqlcheck);
-        console.log("sqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlcheck");
  
         sequelize.query(sqlcheck, null, {
             raw: true
@@ -285,7 +284,7 @@ console.log('444477777444477777444477777444477777444477777444477777444477777');
                 }
 
 
-        console.log("sqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlcheck");
+        console.log("--------------------------------------------------------------------------------");
         console.log(sql);
         console.log("sqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlcheck");
 
@@ -295,6 +294,28 @@ console.log('444477777444477777444477777444477777444477777444477777444477777');
                     res.json(deletedlist);
                 });
             }
+        });
+    },
+
+    getWorkgroupChild: function(req, res){
+
+        if( req.params.dir_type === '0' ){
+            var sql = "SELECT d.id, d.name, d.deleted from directory d JOIN directorypermission dp ON d.id = dp.DirectoryId where dp.AccountId = ? and deleted=0";
+            sql     = Sequelize.Utils.format([ sql, req.session.Account.id ]);
+        }else { 
+            var sql = "SELECT d.id, d.name, d.deleted from directory d JOIN directorypermission dp ON d.id = dp.DirectoryId where dp.AccountId = ? and d.DirectoryId=?";
+            sql     = Sequelize.Utils.format([ sql, req.session.Account.id, req.params.dir_type ]);
+        }
+
+
+    console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+    console.log(sql);
+    console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+
+        sequelize.query(sql, null, {
+            raw: true
+        }).success(function(deletedlist) {
+            res.json(deletedlist);
         });
     }
 };_.extend(exports, TempAccountController);
