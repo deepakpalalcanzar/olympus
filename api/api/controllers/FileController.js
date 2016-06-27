@@ -338,16 +338,16 @@ var FileController = {
                         }
                     });
                 }
-                fsx.exists((path.resolve(sails.config.uploadPath||'files', req.param('id'))), function(exists) {
-                    if(exists){
+                // fsx.exists((path.resolve(sails.config.uploadPath||'files', req.param('id'))), function(exists) {
+                //     if(exists){
                         // If thumbnail of file does not exists then make a call to its corresponding receiver
                         var emitter = global[ sails.config.receiver + 'Receiver' ].newThumbEmitterStream({id: req.param('id'), stream: res, thumb: '0' });
                         if(emitter){//emitter is not null(maybe null when file does not exist)
                             emitter.on('finish', function () { res.end(); });
                             emitter.pipe(res);
                         }
-                    }
-                });
+                //     }
+                // });
 
             }
 
@@ -388,7 +388,7 @@ var FileController = {
 // console.log(req);
 // console.log('LLLLLLLLLLLLLLLLLLLLLLLLHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH');
 
-        if (req.headers['user-agent'].indexOf('AdobeAIR') > -1) {
+        if (req.headers['user-agent'] && req.headers['user-agent'].indexOf('AdobeAIR') > -1) {
             var user_platform = "desktopApp";
         } else {
             var user_platform = req.headers['user-agent'];

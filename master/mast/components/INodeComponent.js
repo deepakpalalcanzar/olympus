@@ -80,7 +80,11 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 
 				// add new marshaled inode to this inodes collecton
 				data.files[0].inodeModel = new self.collection.model(marshaledData);
-				self.collection.add(data.files[0].inodeModel, { at: 0 });
+				if(self.get('num_children') == 0){//Rishabh:don't know why {at:0} is not working for the first file
+					self.collection.add(data.files[0].inodeModel);
+				}else{
+					self.collection.add(data.files[0].inodeModel, { at: 0 });
+				}
 				// Update myself (parent directory) to take into account the new num_children
 				self.set({
 				    num_children: self.get('num_children')+1

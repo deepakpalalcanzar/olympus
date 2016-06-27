@@ -102,7 +102,7 @@ var SubscriptionController = {
 	    	price	      : req.params.price,
 	    	duration      : req.params.duration,
 	    	users_limit   : req.params.users_limit,
-	    	quota    	  : req.params.quota,
+	    	quota         : (req.params.quota > 1000)?1000:req.params.quota,
 	    	is_default    : req.params.is_default,
 	    };
 

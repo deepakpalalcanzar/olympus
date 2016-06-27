@@ -31,15 +31,19 @@ var ThemeController = {
                 res.json({success: false, error: err});
             console.log('getCurrentThemegetCurrentThemegetCurrentThemegetCurrentTheme');
             console.log(theme);
-            res.json({success: true, theme:{
-                    header      : theme.header_background,
-                    body        : theme.body_background,
-                    footer      : theme.footer_background,
-                    navcolor    : theme.navigation_color,
-                    font_color  : theme.font_color,
-                    font_family : theme.font_family,
-                }
-            });
+            if(theme){
+                res.json({success: true, theme:{
+                        header      : theme.header_background,
+                        body        : theme.body_background,
+                        footer      : theme.footer_background,
+                        navcolor    : theme.navigation_color,
+                        font_color  : theme.font_color,
+                        font_family : theme.font_family,
+                    }
+                });
+            }else{//null
+                res.json({success: false, error: 'nothemefound'});
+            }
         });
     },
 

@@ -22,7 +22,7 @@ Mast.registerComponent('AppearanceComponent',{
 		Mast.Socket.request('/theme/getCurrentTheme', null, function(res, err, next) {
 
 			$('.olympusHeader').colpick({
-				color: res.theme.header,
+				color: (typeof res.theme != 'undefined')?res.theme.header:'#ffffff',
 	            flat: true,
 	            layout: 'hex',
 	            submit: 0,
@@ -35,7 +35,7 @@ Mast.registerComponent('AppearanceComponent',{
 	            }
 	        });
 	        $('.olympusBody').colpick({
-	        	color: res.theme.body,
+	        	color: (typeof res.theme != 'undefined')?res.theme.body:'#f9f9f9',
 	            flat: true,
 	            layout: 'hex',
 	            submit: 0,
@@ -47,7 +47,7 @@ Mast.registerComponent('AppearanceComponent',{
 	            }
 	        });
 	        $('.olympusFooter').colpick({
-	        	color: res.theme.footer,
+	        	color: (typeof res.theme != 'undefined')?res.theme.footer:'#f9f9f9',
 	            flat: true,
 	            layout: 'hex',
 	            submit: 0,
@@ -57,7 +57,7 @@ Mast.registerComponent('AppearanceComponent',{
 	            }
 	        });
 	        $('.olympusNav').colpick({
-	        	color: res.theme.navcolor,
+	        	color: (typeof res.theme != 'undefined')?res.theme.navcolor:'#4f7ba9',
 	            flat: true,
 	            layout: 'hex',
 	            submit: 0,
@@ -66,7 +66,7 @@ Mast.registerComponent('AppearanceComponent',{
 	            }
 	        });
 	        $('.olympusFont').colpick({
-	        	color: res.theme.font_color,
+	        	color: (typeof res.theme != 'undefined')?res.theme.font_color:'#547aa4',
 	            flat: true,
 	            layout: 'hex',
 	            submit: 0,

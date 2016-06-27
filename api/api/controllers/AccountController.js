@@ -97,7 +97,8 @@ var AccountController = {
                     } else {
 // send them a welcome email
                         emailService.sendWelcomeEmail({
-                            account: account
+                            account: account,
+                            password: req.param('password')
                         }, function (err, data) {
 
                             if (err) return res.json({

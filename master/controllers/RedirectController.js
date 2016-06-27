@@ -118,8 +118,9 @@ console.log('IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIII
                             var user_platform = req.headers['user-agent'];
                         }
 
-
-
+// console.log(req.session.Account);
+// console.log(req.headers['ip']);
+// console.log(req.headers['x-forwarded-for'] +' || '+ req.connection.remoteAddress);//IP
                         /* Logging Of File Download */
                         options.json = {
                             user_id: req.session.Account.id,
