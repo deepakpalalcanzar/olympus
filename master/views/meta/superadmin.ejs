@@ -270,39 +270,23 @@
             <%- rigging.templateLibrary %>
     </body>
 
-
-    <% if(navigation_color!=='#4f7ba9'){ %>
     <script type="text/javascript">
         $('.upload-search-template').css({
             'background': "<%=navigation_color %>"
         });
-    </script>
-    <% } %>
-
-    <% if(body_background!=='#f9f9f9'){ %>
-    <script type="text/javascript">
         $('.listusers-outlet, .log-outlet, .dropdownActions-outlet').css({'background': "<%=body_background %>"});
-    </script>
-    <% } %>
-
-    <% if(font_color!=='#547aa4'){ %>
-
-    <script type="text/javascript">
+    
         $('body').css({'color': "<%=font_color %>"});
         $('a').css({'color': "<%=font_color %>"});
         $('p, label, span').css({'color': "<%=font_color %>"});
         $('h1, h2, h3, h4, h5, h6').css({'color': "<%=font_color %>"});
-    </script>		
-    <%	} %>
 
-
-    <% if(font_family !== 'ProzimanovaRegular, Helvetica, Ariel, sans-serif'){ %>
-
-    <script type="text/javascript">
+        <% if(font_family !== 'Helvetica, Ariel, sans-serif'){ %>
         $("body, p, a, h1, h2, h3, h4, h5, h6, label, span").css({'font-family': "<%=font_family %>"});
-    </script>		
-
-    <%	} %>
+        <%	}else{ %>
+        $("body, p, a, h1, h2, h3, h4, h5, h6, label, span").css({'font-family': "ProzimanovaRegular, Arial, Helvetica, sans-serif"});
+        <%  } %>
+    </script>
 
     <script type="text/javascript">
         $(".upload-file").hide();

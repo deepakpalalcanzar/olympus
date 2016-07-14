@@ -4,7 +4,7 @@ Mast.registerComponent('DetailsSidebar',{
 
 	events: {
 		'click'                              :function(e){e.stopPropagation();},
-		 'click .activity-tab'               : 'changeToActivityTemplate',
+		'click .activity-tab'                : 'changeToActivityTemplate',
 		'click .sharing-tab'                 : 'changeToSharingTemplate',
 		'click .version-tab'                 : 'changeToVersionTemplate',
 		'click .list-version-tab'            : 'changeToVersionTemplate',
@@ -15,7 +15,7 @@ Mast.registerComponent('DetailsSidebar',{
 		'click input.public_sublinks_enabled': 'enablePublicSublinks',
 		'click input.link_password_enabled'  : 'enableLinkPassword',
 		// 'enter input.link_password'     	 : 'changeLinkPassword',//requires enter plugin
-		// 'keyup input.link_password'     	 : 'changeLinkPassword',
+		'keyup input.link_password'     	 : 'changeLinkPassword',
 		// 'click input.link_password'     	 : 'changeLinkPassword',
 		'click .addLinkPassword-button'		 : 'changeLinkPassword',
 		'gPressEscape'                       : 'dismiss',
@@ -87,6 +87,7 @@ Mast.registerComponent('DetailsSidebar',{
 
 			if (this.iNode.model.attributes.showLinkPassword()) {
 				this.$('.link-password').show();
+				this.$('input.link_password').val(this.iNode.get('link_password'));
 			} else {
 				this.$('.link-password').hide();
 			}
@@ -420,22 +421,44 @@ Mast.registerComponent('DetailsSidebar',{
 	},
 
 	changeLinkPassword : function(event) {
-		// if(event.keyCode == 13){//in case of press enter, removed after save button added
+		if( (event.type == 'click') || (event.type == 'keyup' && event.keyCode == 13) ){//in case of press enter, removed after save button added
 
 	        if($('input.link_password_enabled')[0].checked){
-				Mast.Socket.request('/file/changeLinkPassword',
-				{
-					id 			: this.get('id'),
-					password 	: $('input.link_password').val()
-				},function(res, err){
-					// alert('Password saved for the file.');
-					console.log('res4444444444444444444444444444444444444');
-					console.log(res);
-					console.log(err);
-					console.log('err4444444444444444444444444444444444444');
-				});
+	        	if($('input.link_password').val() != ''){
+					Mast.Socket.request('/file/changeLinkPassword',
+					{
+						id 			: this.get('id'),
+						password 	: $('input.link_password').val()
+					},function(res, err){
+						// alert('Password saved for the file.');
+						if(err){
+							alert(err);
+						}
+						else if(res.success == true){
+							alert('Password Updated Successfully.');
+						}else{
+							console.log('444444444444444444444');
+							console.log(err);
+							console.log(res);
+							console.log('444444444444444444444');
+							alert('Some error occurred.');
+						}
+					});
+				}else{
+					alert('Password can\'t be empty.');
+					if($('input.link_password_enabled')[0].checked){
+
+						//HACK-Actually we need to call disable password on empty but ended up with this
+						// $('input.link_password_enabled').trigger('click');
+						$("input.link_password_enabled").attr("checked",false);
+						this.enableLinkPassword();
+						//HACK-END
+
+						$('.link-password').slideUp();
+					}
+				}
 			}
-	    // }
+	    }
 	}
 
 });

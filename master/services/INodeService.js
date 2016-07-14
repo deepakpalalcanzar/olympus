@@ -354,7 +354,7 @@ exports.rename = function (req, res, cb) {
 
             if (options.model.name == "Directory") {
 
-    
+	
                 DirectoryPermission.findAll({
                     where: { DirectoryId: options.id }
                 }).success(function (directorypermission) {
@@ -449,9 +449,9 @@ exports.insertDirectoryData = function(options, cb){
 
     directoryData.forEach(function (directorylist) {
 
-    console.log("directorylistdirectorylistdirectorylistdirectorylistdirectorylistdirectorylistdirectorylist");
-    console.log(directorylist);
-    console.log("directorylistdirectorylistdirectorylistdirectorylistdirectorylistdirectorylistdirectorylist");
+	console.log("directorylistdirectorylistdirectorylistdirectorylistdirectorylistdirectorylistdirectorylist");
+	console.log(directorylist);
+	console.log("directorylistdirectorylistdirectorylistdirectorylistdirectorylistdirectorylistdirectorylist");
 
         if(checkInsert === 0){
 
@@ -459,17 +459,17 @@ exports.insertDirectoryData = function(options, cb){
                 where: { DirectoryId : directorylist.id }
             }).success(function (directorypermission) {
 
-        console.log("directorypermissiondirectorypermissiondirectorypermissiondirectorypermission");
-        console.log(directorypermission);
-        console.log("directorypermissiondirectorypermissiondirectorypermissiondirectorypermission");
+		console.log("directorypermissiondirectorypermissiondirectorypermissiondirectorypermission");
+		console.log(directorypermission);
+		console.log("directorypermissiondirectorypermissiondirectorypermissiondirectorypermission");
 
                 var sql = "Insert into deletedlist ( type, deleted_id, createdAt, updatedAt, user_id, account_id, directory_id, permission) VALUES ( '" + 2 + "', '" + directorylist.id + "', '" + datetime + "', '" + datetime + "',  '" + account_id + "', '" + directorypermission[0].AccountId + "', '"+ directorylist.DirectoryId +"', '"+directorypermission[0].type+"')";
 
                 sql = Sequelize.Utils.format([sql]);
 
-        console.log("sqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsql");
-        console.log(sql);
-        console.log("sqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsql");
+		console.log("sqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsql");
+		console.log(sql);
+		console.log("sqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsql");
                 sequelize.query(sql, null, {raw: true});
             });
 
@@ -492,9 +492,9 @@ exports.insertDirectoryData = function(options, cb){
                                 var sql = "Insert into deletedlist ( type, deleted_id, createdAt, updatedAt, user_id, account_id, directory_id, permission) VALUES ( '" + 2 + "', '" + directory[0].id + "', '" + datetime + "', '" + datetime + "',  '" + account_id + "', '" + dirper.AccountId + "', '"+ directory[0].DirectoryId +"', '"+dirper.type+"')";
                                 sql = Sequelize.Utils.format([sql]);
 
-                console.log("ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
-                console.log(sql);
-                console.log("ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+				console.log("ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+				console.log(sql);
+				console.log("ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
 
                                 sequelize.query(sql, null, {raw: true});
 
@@ -1428,7 +1428,7 @@ exports.changeLinkPassword = function(req, res) {
         // Set the public link to enabled / disabled based on the information
         // received in the request
         model.link_password = req.param('password');
-    if(model.AccountId) {
+        if(model.AccountId) {
             model.accountId = model.AccountId;
             delete model.AccountId;
         }

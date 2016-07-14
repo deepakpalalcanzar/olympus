@@ -25,7 +25,7 @@ Directory = Model.extend({
 
 	public_sublinks_enabled: {
 		type: BOOLEAN,
-		defaultValue: sails.config.publicLinksEnabledByDefault
+		defaultValue: sails.config.publicLinksEnabledByDefault?true:false
 	},
 
 	isWorkgroup: BOOLEAN,

@@ -81,10 +81,18 @@ Mast.registerComponent('AppearanceComponent',{
 	            }
 	        });
 
-	        console.log(res.theme.font_family);
-	        console.log($('select[name="fontFamily"]').length);
-	        console.log($('select[name="fontFamily"] option[value="'+res.theme.font_family+'"]').length);
-	        $('select[name="fontFamily"] option[value="'+res.theme.font_family+'"]').prop('selected', true);
+	        // console.log(res.theme.font_family);
+	        // console.log($('select[name="fontFamily"]').length);
+	        // console.log($('select[name="fontFamily"] option[value="'+res.theme.font_family+'"]').length);
+	        if((typeof res.theme != 'undefined')){
+	        	this.$('select[name="fontFamily"] option[value="'+((res.theme.font_family == "Arial, Helvetica, sans-serif")?'ProzimanovaRegular, Helvetica, Ariel, sans-serif':res.theme.font_family)+'"]').prop('selected', true);
+	        	$("body, p, a, h1, h2, h3, h4, h5, h6, label").css({ 'font-family' : res.theme.font_family });
+	        	$("body, p, a, h1, h2, h3, h4, h5, h6, label").css({ 'color' : res.theme.font_color });
+	        }else{
+	        	this.$('select[name="fontFamily"] option[value="Arial, Helvetica, sans-serif"]').prop('selected', true);
+	        	$("body, p, a, h1, h2, h3, h4, h5, h6, label").css({ 'font-family' : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif' });
+	        	$("body, p, a, h1, h2, h3, h4, h5, h6, label").css({ 'color' : '#547aa4' });
+	        }
 		});
 	}, 
 
@@ -117,34 +125,14 @@ Mast.registerComponent('AppearanceComponent',{
 	resetConfiguration: function(){
 
 		//Reset Header color
-        $("#topbar").css({'background-color': "#ffffff"});
-        $("#main-nav li a").css({
-            background: "#ffffff",
-            border: "#ffffff"
-        });
-
-        //Reset Body color
-        $("#content").css({'background-color': "#f9f9f9"});
-        $("#content > div").css({'background': "#f9f9f9"});
-        $(".wrapper").css({'background-color': "#f9f9f9"});
-        $('.listusers-outlet, .log-outlet, .dropdownActions-outlet').css({'background': "#f9f9f9"});
-        
-        //Reset Footer color
-        $("#footer").css({'background-color': "#f9f9f9"});
-        
-        //Reset nav color
-        $(".upload-search-template").css({'background': "#4f7ba9"});
-        
-        //Reset font color
-        $(".inode-name").removeAttr("style");
-        $('body').css({'color': "#547aa4"});
-        $('a').css({'color': "#547aa4"});
-        $('p, label, span').css({'color': "#547aa4"});
-        $('h1, h2, h3, h4, h5, h6').css({'color': "#547aa4"});
-        
-        //Reset font style
+		$('.olympusHeader').colpickSetColor('#ffffff');
+        $('.olympusBody').colpickSetColor('#f9f9f9');
+        $('.olympusFooter').colpickSetColor('#f9f9f9');
+        $('.olympusNav').colpickSetColor('#4f7ba9');
+        $('.olympusFont').colpickSetColor('#547aa4');
+       
+        this.$('select[name="fontFamily"] option[value="Arial, Helvetica, sans-serif"]').prop('selected', true);
         $("body, p, a, h1, h2, h3, h4, h5, h6, label").css({ 'font-family' : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif' });
-
 		//save the reset theme permanently
 		var themeChanges = {
 			header 		: '#ffffff',

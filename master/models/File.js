@@ -193,7 +193,7 @@ File = Model.extend({
                             fsName: options.fsName,
                             mimetype: options.type,
                             replaceFileId: options.replaceId || null,
-                            public_link_enabled: sails.config.publicLinksEnabledByDefault,
+                            public_link_enabled: (sails.config.publicLinksEnabledByDefault?true:false),
                             thumbnail: "1",
                         }).done(function (err, result) {
 

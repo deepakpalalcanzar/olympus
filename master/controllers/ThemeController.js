@@ -29,16 +29,15 @@ var ThemeController = {
         Theme.find({where: {account_id: req.session.Account.id}}).done(function (err, theme) {
             if (err)
                 res.json({success: false, error: err});
-            console.log('getCurrentThemegetCurrentThemegetCurrentThemegetCurrentTheme');
-            console.log(theme);
+
             if(theme){
                 res.json({success: true, theme:{
-                        header      : theme.header_background,
-                        body        : theme.body_background,
-                        footer      : theme.footer_background,
-                        navcolor    : theme.navigation_color,
-                        font_color  : theme.font_color,
-                        font_family : theme.font_family,
+                        header      : (theme.header_background).replace(/^#*/g, "#"),//remove one or more # from start and end
+                        body        : (theme.body_background).replace(/^#*/g, "#"),
+                        footer      : (theme.footer_background).replace(/^#*/g, "#"),
+                        navcolor    : (theme.navigation_color).replace(/^#*/g, "#"),
+                        font_color  : (theme.font_color).replace(/^#*/g, "#"),
+                        font_family : (theme.font_family)
                     }
                 });
             }else{//null
@@ -47,7 +46,7 @@ var ThemeController = {
         });
     },
 
-   getThemeConfiguration: function (req, res) {
+    getThemeConfiguration: function (req, res) {
 
         var sql = "SELECT account_id FROM accountdeveloper WHERE access_token=?";
         sql = Sequelize.Utils.format([sql, req.params.id]);

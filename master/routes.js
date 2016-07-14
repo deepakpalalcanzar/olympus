@@ -615,7 +615,7 @@ module.exports = {
         action: 'getCurrentTheme'
     },
 
-   '/theme/getThemeConfiguration/:id': {
+   'post /theme/getThemeConfiguration/:id': {
         controller: 'theme',
         action: 'getThemeConfiguration'
     },

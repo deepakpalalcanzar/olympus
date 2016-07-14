@@ -34,14 +34,13 @@ Mast.registerComponent('AccountSettingsComponent',{
 			}else if (newVal === 'accountAppearance') {
 				this.$('li.accountAppearance').addClass('selected');
 			}
-			
 		}
 	},
 
 	afterRender: function(){
 		// console.log(Mast.Session.Account);
 		// if(Mast.Session.Account.isAdmin && (Mast.Session.Account.isSuperAdmin === 1 || Mast.Session.Account.isSuperAdmin === null || Mast.Session.Account.isSuperAdmin===0))
-		if(Mast.Session.Account.isSuperAdmin === 1)
+		if(Mast.Session.Account.isAdmin || Mast.Session.Account.isSuperAdmin === 1)
 		{
 			$('#domainname').val($('#domaininfo').html());//Rishabh
 			// $('#mail_service').val($('#emailservice').html());
