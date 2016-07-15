@@ -1134,13 +1134,14 @@ impersonate: function(req, res){
     };
 
     File.find({where:{fsName:req.param('fsName')}}).success(function (fileModel) {
-      
-//Remove verison (Vx) from the fileName added by abhishek
-      fileName = fileModel.name;
-      fileName = fileName.substr(0, fileName.lastIndexOf("("));
         
 // If we have a file model to work with...
         if (fileModel) {
+
+            //Remove verison (Vx) from the fileName added by abhishek
+            fileName = fileModel.name;
+            fileName = fileName.substr(0, fileName.lastIndexOf("("));
+
             if((fileModel.link_password_enabled == true) && (fileModel.link_password != '') && (req.body.password != fileModel.link_password) ){
                     
                 var error = '';
@@ -1502,6 +1503,8 @@ impersonate: function(req, res){
 
             }
 
+        }else{ 
+            res.send(404);          
         }
 
       }).error(function(err){res.send(err, 500);});

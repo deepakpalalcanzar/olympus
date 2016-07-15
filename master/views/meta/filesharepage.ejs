@@ -43,60 +43,16 @@
     </head>
     <body style="color:<%= font_color %>;font-family:<%= font_family %>">
 
-        <!-- main content -->
-        <div class="wrapper portal-only">
-            <!-- top section with navigation and search -->
-            <% if(header_color !== 'undefined') { %>
-            <div id="topbar" style="background-color:<%= header_color %>">
-                <% }else{ %>
-                <div id="topbar">
-                    <% } %> 
-                    <div id="top-nav" class="clearfix">
-
-                        <!-- logo and main navigation -->
-                        <div id="main-nav">
-
-                            <% if(enterprise_logo != '' && enterprise_logo != null){ %>
-                            <a href="#" class="logo-link"><img class="main-logo" src="/images/enterprises/<%= enterprise_logo %>" alt="Olympus" /></a>
-                            <% }else{ %>
-                            <a href="#" class="logo-link"><img class="main-logo" src="/images/Branding_12.png" alt="Olympus" /></a>
-                            <%  } %>
-                        </div>
-
-                        <!-- user navigaton outlet -->
-                        <div id="user-nav-outlet" class="user-nav-outlet" <% if(email=='ANONYMOUS'){ %>style="display:none;"<% }%>>
-                            <div class="user-nav-template clearfix">
-                                <a class="user-avatar-link">
-                                    <img src="/images/39.png" class="user-avatar" />
-                                    <!-- <img src="/account/avatar" class="user-avatar" /> -->
-                                </a>
-                                <div class="name-container">
-                                    <span class="user-name">Hi,
-                                        <a class="user-name-link" href="javascript:void(0);">
-                                            <%- username %>
-                                        </a>
-                                    </span>
-                                    <!-- put this back when we are ready for it -->
-                                    <!-- <div class="dropdown-button"></div> -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-        <div style="float:right;padding:15px 37px 0px 0px;<% if(email=='ANONYMOUS'){ %>display:none;<% }%>">
-            <!-- <span class="main-nav-span">Total Space Used: total_space_used %> GB</span> -->
-        </div>
 
 
-<!-- FILE SHARE TEMPLATE -->
-        <div class="fileshare-page portal-only" style="display:inline-block; width:100%;">
-            <!-- <a href="/"><img src="/images/logo_loginScreen.png"/></a> -->
-            <% if( mimetype == "text/html" || mimetype == "image/jpeg" || mimetype == "video/mp4" || mimetype == "video/3gpp" || mimetype == "audio/mp3" || mimetype == "audio/mpeg" || mimetype == "application/pdf" ){ %> 
-                <div class="" style="width: 70% ! important; overflow-y: auto;overflow-x: hidden; float: left; display: inline-block;">
-                    <div id="testLoad"></div>
-                </div>
-            <% } %>
+
+    <!-- <div id="testLoad" style="width:auto;height:auto;max-width:100%;max-height:100%;"></div> -->
+    <!-- FILE SHARE TEMPLATE -->
+    <div class="fileshare-page portal-only" style="display:inline-block; width:100%;">
+        <!-- <a href="/"><img src="/images/logo_loginScreen.png"/></a> -->
+        <% if( (["text/html", "image/jpeg", "image/png", "video/mp4", "video/3gpp", "audio/mp3", "audio/mpeg", "video/ogg", "video/webm", "video/x-ms-wmv", "video/quicktime", "application/pdf"]).indexOf(mimetype) != -1 ){ %>
+                <div id="testLoad" style="width:auto;height:auto;max-width:100%;max-height:100%;"></div>
+        <% }else{ %>
             <div class="file-sharepage-outlet" fsname="<%- fsName %>" fileid="<%- fileid %>" filename="<%- name %>" dtoken="<%- dtoken %>" style="width: <% if( mimetype == "text/html" || mimetype == "image/jpeg" || mimetype == "video/mp4" || mimetype == "video/3gpp" || mimetype == "audio/mp3" || mimetype == "audio/mpeg" || mimetype == "application/pdf" ){ %>26<% }else{ %>96<% } %>% ! important; padding: 2%; overflow: auto; float: right; display: inline-block;">
 
                 <div class="file-sharepage-template" style="display: block; text-align: center;">
@@ -108,48 +64,12 @@
 
                 <!-- <iframe src="https://localhost/file/open/<%- fileid %>/<%- name %>"></iframe> -->
             </div>
-        </div>
+        <% } %>
+    </div>
 <!-- FILE SHARE TEMPLATE END -->
 
 
 
-                <div id="content" style="background-color:<%= body_background %>"></div>
-                <div class="push"></div>
-
-            </div>
-
-            <!-- footer -->
-            <div id="footer" class="portal-only clearfix" style="background-color:<%= footer_background %>">
-
-                <!-- Domain Information -->
-                <div id="domaininfo" style="display:none;"><%= sails.config.host %></div>
-                <div id="emailservice" style="display:none;"><%= sails.config.mailService %></div>
-                <div id="mandrillkey" style="display:none;"><%= sails.config.mandrillApiKey %></div>
-                <div id="smtphost" style="display:none;"><%= (typeof sails.config.smtpDetails != 'undefined')?sails.config.smtpDetails.host:'' %></div>
-                <div id="smtpport" style="display:none;"><%= (typeof sails.config.smtpDetails != 'undefined')?sails.config.smtpDetails.port:'' %></div>
-                <div id="smtpuser" style="display:none;"><%= (typeof sails.config.smtpDetails != 'undefined')?sails.config.smtpDetails.user:'' %></div>
-                <div id="smtppass" style="display:none;"><%= (typeof sails.config.smtpDetails != 'undefined')?sails.config.smtpDetails.pass:'' %></div>
-                <div id="trashopt" style="display:none;"><%= (typeof sails.config.trash_setting != 'undefined')?sails.config.trash_setting:'' %></div>
-                <div id="trashoptdays" style="display:none;"><%= (typeof sails.config.trash_setting_days != 'undefined')?sails.config.trash_setting_days:'' %></div>
-                <script type="text/javascript">
-                    /*console.log(sails_config.express);
-                    console.log(sails_config.session);
-                     sails_config.express = null %>
-                     sails_config.session = null %>
-                    sailsConfig = JSON.parse(JSON.parse(JSON.stringify($('<div/>').html(" (JSON.stringify(sails_config))%>").text())));*/
-                    // console.log(sailsConfig);
-                </script>
-
-                <div id="copyright-info">
-                    <img id="footer-logo" class="footer-logo-class" src="/images/Branding_12.png" />
-                    <span class="copyright-info"><%= sails.config.organization.copyright %></span>
-                </div>
-                <ul id="terms-policies" class="clearfix">
-                    <li><a target="_blank" href="<%= sails.config.organization.links.termsOfUse %>">Terms of Use</a>|</li>
-                    <li><a target="_blank" href="<%= sails.config.organization.links.privacyPolicy %>">Privacy Policy</a>|</li>
-                    <li class="last-item"><a target="_blank" href="<%= sails.config.organization.links.help %>">Help</a></li>
-                </ul>
-            </div>
 
             <script type="text/javascript">
 
@@ -158,12 +78,25 @@
                 <% if(mimetype == "text/html"){ %>
                     $("#testLoad").load(file_url);
                 <% }else if(mimetype == "image/jpeg" || mimetype == "image/png" ){ %>
-                    $("#testLoad").html('<img src="'+file_url+'" style="width:100%;" />');
-                <% }else if(mimetype == "video/mp4" || mimetype == "video/3gpp" || mimetype == "audio/mp3" || mimetype == "audio/mpeg" ){ %>
-                    $("#testLoad").html('<video width="100%" controls="controls"><source src="'+file_url+'" type="video/mp4" />Bummer, your  browser does not support the video tag.</video>');
+                    $("#testLoad").html('<img src="'+file_url+'" />');
+                <% }else if(mimetype == "video/mp4" || mimetype == "video/3gpp" || mimetype == "audio/mp3" || mimetype == "audio/mpeg" || mimetype == "video/ogg" || mimetype == "video/webm" || mimetype == "video/x-ms-wmv" || mimetype == "video/quicktime" ){ %>
+                    $("#testLoad").html('<video  style="max-width:100%;min-width:100%;" controls="controls"><source src="'+file_url+'" type="video/mp4" />Bummer, your  browser does not support the video tag.</video>');
                 <% }else if(mimetype == "application/pdf"){ %>
-                    $("#testLoad").html('<object data="'+file_url+'" type="application/pdf" width="100%" height="100%"><p>Alternative text - include link <a href="'+file_url+'">to the PDF!</a></p></object>');
+                    $("#testLoad").html('<object  style="max-width:100%;min-width:100%;" data="'+file_url+'" type="application/pdf" ><p>Alternative text - include link <a href="'+file_url+'">to the PDF!</a></p></object>');
                 <% } %>
+
+                  jQuery(window).resize(function(){
+                    resize_window();
+                  });
+
+                  resize_window();
+
+                var wh;
+                function resize_window(){
+                    wh = jQuery(window).height();
+                    jQuery('#testLoad video,#testLoad object').height( wh-5 );
+                }
+
                 Mast.raise({
                     // Before router is instantiated and routes are run
                     beforeRouteFn: function() {
