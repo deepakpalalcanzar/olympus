@@ -50,6 +50,39 @@ exports.rename = function (req, res, cb) {
                     if (retrievedFile === null) {
                         model.directoryId = model.DirectoryId;
                         model.rename(req.param('name'), function (err, model) {
+
+                            mimetype = model.mimetype;
+        
+                            if(mimetype != null){
+                                
+                                var fileType = mimetype.split("/");
+                                if(fileType[0] === 'image'){
+
+                                    var imgPath = '/var/www/html/olympus/api/files/'+model.fsName; 
+                                    var thumbImgPath = '/var/www/html/olympus/master/public/images/thumbnail/'+req.param('name')
+                    
+                                    fsx.exists(imgPath , function(exists) { 
+
+                                        console.log(exists);
+                                        if(exists){
+
+                                            fsx.exists(thumbImgPath , function(exists) { 
+                                                if(exists){
+                                                    fsx.unlink(imgPath);
+                                                }else{
+                                                    easyimg.resize({
+                                                        src: "/var/www/html/olympus/api/files/"+model.fsName,
+                                                        // dst: '/var/www/html/olympus/master/public/images/thumbnail/'+req.param('name')+"."+fileType[1], width: 150, height: 150
+                                                        dst: '/var/www/html/olympus/master/public/images/thumbnail/'+req.param('name'), width: 150, height: 150
+                                                    }).then(
+                                                    );
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            }
+                            
                             var apiObj = APIService.File.mini(model);
                             SocketService.broadcast('ITEM_RENAME', subscribers, apiObj);
                             if (!cb) {
