@@ -33,7 +33,7 @@ Mast.registerComponent('ThumbnailComponent', {
     init: function() {
 
         var self = this;
-		Mast.on('UPLOAD_PROGRESS', function(data) {
+		/*Mast.on('UPLOAD_PROGRESS', function(data) {
 	        if (data.files[0].name == self.model.get('name') && self.model.get('parent') && self.model.get('parent').id == data.parentId) {
 	            self.$('.information-stats').hide();
 	            self.$('.progress-bar').show();
@@ -78,7 +78,7 @@ Mast.registerComponent('ThumbnailComponent', {
 				self.afterRender();
 			}
 
-		});
+		});*/
 
     },
 
@@ -292,6 +292,7 @@ Mast.registerComponent('ThumbnailComponent', {
 			}
 			if (event.source.id == Olympus.ui.fileSystem.pwd.get('id')) {
 				console.log("Update button state!", event.source.id, Olympus.ui.fileSystem.pwd.get('id'));
+				console.log('updateButtonState66');
 				Olympus.ui.actionBar.updateButtonState();
 			}
 		},
@@ -357,13 +358,13 @@ Mast.registerComponent('ThumbnailComponent', {
 			}
 		},
 
-        '~UPLOAD_PROGRESS': function(event) {
+        /*'~UPLOAD_PROGRESS': function(event) {
             if (event.source.filename == this.model.get('name') && this.model.get('parent') && this.model.get('parent').id == event.source.id && this.$('.progress-bar').is(':visible')) {
                 progress = event.source.percent + '%';
                 this.$('.bar').css('width', progress);
                 this.$('.progress .number').html(progress);
             }
-        }
+        }*/
 
 
 	},
@@ -388,13 +389,13 @@ Mast.registerComponent('ThumbnailComponent', {
 
 		var self = this;
 		// this.$el.disableSelection();
-        if (this.model.get('uploading')) {
+        /*if (this.model.get('uploading')) {
             this.$el.addClass('uploading');
             this.$('.information-stats').hide();
             this.$('.progress-bar').show();
             this.$('.bar').css('width', 0);
-            this.$('.progress .number').html('0%');        
-        }
+            this.$('.progress .number').html('0%');
+        }*/
 		this.setPadding(this.get('depth'));
 		
 		// Make the inode draggable

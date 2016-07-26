@@ -47,33 +47,46 @@ var AuthController = {
 					var today = new Date();
 					var code = AuthenticationService.randString(15);
 
-					AccountDeveloper.create({
+					async.auto({
+		                getAdapter: function(cb) {
 
-						api_key 		: req.param('api_key'),
-						account_id 		: account.id,
-						code 			: code,
-						access_token 	: AuthenticationService.randString(15),
-						refresh_token 	: AuthenticationService.randString(15),
-						code_expires 	: new Date(today.getTime() + 1000 * 30), // code expires in 30 seconds
-						access_expires 	: new Date(today.getTime() + 1000 * 60 * 60 * 30), // access token expires in one(three) hour
-						// access_expires 	: new Date(today.getTime() + 1000 * 60 * 5), // access token expires in 2 minutes
-						refresh_expires : new Date(today.getTime() + 1000 * 60 * 60 * 24 * 14) // refresh token expires in 14 days
+		                    UploadPaths.find({where:{isActive:1}}).done(cb);
+		                },
+		                showForm: ['getAdapter', function(cb, up) {
+		                    // console.log('asyncResultsasyncResultsasyncResultsasyncResultsasyncResults');
+		                    console.log(up.getAdapter);
+		                    adapter = up.getAdapter.type;
+		                    // options.uploadpath = up.getAdapter.path;
 
-					}).done(function done (err, accountDev) {
-						// if(err) res.send(500);
-						if(err) return res.json({
-							error: "invalid_request",
-							error_description: "Some Error Occurred."
-						});
-						res.json({
-							access_token: accountDev.access_token,
-							expires_in: 108000,//120,//10800,//3600
-							token_type: "bearer",
-							refresh_token: accountDev.refresh_token,
-							is_enterprise: account.is_enterprise,
-							adaptor: sails.config.fileAdapter.adapter
-						});
-					});
+		                    AccountDeveloper.create({
+
+								api_key 		: req.param('api_key'),
+								account_id 		: account.id,
+								code 			: code,
+								access_token 	: AuthenticationService.randString(15),
+								refresh_token 	: AuthenticationService.randString(15),
+								code_expires 	: new Date(today.getTime() + 1000 * 30), // code expires in 30 seconds
+								access_expires 	: new Date(today.getTime() + 1000 * 60 * 60 * 30), // access token expires in one(three) hour
+								// access_expires 	: new Date(today.getTime() + 1000 * 60 * 5), // access token expires in 2 minutes
+								refresh_expires : new Date(today.getTime() + 1000 * 60 * 60 * 24 * 14) // refresh token expires in 14 days
+
+							}).done(function done (err, accountDev) {
+								// if(err) res.send(500);
+								if(err) return res.json({
+									error: "invalid_request",
+									error_description: "Some Error Occurred."
+								});
+								res.json({
+									access_token: accountDev.access_token,
+									expires_in: 108000,//120,//10800,//3600
+									token_type: "bearer",
+									refresh_token: accountDev.refresh_token,
+									is_enterprise: account.is_enterprise,
+									adaptor: adapter,//sails.config.fileAdapter.adapter
+								});
+							});
+		                }]
+		            });
 				}else{
 					// return res.send(500);
 					return res.json({

@@ -7,7 +7,7 @@ Mast.registerComponent('DropdownActionRow',{
     },
 
     afterCreate: function() {
-        this.$el.disableSelection();
+        //this.$el.disableSelection();
     },
 
 

@@ -256,6 +256,7 @@ var Version= function (model){
 		id: model.id,
 		is_reply_comment: false,
 		message: model.name,
+		mimetype: model.mimetype,
 		item: {
 			id: model.version,
 			type: (model.directoryId) ? 'directory' : 'file'

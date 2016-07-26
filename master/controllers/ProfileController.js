@@ -276,7 +276,7 @@ var ProfileController = {
 
     checkUsersLimit: function (req, rest) {
 
-        var user_id = (typeof req.session === "undefined") ? req.id : req.session.Account.id;
+        var user_id = (typeof req.session.Account === "undefined") ? req.id : req.session.Account.id;
         var sql = "SELECT users_limit FROM transactiondetails WHERE is_deleted!=1 AND account_id=? ";
         sql = Sequelize.Utils.format([sql, user_id]);
         sequelize.query(sql, null, {

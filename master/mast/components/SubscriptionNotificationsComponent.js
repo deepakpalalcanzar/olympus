@@ -18,7 +18,7 @@ Mast.registerComponent('SubscriptionNotifications', {
 		Mast.Socket.request('/subscription/subscribedPlan', account, function(res, err){
 			if(res){
 				console.log(res);
-    			var duration_from;
+				var duration_from;
 				var duration_to;
 				if(res[0].duration == '1200'){//Unlimited
 					duration_from 	= '';
@@ -27,6 +27,7 @@ Mast.registerComponent('SubscriptionNotifications', {
 					duration_from 	= res[0].acc_created;
 					duration_to 	= res[0].expiryDate;
 				}
+
 
 				var data = {
 

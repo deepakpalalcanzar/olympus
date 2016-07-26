@@ -290,7 +290,7 @@ module.exports = {
   // Get a dir's workgroup
 workgroup: function(id, cb) {
 
-    if(id === null) {
+    if(id === null || (typeof id == 'undefined') ) {
         cb(null);
         return;
     }

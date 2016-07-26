@@ -59,7 +59,7 @@ Mast.registerComponent('DialogComponent', {
 	},
 
 	events: {
-		'click': function(e) {e.stopPropagation();},
+		// 'click': function(e) {e.stopPropagation();},
 		'click .cancel'       : 'closeDialog',
 		'click .submit'       : 'submit'
 	},

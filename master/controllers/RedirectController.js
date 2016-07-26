@@ -39,10 +39,10 @@ var RedirectController = {
 options.uri = 'http://localhost:1337/files/content';
 options.name = req.param('name');
 options.parent_id = req.param('parent_id');
-console.log(req.params);
+
 console.log('|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||-|||');
-console.log(req);
-console.log('headersheadersheadersheadersheadersheaders');
+console.log(req.params);
+// console.log('headersheadersheadersheadersheadersheaders');
 console.log(headers);
 console.log('TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT-TTT');
 console.log(options);
@@ -64,6 +64,19 @@ console.log('IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIII
                         req.unpipe();
                         proxyReq.end();
                         console.log(data.error);
+                        if(data.error == 'FileExist'){
+                            console.log('redirecttrystartredirecttrystart');
+                            var response = {
+                                // total_count: data.filedata.length,
+                                entries: data.filedata
+                            };
+                            console.log(response);
+                            return res.json(data, 500);
+                            console.log('redirecttryendredirecttryend');
+                            return res.json(response);
+                        }else if(data.error == 'adapter_error'){
+                            return res.json(data, 500);
+                        }
                         //req.end();//[TypeError: Object #<IncomingMessage> has no method 'end']
                         console.log('RETURNING DATA 777 ERROR RETURNING DATA ERROR RETURNING DATA ERROR ');
                         // return res.json({error: 'unknown error555', type: 'error'},500);
@@ -163,16 +176,17 @@ console.log('IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIII
                     // set content-type header
                     res.setHeader('Content-Type', fileModel.mimetype);
                     
-                 if (sails.config.fileAdapter.adapter == "s3") {
-                        var fsNamethumbanil = fileModel.fsName;
-                    } else {
-                        if (fileModel.thumbnail == "1") {
-                            var fsNamethumbanil = "thumbnail-" + fileModel.fsName;
-                        } else {
-                            var fsNamethumbanil = fileModel.fsName;
-                        }
-                    }
-                    
+                 // if (sails.config.fileAdapter.adapter == "s3") {
+                 //        var fsNamethumbanil = fileModel.fsName;
+                 //    } else {
+                 //        if (fileModel.thumbnail == "1") {
+                 //            var fsNamethumbanil = "thumbnail-" + fileModel.fsName;
+                 //        } else {
+                 //            var fsNamethumbanil = fileModel.fsName;
+                 //        }
+                 //    }
+
+                 var fsNamethumbanil = fileModel.fsName;                    
                     
                     options.uri = "http://localhost:1337/file/thumbnaildownload/" + fsNamethumbanil + "?_session=" + JSON.stringify(_session);
                     var proxyReq = request.get(options).pipe(res);
@@ -252,7 +266,7 @@ console.log('IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIII
                 replaceFileId: req.param('replaceFileId'),
                 account_id: req.session.Account.id, // AF
                 thumbnail: "1",
-
+                md5checksum: body.md5checksum
             }, function (err, resultSet) {
 
                 if (err)
@@ -262,7 +276,6 @@ console.log('IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIII
                     entries: resultSet
                 };
                 res.json(response);
-
 
             });
         }

@@ -33,9 +33,9 @@
 
 					<div class="radio">
 				  		<label>
-							<input type="radio" name="protocal" value="443" style="padding-left:10px;padding-right:10px;"> HTTPS
+							<input <?php echo (isset($_SESSION['protocal']) && $_SESSION['protocal'] == '443')?'checked':''; ?> type="radio" name="protocal" value="443" style="padding-left:10px;padding-right:10px;"> HTTPS
 							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-							<input type="radio" name="protocal" value="80" style="padding-left:10px;padding-right:10px"> HTTP
+							<input <?php echo (isset($_SESSION['protocal']) && $_SESSION['protocal'] == '80')?'checked':''; ?> type="radio" name="protocal" value="80" style="padding-left:10px;padding-right:10px"> HTTP
 					  	</label>
 					</div>
 
@@ -43,39 +43,39 @@
 						Application Server Hostname: 
 						<img src="img/help.png" tabindex="0" data-toggle="popover" data-html="true" data-trigger="hover" data-original-title="Application Server Hostname" data-content="IP address of hostname of the server hosting the Olympus application." style="cursor:pointer;">
 					</label>
-					<input type="text" class="login-input-field server-hostname" placeholder="Please enter your application server hostname" name="server_hostname">
+					<input type="text" class="login-input-field server-hostname" placeholder="Please enter your application server hostname" name="server_hostname" value="<?php echo isset($_SESSION['serverName'])?$_SESSION['serverName']:''; ?>">
 					
 
 					<label for="email">
 						Application Server Domain Name: 
 						<img src="img/help.png" tabindex="0" data-toggle="popover" data-html="true" data-trigger="hover" data-original-title="Application Server Hostname" data-content="Domain name of hostname of the server hosting the Olympus application." style="cursor:pointer;">
 					</label>
-					<input type="text" class="login-input-field server-hostname" placeholder="Please enter your application server domain name" name="domain_hostname">
+					<input type="text" class="login-input-field domain-hostname" placeholder="Please enter your application server domain name" name="domain_hostname" value="<?php echo isset($_SESSION['domain_name'])?$_SESSION['domain_name']:''; ?>">
 
 
-					<label for="database_name">
+					<label for="database_hostname">
 						Database Server Hostname: 
 						<img src="img/help.png" tabindex="0" data-toggle="popover" data-html="true" data-trigger="hover" data-original-title="Database Server Hostname" data-content="This is the hostname or IP address of the server hosting the database. It can be the same as the application server hostname or different if your database is running on a separate server." style="cursor:pointer;">
 					</label>
-					<input type="text" class="login-input-field database-name" placeholder="Please enter your database server hostname" name="database_hostname">
+					<input type="text" class="login-input-field database-hostname" placeholder="Please enter your database server hostname" name="database_hostname" value="<?php echo isset($_SESSION['hostname'])?$_SESSION['hostname']:''; ?>">
 					
-					<label for="database_hostname">
+					<label for="database_name">
 						Database Name: 
 						<img src="img/help.png" tabindex="0" data-toggle="popover" data-html="true" data-trigger="hover" data-original-title="Database Name" data-content="This is the name for the Olympus database. Use olympus  as default." style="cursor:pointer;">
 					</label>
-					<input type="text" class="login-input-field database-hostname" placeholder="Please enter your database name" name="database_name">
+					<input type="text" class="login-input-field database-name" placeholder="Please enter your database name" name="database_name" value="<?php echo isset($_SESSION['databaseName'])?$_SESSION['databaseName']:''; ?>">
 					
 					<label for="username">
 						Database Username: 
 						<img src="img/help.png" tabindex="0" data-toggle="popover" data-html="true" data-trigger="hover" data-original-title="Database Username" data-content="Username to create and access the application database." style="cursor:pointer;">
 					</label>
-					<input type="text" class="login-input-field username" placeholder="Please neter your username" name="username">
+					<input type="text" class="login-input-field username" placeholder="Please neter your username" name="username" value="<?php echo isset($_SESSION['username'])?$_SESSION['username']:''; ?>">
 
 					<label for="username">
 						Database Password: 
 						<img src="img/help.png" tabindex="0" data-toggle="popover" data-html="true" data-trigger="hover" data-original-title="Database Password" data-content="Password used to create and access the application database." style="cursor:pointer;">
 					</label>
-					<input type="password" class="login-input-field password" placeholder="Confirm Password" name="password">
+					<input type="password" class="login-input-field password" placeholder="Confirm Password" name="password" value="<?php echo isset($_SESSION['password'])?$_SESSION['password']:''; ?>">
 					
 				</form>
 	<!-- footer section -->
@@ -100,61 +100,64 @@
 			$('.signin-button').click(function(){
 
 				var serverHostname 	= $("input[name='server_hostname']").val();
+				var domainHostname 	= $("input[name='domain_hostname']").val();
 				var databaseName  	= $("input[name='database_name']").val();
 				var databaseHostname= $("input[name='database_hostname']").val();
 				var username 		= $("input[name='username']").val();
+				var no_error		= true;
 
-				if(serverHostname.trim() === ''){
+				//revert all fields to have no red border
+				$( ".login-input-field" ).css({'border': '1px solid #d7dbdc'});
 
+				if (!$('input[name=protocal]:checked').val() ) {
+
+					no_error = false;
+					$( ".message" ).html( " <p style='color:red;text-align:center;'> No Protocol Selected. </p> " );
+				}
+
+				if(no_error && serverHostname.trim() === ''){
+
+					no_error = false;
 					$( ".server-hostname" ).css({'border': '1px solid red'});
-					$( ".database-name" ).css({'border': '1px solid #d7dbdc'});
-					$( ".database-hostname" ).css({'border': '1px solid #d7dbdc'});
-					$( ".username" ).css({'border': '1px solid #d7dbdc'});
-					$( ".password" ).css({'border': '1px solid #d7dbdc'});
+					$( ".message" ).html( " <p style='color:red;text-align:center;'> Please enter server hostname. </p> " );					
+				}
 
+				if(no_error && domainHostname.trim() === ''){
+
+					no_error = false;
+					$( ".domain-hostname" ).css({'border': '1px solid red'});
 					$( ".message" ).html( " <p style='color:red;text-align:center;'> Please enter server hostname. </p> " );
-					return false;					
 				}
 
-				if(databaseName.trim() === ''){
+				if(no_error && databaseHostname.trim() === ''){
 
-					$( ".server-hostname" ).css({'border': '1px solid #d7dbdc'});
-					$( ".database-name" ).css({'border': '1px solid red'});
-					$( ".database-hostname" ).css({'border': '1px solid #d7dbdc'});
-					$( ".username" ).css({'border': '1px solid #d7dbdc'});
-					$( ".password" ).css({'border': '1px solid #d7dbdc'});
-
-
-					$( ".message" ).html( " <p style='color:red;text-align:center;'> Please enter name of your database. </p> " );
-					return false;					
-				}
-
-				if(databaseHostname.trim() === ''){
-
-					$( ".server-hostname" ).css({'border': '1px solid #d7dbdc'});
-					$( ".database-name" ).css({'border': '1px solid #d7dbdc'});
+					no_error = false;
 					$( ".database-hostname" ).css({'border': '1px solid red'});
-					$( ".username" ).css({'border': '1px solid #d7dbdc'});
-					$( ".password" ).css({'border': '1px solid #d7dbdc'});
-
-
 					$( ".message" ).html( " <p style='color:red;text-align:center;'> Please enter database hostname. </p> " );
-					return false;					
 				}
 
-				if(username.trim() === ''){
+				if(no_error && databaseName.trim() === ''){
 
-					$( ".server-hostname" ).css({'border': '1px solid #d7dbdc'});
-					$( ".database-name" ).css({'border': '1px solid #d7dbdc'});
-					$( ".database-hostname" ).css({'border': '1px solid #d7dbdc'});
+					no_error = false;
+					$( ".database-name" ).css({'border': '1px solid red'});
+					$( ".message" ).html( " <p style='color:red;text-align:center;'> Please enter name of your database. </p> " );
+				}
+
+				if(no_error && username.trim() === ''){
+
+					no_error = false;
 					$( ".username" ).css({'border': '1px solid red'});
-					$( ".password" ).css({'border': '1px solid #d7dbdc'});
-
-
 					$( ".message" ).html( " <p style='color:red;text-align:center;'> Please enter your database username </p> " );
-					return false;					
 				}
-				$("#databaseForm").submit();
+
+				if(no_error){
+					$("#databaseForm").submit();
+				}else{
+					$('html,body').animate({
+				        scrollTop: $(".message").offset().top
+				    },'fast');
+					return false;
+				}
 			});
 		});
 		

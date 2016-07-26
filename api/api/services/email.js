@@ -45,6 +45,16 @@ if(sails.config.mailService == 'mandrill'){
                   secure: true
                 }));
 
+                // verify connection configuration
+                transport.verify(function(error, success) {
+                   if (error) {
+                        console.log(error);
+                        console.log('smtptransportErrorsmtptransportErrorsmtptransportError');
+                   } else {
+                        // console.log('Server is ready to take our messages');
+                   }
+                });
+
             var email = {
                 from: 'info@olympus.io',
                 to: account.email,
@@ -59,7 +69,8 @@ if(sails.config.mailService == 'mandrill'){
               } else {
                 console.log(responseStatus.message);
               }
-            },cb);
+              cb();
+            });
 }
 
 };
@@ -107,22 +118,33 @@ if(sails.config.mailService == 'mandrill'){
                   secure: true
                 }));
 
-            var email = {
-                from: 'info@balderdash.co',
-                to: account.email,
-                subject: "Welcome to Olympus",
-                text: "Dear " + account.name + ",\n\nWelcome to the Olympus file sharing system!  In order to log in to Olympus, please verify your account by <a href='" + protocol + host + "/auth/verify?code=" + account.verificationCode + "'>clicking here</a>",
-                html: "Dear " + account.name + ",<br/><br/>Welcome to the Olympus file sharing system!  In order to log in to Olympus, please verify your account by <a href='" + protocol + host + "/auth/verify?code=" + account.verificationCode + "'>clicking here</a>"
-            };
+                  // verify connection configuration
+                  transport.verify(function(error, success) {
+                     if (error) {
+                          console.log(error);
+                          console.log('smtptransportErrorsmtptransportErrorsmtptransportError');
+                     } else {
+                          // console.log('Server is ready to take our messages');
+                     }
+                  });
 
-            transport.sendMail(email, function(err, responseStatus) {
-              if (err) {
-                console.log(err);
-              } else {
-                console.log(responseStatus.message);
-              }
-            },cb);
-}
+              var email = {
+                  from: 'info@balderdash.co',
+                  to: account.email,
+                  subject: "Welcome to Olympus",
+                  text: "Dear " + account.name + ",\n\nWelcome to the Olympus file sharing system!  In order to log in to Olympus, please verify your account by <a href='" + protocol + host + "/auth/verify?code=" + account.verificationCode + "'>clicking here</a>",
+                  html: "Dear " + account.name + ",<br/><br/>Welcome to the Olympus file sharing system!  In order to log in to Olympus, please verify your account by <a href='" + protocol + host + "/auth/verify?code=" + account.verificationCode + "'>clicking here</a>"
+              };
+
+              transport.sendMail(email, function(err, responseStatus) {
+                if (err) {
+                  console.log(err);
+                } else {
+                  console.log(responseStatus);
+                }
+                cb();
+              });
+  }
 };
 
 exports.sendInviteEmail = function (options, cb) {
@@ -185,6 +207,16 @@ if(sails.config.mailService == 'mandrill'){
                   secure: true
                 }));
 
+                // verify connection configuration
+                transport.verify(function(error, success) {
+                   if (error) {
+                        console.log(error);
+                        console.log('smtptransportErrorsmtptransportErrorsmtptransportError');
+                   } else {
+                        // console.log('Server is ready to take our messages');
+                   }
+                });
+
             var email = {
                 from: 'info@olympus.io',
                 to: account.email,
@@ -199,6 +231,7 @@ if(sails.config.mailService == 'mandrill'){
               } else {
                 console.log(responseStatus.message);
               }
-            },cb);
+              cb();
+            });
 }
 };

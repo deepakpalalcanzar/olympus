@@ -51,6 +51,8 @@ Mast.registerComponent('UserNavigationComponent', {
 	// create global dropdown instance and place it at the drop down button
 	// on the user navigation component
 	showDropdown: function(e) {
+
+		$('.inode-template.selected').removeClass('selected');
 		Olympus.util.dropdownHelper.showDropdownAt(this.$(".dropdown-button"),-126,25,e,this,this.get('dropdownItems'));
 	},
 

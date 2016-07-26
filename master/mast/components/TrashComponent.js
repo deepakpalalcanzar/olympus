@@ -282,6 +282,7 @@ Mast.components.TrashComponent = Mast.Tree.extend({
 			}
 			if (event.source.id == Olympus.ui.fileSystem.pwd.get('id')) {
 				console.log("Update button state!", event.source.id, Olympus.ui.fileSystem.pwd.get('id'));
+				console.log('updateButtonState99');
 				Olympus.ui.actionBar.updateButtonState();
 			}
 		},
@@ -347,13 +348,13 @@ Mast.components.TrashComponent = Mast.Tree.extend({
 			}
 		},
 
-        '~UPLOAD_PROGRESS': function(event) {
+        /*'~UPLOAD_PROGRESS': function(event) {
             if (event.source.filename == this.model.get('name') && this.model.get('parent') && this.model.get('parent').id == event.source.id && this.$('.progress-bar').is(':visible')) {
                 progress = event.source.percent + '%';
                 this.$('.bar').css('width', progress);
                 this.$('.progress .number').html(progress);
             }
-        }
+        }*/
 
 
 	},
@@ -378,13 +379,13 @@ Mast.components.TrashComponent = Mast.Tree.extend({
 
 		var self = this;
 		// this.$el.disableSelection();
-        if (this.model.get('uploading')) {
+        /*if (this.model.get('uploading')) {
             this.$el.addClass('uploading');
             this.$('.information-stats').hide();
             this.$('.progress-bar').show();
             this.$('.bar').css('width', 0);
             this.$('.progress .number').html('0%');        
-        }
+        }*/
         
 		this.setPadding(this.get('depth'));
 		

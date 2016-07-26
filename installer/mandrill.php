@@ -90,56 +90,64 @@
 
 			$('.signin-button').click(function(){
 
+				var no_error = true;
+
+				//revert all fields to have no red border
+				$( ".login-input-field" ).css({'border': '1px solid #d7dbdc'});
+
 				if( $('input[name="mail_service"]:checked').val() == 'mandrill' ){
 					var mandrillKey = $("input[name='mandrill_key']").val();
 					if(mandrillKey.trim() === ''){
 						$( ".mandrill-key" ).css({'border': '1px solid red'});
 						$( ".message" ).html( " <p style='color:red;text-align:center;'> Please enter your mandrill api key. </p> " );
-						return false;					
+						no_error = false;
 					}
 				}else{
 					var smtpHost = $("input[name='smtp_host']").val();
 					var smtpPort = $("input[name='smtp_port']").val();
 					var smtpUser = $("input[name='smtp_user']").val();
 					var smtpPass = $("input[name='smtp_pass']").val();
-					var error = false;
 
 					if(smtpHost.trim() === ''){
 						$( ".smtp-host" ).css({'border': '1px solid red'});
 						$( ".message" ).html( " <p style='color:red;text-align:center;'> Please enter Smtp details. </p> " );
-						error = true;
+						no_error = false;
 					}
-					if( ( smtpPort.trim() === '') || isNaN( smtpPort.trim() ) ){
+					if(no_error && ( smtpPort.trim() === '') || isNaN( smtpPort.trim() ) ){
 						$( ".smtp-port" ).css({'border': '1px solid red'});
-						if(!error){
+						if(no_error){
 							if(smtpPort.trim() === ''){
 								$( ".message" ).html( " <p style='color:red;text-align:center;'> Please enter Smtp details. </p> " );
 							}else if(isNaN( smtpPort.trim() )) {
 								$( ".message" ).html( " <p style='color:red;text-align:center;'> SMTP port should be a number. </p> " );
 							}
-							error = true;
+							no_error = false;
 						}
 					}
-					if(smtpUser.trim() === ''){
+					if(no_error && smtpUser.trim() === ''){
 						$( ".smtp-user" ).css({'border': '1px solid red'});
-						if(!error){
+						if(no_error){
 							$( ".message" ).html( " <p style='color:red;text-align:center;'> Please enter Smtp details. </p> " );
-							error = true;
+							no_error = false;
 						}
 					}
-					if(smtpPass.trim() === ''){
+					if(no_error && smtpPass.trim() === ''){
 						$( ".smtp-pass" ).css({'border': '1px solid red'});
-						if(!error){
+						if(no_error){
 							$( ".message" ).html( " <p style='color:red;text-align:center;'> Please enter Smtp details. </p> " );
-							error = true;
+							no_error = false;
 						}
-					}
-
-					if(error){
-						return false;
 					}
 				}
-				$("#mandrillForm").submit();
+
+				if(no_error){
+					$("#mandrillForm").submit();
+				}else{
+					$('html,body').animate({
+				        scrollTop: $(".message").offset().top
+				    },'fast');
+					return false;
+				}
 			});
 		});
 

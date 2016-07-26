@@ -19,9 +19,9 @@ module.exports = {
 		sails.log('Downloading '+options.id+' using from S3.');
 
 		var client = knox.createClient({
-			key: sails.config.adapters.s3.apiKey, 
-			secret: sails.config.adapters.s3.apiSecret,
-			bucket: sails.config.adapters.s3.bucket
+			key: options.receiverinfo.accessKeyId,//sails.config.adapters.s3.apiKey, 
+			secret: options.receiverinfo.secretAccessKey,//sails.config.adapters.s3.apiSecret,
+			bucket: options.receiverinfo.bucket//sails.config.adapters.s3.bucket
 		});
 
 		var Duplex = require('stream').Duplex;
@@ -69,10 +69,20 @@ module.exports = {
 
 		sails.log('Downloading '+options.id+' using from S3.');
 
+		/*File.update({
+            fsName: options.id
+        }, {
+            md5checksum         : 'checkingup'
+        }).exec(function(err, file){
+        	console.log('S3ReceiverS3ReceiverS3ReceiverS3Receiver');
+        	console.log(file)
+        	console.log('S3ReceiverS3ReceiverS3ReceiverS3Receiver');
+        });*/
+
 		var client = knox.createClient({
-			key: sails.config.adapters.s3.apiKey, 
-			secret: sails.config.adapters.s3.apiSecret,
-			bucket: sails.config.adapters.s3.bucket
+			key: options.receiverinfo.accessKeyId,//sails.config.adapters.s3.apiKey, 
+			secret: options.receiverinfo.secretAccessKey,//sails.config.adapters.s3.apiSecret,
+			bucket: options.receiverinfo.bucket//sails.config.adapters.s3.bucket
 		});
 
 		var Duplex = require('stream').Duplex;
@@ -96,37 +106,100 @@ module.exports = {
 
             if (options.stream) {
 
-		var fileWrite = s3res.pipe(fsx.createWriteStream("/var/www/html/olympus/api/files/"+options.id));
-		fileWrite.on('finish', function(){
-		easyimg.resize({
-			src: '/var/www/html/olympus/api/files/'+options.id, 
-			dst: '/var/www/html/olympus/api/files/thumbnail-'+options.id, width: 150, height: 150
-		}).then(
-			
-			function(image) {
-				easyimg.resize({
-                                	src: '/var/www/html/olympus/api/files/'+options.id, 
-                                	dst: '/var/www/html/olympus/master/public/images/thumbnail-'+options.id, width: 150, height: 150
-                            	}).then(
-					function(image){
-                            			fsx.unlink("/var/www/html/olympus/api/files/"+options.id);
-                            		},
-	                            	function (err) {
-	                            		console.log(err);
-	                            	}
-	                            );
-	                        },
-	                        function (err) {
-	                            console.log(err);
-	                        }
-	                    );
-	                    return s3res.pipe(options.stream);
-			});
+				var fileWrite = s3res.pipe(fsx.createWriteStream(('files/')+""+options.id));
+				fileWrite.on('finish', function(){
+
+					easyimg.resize({
+						src: ('files/')+''+options.id, 
+						dst: ('files/')+'thumbnail-'+options.id, width: 150, height: 150
+					}).then(
+						
+						function(image) {
+							easyimg.resize({
+			                	src: ('files/')+''+options.id, 
+			                	dst: '/var/www/html/olympus/master/public/images/thumbnail-'+options.id, width: 150, height: 150
+			            	}).then(function(image){
+			            			fsx.unlink(('files/')+""+options.id);
+			            		},
+			                	function (err) {
+			                		console.log(err);
+			                	}
+			                );
+			            },
+			            function (err) {
+			                console.log(err);
+			            }
+			        );
+		            return s3res.pipe(options.stream);
+				});
 	        }
-		s3res.pipe(emitter__);
-	});
-	return emitter__;
-},
+			s3res.pipe(emitter__);
+		});
+		return emitter__;
+	},
+
+	/**
+		* Build a mock readable stream that emits incoming files.
+		* (used for file downloads)
+		* @return {Stream.Readable}
+	*/
+
+	md5EmitterStream: function md5EmitterStream (options,cb) {
+
+		var crypto = require('crypto');
+		sails.log('Downloading '+options.id+' using from S3.');
+
+		var client = knox.createClient({
+			key: options.receiverinfo.accessKeyId,//sails.config.adapters.s3.apiKey, 
+			secret: options.receiverinfo.secretAccessKey,//sails.config.adapters.s3.apiSecret,
+			bucket: options.receiverinfo.bucket//sails.config.adapters.s3.bucket
+		});
+
+		client.getFile(options.id, function( err, s3res ) {
+
+			if (err) {
+				cb(null, 'ENOENT');
+			}
+
+            if (options.stream) {
+
+				var fileWrite = s3res.pipe(fsx.createWriteStream(('files/')+""+options.id));
+				fileWrite.on('finish', function(){
+
+					var hash = crypto.createHash('md5');
+                    console.log('cbfirstcbfirstcbfirstcbfirstcbfirstcbfirst');
+                    // console.log(cb);
+                    var s = fsx.createReadStream(('/var/www/html/olympus/api/files/' || 'files/')+'' + options.id);
+                    s.on('readable', function () {
+                        console.log('firstFileReadable');
+                        var chunk;
+                        while (null !== (chunk = s.read())) {
+                            hash.update(chunk);
+                        }
+                    }).on('end', function () {
+                        console.log('firstFileEnd');
+                        // console.log(cb);
+                        // encryptedData["first"] = hash.digest('hex');
+                        fileHash = hash.digest('hex')
+
+                        //Unlink the file now
+						fsx.unlink(('files/')+""+options.id);
+
+                    	if(typeof cb != 'undefined')
+				        	cb(null, fileHash);
+
+                    }).on('error', function(e){
+                        console.log('firstFileError');
+                        console.log(e);
+                        cb(null, 'ENOENT');
+                    });
+		            // return s3res.pipe(options.stream);
+				});
+	        }
+			// s3res.pipe(emitter__);
+		});
+		// return emitter__;
+	},
 
 	/**
 	 * Build a mock writable stream that handles incoming files.
@@ -144,9 +217,9 @@ module.exports = {
 		var Writable = require('stream').Writable;
 		var receiver__ = Writable({objectMode: true});
 		var client = knox.createClient({
-			key: sails.config.adapters.s3.apiKey, 
-			secret: sails.config.adapters.s3.apiSecret,
-			bucket: sails.config.adapters.s3.bucket
+			key: options.receiverinfo.accessKeyId,//sails.config.adapters.s3.apiKey, 
+			secret: options.receiverinfo.secretAccessKey,//sails.config.adapters.s3.apiSecret,
+			bucket: options.receiverinfo.bucket,//sails.config.adapters.s3.bucket
 		});
 
 		receiver__._write = function onFile (__newFile, encoding, next) {

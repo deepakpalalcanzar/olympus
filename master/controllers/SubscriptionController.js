@@ -1134,7 +1134,7 @@ impersonate: function(req, res){
     };
 
     File.find({where:{fsName:req.param('fsName')}}).success(function (fileModel) {
-        
+
 // If we have a file model to work with...
         if (fileModel) {
 
@@ -1503,8 +1503,8 @@ impersonate: function(req, res){
 
             }
 
-        }else{ 
-            res.send(404);          
+        }else{
+            res.send(404);
         }
 
       }).error(function(err){res.send(err, 500);});
@@ -1537,34 +1537,54 @@ impersonate: function(req, res){
 
         // If we have a file model to work with...
         if (fileModel) {
-            //Remove verison (Vx) from the fileName added by abhishek
-            fileName = fileModel.name;
-            fileName = fileName.substr(0, fileName.lastIndexOf("("));
 
-            var md5 = 'p';
-            if((fileModel.link_password_enabled == true) && (fileModel.link_password != '')){
-                var crypto = require('crypto');
-                md5 = crypto
-                        .createHash('md5')
-                        .update(fileModel.link_password)
-                        .digest('base64');
-            }
-            
-            if((fileModel.link_password_enabled != true) || (fileModel.link_password == '') || (md5 == req.param('dtoken'))){
-              // If the "open" param isn't set, force the file to download
-                if (!req.url.match(/^\/file\/open\//)) {
-                    res.setHeader('Content-disposition', 'attachment; filename=\"' + fileName.trim() + '\"');
+            async.auto({
+                // getAdapter: function(cb) {
+
+                //     UploadPaths.find({where:{id:fileModel.uploadPathId}}).done(cb);
+                // },
+                // showForm: ['getAdapter', function(cb, up) {
+                    // console.log('asyncResultsasyncResultsasyncResultsasyncResultsasyncResults');
+                    // console.log(up.getAdapter.path);
+                    // request.uuploadpath = up.getAdapter.path;
+                    // options.uploadpath = up.getAdapter.path;
+                // }]
+                showForm: function(cb) {
+
+                    //Remove verison (Vx) from the fileName added by abhishek
+                    fileName = fileModel.name;
+                    fileName = fileName.substr(0, fileName.lastIndexOf("("));
+
+                    var md5 = 'p';
+                    if((fileModel.link_password_enabled == true) && (fileModel.link_password != '')){
+                        var crypto = require('crypto');
+                        md5 = crypto
+                                .createHash('md5')
+                                .update(fileModel.link_password)
+                                .digest('base64');
+                    }
+                    
+                    if((fileModel.link_password_enabled != true) || (fileModel.link_password == '') || (md5 == req.param('dtoken'))){
+                      // If the "open" param isn't set, force the file to download
+                        if (!req.url.match(/^\/file\/open\//)) {
+                            res.setHeader('Content-disposition', 'attachment; filename=\"' + fileName.trim() + '\"');
+                        }
+
+                      // set content-type header
+
+                        res.setHeader('Content-Type', fileModel.mimetype);
+                        options.uri = "http://localhost:1337/file/download/"+fileModel.fsName;
+                        var proxyReq = request.post(options).pipe(res);
+                    }else{
+                        res.send(403);
+                        // return res.json({error: 'File can not be accessed.', type: 'error'});
+                    }
+                    cb();
                 }
 
-              // set content-type header
+            });
 
-                res.setHeader('Content-Type', fileModel.mimetype);
-                options.uri = "http://localhost:1337/file/download/"+fileModel.fsName;
-                var proxyReq = request.get(options).pipe(res);
-            }else{
-                res.send(403);
-                // return res.json({error: 'File can not be accessed.', type: 'error'});
-            }
+            
         }else{
             res.send(403);//Forbidden
         }

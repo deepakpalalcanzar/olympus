@@ -11,6 +11,7 @@ module.exports = {
         name: 'string',
         size: 'integer',
         fsName: 'text',
+        md5checksum: 'text',
 
         deleted: {
             type: 'boolean',
@@ -42,7 +43,7 @@ module.exports = {
 
         DirectoryId: 'integer',
         thumbnail: 'integer',
-
+        uploadPathId: 'integer',
 
 /****************************************************
 * Instance Methods

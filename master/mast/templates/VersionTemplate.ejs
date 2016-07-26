@@ -21,9 +21,13 @@
 
 <div class="versionRow-template comment-attire">
 
-	<div class="comment-user-avatar" id="avatar_{{ id }}">
-		<a class="user-avatar-link" href="#">
-			<img src="/images/icon_unknown@2x.png" class="user-avatar" class="user-avatar" />
+	<div class="version-thumb-container" id="avatar_{{ id }}" style="float: left;margin-right: 4px;width: 58px; height:44px;">
+		<a class="version-thumb-link" href="#">
+		{%  if ( mimetype.match(/image/g) ) { %}
+			<img class="version-thumb" style="height:auto; margin: auto; max-height:100%; max-width:100%; width:auto;" src="/file/thumbnail/{{ id }}/{{ message }}" />
+		{% }else{ %}
+			<img class="version-thumb" style="height:auto; margin: auto; max-height:100%; max-width:100%; width:auto;" src="/images/icon_unknown@2x.png">
+		{% } %}
 		</a> 
 	</div>
 

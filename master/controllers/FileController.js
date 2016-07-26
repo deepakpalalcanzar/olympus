@@ -591,7 +591,7 @@ var FileController = {
         });
     },
     getVersionComment: function (req, res) {
-        var sql = "SELECT c.id,c.payload,c.CreatedAt AS comm_date,a.name FROM comment c INNER JOIN account a " +
+        var sql = "SELECT c.id,c.payload,c.CreatedAt AS comm_date,a.name,a.avatar_image FROM comment c INNER JOIN account a " +
                 "ON c.AccountId=a.id WHERE c.FileId=?";
         sql = Sequelize.Utils.format([sql, req.params.id]);
         sequelize.query(sql, null, {

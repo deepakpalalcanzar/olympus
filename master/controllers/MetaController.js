@@ -82,12 +82,12 @@ var MetaController = {
 									enterprise_logo : enterpriseLogo,
 									avatar 			: account.avatar_image,
 									setting 		: hideSetting,
-									header_color 	 : theme.header_background 	!== '' ? theme.header_background : '#FFFFFF',
-									navigation_color : theme.navigation_color 	!== '' ? theme.navigation_color : '#4f7ba9',
-									body_background  : theme.body_background 	!== '' ? theme.body_background : '#f9f9f9',
-									footer_background: theme.footer_background 	!== '' ? theme.footer_background : '#f9f9f9',
+									header_color 	 : theme.header_background 	!== '' ? (theme.header_background).replace(/^#*/g, "#") : '#FFFFFF',
+									navigation_color : theme.navigation_color 	!== '' ? (theme.navigation_color).replace(/^#*/g, "#") : '#4f7ba9',
+									body_background  : theme.body_background 	!== '' ? (theme.body_background).replace(/^#*/g, "#") : '#f9f9f9',
+									footer_background: theme.footer_background 	!== '' ? (theme.footer_background).replace(/^#*/g, "#") : '#f9f9f9',
 									font_family 	 : theme.font_family 		!== '' ? theme.font_family : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif',
-									font_color 	 	 : theme.font_color 		!== '' ? theme.font_color : '#547aa4',
+									font_color 	 	 : theme.font_color 		!== '' ? (theme.font_color).replace(/^#*/g, "#") : '#547aa4',
 	 								total_space_used : dir[0].total_space_used
 								});
 							}
@@ -126,12 +126,12 @@ var MetaController = {
 									enterprise_logo  : enterpriseLogo,
 									avatar 			 : account.avatar_image,
 									setting 		 : hideSetting, 
-									header_color 	 : theme.header_background 	!== '' ? theme.header_background : '#FFFFFF',
-									navigation_color : theme.navigation_color 	!== '' ? theme.navigation_color : '#4f7ba9',
-									body_background  : theme.body_background 	!== '' ? theme.body_background : '#f9f9f9',
-									footer_background: theme.footer_background 	!== '' ? theme.footer_background : '#f9f9f9',
+									header_color 	 : theme.header_background 	!== '' ? (theme.header_background).replace(/^#*/g, "#") : '#FFFFFF',
+									navigation_color : theme.navigation_color 	!== '' ? (theme.navigation_color).replace(/^#*/g, "#") : '#4f7ba9',
+									body_background  : theme.body_background 	!== '' ? (theme.body_background).replace(/^#*/g, "#") : '#f9f9f9',
+									footer_background: theme.footer_background 	!== '' ? (theme.footer_background).replace(/^#*/g, "#") : '#f9f9f9',
 									font_family 	 : theme.font_family 		!== '' ? theme.font_family : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif',
-									font_color 	 	 : theme.font_color 		!== '' ? theme.font_color : '#547aa4'
+									font_color 	 	 : theme.font_color 		!== '' ? (theme.font_color).replace(/^#*/g, "#") : '#547aa4'
 								});
 							}
 						});
@@ -179,12 +179,12 @@ var MetaController = {
 										avatar 			 : account.avatar_image,
 										profile			 : adminuser,
 										setting 		 : hideSetting, 
-										header_color 	 : theme.header_background 	!== '' ? theme.header_background : '#FFFFFF',
-										navigation_color : theme.navigation_color 	!== '' ? theme.navigation_color : '#4f7ba9',
-										body_background  : theme.body_background 	!== '' ? theme.body_background : '#f9f9f9',
-										footer_background: theme.footer_background 	!== '' ? theme.footer_background : '#f9f9f9',
+										header_color 	 : theme.header_background 	!== '' ? (theme.header_background).replace(/^#*/g, "#") : '#FFFFFF',
+										navigation_color : theme.navigation_color 	!== '' ? (theme.navigation_color).replace(/^#*/g, "#") : '#4f7ba9',
+										body_background  : theme.body_background 	!== '' ? (theme.body_background).replace(/^#*/g, "#") : '#f9f9f9',
+										footer_background: theme.footer_background 	!== '' ? (theme.footer_background).replace(/^#*/g, "#") : '#f9f9f9',
 										font_family 	 : theme.font_family 		!== '' ? theme.font_family : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif',
-										font_color 	 	 : theme.font_color 		!== '' ? theme.font_color : '#547aa4'
+										font_color 	 	 : theme.font_color 		!== '' ? (theme.font_color).replace(/^#*/g, "#") : '#547aa4'
 									});
 								}
 							});

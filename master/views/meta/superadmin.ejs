@@ -192,6 +192,7 @@
 
                 <!-- Domain Information -->
                 <div id="domaininfo" style="display:none;"><%= sails.config.host %></div>
+                <div id="adapter_type" style="display:none;"> sails.config.fileAdapter.adapter</div>
                 <div id="emailservice" style="display:none;"><%= sails.config.mailService %></div>
                 <div id="mandrillkey" style="display:none;"><%= sails.config.mandrillApiKey %></div>
                 <div id="smtphost" style="display:none;"><%= (typeof sails.config.smtpDetails != 'undefined')?sails.config.smtpDetails.host:'' %></div>

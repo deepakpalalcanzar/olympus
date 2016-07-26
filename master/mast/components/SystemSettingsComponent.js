@@ -5,16 +5,34 @@ Mast.components.SystemSettingsComponent  = Mast.Component.extend({
 	events: {
 		// 'click .setting-save-button' : 'saveCompanyInfo',
 		'click #saveDomain' : 'saveDomainInfo',
+		'click #saveAdapter': 'saveAdapterInfo',
 		'click #saveEmail'  : 'saveEmailInfo',
 		'click #saveTrashSetting' : 'saveTrashSetting',
+		'change input[name="adapter_type"]' : 'toggleAdapter',
 		// 'click input[name="mail_service"]' : 'toggleMailService',
 		'change input[name="mail_service"]' : 'toggleMailService',
 		'change input[name="trash_setting"]' : 'toggleTrashSetting',
+		'change input[name="disk_path"]' : 'checkdiskpath',
 	},
 
 	// saveCompanyInfo : function(){
 	// 	alert("aaaaaaaaaaaaaaa");
 	// }
+
+	checkdiskpath: function(){
+		console.log($('input[name="disk_adapter_path"]').val());
+	},
+
+	toggleAdapter : function(){
+		console.log($('input[name="adapter_type"]:checked').val());
+		if( $('input[name="adapter_type"]:checked').val() == 'Disk' ){
+			$('#Disk_adapter_details').show();
+			$('#S3_adapter_details').hide();
+		}else{
+			$('#Disk_adapter_details').hide();
+			$('#S3_adapter_details').show();
+		}
+	},
 
 	toggleMailService : function(){
 		console.log($('input[name="mail_service"]:checked').val());
@@ -47,7 +65,7 @@ Mast.components.SystemSettingsComponent  = Mast.Component.extend({
 			if(confirm('Olympus configuration will be mapped to given domain. You will be required to restart forevers(app.js and olympus.js) on your server after the process. Are you sure you want to continue?')){
 				Mast.Socket.request('/account/changeDomainname', {
 					'formaction'	: 'save_domain_info',
-					'newdomain' : $('#domainname').val(),
+					'newdomain' 	: $('#domainname').val(),
 				} , function(res, err){
 					// console.log(res);
 					if((typeof res.status != 'undefined') && res.status == 'ok'){
@@ -63,6 +81,61 @@ Mast.components.SystemSettingsComponent  = Mast.Component.extend({
 	    }else{
 	    	alert('Domain should be like www.domain.com or \'localhost\'.');
 	    }
+	},
+
+	saveAdapterInfo : function(){
+
+		var adapter_type = $('input[name="adapter_type"]:checked').val();
+		var diskpath = $("input[name='disk_path']").val();
+		var S3access = $("input[name='S3_access']").val();
+		var S3secret = $("input[name='S3_secret']").val();
+		var S3bucket = $("input[name='S3_bucket']").val();
+		var S3region = $("input[name='S3_region']").val();
+
+		if( adapter_type == 'Disk' ){
+
+			if( diskpath.trim() == ''){
+				alert('Please enter valid disk path.');
+				return false;
+			}
+
+		}else if( adapter_type == 'S3' ){
+
+			if( S3access.trim() == '' || S3secret.trim() == '' || S3bucket.trim() == '' || S3region.trim() == '' ){
+				alert('Please enter S3 details.');
+				return false;
+			}
+
+			// if(isNaN( smtpPort.trim())){
+			// 	alert('Please enter Smtp details.');
+			// 	return false;
+			// }
+
+		}else{
+			alert('please select adapter type.');
+			return false;
+		}
+		console.log('proceeding...');
+
+			Mast.Socket.request('/account/changeAdapterSetting', {
+				'formaction'	: 'save_adapter_info',
+				'adapter_type': adapter_type,
+				'diskpath': diskpath,
+				'S3access': S3access,
+				'S3secret': S3secret,
+				'S3bucket': S3bucket,
+				'S3region': S3region,
+			} , function(res, err){
+				// console.log(res);
+				if((typeof res.status != 'undefined') && res.status == 'ok'){
+					$('#adapter_type').html($('#adapter_type').val());
+					alert('Adapter Settings Updated.')
+				}else if(typeof res.error != 'undefined'){
+					alert(res.error);
+				}else{
+					alert('Some error occurred.');
+				}
+	        });
 	},
 
 	saveEmailInfo : function(){

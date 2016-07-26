@@ -67,7 +67,12 @@ Mast.registerComponent('Uploader',{
 					alert('Sorry, your quota for that directory has been reached.');
 				} else if(msg == 'FileExist'){
 					//fsx.unlink('/var/www/olympus/api/files/'+file.extra.fsName);
-					//alert('File you are trying to uplaod already exists.');
+					$('.uploading').remove();
+					$('.information-stats').show();
+            		$('.progress').hide();
+            		alert('File you are trying to uplaod already exists.');
+				}else if(msg == 'adapter_error'){
+					alert('Adapter settings are not correct, please contact administrator.');
 				}else{
 					alert('Sorry, an error occurred. Please try again.');
 				}
@@ -121,7 +126,6 @@ Mast.registerComponent('Uploader',{
 	
 	// Called when upload is complete
 	afterUpload: function (e,data) {
-		
 		Mast._uploadingFiles--;
 		
 		if (Mast._uploadingFiles <= 0) {

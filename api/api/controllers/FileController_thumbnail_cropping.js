@@ -281,7 +281,7 @@ var FileController = {
     },
     
     thumbnaildownload: function (req, res) {
-        var thumb   = path.resolve(sails.config.uploadPath||'files', 'thumbnail-'+req.param('id'));
+        var thumb   = path.resolve('/var/www/html/olympus/api/files/'||'files', 'thumbnail-'+req.param('id'));
         var emitter = global[sails.config.receiver + 'Receiver'].newEmitterStream({id: req.param('id'), stream: res, thumb:'0'});
         emitter.on('finish', function () {
             res.end();
@@ -331,13 +331,13 @@ var FileController = {
                         if (type[0] == "image") {
 
                             easyimg.resize({
-                                src: '/var/www/html/olympus/olympus1/api/files/' + file[0].extra.fsName, 
-                                dst: '/var/www/html/olympus/olympus1/api/files/thumbnail-' + file[0].extra.fsName, width: 150, height: 150
+                                src: '/var/www/html/olympus/api/files/' + file[0].extra.fsName, 
+                                dst: '/var/www/html/olympus/api/files/thumbnail-' + file[0].extra.fsName, width: 150, height: 150
                             }).then(
                             
                                 function(image) {
                                     console.log('Resized and cropped: ' + image.width + ' x ' + image.height);
-                                    fsx.unlink('/var/www/html/olympus/olympus1/api/files/' + file[0].extra.fsName);
+                                    fsx.unlink('/var/www/html/olympus/api/files/' + file[0].extra.fsName);
                                 },
 
                                 function (err) {
@@ -347,7 +347,7 @@ var FileController = {
 
                             // Save Image to master brach and make that thumbnail available to mobile data
                             easyimg.resize({ 
-                                src: '/var/www/html/olympus/olympus1/api/files/' + file[0].extra.fsName, 
+                                src: '/var/www/html/olympus/api/files/' + file[0].extra.fsName, 
                                 dst: '/var/www/html/olympus/master/public/images/thumbnail/' + file[0].extra.fsName, width: 150, height: 150
                             }).then(
                                 function(image) {
@@ -361,7 +361,7 @@ var FileController = {
 
 
                         }else{
-                            fsx.unlink('/var/www/html/olympus/olympus1/api/files/' + file[0].extra.fsName);
+                            fsx.unlink('/var/www/html/olympus/api/files/' + file[0].extra.fsName);
                         }
 
                     }, cb());
@@ -408,7 +408,7 @@ var FileController = {
                                                 {first: fileData.fsName, second: file.extra.fsName}, function (rmErr) {
                                                 var parsedResponse = JSON.parse(rmErr)
                                                 if (parsedResponse.first === parsedResponse.second) {
-                                                    fsx.unlink('/var/www/html/olympus/olympus1/api/files/' + file.extra.fsName);
+                                                    fsx.unlink('/var/www/html/olympus/api/files/' + file.extra.fsName);
                                                     return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
                                                 }
                                             });
@@ -443,7 +443,7 @@ var FileController = {
                                                         {first: latestFile.fsName, second: file.extra.fsName}, function (rmErr) {
                                                     var parsedResponse = JSON.parse(rmErr)
                                                     if (parsedResponse.first === parsedResponse.second) {
-                                                        fsx.unlink('/var/www/html/olympus/olympus1/api/files/' + file.extra.fsName);
+                                                        fsx.unlink('/var/www/html/olympus/api/files/' + file.extra.fsName);
                                                         return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
                                                     }
                                                 });
@@ -489,7 +489,7 @@ var FileController = {
 var streamAdaptor = {
     firstFile: function (options, cb) {
         var hash = crypto.createHash('md5');
-        var s = fsx.createReadStream('/var/www/html/olympus/olympus1/api/files/' + options.first);
+        var s = fsx.createReadStream('/var/www/html/olympus/api/files/' + options.first);
         s.on('readable', function () {
             var chunk;
             while (null !== (chunk = s.read())) {
@@ -500,7 +500,7 @@ var streamAdaptor = {
         });
 
         var hs = crypto.createHash('md5');
-        var nw = fsx.ReadStream('/var/www/html/olympus/olympus1/api/files/' + options.second);
+        var nw = fsx.ReadStream('/var/www/html/olympus/api/files/' + options.second);
         nw.on('readable', function () {
             var chunk;
             while (null !== (chunk = nw.read())) {

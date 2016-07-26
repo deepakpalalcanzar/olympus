@@ -8,15 +8,15 @@ module.exports = {
 	newEmitterStream: function newEmitterStream (options) {
 
 		sails.log('Downloading '+options.id+' using from Disk.');
-		//return blobAdapter.read({id: path.resolve(sails.config.uploadPath||'files', options.id)});
+		//return blobAdapter.read({id: path.resolve(options.receiverinfo.path||'files', options.id)});
 
 		if(options.thumb === '1'){
 			return blobAdapter.read({
-				id: path.resolve(sails.config.uploadPath||'files', 'thumbnail-'+options.id),
+				id: path.resolve(options.receiverinfo.path||'files', 'thumbnail-'+options.id),
 			});
 		}else{
 			return blobAdapter.read({
-				id: path.resolve(sails.config.uploadPath||'files', options.id),
+				id: path.resolve(options.receiverinfo.path||'files', options.id),
 			});
 		}
 
@@ -29,12 +29,12 @@ module.exports = {
 		// sails.log(options);
 		if(options.thumb === '0'){ // thumb 0 means thumbnail does not exists in system
 		  	return blobAdapter.generateThumb({
-				id : path.resolve(sails.config.uploadPath||'files', options.id), 
+				id : path.resolve(options.receiverinfo.path||'files', options.id), 
 				filename : options.id
 			});
 		}else if(options.thumb === '1'){ // If we already have thumbnail
 			return blobAdapter.read({ 
-				id : path.resolve(sails.config.uploadPath||'files', 'thumbnail-'+options.id),
+				id : path.resolve(options.receiverinfo.path||'files', 'thumbnail-'+options.id),
 				filename : options.id
 			});
 		}
@@ -66,7 +66,7 @@ module.exports = {
 
 			log(('Receiver: Received file `'+__newFile.filename+'` from an Upstream.').grey);
 
-			var outs = blobAdapter.touch({id: path.resolve(sails.config.uploadPath||'files', fsName)});
+			var outs = blobAdapter.touch({id: path.resolve(options.receiverinfo.path||'/var/www/html/olympus/api/files/', fsName)});
 			outs.written = 0;
 
 			__newFile.on('readable', readFromStream);
@@ -88,6 +88,7 @@ module.exports = {
 
 						outs.written += writeChunk.length;
 						if (__newFile.byteCount) {
+							console.log('DiskReceiver '+(outs.written / __newFile.byteCount * 100 | 0));
 							receiver__.emit('progress', {
 								name: __newFile.filename,
 								written: outs.written,
@@ -111,7 +112,7 @@ module.exports = {
 				log(('Receiver: Error writing `'+__newFile.filename+'`:: '+ require('util').inspect(err)+' :: Cancelling upload and cleaning up already-written bytes...').red);
 				
 				// Garbage-collects the already-written bytes for this file.
-				blobAdapter.rm({id: path.resolve(sails.config.uploadPath||'files', fsName)}, function (rmErr) {
+				blobAdapter.rm({id: path.resolve(options.receiverinfo.path||'/var/www/html/olympus/api/files/', fsName)}, function (rmErr) {
 					// If the file could not be garbage-collected, concatenate a final error
 					// before calling `next()`
 					if (rmErr) return next([err].concat([rmErr]));
@@ -136,19 +137,19 @@ module.exports = {
 
 		sails.log(options);
 
-		fsx.unlink('/var/www/html/olympus/api/files/' + options.id, function(err){
+		fsx.unlink((options.receiverinfo.path||'files/')+'' + options.id, function(err){
           // if (err) console.log(err);
         });
-        fsx.unlink('/var/www/html/olympus/api/files/thumbnail-' + options.id, function(err){
+        fsx.unlink((options.receiverinfo.path||'files/')+'thumbnail-' + options.id, function(err){
           // if (err) console.log(err);
         });
-        fsx.unlink('/var/www/html/olympus/api/files/thumbnail-thumbnail-' + options.id, function(err){
+        fsx.unlink((options.receiverinfo.path||'files/')+'thumbnail-thumbnail-' + options.id, function(err){
           // if (err) console.log(err);
         });
-        // fs.unlink('/var/www/html/olympus/master/public/images/thumbnail/'+fileModel.name, function(err){
+        // fs.unlink(sails.config.linuxPath+'master/public/images/thumbnail/'+fileModel.name, function(err){
           // if (err) console.log(err);
         // });
-        fsx.unlink('/var/www/html/olympus/master/public/images/thumbnail-thumbnail-'+options.id, function(err){
+        fsx.unlink(sails.config.linuxPath+'master/public/images/thumbnail-thumbnail-'+options.id, function(err){
           // if (err) console.log(err);
         });
 

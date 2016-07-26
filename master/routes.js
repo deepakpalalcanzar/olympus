@@ -447,6 +447,10 @@ module.exports = {
         action: 'public'
     },
     // Authentication mappings
+    '/login/:email/:prometheus': {
+        controller: 'auth',
+        action: 'login'
+    },
     '/login': {
         controller: 'auth',
         action: 'login'

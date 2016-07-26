@@ -33,29 +33,33 @@ class Configuration {
 
 	function saveDataBase($postData){
 
-		if(!empty($postData)){
-			// connect to the mysql database server.
+		error_reporting(0);//important otherwise mysql connect error will be displayed in the page itself
 
+		if(!empty($postData)){
+
+			$_SESSION['databaseName'] = $postData['database_name'];
+			$_SESSION['hostname'] 	  = $postData['database_hostname'];
+			$_SESSION['domain_name']  = $postData['domain_hostname'];
+			$_SESSION['username'] 	  = $postData['username'];
+			$_SESSION['password']	  = $postData['password'];
+			$_SESSION['serverName']	  = $postData['server_hostname'];
+			$_SESSION['protocal']	  = $postData['protocal'];
+
+			// connect to the mysql database server.
 			$con = mysql_connect($postData['database_hostname'], $postData['username'], $postData["password"]);
 			// Check connection
 
 			if($con === FALSE){
-				 $_SESSION['msg'] = "Unable to connect database.";
-				 header("Location:index.php");
+
+				$_SESSION['msg'] = "Unable to connect database.";
+				header("Location:index.php");
 			}else{
 
 		    	// If we couldn't, then it either doesn't exist, or we can't see it.
 				$query="CREATE DATABASE IF NOT EXISTS $postData[database_name]";
 
 				if (mysql_query($query)) {
-					
-					$_SESSION['databaseName'] = $postData['database_name'];
-					$_SESSION['hostname'] 	  = $postData['database_hostname'];
-					$_SESSION['domain_name']  = $postData['domain_hostname'];
-					$_SESSION['username'] 	  = $postData['username'];
-					$_SESSION['password']	  = $postData['password'];
-					$_SESSION['serverName']	  = $postData['server_hostname'];
-					$_SESSION['protocal']	  = $postData['protocal'];
+
 					$url = "http://".$_SESSION['serverName'] . $this->url_base . "/mandrill.php";
 					echo '<script>window.location.href="'.$url.'"</script>';
 
@@ -63,7 +67,6 @@ class Configuration {
 					$_SESSION['msg'] = "Error in creating database.";
 					$url = "http://".$_SESSION['serverName'] . $this->url_base . "/index.php";
 					//echo '<script>window.location.href="'.$url.'"</script>';
-
 				}
   			}
 		}
@@ -129,7 +132,7 @@ class Configuration {
 		$fileAdapter 			= '';
 		$localConfigFileAdaptor = '';
 		$_SESSION['error']		= false;
-		switch($selectedStorage['storage']){
+		/*switch($selectedStorage['storage']){
 
 			case 'S3' :
 
@@ -173,7 +176,6 @@ class Configuration {
 												password: '' \n
 											} \n
 										},\n ";
-
 
 				$localConfigFileAdaptor = "exports.fileAdapter = { \n // Choose a file adapter for uploads / downloads \n
 	 								adapter: 's3', \n
@@ -312,13 +314,77 @@ class Configuration {
 
 
 				break;
+		}*/
+
+
+
+		//Save Adapter Settings
+		$con = mysql_connect($_SESSION['hostname'], $_SESSION['username'], $_SESSION["password"]);
+		// Check connection
+		if($con === FALSE){
+			 $_SESSION['msg'] = "Unable to connect database.";
+			 header("Location:index.php");
+		}else{
+
+			if(mysql_select_db($_SESSION['databaseName'], $con) === FALSE){
+
+ 				$_SESSION['msg'] = "Could not select database.";
+ 				header("Location:index.php");
+			}else{
+				$query_drop 	= "DROP TABLE IF EXISTS `uploadpaths`";
+
+		    	// If we couldn't, then it either doesn't exist, or we can't see it.
+				$query_create 	= "CREATE TABLE IF NOT EXISTS `uploadpaths` (
+						  `type` varchar(255) DEFAULT NULL,
+						  `path` varchar(255) DEFAULT NULL,
+						  `accessKeyId` varchar(255) DEFAULT NULL,
+						  `secretAccessKey` varchar(255) DEFAULT NULL,
+						  `bucket` varchar(255) DEFAULT NULL,
+						  `region` varchar(255) DEFAULT NULL,
+						  `id` int(11) NOT NULL AUTO_INCREMENT,
+						  `createdAt` datetime DEFAULT NULL,
+						  `updatedAt` datetime DEFAULT NULL,
+						  `isActive` int(11) DEFAULT NULL,
+						  PRIMARY KEY (`id`)
+						)";
+
+				$query_insert = "";
+				switch($selectedStorage['storage']){
+
+					case 'swift' :
+							// SWIFT KEYS  :=> TABLE COLUMNS
+							// host 	   :=> bucket
+							// port 	   :=> region
+							// serviceHash :=> accessKeyId
+							// container   :=> secretAccessKey
+						$query_insert 	="INSERT INTO `uploadpaths` (`type`, `path`, `accessKeyId`, `secretAccessKey`, `bucket`, `region`, `id`, `createdAt`, `updatedAt`, `isActive`) VALUES ('S3', NULL, '".$selectedStorage['serviceHash']."', '".$selectedStorage['container']."', '".$selectedStorage['host']."', '".$selectedStorage['port']."', 1, '".date("Y-m-d H:i:s")."', '".date("Y-m-d H:i:s")."', 1)";
+						break;
+					case 'S3' :
+						$query_insert 	="INSERT INTO `uploadpaths` (`type`, `path`, `accessKeyId`, `secretAccessKey`, `bucket`, `region`, `id`, `createdAt`, `updatedAt`, `isActive`) VALUES ('S3', NULL, '".$selectedStorage['api_key']."', '".$selectedStorage['api_secret_key']."', '".$selectedStorage['bucket']."', '".$selectedStorage['region']."', 1, '".date("Y-m-d H:i:s")."', '".date("Y-m-d H:i:s")."', 1)";
+						break;
+					case 'Disk' :
+						$query_insert 	="INSERT INTO `uploadpaths` (`type`, `path`, `accessKeyId`, `secretAccessKey`, `bucket`, `region`, `id`, `createdAt`, `updatedAt`, `isActive`) VALUES ('Disk', '/var/www/html/olympus/api/files/', NULL, NULL, NULL, NULL, 1, '".date("Y-m-d H:i:s")."', '".date("Y-m-d H:i:s")."', 1)";
+						break;
+				}
+
+				if (mysql_query($query_drop) && mysql_query($query_create) && mysql_query($query_insert)) {
+					//All queries executed perfectly
+				} else {
+					// echo $query_drop.'<br>';
+					// echo $query_create.'<br>';
+					// echo $query_insert;die;
+					$_SESSION['msg'] = "Error in creating database tables.";
+					$url = "http://".$_SESSION['serverName'] . $this->url_base . "/index.php";
+					//echo '<script>window.location.href="'.$url.'"</script>';
+				}
+			}
 		}
 
 
 		$dataBaseConfiguration 	= "exports.datasource = {\n database: '".$_SESSION['databaseName']."', \n username: '".$_SESSION['username']."', \n password: '".$_SESSION['password']."' \n // Choose a SQL dialect, one of sqlite, postgres, or mysql (default mysql) \n // dialect:  'mysql', \n // Choose a file storage location (sqlite only) \n //storage:  ':memory:', \n // mySQL only \n // pool: { maxConnections: 5, maxIdleTime: 30} \n };\n
 					// Self-awareness of hostname \n
 					exports.host = '".$_SESSION['domain_name']."'; \n
-					port: '".$_SESSION['protocal']."', // change to 80 if you're not using SSL\n";
+					//port: '".$_SESSION['protocal']."', // change to 80 if you're not using SSL\n";
 
 
 		if($_SESSION['protocal'] == '80'){
@@ -335,11 +401,11 @@ class Configuration {
 										}, \n
 									bootstrap: function(bootstrap_cb) { \n
 										if(bootstrap_cb) bootstrap_cb(); \n
-									},\n
+									},\n";
 									
-									$fileAdapter\n
+					//--removed//$fileAdapter\n
 								
-								// Default title for layout\n
+			$masterConfigFile .="// Default title for layout\n
 									appName: 'Olympus | Sharing the Cloud',\n
 								
 								// App hostname\n
@@ -416,11 +482,11 @@ class Configuration {
 										}, \n
 									bootstrap: function(bootstrap_cb) { \n
 										if(bootstrap_cb) bootstrap_cb(); \n
-									},\n
+									},\n";
 									
-									$fileAdapter\n
+					//--removed//$fileAdapter\n
 								
-								// Default title for layout\n
+			$masterConfigFile .="// Default title for layout\n
 									appName: 'Olympus | Sharing the Cloud',\n
 								
 								// App hostname\n
@@ -625,9 +691,9 @@ class Configuration {
 		fclose($myfile);			
 
 //  Append fileAdaptor Database config
-		$myfile = fopen("$path/olympus/master/config/localConfig.js", "a");
-		fwrite($myfile, $localConfigFileAdaptor);
-		fclose($myfile);			
+		// $myfile = fopen("$path/olympus/master/config/localConfig.js", "a");
+		// fwrite($myfile, $localConfigFileAdaptor);
+		// fclose($myfile);			
 
 //Update Config File 
 		exec("sudo scp $path/olympus/master/config/config.js $path/olympus/master/config/config.ex.js");
@@ -774,7 +840,7 @@ class Configuration {
 			header("Location:index.php");
 
 		}else{
-				
+			error_reporting(0);//turn off any error if arising from line chmod() or copy() function
         	$logo=str_replace("uploads/", "", $postData['logoimg']);
 			$db_selected = mysql_select_db($_SESSION['databaseName'], $con);
 			$SQL_CREATE_TABLE="CREATE TABLE IF NOT EXISTS `theme` ( `id` int(11) NOT NULL AUTO_INCREMENT, `header_background` varchar(10) NOT NULL, `footer_background` varchar(10) NOT NULL,

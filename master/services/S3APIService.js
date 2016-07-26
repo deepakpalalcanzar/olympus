@@ -3,16 +3,16 @@ var amazonS3 = require('awssum-amazon-s3');
 
 // Validate configuration
 // Get keys from config or environment
-var config = {
-	accessKeyId: sails.config.fileAdapter.s3.accessKeyId || process.env.AWS_ACCESS_KEY_ID,
-	secretAccessKey: sails.config.fileAdapter.s3.secretAccessKey || process.env.AWS_SECRET_ACCESS_KEY,
-	// awsAccountId: sails.config.fileAdapter.s3.awsAccountId || process.env.AWS_ACCOUNT_ID,
-	bucket: sails.config.fileAdapter.s3.bucket || process.env.AWS_BUCKET,
-	region: require('awssum-amazon')[sails.config.fileAdapter.s3.region || process.env.AWS_REGION]
-};
+// var config = {
+// 	accessKeyId: sails.config.fileAdapter.s3.accessKeyId || process.env.AWS_ACCESS_KEY_ID,
+// 	secretAccessKey: sails.config.fileAdapter.s3.secretAccessKey || process.env.AWS_SECRET_ACCESS_KEY,
+// 	// awsAccountId: sails.config.fileAdapter.s3.awsAccountId || process.env.AWS_ACCOUNT_ID,
+// 	bucket: sails.config.fileAdapter.s3.bucket || process.env.AWS_BUCKET,
+// 	region: require('awssum-amazon')[sails.config.fileAdapter.s3.region || process.env.AWS_REGION]
+// };
 
 // Immediately instantiate this service using API credentials. 
-var s3 = new amazonS3.S3(config);
+// var s3 = new amazonS3.S3(config);
 
 /**
  * Upload a local file

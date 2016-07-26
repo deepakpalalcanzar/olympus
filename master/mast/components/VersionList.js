@@ -33,8 +33,27 @@ Mast.registerTree('VersionList', {
 	subscriptions: {
 		'~COMMENT_CREATE': function (comment) {
 			if (comment && comment.source && comment.source.item &&
-				comment.source.item.id == this.get('id') &&
+				// comment.source.item.id == this.get('id') &&
 				comment.source.item.type == this.get('type')) {
+
+				/*Rishabh-Update comment list:: Added trigger in postVersion method for refresh*/
+				/*var html='';
+				// console.log(val);
+				html+='<div class="commentRow-template comment-attire">'+
+					  '<div class="comment-user-avatar">'+
+					  '<a href="#" class="user-avatar-link">'+
+					  '<img class="user-avatar" src="'+comment.source.modified_by.avatar+'"></a></div>'+
+					  '<div class="comment-container">'+
+                      '<h6><a href="#">'+comment.source.modified_by.name+'</a></h6>'+
+					  '<span class="comment-date">'+comment.source.modified_at+'</span>'+
+					  '<p class="details-text">'+comment.source.message+'</p></div>'+
+					  '<div class="clear-tab"></div><div class="comment-border"></div>'+
+					  '</div>';
+				
+				console.log('vers-comm-length'+$('#vers-com').length)
+				$('#vers-com').append(html).show();*/
+				/*Rishabh-Update comment list*/
+
 				this.collection.add(comment.source);
 				this.scrollToBottom();
 			}
@@ -99,6 +118,12 @@ Mast.registerTree('VersionList', {
 
 		//Show version comment Afzal
 		$('#vers-comm-form').show();
+
+		// $('.versionCommentRow-outlet').load(
+			// Mast.components.ActivityRow({
+			// 	outlet	: '.commentRow-outlet'
+			// })
+		// );
 		Mast.Socket.request('/'+this.get('type')+'/getVersionComment',{
 			id: event.target.id
 		}, function(response){
@@ -111,7 +136,7 @@ Mast.registerTree('VersionList', {
 						html+='<div class="commentRow-template comment-attire">'+
 							  '<div class="comment-user-avatar">'+
 							  '<a href="#" class="user-avatar-link">'+
-							  '<img class="user-avatar" src="/account/avatar/null"></a></div>'+
+							  '<img class="user-avatar" src="'+((val.avatar_image == null)?'/images/39.png':'/images/profile/'+val.avatar_image)+'"></a></div>'+
 							  '<div class="comment-container">'+
 		                      '<h6><a href="#">'+val.name+'</a></h6>'+
 							  '<span class="comment-date">'+val.comm_date+'</span>'+
@@ -166,7 +191,10 @@ Mast.registerTree('VersionList', {
 		Mast.Socket.request(this.getUrlRoot()+'addComment',{
 			id: this.$('.postVersion-button').attr('id'),
 			payload: commentPayload
-		}, function(res) {});
+		}, function(res) {
+			$('.span-comment:visible').trigger('click');
+			$('.span-comment:visible').html(1+parseInt($('.span-comment:visible').html()));
+		});
 	},
 
 	// Fetch and clear the contents of the textarea

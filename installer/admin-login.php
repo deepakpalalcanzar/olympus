@@ -68,52 +68,46 @@
 				var confirmEmail 		= $("input[name='confirm-email']").val();
 				var password 			= $("input[name='password']").val();
 				var confirmPassword 	= $("input[name='confirm-password']").val();
+				var no_error 			= true;
+				//revert all fields to have no red border
+				$( ".login-input-field" ).css({'border': '1px solid #d7dbdc'});
 
 				if(email.trim() === ''){
 
 					$( ".email" ).css({'border': '1px solid red'});
-					$( ".confirm-email" ).css({'border': '1px solid #d7dbdc'});
-					$( ".password" ).css({'border': '1px solid #d7dbdc'});
-					$( ".confirm-password" ).css({'border': '1px solid #d7dbdc'});
 					$( ".message" ).html( " <p style='color:red;text-align:center;'> Please enter your email. </p> " );
-					return false;					
+					no_error = false;
 				}
 
-				if(confirmEmail.trim() != email.trim()){
+				if(no_error && confirmEmail.trim() != email.trim()){
 
-					$( ".email" ).css({'border': '1px solid #d7dbdc'});
 					$( ".confirm-email" ).css({'border': '1px solid red'});
-					$( ".password" ).css({'border': '1px solid #d7dbdc'});
-					$( ".confirm-password" ).css({'border': '1px solid #d7dbdc'});
-
 					$( ".message" ).html( " <p style='color:red;text-align:center;'> Email entered does not match. </p> " );
-					return false;					
+					no_error = false;
 				}
 
-				if(password.trim() === ''){
+				if(no_error && password.trim() === ''){
 
-					$( ".email" ).css({'border': '1px solid red'});
-					$( ".confirm-email" ).css({'border': '1px solid #d7dbdc'});
 					$( ".password" ).css({'border': '1px solid red'});
-					$( ".confirm-password" ).css({'border': '1px solid #d7dbdc'});
-
 					$( ".message" ).html( " <p style='color:red;text-align:center;'> Please enter password. </p> " );
-					return false;					
+					no_error = false;
 				}
 
-				if(confirmPassword.trim() === ''){
+				if(no_error && confirmPassword.trim() === ''){
 
-					$( ".email" ).css({'border': '1px solid red'});
-					$( ".confirm-email" ).css({'border': '1px solid #d7dbdc'});
-					$( ".password" ).css({'border': '1px solid #d7dbdc'});
 					$( ".confirm-password" ).css({'border': '1px solid red'});
-
 					$( ".message" ).html( " <p style='color:red;text-align:center;'> Please enter your database username </p> " );
-					return false;					
+					no_error = false;
 				}
 
-				$("#databaseForm").submit();
-
+				if(no_error){
+					$("#databaseForm").submit();
+				}else{
+					$('html,body').animate({
+				        scrollTop: $(".message").offset().top
+				    },'fast');
+					return false;
+				}
 				
 			});
 

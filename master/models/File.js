@@ -3,12 +3,18 @@ File = Model.extend({
     name: STRING,
     size: INTEGER,
     fsName: TEXT,
+    md5checksum: TEXT,
     deleted: BOOLEAN,
     mimetype: STRING,
     public_link_enabled: BOOLEAN,
     deleteDate: DATE,
     replaceFileId: INTEGER,
     thumbnail: INTEGER,
+    uploadPathId: INTEGER,
+    // Add a reference to Pet
+    // uploadpath: {
+    //   model: 'uploadPaths'
+    // },
     // Save the name and identifying info of the adapter used for the upload
     // adapterName: STRING,
     // adapterId: STRING,
@@ -177,10 +183,13 @@ File = Model.extend({
                 uniqueName: function (cb) {
                     UniqueNameService.unique(File, options.name, options.parentId, cb, options.replaceId);
                 },
+                getAdapter: function(cb) {
+                    UploadPaths.find({where:{isActive:1}}).done(cb);
+                },
                 // Save File to database
                 // TODO: move `writeFile` dependency to the other places that depend on it
                 // (we can save the metadata as soon as possible-- dont need to wait until the upload actually finishes)
-                fileModel: ['uniqueName', function (cb, r) {
+                fileModel: ['uniqueName','getAdapter', function (cb, r) {
 
                         sails.log.debug('saving file to db');
 
@@ -194,7 +203,9 @@ File = Model.extend({
                             mimetype: options.type,
                             replaceFileId: options.replaceId || null,
                             public_link_enabled: (sails.config.publicLinksEnabledByDefault?true:false),
-                            thumbnail: "1",
+                            thumbnail: (r.getAdapter.type == "Disk")?"1":"0",
+                            uploadPathId: r.getAdapter.id,
+                            md5checksum: options.md5checksum
                         }).done(function (err, result) {
 
                             if (err) return cb(err);

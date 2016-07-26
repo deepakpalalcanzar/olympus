@@ -47,12 +47,12 @@ Mast.registerComponent('AccountDetails', {
 			}else if(res.avatar !== '' && res.avatar !== null){
 				$('.user-avatar').attr('src', "/images/profile/"+res.avatar);			
 				this.$('.profile-pic').attr('src', "/images/profile/"+res.avatar);
-			}			
+			}
 		});
 	},
 
 	updateAccountDetails: function() {
-		
+
 		var self = this;
 		console.log("aaaaaaaaaaaaaaaaaaaaa");
 		console.log(fileData);

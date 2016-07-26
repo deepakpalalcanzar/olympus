@@ -3,7 +3,7 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 	events: {
 		'dblclick'              : 'download',
 		'click'                 : 'select',
-		'clickoutside'          : 'deselect',//added to avoid having selected 2 rows(testcase not reproduced)
+		// 'clickoutside'          : 'deselect',//added to avoid having selected 2 rows(testcase not reproduced)
 		//'click'          		: 'cancel',
 		'mouseenter >.inode-row': 'displayActionButtons',
 		'mouseleave >.inode-row': 'hideActionButtons',
@@ -716,6 +716,18 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 				if (response === 403) {
 					self.cancel();
 					alert('Permission denied. You do not have sufficient permissions to rename this item.');
+				}
+				if(typeof response.status != 'undefined' && response.status == 'conflict' && typeof response.retrievedFile.name != 'undefined'){
+					if(type == 'file'){
+						var ext = (response.retrievedFile.name).split(".").slice(1).pop();
+						var ext_text = '';
+						if((typeof ext != 'undefined') && (ext != '')){
+							var ext_text = 'with extension “.'+ext+'”';
+						}
+						alert('The name “'+(response.retrievedFile.name).replace("."+ext, "")+'” '+ext_text+' is already taken. Please choose a different name.');
+					}else{
+						alert('The folder with name “'+response.retrievedFile.name+'” already exists. Please choose a different name.');
+					}
 				}
 			});
 		}

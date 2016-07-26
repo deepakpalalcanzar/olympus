@@ -1,5 +1,5 @@
 var request = require('request');
-var ThemeController = {
+var UploadPathsController = {
 
     updateColor: function (req, res) {
 
@@ -25,23 +25,15 @@ var ThemeController = {
 
     },
 
-    getCurrentTheme: function (req, res) {//Used in web only(Appearence Setting)
-        Theme.find({where: {account_id: req.session.Account.id}}).done(function (err, theme) {
+    getCurrentAdapter: function (req, res) {//Used in web only(Appearence Setting)
+        UploadPaths.find({where:{isActive:1}}).done(function (err, adapter) {
             if (err)
                 res.json({success: false, error: err});
 
-            if(theme){
-                res.json({success: true, theme:{
-                        header      : (theme.header_background).replace(/^#*/g, "#"),//remove one or more # from start and end
-                        body        : (theme.body_background).replace(/^#*/g, "#"),
-                        footer      : (theme.footer_background).replace(/^#*/g, "#"),
-                        navcolor    : (theme.navigation_color).replace(/^#*/g, "#"),
-                        font_color  : (theme.font_color).replace(/^#*/g, "#"),
-                        font_family : (theme.font_family)
-                    }
-                });
+            if(adapter){
+                res.json({success: true, adapter:adapter});
             }else{//null
-                res.json({success: false, error: 'nothemefound'});
+                res.json({success: false, error: 'noadapterfound'});
             }
         });
     },
@@ -51,8 +43,8 @@ var ThemeController = {
         var sql = "SELECT account_id FROM accountdeveloper WHERE access_token=?";
         sql = Sequelize.Utils.format([sql, req.params.id]);
 
-	// console.log("Printing Query Printing Query Printing Query Printing Query");
-	// console.log(req);
+	console.log("Printing Query Printing Query Printing Query Printing Query");
+	console.log(req);
 	console.log("Printing Query Printing Query Printing Query Printing Query");
 	console.log(sql);
 
@@ -82,4 +74,4 @@ var ThemeController = {
     }
 
 };
-_.extend(exports, ThemeController);
+_.extend(exports, UploadPathsController);

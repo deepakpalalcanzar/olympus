@@ -253,19 +253,24 @@ var TrashController = {
             raw: true
         }).success(function (accounts) {
             // console.log(comments[0].AccountId);
-            AccountId = accounts[0].AccountId;
 
-            Deletedlist.deleted({
-                account_id : AccountId,//req.param('id'),
-                // file_id : req.param('id'),
-                // type    : req.param('type')
-            }, function(err, result){
-                if (err)
-                    return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+            if(typeof accounts[0].AccountId != 'undefined'){
+                AccountId = accounts[0].AccountId;
 
-                res.json(result, 200);
-                // res.json(200);
-            });
+                Deletedlist.deleted({
+                    account_id : AccountId,//req.param('id'),
+                    // file_id : req.param('id'),
+                    // type    : req.param('type')
+                }, function(err, result){
+                    if (err)
+                        return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+
+                    res.json(result, 200);
+                    // res.json(200);
+                });
+            }else{
+                res.json(500);
+            }
             // res.json(comments, 200);
         });
 

@@ -46,6 +46,10 @@ exports.rename = function (req, res, cb) {
                         deleted: null
                     }
                 }).success(function (retrievedFile) {
+
+                    var easyimg = require('easyimage');
+                    var fsx     = require('fs-extra');
+
                     // If there is none, proceed with the rename
                     if (retrievedFile === null) {
                         model.directoryId = model.DirectoryId;
@@ -82,7 +86,7 @@ exports.rename = function (req, res, cb) {
                                     });
                                 }
                             }
-                            
+
                             var apiObj = APIService.File.mini(model);
                             SocketService.broadcast('ITEM_RENAME', subscribers, apiObj);
                             if (!cb) {
@@ -176,8 +180,10 @@ exports.rename = function (req, res, cb) {
                         SocketService.broadcast('ITEM_RENAME', subscribers, apiObj);
                         if (!cb) {
                             res.json({
-                                status: 'success',
-                                obj: apiObj
+                                status: 'conflict',
+                                message: "Can't rename node; node with same type and name exists in this location",
+                                obj: apiObj,
+                                retrievedFile: retrievedFile
                             });
                         } else {
                             cb({
@@ -1160,18 +1166,19 @@ exports.removePermission = function (req, res) {
                 var subscribers = INodeModel.roomName(inodeId);
 
                 if (!_.isFinite(inodeId)) {
-                    throw new Error("Trying to leave NULL inode!");
+                    //throw new Error("Trying to leave NULL inode!");
                 }
-
-                // And broadcast activity to all sockets subscribed to the comment's parent item
-                req.socket.leave(INodeModel.activeRoomName(inodeId));
-                SocketService.broadcast('ACCOUNT_LEAVE', subscribers, _.extend(APIService.Account(req.session.Account), {
-                    num_active: INodeModel.getNumActiveUsers(inodeId),
-                    part_of: {
-                        id: inodeId,
-                        type: req.param('controller')
-                    }
-                }));
+                else{
+                    // And broadcast activity to all sockets subscribed to the comment's parent item
+                    req.socket.leave(INodeModel.activeRoomName(inodeId));
+                    SocketService.broadcast('ACCOUNT_LEAVE', subscribers, _.extend(APIService.Account(req.session.Account), {
+                        num_active: INodeModel.getNumActiveUsers(inodeId),
+                        part_of: {
+                            id: inodeId,
+                            type: req.param('controller')
+                        }
+                    }));
+                }
             } else {
                 SocketService.wrongTransportError(res);
             }
@@ -1198,9 +1205,6 @@ exports.removePermission = function (req, res) {
 
 
             function afterwards(comment) {
-                res.json({
-                    success: true
-                });
 
 
                 if (req.isSocket) {
@@ -1211,6 +1215,7 @@ exports.removePermission = function (req, res) {
                     // sockets subscribed to the comment's parent item.
                     SocketService.broadcast('COMMENT_CREATE', subscribers, APIService.Comment(_.extend(comment, {
                         ItemId: req.param('id'),
+                        avatar_image: req.session.Account && req.session.Account.avatar_image,
                         AccountName: req.session.Account && req.session.Account.name
                     })));
 
@@ -1253,6 +1258,10 @@ exports.removePermission = function (req, res) {
                     /*Create logging*/
 
                 }
+
+                res.json({
+                    success: true
+                });
             }
         };
 

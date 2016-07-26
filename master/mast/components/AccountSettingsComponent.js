@@ -72,6 +72,29 @@ Mast.registerComponent('AccountSettingsComponent',{
 				$('#trash_auto_setting').hide();
 			}
 
+			$('.adapter-mod').hide();
+			Mast.Socket.request('/uploadpaths/getCurrentAdapter', {}, function (res, err) {
+				if(err || res.success == false){
+					console.log(err || res.error);
+					return;
+				}
+
+				$('input[name="adapter_type"][value="' + res.adapter.type + '"]').prop('checked', true);
+				$('#Disk_adapter_details span b').html(''+res.adapter.path);
+				$('#S3_access').val(res.adapter.accessKeyId);
+				$('#S3_secret').val(res.adapter.secretAccessKey);
+				$('#S3_bucket').val(res.adapter.bucket);
+				$('#S3_region').val(res.adapter.region);
+				if(res.adapter.type == 'Disk'){
+					$('#Disk_adapter_details').show();
+					$('#S3_adapter_details').hide();
+				}else{//S3
+					$('#Disk_adapter_details').hide();
+					$('#S3_adapter_details').show();
+				}
+				$('.adapter-mod').show();
+			});
+
 			this.set('showSystemSetting', true);
 			this.set('showSetting', true);
 			// this.set('showSubscription', true);//no subscription aplies to superadmin

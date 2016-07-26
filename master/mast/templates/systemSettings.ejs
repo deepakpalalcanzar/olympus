@@ -22,11 +22,43 @@
 
 	<hr><br>
 
+	<!--Adapter Settings -->
+	<div class="adapter-mod">
+		<label>Adapter Settings</label>
+		<input type="radio" name="adapter_type" value="Disk" /> Use Disk
+		<input type="radio" name="adapter_type" value="S3" /> Use Amazon S3
+		<br><br>
+		<div id="Disk_adapter_details">
+			<label> Disk Adapter Path: </label>
+			<span>Default Path : <b>/var/www/html/olympus/api/files/</b></span>
+			<input type="hidden" id="#disk_path" name="disk_path" value="/var/www/html/olympus/api/files/" >
+			<!-- <input type="file" class="disk-path" placeholder="" value="" id="disk_path" name="disk_path" nwdirectory nwsaveas webkitdirectory directory multiple> -->
+		</div>
+		<div id="S3_adapter_details" style="display:none;">
+			<label> Access Key Id :</label>
+			<input type="text" class="S3-access" placeholder="" value="" id="S3_access" name="S3_access">
+
+			<label> Secret Access Key :</label>
+			<input type="text" class="S3-secret" placeholder="" value="" id="S3_secret" name="S3_secret">
+
+			<label> Bucket :</label>
+			<input type="text" class="S3-bucket" placeholder="" value="" id="S3_bucket" name="S3_bucket">
+
+			<label> Region :</label>
+			<input type="text" class="S3-region" placeholder="" value="" id="S3_region" name="S3_region"><br>
+		</div>
+	    <input type="button" id="saveAdapter" value="Save">
+		<br><br>
+	</div>
+	<!-- -->
+
+	<hr><br>
+
 	<!--Email Service Settings -->
 	<div class="domain-mod">
 		<label>Email Service Settings</label>
-		<input id="mail_service" type="radio" name="mail_service" value="mandrill" /> Use Mandrill
-		<input id="mail_service" type="radio" name="mail_service" value="internal" /> Use Internal Email Setup
+		<input type="radio" name="mail_service" value="mandrill" /> Use Mandrill
+		<input type="radio" name="mail_service" value="internal" /> Use Internal Email Setup
 		<br><br>
 		<div id="mandrill_details">
 			<label> Mandrill Api Key: </label>

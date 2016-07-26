@@ -129,7 +129,8 @@ Mast.registerComponent('EnterprisesRow', {
 
 		Mast.Socket.request('/enterprises/impersonate', options, function(req, err) {
 			if(req == 200){
-				 window.open('https://dev.olympus.io/', '_blank');
+				//window.open('https://dev.olympus.io/', '_blank');
+				window.open('https://'+sails.config.host+'/', '_blank');
 				//window.open('https://localhost/', '_blank');
 				window.focus();
 			}		

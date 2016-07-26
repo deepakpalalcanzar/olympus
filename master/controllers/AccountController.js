@@ -712,6 +712,102 @@ console.log('33333333333333333333333333333333333');
             console.log(response);
         });
     },
+    changeAdapterSetting: function (req, res) {
+
+        var adapter_type = req.param('adapter_type');
+        var diskpath = req.param('diskpath');
+        var S3access = req.param('S3access');
+        var S3secret = req.param('S3secret');
+        var S3bucket = req.param('S3bucket');
+        var S3region = req.param('S3region');
+
+        if(adapter_type == 'Disk' || adapter_type == 'S3' ){
+
+            var options;
+
+            //Check existing adapters with same configuration
+            if(adapter_type == 'Disk'){
+                options = {
+                    type: adapter_type,
+                    path: diskpath
+                };
+            }
+            if(adapter_type == 'S3'){
+                options = {
+                    type: adapter_type,
+                    accessKeyId: S3access,
+                    secretAccessKey: S3secret,
+                    bucket: S3bucket,
+                    region: S3region
+                };
+            }
+
+            //Find Adapter with same configuration
+            UploadPaths.find({where:options}).done(function (err, adapter) {
+                if (err)
+                    res.json({success: false, error: err});
+
+                if(adapter){
+                    console.log('Adapter with same configuration found');
+                    if(adapter.isActive){//if Adapter is Already Active
+                        //Do nothing
+                        return res.json({ status: 'ok'}, 200);
+                    }else{
+                        //Find the current Active Adapter
+                        UploadPaths.find({where:{isActive:1}}).done(function (err, adapterold) {
+                            if (err)
+                                res.json({success: false, error: err});
+
+                            if(adapterold){
+                                adapterold.isActive = false;
+                                adapterold.save().done(function(err) {
+                                    //Set it as Active
+                                    adapter.isActive = true;
+                                    adapter.save().done(function(err) {
+                                        return res.json({ status: 'ok'}, 200);
+                                    });
+                                });
+                            }
+                        });
+                    }
+                }else{
+                    console.log('New Adapter Being Added');
+
+                    //Find the current Active Adapter
+                    UploadPaths.find({where:{isActive:1}}).done(function (err, adapterold) {
+                        if (err)
+                            res.json({success: false, error: err});
+
+                        if(adapterold){
+                            adapterold.isActive = false;
+                            adapterold.save().done(function(err) {
+                                UploadPaths.create({
+
+                                    type            : adapter_type,
+                                    path            : (adapter_type == 'Disk')?diskpath:null,
+                                    accessKeyId     : (adapter_type == 'Disk')?null:S3access,
+                                    secretAccessKey : (adapter_type == 'Disk')?null:S3secret,
+                                    bucket          : (adapter_type == 'Disk')?null:S3bucket,
+                                    region          : (adapter_type == 'Disk')?null:S3region,
+                                    isActive        : 1
+
+                                }).done(function foundAdapter (err, uploadpath) {
+
+                                    if (err) return res.json({ error: err}, 200);
+                                    // console.log(uploadpath);
+                                    return res.json({ status: 'ok'}, 200);
+                                });
+                        });
+                            // res.json({success: true, adapter:adapter});
+                        }else{//null
+                            console.log('noadapterfoundnoadapterfoundnoadapterfound')
+                            return res.json({ error: 'noadapterfound'}, 200);
+                        }
+                    });
+                }
+            });
+        }
+    },
     saveTrashSetting: function (req, res) {
 console.log('999999999999999999999999999999999999');
     var trash_setting;
@@ -793,6 +889,7 @@ console.log(opts);
                         uri: 'http://localhost:1337/transactiondetails/register/',
                         method: 'POST',
                     };
+
                     var created_date = new Date();
                     tran_options.json = {
                         trans_id: (req.session.Account.isSuperAdmin === 1) ? 'superadmin' : 'workgroupadmin',
@@ -813,6 +910,7 @@ console.log(opts);
                         //        Resend using the original response statusCode
                         //        use the json parsing above as a simple check we got back good stuff
                         // res.json(body, response && response.statusCode);
+
                         return;
                     });
                 });
@@ -1149,8 +1247,7 @@ console.log(opts);
                     activity: 'update',
                     on_user: req.session.Account.id,
 //                    ip: req.session.Account.ip
-		ip: typeof req.session.Account.ip === 'undefined' ? req.headers['ip'] : req.session.Account.ip,
-
+		              ip: typeof req.session.Account.ip === 'undefined' ? req.headers['ip'] : req.session.Account.ip,
                 };
 
                 request(options, function (err, response, body) {
@@ -1226,6 +1323,8 @@ console.log(opts);
                 if (picUploadType === 'enterprise') {
 
 
+                    // fsx.writeFile(sails.config.fileAdapter.linuxPath+"master/public/images/enterprises/" + enterpriseName, binaryData, 'binary', function (err) {
+                    // });
                     fsx.writeFile("/var/www/html/olympus/master/public/images/enterprises/" + enterpriseName, binaryData, 'binary', function (err) {
                     });
                     account.enterprise_fsname = enterpriseName;

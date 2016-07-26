@@ -43,7 +43,7 @@ Mast.registerComponent('TrashRestoreComponent', {
 					}
 				});
 			}else{
-				$(".popup-body li").after("<input type='radio' name='fileselected' id='item-"+res[0].id+"' /><label for='item-"+res[0].id+"' data-attr='item-"+res[0].id+"' class='class-"+res[0].id+"'>"+res[0].name+"</label>");
+				$(".popup-body li").html("<input type='radio' name='fileselected' id='item-"+res[0].id+"' /><label for='item-"+res[0].id+"' data-attr='item-"+res[0].id+"' class='class-"+res[0].id+"'>"+res[0].name+"</label>");
 			}
 
 		});
@@ -56,14 +56,14 @@ Mast.registerComponent('TrashRestoreComponent', {
 		//IE-e.srcElement
 		//other than IE-e.target
 		var clickedElement 	= (typeof e.srcElement != 'undefined')?e.srcElement.htmlFor:e.target.getAttribute('for');
-		console.log('clickedElementclickedElementclickedElement');
-		console.log(clickedElement);
+		// console.log('clickedElementclickedElementclickedElement');
+		// console.log(clickedElement);
 		var element 		= clickedElement.split("-");
 		var element_id 		= element[element.length-1];
-		var container_ul = $(".class-"+element_id).parent('ul').find('ul');
+		var container_ul = $(".class-"+element_id).parent('li').find('ul');
 		if(container_ul.length == 0){
 
-			Mast.Socket.request('/tempaccount/getWorkgroups', {
+			Mast.Socket.request('/tempaccount/getWorkgroupChild', {
 				dir_type : element_id,
 				item_id  : file_id
 			}, function(res, err){

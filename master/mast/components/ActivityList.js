@@ -32,8 +32,9 @@ Mast.registerTree('ActivityList', {
 	branchComponent: 'ActivityRow',
 
 	subscriptions: {
-		'~COMMENT_CREATE': function (comment) {
-
+		/*Rishabh-Removing This subscription as it is not adding comment on correct tree */
+		/*'~COMMENT_CREATE': function (comment) {
+			alert('TEST');
                         if(Mast.Session.Account.avatar_image==null){
                            var avatar_image="/images/avatar_anonymous.png";
                         }else{
@@ -43,11 +44,15 @@ Mast.registerTree('ActivityList', {
 			if (comment && comment.source && comment.source.item &&
 				comment.source.item.id == this.get('id') &&
 				comment.source.item.type == this.get('type')) {
+				console.log(comment);
 				comment.source.created_by.avatar = avatar_image;
 				this.collection.add(comment.source);
 				this.scrollToBottom();
+			}else{
+				console.log('COMMENTDETAILSNOTFOUND');
+				console.log(comment);
 			}
-		}
+		}*/
 	},
 
 	events: {

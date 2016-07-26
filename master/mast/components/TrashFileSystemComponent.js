@@ -54,7 +54,11 @@ Mast.registerTree('TrashFileSystem',{
 	branchOutlet	: '#trashSystem-outlet',
 
 	afterRender: function(e) {
+
+		var self = this;
+		console.log('updateButtonState55');
 		Olympus.ui.actionBar.updateButtonState();
+
 		/* For number shared*/
 		Mast.Socket.request('/tempaccount/sharedDirectory', null, function(res, err){
 			$.each(res, function( i, val ) {
