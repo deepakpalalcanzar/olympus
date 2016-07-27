@@ -443,8 +443,8 @@ module.exports = { \r\n\
         }, \r\n\
     bootstrap: function(bootstrap_cb) { \r\n\
         if(bootstrap_cb) bootstrap_cb(); \r\n\
-        }, \r\n\
-    fileAdapter: {  \r\n\
+        },';
+    /*fileAdapter: {  \r\n\
         // Which adapter to use  \r\n\
         adapter: \''+sails.config.fileAdapter.adapter+'\', \r\n\
         // Amazon S3 API credentials \r\n\
@@ -469,8 +469,8 @@ module.exports = { \r\n\
                 username: \''+sails.config.fileAdapter.keystone.username+'\', \r\n\
                 password: \''+sails.config.fileAdapter.keystone.password+'\' \r\n\
             } \r\n\
-        }, \r\n\
-        // Default title for layout \r\n\
+        }, \r\n\*/
+master_config_config += '// Default title for layout \r\n\
             appName: \''+sails.config.appName+'\', \r\n\
         // App hostname \r\n\
             host: \''+domainname+'\', \r\n\
@@ -542,7 +542,7 @@ exports.datasource = { \r\n\
 // pool: { maxConnections: 5, maxIdleTime: 30} \r\n\
 }; \r\n\r\n\
 // Self-awareness of hostname \r\n\
-exports.host = \''+domainname+'\'; \r\n\
+exports.host = \''+domainname+'\';';/* \r\n\
 port: \''+sails.config.port+'\', // change to 80 if you\'re not using SSL \r\n\
 exports.fileAdapter = { \r\n\
 // Choose a file adapter for uploads / downloads \r\n\
@@ -561,7 +561,7 @@ exports.fileAdapter = { \r\n\
         serviceHash: \''+sails.config.fileAdapter.swift.serviceHash+'\', \r\n\
         container: \''+sails.config.fileAdapter.swift.container+'\', \r\n\
     }, \r\n\
-}';
+}';*/
 //END master_config_localConfig content
 
 //START root's index.html content

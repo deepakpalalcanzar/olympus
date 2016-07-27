@@ -532,7 +532,7 @@ var AuthController = {
                                     }        
                                 }
                     
-				EmailService.sendForgotPasswordEmail({
+				EmailServices.sendEmail('forgotpasswordemail',{
 					host: req.header('host'),
 					account: account
 				});
@@ -571,7 +571,7 @@ var AuthController = {
                                         raw: true
                                     }).success(function (accountdetails) {
                                 
-				EmailService.sendForgotPassword({
+				EmailServices.sendEmail('forgotpassword',{
 					host: req.header('host'),
 					account: account,
 					randPassword: randPassword,
@@ -711,7 +711,7 @@ var AuthController = {
 
 					// Send an email to the user we just verified, giving them their username / password
 					var host = req.header('host');
-					EmailService.sendVerifyEmail({
+					EmailServices.sendEmail('verify',{
 						host: host,
 						account: account
 					});

@@ -300,7 +300,7 @@ workgroup: function(id, cb) {
         
         if(model === null) {
             return cb(null);
-        } else if(model.DirectoryId === null) {
+        } else if((typeof model == 'undefined') || (model.DirectoryId === null)) {
             return cb(null, model);
         } else {
     

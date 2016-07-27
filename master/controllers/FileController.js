@@ -428,8 +428,23 @@ var FileController = {
 //                    });
                 }
 
+            //Rishabh: START async.auto
+        async.auto({
+            getAdapter: function(cb) {
+
+                uploadPaths.findOne({where:{isActive:1}}).done(cb);
+            },
+            uploadFileTask: ['getAdapter', function(cb, up) {
+                console.log('asyncResultsasyncResultsasyncResultsasyncResultsasyncResults');
+                console.log(up);
+                console.log('up.getAdapter.type');
+                console.log(up.getAdapter.type);
+                var current_receiver        = up.getAdapter.type;
+                var current_receiverinfo    = up.getAdapter;
+                console.log(current_receiver);
+
                 // set content-type header
-                if (sails.config.fileAdapter.adapter == 'disk') {
+                if (current_receiver == 'disk') {
                     //Download and serve file from local Disk
                     var file = '/var/www/html/olympus/api/files/' + fileModel.fsName;
                     res.setHeader('Content-disposition', 'attachment; filename=' + fileModel.name);
@@ -510,6 +525,8 @@ var FileController = {
                         }
                     });
                 }
+            }]
+        });
 
             } else {
                 res.json({

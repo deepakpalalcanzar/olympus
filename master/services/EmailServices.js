@@ -4,6 +4,7 @@ exports.sendEmail = function(template, options) {
     var accountName = options.accountName;
     var account = options.account;
     var controller = options.controller;
+    var randPassword = options.randPassword;
     var inode = options.inode;
     var host = options.host;
     var port = options.port || app.address().port;
@@ -77,6 +78,7 @@ exports.sendEmail = function(template, options) {
             mandrill.call(opts, function(data){
             });
         break;
+        case 'internal':
         case 'smtp'://BOTH smtp and gmail
             var nodemailer = require('nodemailer');
             var smtpTransport = require('nodemailer-smtp-transport');
