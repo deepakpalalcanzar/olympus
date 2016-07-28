@@ -432,7 +432,8 @@ var FileController = {
         async.auto({
             getAdapter: function(cb) {
 
-                uploadPaths.findOne({where:{isActive:1}}).done(cb);
+                UploadPaths.find({where:{isActive:1}}).done(cb);
+                // uploadPaths.findOne({where:{isActive:1}}).done(cb);
             },
             uploadFileTask: ['getAdapter', function(cb, up) {
                 console.log('asyncResultsasyncResultsasyncResultsasyncResultsasyncResults');
@@ -444,7 +445,7 @@ var FileController = {
                 console.log(current_receiver);
 
                 // set content-type header
-                if (current_receiver == 'disk') {
+                if (current_receiver == 'Disk') {
                     //Download and serve file from local Disk
                     var file = '/var/www/html/olympus/api/files/' + fileModel.fsName;
                     res.setHeader('Content-disposition', 'attachment; filename=' + fileModel.name);

@@ -194,6 +194,15 @@ console.log('IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIII
                         res.send(err, 500)
                     });
                 }
+                else {
+                    console.log('TESTINGTESTINGTESTINGTESTINGTESTINGTESTING');
+                    res.setHeader('Content-Type', 'image/png');
+                    fs.readFile(__dirname + '/../../public/images/avatar_anonymous.png', function (err, data) {
+                        if (err)
+                            return res.send(err, 500);
+                        res.send(data);
+                    });
+                }
             }).error(function (err) {
                 res.send(err, 500);
             });
