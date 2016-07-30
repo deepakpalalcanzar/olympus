@@ -257,6 +257,7 @@ var Version= function (model){
 		is_reply_comment: false,
 		message: model.name,
 		mimetype: model.mimetype,
+		mimeClass: model.mimetype ? (model.mimetype).replace(/[\/.]/g, '-') : '',
 		item: {
 			id: model.version,
 			type: (model.directoryId) ? 'directory' : 'file'

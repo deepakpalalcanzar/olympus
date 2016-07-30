@@ -169,43 +169,45 @@ console.log('IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIII
             return;
         } else if (req.url.match(/^\/file\/thumbnail\//)) {
 
- 
-            File.find(req.param('id')).success(function (fileModel) {
-                // If we have a file model to work with...
-                if (fileModel) {
-                    // set content-type header
-                    res.setHeader('Content-Type', fileModel.mimetype);
-                    
-                 // if (sails.config.fileAdapter.adapter == "s3") {
-                 //        var fsNamethumbanil = fileModel.fsName;
-                 //    } else {
-                 //        if (fileModel.thumbnail == "1") {
-                 //            var fsNamethumbanil = "thumbnail-" + fileModel.fsName;
-                 //        } else {
-                 //            var fsNamethumbanil = fileModel.fsName;
-                 //        }
-                 //    }
+            if(req.param('id') != '{{id}}'){//avoid template load-time calling
+                File.find(req.param('id')).success(function (fileModel) {
+                    // If we have a file model to work with...
+                    if (fileModel) {
+                        // set content-type header
+                        res.setHeader('Content-Type', fileModel.mimetype);
+                        
+                     // if (sails.config.fileAdapter.adapter == "s3") {
+                     //        var fsNamethumbanil = fileModel.fsName;
+                     //    } else {
+                     //        if (fileModel.thumbnail == "1") {
+                     //            var fsNamethumbanil = "thumbnail-" + fileModel.fsName;
+                     //        } else {
+                     //            var fsNamethumbanil = fileModel.fsName;
+                     //        }
+                     //    }
 
-                 var fsNamethumbanil = fileModel.fsName;                    
-                    
-                    options.uri = "http://localhost:1337/file/thumbnaildownload/" + fsNamethumbanil + "?_session=" + JSON.stringify(_session);
-                    var proxyReq = request.get(options).pipe(res);
-                    proxyReq.on('error', function (err) {
-                        res.send(err, 500)
-                    });
-                }
-                else {
-                    console.log('TESTINGTESTINGTESTINGTESTINGTESTINGTESTING');
-                    res.setHeader('Content-Type', 'image/png');
-                    fs.readFile(__dirname + '/../../public/images/avatar_anonymous.png', function (err, data) {
-                        if (err)
-                            return res.send(err, 500);
-                        res.send(data);
-                    });
-                }
-            }).error(function (err) {
-                res.send(err, 500);
-            });
+                     var fsNamethumbanil = fileModel.fsName;                    
+                        
+                        options.uri = "http://localhost:1337/file/thumbnaildownload/" + fsNamethumbanil + "?_session=" + JSON.stringify(_session);
+                        var proxyReq = request.get(options).pipe(res);
+                        proxyReq.on('error', function (err) {
+                            res.send(err, 500)
+                        });
+                    }// Otherwise serve up the anonymous avatar image
+                    else {
+                        res.setHeader('Content-Type', 'image/png');
+                        fs.readFile(__dirname + '/../../public/images/avatar_anonymous.png', function (err, data) {
+                            if (err)
+                                return res.send(500);
+                            res.send(data);
+                        });
+                    }
+                }).error(function (err) {
+                    res.send(err, 500);
+                });
+            }else{
+                res.send(500);
+            }
             return;
 
         }
