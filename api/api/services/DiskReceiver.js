@@ -137,19 +137,19 @@ module.exports = {
 
 		sails.log(options);
 
-		fsx.unlink((options.receiverinfo.path||'files/')+'' + options.id, function(err){
+		fsx.unlink((options.receiverinfo.path||'/var/www/html/olympus/api/files/')+'' + options.id, function(err){
           // if (err) console.log(err);
         });
-        fsx.unlink((options.receiverinfo.path||'files/')+'thumbnail-' + options.id, function(err){
+        fsx.unlink((options.receiverinfo.path||'/var/www/html/olympus/api/files/')+'thumbnail-' + options.id, function(err){
           // if (err) console.log(err);
         });
-        fsx.unlink((options.receiverinfo.path||'files/')+'thumbnail-thumbnail-' + options.id, function(err){
+        fsx.unlink((options.receiverinfo.path||'/var/www/html/olympus/api/files/')+'thumbnail-thumbnail-' + options.id, function(err){
           // if (err) console.log(err);
         });
         // fs.unlink(sails.config.linuxPath+'master/public/images/thumbnail/'+fileModel.name, function(err){
           // if (err) console.log(err);
         // });
-        fsx.unlink(sails.config.linuxPath+'master/public/images/thumbnail-thumbnail-'+options.id, function(err){
+        fsx.unlink('/var/www/html/master/public/images/thumbnail-thumbnail-'+options.id, function(err){
           // if (err) console.log(err);
         });
 

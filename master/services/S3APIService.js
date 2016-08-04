@@ -40,6 +40,16 @@ module.exports.upload = function(options, cb) {
  */
 module.exports.download = function(options, cb) {
 
+	console.log(options);
+	var config = {
+		accessKeyId: options.current_receiverinfo.accessKeyId || process.env.AWS_ACCESS_KEY_ID,
+		secretAccessKey: options.current_receiverinfo.secretAccessKey || process.env.AWS_SECRET_ACCESS_KEY,
+		// awsAccountId: sails.config.fileAdapter.s3.awsAccountId || process.env.AWS_ACCOUNT_ID,
+		bucket: options.current_receiverinfo.bucket || process.env.AWS_BUCKET,
+		region: require('awssum-amazon')[options.current_receiverinfo.region || process.env.AWS_REGION]
+	};
+
+	var s3 = new amazonS3.S3(config);
 	// creation of bucket was ok, now let's put an object into it
 /*	s3.GetObject({
 		BucketName: config.bucket,

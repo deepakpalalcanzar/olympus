@@ -305,39 +305,59 @@ module.exports = {
                     console.log('S3 START------------file');
                     console.log(file.fsName);
 
+                    console.log('33333333333333333333333333333333333333rishabh');
+
                     // TrashController.deletePermanent();
-                    var receiver = global[sails.config.receiver + 'Receiver'].deleteobject({
-                        id: file.fsName
-                    },function(err,data){
-                        console.log('err');
-                        console.log(err);
-                        console.log(data);
-                        console.log('data');
+                    async.auto({
+                        getAdapterId: function(cb) {
 
-                        var fs = require('fs');
+                            File.findOne({where:{fsName:file.fsName}}).done(cb);
+                        },
+                        getAdapter: ['getAdapterId', function(cb, up) {
 
-                        DeletedList.destroy({deleted_id:options.file_id}).exec(function (err){
-                          if (err) {
-                            console.log(err);
-                          }
-                          console.log('Any file with deleted_id : '+options.file_id+' have now been deleted, if there were any.');
-                          // return res.ok();
+                            uploadPaths.findOne({where:{id:up.getAdapterId.uploadPathId}}).done(cb);
+                        }],
+                        downloadTask: ['getAdapter', function(cb, up) {
 
-                            fs.unlink('/var/www/html/olympus/api/files/' + file.fsName, function(err){
-                              // if (err) console.log(err);
+                            var current_receiver        = up.getAdapter.type;
+                            var current_receiverinfo    = up.getAdapter;
+                            console.log('File ReceiverDeletedList: '+current_receiver);
+
+                            var receiver = global[current_receiver + 'Receiver'].deleteobject({
+                                id: file.fsName,
+                                receiverinfo: current_receiverinfo
+                            },function(err,data){
+                                console.log('err');
+                                console.log(err);
+                                console.log(data);
+                                console.log('data');
+
+                                var fs = require('fs');
+
+                                DeletedList.destroy({deleted_id:options.file_id}).exec(function (err){
+                                  if (err) {
+                                    console.log(err);
+                                  }
+                                  console.log('Any file with deleted_id : '+options.file_id+' have now been deleted, if there were any.');
+                                  // return res.ok();
+
+                                    fs.unlink('/var/www/html/olympus/api/files/' + file.fsName, function(err){
+                                      // if (err) console.log(err);
+                                    });
+                                    fs.unlink('/var/www/html/olympus/api/files/thumbnail-' + file.fsName, function(err){
+                                      // if (err) console.log(err);
+                                    });
+                                    fs.unlink('/var/www/html/olympus/api/files/thumbnail-thumbnail-' + file.fsName, function(err){
+                                      // if (err) console.log(err);
+                                    });
+                                    fs.unlink('/var/www/html/olympus/master/public/images/thumbnail/'+file.name, function(err){
+                                      // if (err) console.log(err);
+                                    });
+                                    console.log('returning callback for '+file.fsName);
+                                    return cb && cb();
+                                });
                             });
-                            fs.unlink('/var/www/html/olympus/api/files/thumbnail-' + file.fsName, function(err){
-                              // if (err) console.log(err);
-                            });
-                            fs.unlink('/var/www/html/olympus/api/files/thumbnail-thumbnail-' + file.fsName, function(err){
-                              // if (err) console.log(err);
-                            });
-                            fs.unlink('/var/www/html/olympus/master/public/images/thumbnail/'+file.name, function(err){
-                              // if (err) console.log(err);
-                            });
-                            console.log('returning callback for '+file.fsName);
-                            return cb && cb();
-                        });
+                        }]
                     });
                     console.log('S3 END------------file');
                 });

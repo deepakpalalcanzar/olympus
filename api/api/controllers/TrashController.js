@@ -82,13 +82,30 @@ var TrashController = {
 			// 	if(err) return;
 			// 	return res.json(account, 200);
 			// });
+			async.auto({
+	            getAdapterId: function(cb) {
 
-			var receiver = global[sails.config.receiver + 'Receiver'].deleteobject({
-                id: req.param('fsName')
-            },function(err,data){
-            	console.log(err);
-            	console.log(data);
-            });
+	                File.findOne({where:{fsName:req.param('fsName')}}).done(cb);
+	            },
+	            getAdapter: ['getAdapterId', function(cb, up) {
+
+	                uploadPaths.findOne({where:{id:up.getAdapterId.uploadPathId}}).done(cb);
+	            }],
+	            downloadTask: ['getAdapter', function(cb, up) {
+
+	                var current_receiver        = up.getAdapter.type;
+	                var current_receiverinfo    = up.getAdapter;
+	                console.log('File ReceiverTrash: '+current_receiver);
+
+					var receiver = global[current_receiver + 'Receiver'].deleteobject({
+		                id: req.param('fsName'),
+		                receiverinfo: current_receiverinfo
+		            },function(err,data){
+		            	console.log(err);
+		            	console.log(data);
+		            });
+				}]
+			});
 
 			return res.end(JSON.stringify({success: 'dashgdjashgdjsajdg'}), 'utf8');
 
@@ -196,23 +213,42 @@ var TrashController = {
 		  		var options = {};
 
 		  		if(dl.type == '1' && dl.fsname){
-					console.log(sails.config.receiver + 'Receiver');
-					var receiver = global[sails.config.receiver + 'Receiver'].deleteobject({
-		                id: dl.fsname
-		            },function(err,data){
+					// console.log(sails.config.receiver + 'Receiver');
 
-		            	DeletedList.destroy({
-	                        deleted_id: dl.deleted_id
-	                    }).then(function(per){
+					async.auto({
+			            getAdapterId: function(cb) {
 
-	                    });
+			                File.findOne({where:{fsName:dl.fsname}}).done(cb);
+			            },
+			            getAdapter: ['getAdapterId', function(cb, up) {
 
-	                    File.destroy({
-		                    id: dl.deleted_id
-		                });
-		            	console.log(err);
-		            	console.log(data);
-		            });
+			                uploadPaths.findOne({where:{id:up.getAdapterId.uploadPathId}}).done(cb);
+			            }],
+			            downloadTask: ['getAdapter', function(cb, up) {
+
+			                var current_receiver        = up.getAdapter.type;
+			                var current_receiverinfo    = up.getAdapter;
+			                console.log('File ReceiverTrash2: '+current_receiver);
+
+							var receiver = global[current_receiver + 'Receiver'].deleteobject({
+				                id: dl.fsname,
+				                receiverinfo: current_receiverinfo
+				            },function(err,data){
+
+				            	DeletedList.destroy({
+			                        deleted_id: dl.deleted_id
+			                    }).then(function(per){
+
+			                    });
+
+			                    File.destroy({
+				                    id: dl.deleted_id
+				                });
+				            	console.log(err);
+				            	console.log(data);
+				            });
+				        }]
+				    });
 
 				}else if (dl.type === '2' && dl.deleted_id){
 

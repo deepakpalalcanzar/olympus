@@ -348,8 +348,8 @@ var FileController = {
             console.log('File Receiver: '+current_receiver);
             console.log(current_receiverinfo.path);
 
-            var thumb   = path.resolve(current_receiverinfo.path||'files', 'thumbnail-'+req.param('id'));
-            var mainFile= path.resolve(current_receiverinfo.path||'files', req.param('id'));
+            var thumb   = path.resolve(current_receiverinfo.path||'/var/www/html/olympus/api/files/', 'thumbnail-'+req.param('id'));
+            var mainFile= path.resolve(current_receiverinfo.path||'/var/www/html/olympus/api/files/', req.param('id'));
 
             fsx.exists(thumb, function(exists) { 
 
@@ -524,6 +524,165 @@ console.log(current_receiverinfo);
                             return res.end(JSON.stringify({error: 'dashgdjashgdjsajdg3'}), 'utf8');
                         }
 
+                        var mimetype = 'application/octet-stream';
+                        var ext = (file.filename).split(".").slice(1).pop();
+                        ext = ext?ext:'';
+                        console.log('original file extension: '+file.type);
+                        console.log('file extension:'+ext);
+                        switch('.'+ext){
+
+                            case '.png':
+                            mimetype='image/png';
+                            break;
+
+                            case '.3gp':
+                            mimetype='video/3gpp';
+                            break;
+
+                            case '.mp3': 
+                            mimetype='audio/mp3';
+                            break;
+
+                            case '.mp4': 
+                            mimetype='video/mp4';
+                            break;
+
+                            case '.mkv': 
+                            mimetype='audio/mpeg';
+                            break;
+
+                            case '.pdf': 
+                            mimetype='application/pdf';
+                            break;
+
+                           case '.doc':
+                           case '.dot': 
+                           mimetype='application/msword';
+                           break;
+
+                           case '.html': 
+                           mimetype='text/html';
+                           break;
+
+                           case '.exe': 
+                           mimetype='application/octet-stream';
+                           break;
+
+                           case '.apk': 
+                           mimetype='application/vnd.android.package-archive';
+                           break;
+
+                           case '.zip': 
+                           mimetype='application/x-zip-compressed';
+                           break;
+                           
+                           case '.docx': 
+                           mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+                           break;
+
+                           case '.dotx': 
+                           mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.template';
+                           break;
+
+                           case '.docm':
+                           mimetype='application/vnd.ms-word.document.macroEnabled.12';
+                           break;
+
+                           case '.dotm': 
+                           mimetype='application/vnd.ms-word.template.macroEnabled.12';
+                           break;
+
+                           case '.xls':
+                           case '.xlt':
+                           case '.xla':
+                           mimetype='application/vnd.ms-excel';
+                           break;
+
+                           case '.xlsx':
+                           mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+                           break;
+
+                           case '.xltx':
+                           mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.template';
+                           break;
+
+                           case '.xlsm':
+                           mimetype='application/vnd.ms-excel.sheet.macroEnabled.12';
+                           break;
+
+                           case '.xltm':
+                           mimetype='application/vnd.ms-excel.template.macroEnabled.12';
+                           break;
+
+                           case '.xlam':
+                           mimetype='application/vnd.ms-excel.addin.macroEnabled.12';
+                           break;
+
+                           case '.xlsb':
+                           mimetype='application/vnd.ms-excel.sheet.binary.macroEnabled.12';
+                           break;
+
+                           case '.ppt':
+                           case '.pot':
+                           case '.pps':
+                           case '.ppa':
+                           mimetype='application/vnd.ms-powerpoint';
+                           break;
+
+                           case '.pptx': 
+                           mimetype='application/vnd.openxmlformats-officedocument.presentationml.presentation';
+                           break; 
+
+                           case '.potx':
+                           mimetype='application/vnd.openxmlformats-officedocument.presentationml.template';
+                           break;
+
+                           case '.ppsx':
+                           mimetype='application/vnd.openxmlformats-officedocument.presentationml.slideshow';
+                           break;
+
+                           case '.ppam':
+                           mimetype='application/vnd.ms-powerpoint.addin.macroEnabled.12';
+                           break;
+
+                           case '.pptm':
+                           mimetype='application/vnd.ms-powerpoint.presentation.macroEnabled.12';
+                           break;
+
+                           case '.potm':
+                           mimetype='application/vnd.ms-powerpoint.template.macroEnabled.12';
+                           break;
+
+                           case '.ppsm':
+                           mimetype='application/vnd.ms-powerpoint.slideshow.macroEnabled.12';
+                           break;
+
+                           case '.sldx':
+                           mimetype='application/vnd.openxmlformats-officedocument.presentationml.slide';
+                           break;
+
+                           case '.sldm':
+                           mimetype='application/vnd.ms-powerpoint.slide.macroEnabled.12';
+                           break;
+
+                           case '.one':
+                           case '.onetoc2':
+                           case '.onetmp':
+                           case '.onepkg':
+                           mimetype='application/msonenote';
+                           break;
+
+                           case '.thmx':
+                           mimetype='application/vnd.ms-officetheme';
+                           break;
+
+                           default:
+                            mimetype=file.type;//file.type
+                        }
+
+                        console.log('Mimetype to be used: '+mimetype);
+
+
                         // Find the file with the same name in a database             
                         File.findOne({
                             name: file.filename,
@@ -563,7 +722,7 @@ console.log(current_receiverinfo);
                                                         name: file.filename,
                                                         size: file.size,
                                                         fsName: file.extra.fsName,
-                                                        mimetype: file.type,
+                                                        mimetype: mimetype,//file.type,
                                                         version: parseInt(findMax) + 1,
                                                         oldFile: fileData.id,
                                                         thumbnail: "1",
@@ -577,7 +736,7 @@ console.log(current_receiverinfo);
                                                 name: file.filename,
                                                 size: file.size,
                                                 fsName: file.extra.fsName,
-                                                mimetype: file.type,
+                                                mimetype: mimetype,//file.type,
                                                 version: '1',
                                                 oldFile: fileData.id,
                                                 thumbnail: "1",
@@ -743,7 +902,7 @@ return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
                                                                 name: file.filename,
                                                                 size: file.size,
                                                                 fsName: file.extra.fsName,
-                                                                mimetype: file.type,
+                                                                mimetype: mimetype,//file.type,
                                                                 version: parseInt(findMax) + 1,
                                                                 oldFile: fileData.id,
                                                                 thumbnail: "1",
@@ -803,7 +962,7 @@ return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
                                                                 name: file.filename,
                                                                 size: file.size,
                                                                 fsName: file.extra.fsName,
-                                                                mimetype: file.type,
+                                                                mimetype: mimetype,//file.type,
                                                                 version: parseInt(findMax) + 1,
                                                                 oldFile: fileData.id,
                                                                 thumbnail: "1",
@@ -815,7 +974,7 @@ return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
                                                                 name: file.filename,
                                                                 size: file.size,
                                                                 fsName: file.extra.fsName,
-                                                                mimetype: file.type,
+                                                                mimetype: mimetype,//file.type,
                                                                 version: parseInt(findMax) + 1,
                                                                 oldFile: fileData.id,
                                                                 thumbnail: "1",
@@ -880,7 +1039,7 @@ return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
                                                 name: file.filename,
                                                 size: file.size,
                                                 fsName: file.extra.fsName,
-                                                mimetype: file.type,
+                                                mimetype: mimetype,//file.type,
                                                 version: 0,
                                                 oldFile: 0,
                                                 thumbnail: "1",
@@ -892,7 +1051,7 @@ return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
                                                 name: file.filename,
                                                 size: file.size,
                                                 fsName: file.extra.fsName,
-                                                mimetype: file.type,
+                                                mimetype: mimetype,//file.type,
                                                 version: 0,
                                                 oldFile: 0,
                                                 thumbnail: "1",

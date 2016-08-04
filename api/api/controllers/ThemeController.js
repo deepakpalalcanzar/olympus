@@ -110,28 +110,28 @@ var ThemeController = {
         var id = req.body.account_id;
         if (id) {
 
-            Account.findOne(id).done(function (err, account_enter) {
+            Account.findOne(id).done(function (err, account) {
 
-                if (!account_enter.id) {
+                if (!account.id) {
                     console.log('Enterprise Data not found');
                     return res.json({
                         error: 'Enterprise Data not found',
                         type: 'error'
                     }, 400);
                 }
-                Theme.findOne({account_id: account_enter.id}).sort('createdAt DESC').done(function (err, dir) {
+                Theme.findOne({account_id: account.id}).sort('createdAt DESC').done(function (err, dir) {
                     if (err)
                         res.json({success: false, error: err});
 
                     TransactionDetails.findOne({
-                        account_id: account_enter.id
+                        account_id: account.id
                     }).sort('createdAt DESC').done(function(err, trans){
                         if (!dir) {
-                            if(!account_enter.created_by){//is null
-                                ThemeController.sendthemeResponse(res, dir, account_enter, trans);
+                            if(!account.created_by){//is null
+                                ThemeController.sendthemeResponse(res, dir, account, trans, account);
                             }else{
                                 //if no theme found, check parent enterprise account
-                                Account.findOne(account_enter.created_by).done(function (err, account_enter) {
+                                Account.findOne(account.created_by).done(function (err, account_enter) {
 
                                     if (!account_enter.id) {
                                         console.log('Enterprise Data not found');
@@ -145,7 +145,7 @@ var ThemeController = {
                                             res.json({success: false, error: err});
 
                                         if (!dir || !account_enter.is_enterprise) {
-                                            ThemeController.sendthemeResponse(res, dir, account_enter, trans);
+                                            ThemeController.sendthemeResponse(res, dir, account_enter, trans, account);
                                             /*return  res.json({
                                                 success             : true, 
                                                 enterprise_fsname   : (account_enter.enterprise_fsname)?account_enter.enterprise_fsname:"null", 
@@ -166,7 +166,7 @@ var ThemeController = {
                                             });*/
                                         }
 
-                                        ThemeController.sendthemeResponse(res, dir, account_enter, trans);
+                                        ThemeController.sendthemeResponse(res, dir, account_enter, trans, account);
                                         /*var Rgb_header_background   = ""+ (dir.header_background === '#undefined' ? null : (hexToRgb(dir.header_background).r)) +","+(dir.header_background === '#undefined' ? null : (hexToRgb(dir.header_background).g))+","+(dir.header_background === '#undefined' ? null : (hexToRgb(dir.header_background).b))+"";
                                         var Rgb_footer_background   = ""+ (dir.footer_background === '#undefined' ? null : (hexToRgb(dir.footer_background).r)) +","+(dir.footer_background === '#undefined' ? null : (hexToRgb(dir.footer_background).g))+","+(dir.footer_background === '#undefined' ? null : (hexToRgb(dir.footer_background).b))+"";
                                         var Rgb_body_background     = ""+ (dir.body_background === '#undefined' ? null : (hexToRgb(dir.body_background).r)) +","+(dir.body_background === '#undefined' ? null : (hexToRgb(dir.body_background).g))+","+(dir.body_background === '#undefined' ? null : (hexToRgb(dir.body_background).b))+"";
@@ -195,7 +195,7 @@ var ThemeController = {
                             }
                         }else{
 
-                            ThemeController.sendthemeResponse(res, dir, account_enter, trans);ThemeController.sendthemeResponse(res, dir, account_enter, trans);
+                            ThemeController.sendthemeResponse(res, dir, account, trans, account);
                             /*var Rgb_header_background   = ""+ (dir.header_background === '#undefined' ? null : (hexToRgb(dir.header_background).r)) +","+(dir.header_background === '#undefined' ? null : (hexToRgb(dir.header_background).g))+","+(dir.header_background === '#undefined' ? null : (hexToRgb(dir.header_background).b))+"";
                             var Rgb_footer_background   = ""+ (dir.footer_background === '#undefined' ? null : (hexToRgb(dir.footer_background).r)) +","+(dir.footer_background === '#undefined' ? null : (hexToRgb(dir.footer_background).g))+","+(dir.footer_background === '#undefined' ? null : (hexToRgb(dir.footer_background).b))+"";
                             var Rgb_body_background     = ""+ (dir.body_background === '#undefined' ? null : (hexToRgb(dir.body_background).r)) +","+(dir.body_background === '#undefined' ? null : (hexToRgb(dir.body_background).g))+","+(dir.body_background === '#undefined' ? null : (hexToRgb(dir.body_background).b))+"";
@@ -205,8 +205,8 @@ var ThemeController = {
                         
                             return  res.json({
                                 success             : true, 
-                                enterprise_fsname   : account_enter.enterprise_fsname, 
-                                enterprise_mimetype : account_enter.enterprise_mimetype,
+                                enterprise_fsname   : account.enterprise_fsname, 
+                                enterprise_mimetype : account.enterprise_mimetype,
                                 header_background   : Rgb_header_background, 
                                 footer_background   : Rgb_footer_background, 
                                 body_background     : Rgb_body_background, 
@@ -217,7 +217,7 @@ var ThemeController = {
                                 users_limit         : trans.users_limit,
                                 quota               : trans.quota,
                                 plan_name           : trans.plan_name,
-    				account_id	:account_enter.id,
+    				account_id	:account.id,
                                 duration            : trans.duration,
 
                             });*/
@@ -227,7 +227,7 @@ var ThemeController = {
             })
         }
     },
-    sendthemeResponse: function (res, dir, account_enter, trans) {
+    sendthemeResponse: function (res, dir, account_enter, trans, account) {
 
         function hexToRgb(hex) {
             // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
@@ -265,7 +265,7 @@ var ThemeController = {
                 plan_name           : (trans.plan_name === 'undefined') ? null :trans.plan_name,
                 duration            : (trans.duration === 'undefined') ? null :trans.duration,
                 account_id          : account_enter.id,
-
+                account_avatar      : (account.avatar_image)?account.avatar_image:"null"
             });
         }
 
@@ -296,6 +296,7 @@ var ThemeController = {
             plan_name           : trans.plan_name,
 account_id  :account_enter.id,
             duration            : trans.duration,
+            account_avatar      : (account.avatar_image)?account.avatar_image:"null"
 
         });
     }

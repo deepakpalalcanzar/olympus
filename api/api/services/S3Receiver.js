@@ -274,9 +274,9 @@ module.exports = {
 		sails.log(options);
 
 		var client = knox.createClient({
-			key: sails.config.adapters.s3.apiKey, 
-			secret: sails.config.adapters.s3.apiSecret,
-			bucket: sails.config.adapters.s3.bucket
+			key: options.receiverinfo.accessKeyId, 
+			secret: options.receiverinfo.secretAccessKey,
+			bucket: options.receiverinfo.bucket
 		});
 
 		client.deleteFile(options.id, function(err, res) {

@@ -88,10 +88,12 @@ Mast.registerComponent('AppearanceComponent',{
 	        	this.$('select[name="fontFamily"] option[value="'+((res.theme.font_family == "Arial, Helvetica, sans-serif")?'ProzimanovaRegular, Helvetica, Ariel, sans-serif':res.theme.font_family)+'"]').prop('selected', true);
 	        	$("body, p, a, h1, h2, h3, h4, h5, h6, label").css({ 'font-family' : res.theme.font_family });
 	        	$("body, p, a, h1, h2, h3, h4, h5, h6, label").css({ 'color' : res.theme.font_color });
+	        	$("p.ajax-loader,p.ajax-loader b,.inode-name,.modified-date").css({ 'color' : '#EFEFEF' });//exception
 	        }else{
 	        	this.$('select[name="fontFamily"] option[value="Arial, Helvetica, sans-serif"]').prop('selected', true);
 	        	$("body, p, a, h1, h2, h3, h4, h5, h6, label").css({ 'font-family' : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif' });
 	        	$("body, p, a, h1, h2, h3, h4, h5, h6, label").css({ 'color' : '#547aa4' });
+	        	$("p.ajax-loader,p.ajax-loader b,.selected .inode-name,.selected .modified-date").css({ 'color' : '#EFEFEF' });//exception
 	        }
 		});
 	}, 

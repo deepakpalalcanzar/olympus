@@ -432,12 +432,12 @@ var FileController = {
         async.auto({
             getAdapter: function(cb) {
 
-                UploadPaths.find({where:{isActive:1}}).done(cb);
+                UploadPaths.find({where:{id:fileModel.uploadPathId}}).done(cb);
                 // uploadPaths.findOne({where:{isActive:1}}).done(cb);
             },
             uploadFileTask: ['getAdapter', function(cb, up) {
-                console.log('asyncResultsasyncResultsasyncResultsasyncResultsasyncResults');
-                console.log(up);
+                // console.log('asyncResultsasyncResultsasyncResultsasyncResultsasyncResults');
+                // console.log(up);
                 console.log('up.getAdapter.type');
                 console.log(up.getAdapter.type);
                 var current_receiver        = up.getAdapter.type;
@@ -461,9 +461,11 @@ var FileController = {
 
                 } else {
 
+                    console.log(FileAdapter);
                     // Download and serve file from s3 and swift
-                    FileAdapter.download({
-                        name: fileModel.fsName
+                    S3APIService.download({
+                        name: fileModel.fsName,
+                        current_receiverinfo: current_receiverinfo
                     }, function (err, data, contentLength, stream) {
 
                         if (err)
