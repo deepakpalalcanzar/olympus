@@ -245,10 +245,10 @@ var ThemeController = {
         }
 
         if (!dir) {
-            console.log('accountAPIaccountAPIaccountAPIaccountAPIaccountAPI');
-            console.log(account_enter);
-            console.log((account_enter.enterprise_fsname)?account_enter.enterprise_fsname:"null");
-            console.log('accountAPIaccountAPIaccountAPIaccountAPIaccountAPI');
+            // console.log('accountAPIaccountAPIaccountAPIaccountAPIaccountAPI');
+            // console.log(account_enter);
+            // console.log((account_enter.enterprise_fsname)?account_enter.enterprise_fsname:"null");
+            // console.log('accountAPIaccountAPIaccountAPIaccountAPIaccountAPI');
             return  res.json({
                 success             : true, 
                 enterprise_fsname   : (account_enter.enterprise_fsname)?account_enter.enterprise_fsname:"null", 
@@ -260,25 +260,20 @@ var ThemeController = {
                 font_color          : "null", 
                 font_family         : "null",
                 adaptor             : sails.config.receiver,
-                users_limit         : (trans.users_limit === 'undefined') ? null :trans.users_limit,
-                quota               : (trans.quota === 'undefined') ? null :trans.quota,
-                plan_name           : (trans.plan_name === 'undefined') ? null :trans.plan_name,
-                duration            : (trans.duration === 'undefined') ? null :trans.duration,
+                users_limit         : trans ? trans.users_limit:"null",
+                quota               : trans ? trans.quota:"null",
+                plan_name           : trans ? trans.plan_name:"null",
+                duration            : trans ? trans.duration:"null",
                 account_id          : account_enter.id,
                 account_avatar      : (account.avatar_image)?account.avatar_image:"null"
             });
         }
 
-        var Rgb_header_background   = ""+ (dir.header_background === '#' || dir.header_background === 'undefined') ? "null" : (hexToRgb(dir.header_background).r) +","+(hexToRgb(dir.header_background).g)+","+(hexToRgb(dir.header_background).b)+"";
-        var Rgb_footer_background   = ""+ (dir.footer_background === '#' || dir.header_background === 'undefined') ? "null" : (hexToRgb(dir.footer_background).r) +","+(hexToRgb(dir.footer_background).g)+","+(hexToRgb(dir.footer_background).b)+"";
-        var Rgb_body_background     = ""+ (dir.body_background === '#' || dir.header_background === 'undefined') ? "null" : (hexToRgb(dir.body_background).r) +","+(hexToRgb(dir.body_background).g)+","+(hexToRgb(dir.body_background).b)+"";
-        var Rgb_navigation_color    = ""+ (dir.navigation_color === '#' || dir.header_background === 'undefined') ? "null" : (hexToRgb(dir.navigation_color).r) +","+(hexToRgb(dir.navigation_color).g)+","+(hexToRgb(dir.navigation_color).b)+"";
-        var Rgb_font_color          = ""+ (dir.font_color === '#' || dir.header_background === 'undefined') ? "null" : (hexToRgb(dir.font_color).r) +","+(hexToRgb(dir.font_color).g)+","+(hexToRgb(dir.font_color).b)+"";                                
-        
-        console.log('2222accountAPIaccountAPIaccountAPIaccountAPIaccountAPI');
-        console.log(account_enter);
-        console.log((account_enter.enterprise_fsname)?account_enter.enterprise_fsname:"null");
-        console.log('2222accountAPIaccountAPIaccountAPIaccountAPIaccountAPI');
+        var Rgb_header_background   = (dir.header_background === '#' || dir.header_background === 'undefined') ? "null" : (hexToRgb(dir.header_background).r) +","+(hexToRgb(dir.header_background).g)+","+(hexToRgb(dir.header_background).b)+"";
+        var Rgb_footer_background   = (dir.footer_background === '#' || dir.header_background === 'undefined') ? "null" : (hexToRgb(dir.footer_background).r) +","+(hexToRgb(dir.footer_background).g)+","+(hexToRgb(dir.footer_background).b)+"";
+        var Rgb_body_background     = (dir.body_background === '#' || dir.header_background === 'undefined') ? "null" : (hexToRgb(dir.body_background).r) +","+(hexToRgb(dir.body_background).g)+","+(hexToRgb(dir.body_background).b)+"";
+        var Rgb_navigation_color    = (dir.navigation_color === '#' || dir.header_background === 'undefined') ? "null" : (hexToRgb(dir.navigation_color).r) +","+(hexToRgb(dir.navigation_color).g)+","+(hexToRgb(dir.navigation_color).b)+"";
+        var Rgb_font_color          = (dir.font_color === '#' || dir.header_background === 'undefined') ? "null" : (hexToRgb(dir.font_color).r) +","+(hexToRgb(dir.font_color).g)+","+(hexToRgb(dir.font_color).b)+"";
 
         return  res.json({
             success             : true, 
@@ -291,11 +286,11 @@ var ThemeController = {
             font_color          : Rgb_font_color, 
             font_family         : dir.font_family, 
             adaptor             : sails.config.receiver,
-            users_limit         : trans.users_limit,
-            quota               : trans.quota,
-            plan_name           : trans.plan_name,
-account_id  :account_enter.id,
-            duration            : trans.duration,
+            users_limit         : trans?trans.users_limit:"null",
+            quota               : trans?trans.quota:"null",
+            plan_name           : trans?trans.plan_name:"null",
+            duration            : trans?trans.duration:"null",
+            account_id          :account_enter.id,
             account_avatar      : (account.avatar_image)?account.avatar_image:"null"
 
         });

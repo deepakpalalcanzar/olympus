@@ -196,31 +196,35 @@ var TempAccountController = {
             raw: true
         }).success(function(accounts) {
 
-            var response = [];
-            var sql, sqlFile;
-console.log('444477777444477777444477777444477777444477777444477777444477777');
-console.log(accounts);
-console.log('444477777444477777444477777444477777444477777444477777444477777');
-            if(lastSync === '0'){
-                sql = "SELECT * from deletedlist where account_id = ? and deleted_id IS NOT NULL";
-                sql = Sequelize.Utils.format([sql, accounts[0].account_id]);
-            }else{
-                sql = "SELECT * from deletedlist where account_id = ? and createdAt > ? and deleted_id IS NOT NULL";
-                sql = Sequelize.Utils.format([sql, accounts[0].account_id, lastSync]);
-            }
-
-            sequelize.query(sql, null, {
-                raw: true
-            }).success(function(deletedlist) {
-
-                if(deletedlist.length > 0){
-                    response['0'] = deletedlist;
+            if(typeof accounts[0] !== 'undefined'){
+                var response = [];
+                var sql, sqlFile;
+    console.log('444477777444477777444477777444477777444477777444477777444477777');
+    console.log(accounts);
+    console.log('444477777444477777444477777444477777444477777444477777444477777');
+                if(lastSync === '0'){
+                    sql = "SELECT * from deletedlist where account_id = ? and deleted_id IS NOT NULL";
+                    sql = Sequelize.Utils.format([sql, accounts[0].account_id]);
+                }else{
+                    sql = "SELECT * from deletedlist where account_id = ? and createdAt > ? and deleted_id IS NOT NULL";
+                    sql = Sequelize.Utils.format([sql, accounts[0].account_id, lastSync]);
                 }
-                
-                response['1'] = lastCall;
-                res.json(response);
 
-            });
+                sequelize.query(sql, null, {
+                    raw: true
+                }).success(function(deletedlist) {
+
+                    if(deletedlist.length > 0){
+                        response['0'] = deletedlist;
+                    }
+                    
+                    response['1'] = lastCall;
+                    res.json(response);
+
+                });
+            }else{
+                res.json({ notAuth: 'not autorized'});
+            }
 
         });
 
