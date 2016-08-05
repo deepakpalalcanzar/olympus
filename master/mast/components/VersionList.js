@@ -31,13 +31,22 @@ Mast.registerTree('VersionList', {
 	branchComponent: 'VersionRow',
 
 	subscriptions: {
-		'~COMMENT_CREATE': function (comment) {
+		//Below subscription prevents Activity Comment List to function correctly
+		//TEST CASE:
+		//1.click on Activity(/Comment) tab
+		//2.comment-(comment rendered immediately)
+		//3.Click on Version Tab
+		//4.Click again in Activity(/Comment) tab
+		//5.Again Comment -This time comment posted in backend but did not render immediately
+		//Actually in Activity comments are updated with ActivityList components' subscription but 
+		//for Version tab comments are loaded from collection each time Version tab is clicked but 
+		//but on comment a new static row is added immediately
+		/*'~COMMENT_CREATE': function (comment) {
 			if (comment && comment.source && comment.source.item &&
 				// comment.source.item.id == this.get('id') &&
 				comment.source.item.type == this.get('type')) {
 
-				/*Rishabh-Update comment list:: Added trigger in postVersion method for refresh*/
-				/*var html='';
+				var html='';
 				// console.log(val);
 				html+='<div class="commentRow-template comment-attire">'+
 					  '<div class="comment-user-avatar">'+
@@ -51,13 +60,12 @@ Mast.registerTree('VersionList', {
 					  '</div>';
 				
 				console.log('vers-comm-length'+$('#vers-com').length)
-				$('#vers-com').append(html).show();*/
-				/*Rishabh-Update comment list*/
+				$('#vers-com').append(html).show();
 
-				this.collection.add(comment.source);
-				this.scrollToBottom();
+				// this.collection.add(comment.source);
+				// this.scrollToBottom();
 			}
-		}
+		}*/
 	},
 
 	events: {

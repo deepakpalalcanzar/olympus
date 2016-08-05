@@ -33,8 +33,8 @@ Mast.registerTree('ActivityList', {
 
 	subscriptions: {
 		/*Rishabh-Removing This subscription as it is not adding comment on correct tree */
-		/*'~COMMENT_CREATE': function (comment) {
-			alert('TEST');
+		'~COMMENT_CREATE': function (comment) {
+			// alert('TEST');
                         if(Mast.Session.Account.avatar_image==null){
                            var avatar_image="/images/avatar_anonymous.png";
                         }else{
@@ -52,7 +52,7 @@ Mast.registerTree('ActivityList', {
 				console.log('COMMENTDETAILSNOTFOUND');
 				console.log(comment);
 			}
-		}*/
+		}
 	},
 
 	events: {
