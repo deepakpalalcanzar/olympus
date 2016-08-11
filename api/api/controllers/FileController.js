@@ -535,6 +535,11 @@ console.log(current_receiverinfo);
                             mimetype='image/png';
                             break;
 
+                            case '.jpg':
+                            case '.jpeg':
+                            mimetype='image/jpeg';
+                            break;
+
                             case '.3gp':
                             mimetype='video/3gpp';
                             break;

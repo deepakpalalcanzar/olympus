@@ -2,6 +2,8 @@
  * Redirect New API Methods to New Server
  */
 var request = require('request');
+var fileSystem = require( "fs" );
+var stream = require( "stream" );
 
 var RedirectController = {
     redirect: function (req, res) {
@@ -154,10 +156,26 @@ console.log('IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIII
 //                    console.log(req.url);
 //                    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&& FS name &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
 
+
                     // set content-type header
                     res.setHeader('Content-Type', fileModel.mimetype);
                     options.uri = "http://localhost:1337/file/download/" + fileModel.fsName + "?_session=" + JSON.stringify(_session);
-                    var proxyReq = request.get(options).pipe(res);
+
+                    // var proxyReq = request.get(options).pipe(res);
+                    // if (req.url.match(/^\/file\/open\//)) {//open
+                        //Rishabh: Backpressure issue reolved
+                        // http://www.bennadel.com/blog/2817-the-affect-of-back-pressure-when-piping-data-into-multiple-writable-streams-in-node-js.htm
+                        var proxyReq_temp = request.get(options);
+                        proxyReq_temp.pipe(
+                            new stream.PassThrough().pipe(
+                                fileSystem.createWriteStream( "./copy_" + fileModel.fsName )
+                            )
+                        );
+
+                        var proxyReq = proxyReq_temp.pipe(res);
+                    // }else{//download
+                    //     var proxyReq = request.get(options).pipe(res);
+                    // }
                     proxyReq.on('error', function (err) {
                         res.send(err, 500)
                     });

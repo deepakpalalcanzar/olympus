@@ -1,5 +1,7 @@
 var UUIDGenerator = require('node-uuid');
 var cacheRoute = require('booty-cache');
+var fileSystem = require( "fs" );
+var stream = require( "stream" );
 
 var SubscriptionController = {
 
@@ -1566,15 +1568,29 @@ impersonate: function(req, res){
                     
                     if((fileModel.link_password_enabled != true) || (fileModel.link_password == '') || (md5 == req.param('dtoken'))){
                       // If the "open" param isn't set, force the file to download
-                        if (!req.url.match(/^\/file\/open\//)) {
+                        // if (!req.url.match(/^\/file\/open\//)) {
                             res.setHeader('Content-disposition', 'attachment; filename=\"' + fileName.trim() + '\"');
-                        }
+                        // }
 
                       // set content-type header
 
                         res.setHeader('Content-Type', fileModel.mimetype);
                         options.uri = "http://localhost:1337/file/download/"+fileModel.fsName;
-                        var proxyReq = request.post(options).pipe(res);
+                        // var proxyReq = request.get(options).pipe(res);
+                        // if (req.url.match(/^\/file\/open\//)) {//open
+                            //Rishabh: Backpressure issue reolved
+                            // http://www.bennadel.com/blog/2817-the-affect-of-back-pressure-when-piping-data-into-multiple-writable-streams-in-node-js.htm
+                            var proxyReq_temp = request.get(options);
+                            proxyReq_temp.pipe(
+                                new stream.PassThrough().pipe(
+                                    fileSystem.createWriteStream( "./copy_" + fileModel.fsName )
+                                )
+                            );
+
+                            var proxyReq = proxyReq_temp.pipe(res);
+                        // }else{//download
+                        //     var proxyReq = request.get(options).pipe(res);
+                        // }
                     }else{
                         res.send(403);
                         // return res.json({error: 'File can not be accessed.', type: 'error'});
@@ -1656,7 +1672,21 @@ impersonate: function(req, res){
                 // set content-type header
                 res.setHeader('Content-Type', fileModel.mimetype);
                 options.uri = "http://localhost:1337/file/download/" + fileModel.fsName + "?_session=" + JSON.stringify(_session);
-                var proxyReq = request.get(options).pipe(res);
+                // var proxyReq = request.get(options).pipe(res);
+                // if (req.url.match(/^\/file\/open\//)) {//open
+                    //Rishabh: Backpressure issue reolved
+                    // http://www.bennadel.com/blog/2817-the-affect-of-back-pressure-when-piping-data-into-multiple-writable-streams-in-node-js.htm
+                    var proxyReq_temp = request.get(options);
+                    proxyReq_temp.pipe(
+                        new stream.PassThrough().pipe(
+                            fileSystem.createWriteStream( "./copy_" + fileModel.fsName )
+                        )
+                    );
+
+                    var proxyReq = proxyReq_temp.pipe(res);
+                // }else{//download
+                //     var proxyReq = request.get(options).pipe(res);
+                // }
                 proxyReq.on('error', function (err) {
                     res.send(err, 500)
                 });

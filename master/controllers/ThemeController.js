@@ -63,7 +63,8 @@ var ThemeController = {
             if (accountDev.length) {
                 var options = {
                     uri     : 'http://localhost:1337/theme/getThemeConfiguration',
-                    method  : 'POST'
+                    method  : 'POST',
+                    timeout : 40000
                 };
 
                 options.json = {
