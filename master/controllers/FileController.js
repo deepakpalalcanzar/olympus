@@ -277,7 +277,6 @@ var FileController = {
 	
         var today = new Date();
         File.find(req.param('id')).success(function (model) {
-            console.log(model);
             if (model) {
 
 
@@ -436,13 +435,10 @@ var FileController = {
                 // uploadPaths.findOne({where:{isActive:1}}).done(cb);
             },
             uploadFileTask: ['getAdapter', function(cb, up) {
-                // console.log('asyncResultsasyncResultsasyncResultsasyncResultsasyncResults');
-                // console.log(up);
                 console.log('up.getAdapter.type');
                 console.log(up.getAdapter.type);
                 var current_receiver        = up.getAdapter.type;
                 var current_receiverinfo    = up.getAdapter;
-                console.log(current_receiver);
 
                 // set content-type header
                 if (current_receiver == 'Disk') {
@@ -455,21 +451,26 @@ var FileController = {
 
                     res.setHeader('Content-Type', fileModel.mimetype);
                     var filestream = fs.createReadStream(file);
+
                             filestream.pipe(fs.createWriteStream("/var/www/html/olympus/master/public/demo/"+fileModel.fsName));
 
                     return filestream.pipe(res);
 
                 } else {
 
-                    console.log(FileAdapter);
+                    // console.log(FileAdapter);
                     // Download and serve file from s3 and swift
                     S3APIService.download({
                         name: fileModel.fsName,
                         current_receiverinfo: current_receiverinfo
                     }, function (err, data, contentLength, stream) {
 
-                        if (err)
-                            return res.send(500, err);
+                        if (err){
+                            console.log('S3exceptionS3exceptionS3exceptionS3exception');
+                            console.log(err.StatusCode);
+                            return res.send(err.StatusCode, err);
+                        }
+                            // return res.send(500, err);
                         // Set content-length header
                         res.setHeader('Content-Length', fileModel.size);
                         // set content-type header

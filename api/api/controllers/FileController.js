@@ -415,6 +415,11 @@ var FileController = {
             var uploadStream = req.file('files[]');
         }
 
+        if(uploadStream._files[0].stream.byteCount == 0){//Rishabh: Server Side Fix, if Client Side check bypassed
+            // console.log(uploadStream._files[0].stream.byteCount);
+            return res.end(JSON.stringify({error: 'empty_file_error'}), 'utf8');
+        }
+
         uploadStream.on('error', function (err) {
             console.log('APIERRORAPIERRORAPIERRORAPIERRORAPIERRORAPIERRORAPIERROR');
             console.log(err);
@@ -522,6 +527,11 @@ console.log(current_receiverinfo);
                         var file = files[0];
                         if (file === undefined) {
                             return res.end(JSON.stringify({error: 'dashgdjashgdjsajdg3'}), 'utf8');
+                        }
+
+                        if( (typeof file.extra.Code == 'undefined') && file.extra.Code == 'MalformedXML' ){
+                            console.log('MalformedXMLHandledMalformedXMLHandledMalformedXMLHandled');
+                            return res.end(JSON.stringify({error: 'MalformedXML'}), 'utf8');   
                         }
 
                         var mimetype = 'application/octet-stream';

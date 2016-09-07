@@ -319,7 +319,7 @@ var AuthController = {
 						access_token: AuthenticationService.randString(15),
 						refresh_token: AuthenticationService.randString(15),
 						code_expires: new Date(today.getTime() + 1000 * 30), // code expires in 30 seconds
-						access_expires: new Date(today.getTime() + 1000 * 60 * 60), // access token expires in one hour
+						access_expires: new Date(today.getTime() + 1000 * 60 * 60 * 30), // access token expires in one hour
 						refresh_expires: new Date(today.getTime() + 1000 * 60 * 60 * 24 * 14) // refresh token expires in 14 days
 					}).done(function done (err, account) {
 						// Redirect to the 3rd party app with the info they need to get the access token
@@ -435,7 +435,7 @@ var AuthController = {
 					// Looking good, so we'll return the auth token
 					res.json({
 						"access_token": accountDeveloper.access_token,
-						"expires_in": 3600,
+						"expires_in": 10800,
 						"token_type": "bearer",
 						"refresh_token": accountDeveloper.refresh_token
 					});
@@ -454,12 +454,12 @@ var AuthController = {
 					// Create a new access token and new refresh token
 					accountDeveloper.access_token = AuthenticationService.randString(15);
 					accountDeveloper.refresh_token = AuthenticationService.randString(15);
-					accountDeveloper.access_expires = new Date(now.getTime() + 1000 * 60 * 60); // access token expires in one hour
+					accountDeveloper.access_expires = new Date(now.getTime() + 1000 * 60 * 60 * 30); // access token expires in one hour
 					accountDeveloper.refresh_expire =  new Date(now.getTime() + 1000 * 60 * 60 * 24 * 14); // refresh token expires in 14 days
 					accountDeveloper.save().success(function(ad){
 						res.json({
 							"access_token": accountDeveloper.access_token,
-							"expires_in": 3600,
+							"expires_in": 10800,
 							"token_type": "bearer",
 							"refresh_token": accountDeveloper.refresh_token
 						});

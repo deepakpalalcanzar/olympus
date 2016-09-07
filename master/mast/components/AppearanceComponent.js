@@ -76,7 +76,7 @@ Mast.registerComponent('AppearanceComponent',{
 
 	                $('body').css({'color': "#" + hex});
 	                $('a').css({'color': "#" + hex});
-	                $('p, label, span').css({'color': "#" + hex});
+	                $('p, label').css({'color': "#" + hex});
 	                $('h1, h2, h3, h4, h5, h6').css({'color': "#" + hex});
 	            }
 	        });

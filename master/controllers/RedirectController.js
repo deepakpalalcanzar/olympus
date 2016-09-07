@@ -78,6 +78,10 @@ console.log('IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIII
                             return res.json(response);
                         }else if(data.error == 'adapter_error'){
                             return res.json(data, 500);
+                        }else if(data.error == 'empty_file_error'){
+                            return res.json(data, 500);
+                        }else if(data.error == 'MalformedXML'){
+                            return res.json(data, 500);
                         }
                         //req.end();//[TypeError: Object #<IncomingMessage> has no method 'end']
                         console.log('RETURNING DATA 777 ERROR RETURNING DATA ERROR RETURNING DATA ERROR ');
