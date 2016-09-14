@@ -33,6 +33,8 @@ Account = Model.extend({
 	avatar_mimetype: STRING,
 
 	isAdmin: BOOLEAN,
+	isLdapUser: BOOLEAN,
+	isADUser: BOOLEAN,
 	deleted: {
 		type: BOOLEAN,
 		defaultValue: false

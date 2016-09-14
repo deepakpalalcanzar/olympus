@@ -6,9 +6,11 @@
             <a href="#account/details" class="account-details"> Account Details</a>
         </li>
 
-        <li class="accountPassword">
-            <a href="#account/password" class="account-password"> Change Password </a>
-        </li>
+        {% if ( showPassword ) { %}
+            <li class="accountPassword">
+                <a href="#account/password" class="account-password"> Change Password </a>
+            </li>
+        {% } %}
 
         {% if ( showSetting ) { %}
 
@@ -26,6 +28,22 @@
             <li class="systemSettings">
                 <a href="#account/systemsettings" class="system-settings"> System Settings </a>
             </li>
+
+                <li class="systemPages accountSubscriptionSubnav" style="display:none;margin-left:30px;">
+                    <a href="#account/systemsettings" class="system-domain"> Domain Settings </a>
+                </li>
+                <li class="systemPages accountSubscriptionSubnav" style="display:none;margin-left:30px;">
+                    <a href="#account/systemsettings" class="system-adapter"> Adapter Settings </a>
+                </li>
+                <li class="systemPages accountSubscriptionSubnav" style="display:none;margin-left:30px;">
+                    <a href="#account/systemsettings" class="system-email"> Email Settings </a>
+                </li>
+                <li class="systemPages accountSubscriptionSubnav" style="display:none;margin-left:30px;">
+                    <a href="#account/systemsettings" class="system-trash"> Trash Settings </a>
+                </li>
+                <li class="systemPages accountSubscriptionSubnav" style="display:none;margin-left:30px;">
+                    <a href="#account/systemsettings" class="system-ldap"> LDAP/AD Settings </a>
+                </li>
 
         {% } %}
         

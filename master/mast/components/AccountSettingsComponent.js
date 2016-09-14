@@ -2,6 +2,7 @@ Mast.registerComponent('AccountSettingsComponent',{
 
 	model: {
 		selectedTab 	 : 'accountDetails',
+		showPassword	 : false,
 		showSystemSetting: false,
 		showSubscription : false,
 		showSetting 	 : false
@@ -15,7 +16,12 @@ Mast.registerComponent('AccountSettingsComponent',{
 		'click a.account-password'     : 'displayAccountPassword',
 		'click a.account-notifications': 'displayAccountSettings',//'displayAccountNotifications',
 		'click a.account-subscription' : 'displaySubscribedPlan',
-		'click a.system-settings' 	   : 'displaySystemSettings'
+		'click a.system-settings' 	   : 'displaySystemSettingsDomain',//'displaySystemSettings',
+		'click a.system-domain' 	   : 'displaySystemSettingsDomain',
+		'click a.system-adapter' 	   : 'displaySystemSettingsAdapter',
+		'click a.system-email' 	   	   : 'displaySystemSettingsEmail',
+		'click a.system-trash' 	   	   : 'displaySystemSettingsTrash',
+		'click a.system-ldap' 	   	   : 'displaySystemSettingsLdap'
 	},
 
 	bindings: {
@@ -23,6 +29,8 @@ Mast.registerComponent('AccountSettingsComponent',{
 		selectedTab: function(newVal) {
 
 			this.removeSelected();
+			$('.systemPages').hide();
+
 			if (newVal === 'accountDetails') {
 				this.$('li.accountDetails').addClass('selected');
 			} else if (newVal === 'accountPassword') {
@@ -31,6 +39,11 @@ Mast.registerComponent('AccountSettingsComponent',{
 				this.$('li.accountNotifications').addClass('selected');
 			}else if (newVal === 'accountSubscription') {
 				this.$('li.accountSubscription').addClass('selected');
+			}else if (newVal === 'settings') {
+				this.$('li.settings').addClass('selected');
+			}else if (newVal === 'systemSettings') {
+				$('.systemPages').show();
+				this.$('li.systemSettings').addClass('selected');
 			}else if (newVal === 'accountAppearance') {
 				this.$('li.accountAppearance').addClass('selected');
 			}
@@ -38,9 +51,9 @@ Mast.registerComponent('AccountSettingsComponent',{
 	},
 
 	afterRender: function(){
-		// console.log(Mast.Session.Account);
+		this.set('showPassword', true);
 		// if(Mast.Session.Account.isAdmin && (Mast.Session.Account.isSuperAdmin === 1 || Mast.Session.Account.isSuperAdmin === null || Mast.Session.Account.isSuperAdmin===0))
-		if(Mast.Session.Account.isAdmin || Mast.Session.Account.isSuperAdmin === 1)
+		if(Mast.Session.Account.isSuperAdmin === 1)//Mast.Session.Account.isAdmin || 
 		{
 			$('#domainname').val($('#domaininfo').html());//Rishabh
 			// $('#mail_service').val($('#emailservice').html());
@@ -92,7 +105,49 @@ Mast.registerComponent('AccountSettingsComponent',{
 					$('#Disk_adapter_details').hide();
 					$('#S3_adapter_details').show();
 				}
-				$('.adapter-mod').show();
+				// $('.adapter-mod').show();
+			});
+
+			Mast.Socket.request('/sitesettings/getLdapSettings', {}, function (res, err) {
+				if(err || res.success == false){
+					console.log(err || res.error);
+					return;
+				}
+
+				if(res.ldapopt.ldapOn == '1'){
+					$('input[name="ldap_enbled"]').prop('checked', true);	
+				}
+				$('input[name="service_type"][value="' + res.ldapopt.ServiceType + '"]').prop('checked', true);
+
+				if(res.ldapopt.ServiceType == '1'){
+
+					$('#ldap_details').show();
+					$('#ad_details').hide();
+
+					$('#server_ip').val(res.ldapopt.ldapServerIp);
+					$('#org_unit').val(res.ldapopt.ldapOU);
+					$('#basedn').val(res.ldapopt.ldapBaseDN);
+					$('#ldap_admin').val(res.ldapopt.ldapAdmin);
+					$('#ldap_pass').val(res.ldapopt.ldapPassword);
+				}else if(res.ldapopt.ServiceType == '2'){
+
+					$('#ldap_details').hide();
+					$('#ad_details').show();
+
+					$('#server_ip_ad').val(res.ldapopt.ldapServerIp);
+					// $('#org_unit').val(res.ldapopt.ldapOU);
+					$('#basedn_ad').val(res.ldapopt.ldapBaseDN);
+					$('#ldap_admin_ad').val(res.ldapopt.ldapAdmin);
+					$('#ldap_pass_ad').val(res.ldapopt.ldapPassword);
+				}else{
+					$('#ldap_details').hide();
+					$('#ad_details').hide();
+				}
+				
+				if(res.ldapopt.ldapCreateUser == '1'){
+					$('input[name="ldap_create_user"]').prop('checked', true);	
+				}
+				// $('.adapter-mod').show();
 			});
 
 			this.set('showSystemSetting', true);
@@ -106,6 +161,9 @@ Mast.registerComponent('AccountSettingsComponent',{
 			this.set('showSetting', false);
 			this.set('showSystemSetting', false);
 			this.set('showSubscription', true);
+			if(Mast.Session.Account.isLdapUser){
+				this.set('showPassword', false);
+			}
 		}
 		//show to all
 	},
@@ -139,8 +197,67 @@ Mast.registerComponent('AccountSettingsComponent',{
 
 	displaySystemSettings: function() {
 		$('.upload-file').hide();
+		$('.system-settings-template > div').hide();
+
+		$('.domain-mod').show();
+
 		this.attach('.account-settings-page', 'SystemSettingsComponent');
 		this.set('selectedTab', 'systemSettings');
+	},
+
+	displaySystemSettingsDomain: function() {
+
+		$('.upload-file').hide();
+		$('.system-settings-template > div').hide();
+
+		$('.domain-mod').show();
+
+		// this.attach('.account-settings-page', 'SystemSettingsComponent');
+		// this.set('selectedTab', 'systemSettings');
+	},
+
+	displaySystemSettingsAdapter: function() {
+
+		$('.upload-file').hide();
+		$('.system-settings-template > div').hide();
+
+		$('.adapter-mod').show();
+
+		// this.attach('.account-settings-page', 'SystemSettingsComponent');
+		// this.set('selectedTab', 'systemSettings');
+	},
+
+	displaySystemSettingsEmail: function() {
+
+		$('.upload-file').hide();
+		$('.system-settings-template > div').hide();
+
+		$('.email-mod').show();
+
+		// this.attach('.account-settings-page', 'SystemSettingsComponent');
+		// this.set('selectedTab', 'systemSettings');
+	},
+
+	displaySystemSettingsTrash: function() {
+
+		$('.upload-file').hide();
+		$('.system-settings-template > div').hide();
+
+		$('.trash-mod').show();
+
+		// this.attach('.account-settings-page', 'SystemSettingsComponent');
+		// this.set('selectedTab', 'systemSettings');
+	},
+
+	displaySystemSettingsLdap: function() {
+
+		$('.upload-file').hide();
+		$('.system-settings-template > div').hide();
+
+		$('.ldap-mod').show();
+
+		// this.attach('.account-settings-page', 'SystemSettingsComponent');
+		// this.set('selectedTab', 'systemSettings');
 	},
 
 	displayAppearance: function() {

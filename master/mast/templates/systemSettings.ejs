@@ -20,7 +20,7 @@
 	</div>
 	<!-- -->
 
-	<hr><br>
+	<!-- <hr><br> -->
 
 	<!--Adapter Settings -->
 	<div class="adapter-mod">
@@ -52,10 +52,10 @@
 	</div>
 	<!-- -->
 
-	<hr><br>
+	<!-- <hr><br> -->
 
 	<!--Email Service Settings -->
-	<div class="domain-mod">
+	<div class="email-mod">
 		<label>Email Service Settings</label>
 		<input type="radio" name="mail_service" value="mandrill" /> Use Mandrill
 		<input type="radio" name="mail_service" value="internal" /> Use Internal Email Setup
@@ -79,7 +79,7 @@
 	</div>
 	<!-- -->
 
-	<hr><br>
+	<!-- <hr><br> -->
 
 	<!--trash setting -->
 	<div class="trash-mod">
@@ -112,7 +112,55 @@
 	</div>
 	<!-- -->
 
-	<hr><br>
+	<!-- <hr><br> -->
+
+	<!--LDAP Settings -->
+	<div class="ldap-mod">
+		<label>LDAP/AD Settings</label>
+		<input type="checkbox" name="ldap_enbled" id="ldap_enbled" /> Enable LDAP/AD
+		<br><br>
+		<input type="radio" name="service_type" value="1" /> LDAP Settings
+		<input type="radio" name="service_type" value="2" /> AD Settings
+		<br><br>
+		<div id="ldap_details">
+			<label> Server IP :</label>
+			<input type="text" class="server-ip" placeholder="" value="" id="server_ip" name="server_ip">
+
+			<label> Organisational Unit (OU) :</label>
+			<input type="text" class="org-unit" placeholder="" value="" id="org_unit" name="org_unit">
+
+			<label> Base DN :</label>
+			<input type="text" class="basedn" placeholder="" value="" id="basedn" name="basedn">
+
+			<label> Administrator :</label>
+			<input type="text" class="ldap-admin" placeholder="" value="" id="ldap_admin" name="ldap_admin"><br>
+
+			<label> Password :</label>
+			<input type="password" class="ldap-pass" placeholder="" value="" id="ldap_pass" name="ldap_pass"><br>
+
+			<input type="hidden" class="ldap-create-user" placeholder="" value="" id="ldap_create_user" name="ldap_create_user"><br>
+		</div>
+		<div id="ad_details" style="display:none;">
+			<label> Server IP :</label>
+			<input type="text" class="server-ip" placeholder="" value="" id="server_ip_ad" name="server_ip_ad">
+
+			<label> Base DN :</label>
+			<input type="text" class="basedn" placeholder="" value="" id="basedn_ad" name="basedn_ad">
+
+			<label> Administrator :</label>
+			<input type="text" class="ldap-admin" placeholder="" value="" id="ldap_admin_ad" name="ldap_admin_ad"><br>
+
+			<label> Password :</label>
+			<input type="password" class="ldap-pass" placeholder="" value="" id="ldap_pass_ad" name="ldap_pass_ad"><br>
+
+			<input type="hidden" class="ldap-create-user" placeholder="" value="" id="ldap_create_user_ad" name="ldap_create_user_ad"><br>
+		</div>
+	    <input type="button" id="saveldapsettings" value="Save">
+		<br><br>
+	</div>
+	<!-- -->
+
+	<!-- <hr><br> -->
 </div>
 
 

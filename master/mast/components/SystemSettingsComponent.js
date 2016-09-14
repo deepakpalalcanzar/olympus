@@ -8,6 +8,8 @@ Mast.components.SystemSettingsComponent  = Mast.Component.extend({
 		'click #saveAdapter': 'saveAdapterInfo',
 		'click #saveEmail'  : 'saveEmailInfo',
 		'click #saveTrashSetting' : 'saveTrashSetting',
+		'click #saveldapsettings' : 'saveLdapSettings',
+		'change input[name="service_type"]' : 'toggleLdapSettings',
 		'change input[name="adapter_type"]' : 'toggleAdapter',
 		// 'click input[name="mail_service"]' : 'toggleMailService',
 		'change input[name="mail_service"]' : 'toggleMailService',
@@ -42,6 +44,17 @@ Mast.components.SystemSettingsComponent  = Mast.Component.extend({
 		}else{
 			$('#mandrill_details').hide();
 			$('#inernal_email_details').show();
+		}
+	},
+
+	toggleLdapSettings : function(){
+		console.log($('input[name="service_type"]:checked').val());
+		if( $('input[name="service_type"]:checked').val() == '1' ){
+			$('#ldap_details').show();
+			$('#ad_details').hide();
+		}else{
+			$('#ldap_details').hide();
+			$('#ad_details').show();
 		}
 	},
 
@@ -81,6 +94,62 @@ Mast.components.SystemSettingsComponent  = Mast.Component.extend({
 	    }else{
 	    	alert('Domain should be like www.domain.com or \'localhost\'.');
 	    }
+	},
+
+	saveLdapSettings: function(){
+
+		var server_ip = org_unit = basedn = ldap_admin = ldap_pass = ldap_create_user = '';
+		var ldap_enabled 		= $('input[name="ldap_enbled"]').is(':checked');
+		var service_type 		= $('input[name="service_type"]:checked').val();
+
+		console.log(service_type);
+
+		if(service_type == '1'){
+			server_ip 			= $("input[name='server_ip']").val();
+			org_unit 			= $("input[name='org_unit']").val();
+			basedn 				= $("input[name='basedn']").val();
+			ldap_admin 			= $("input[name='ldap_admin']").val();
+			ldap_pass 			= $("input[name='ldap_pass']").val();
+			ldap_create_user 	= $("input[name='ldap_create_user']").is(':checked');
+		}else{
+			server_ip 			= $("input[name='server_ip_ad']").val();
+			// org_unit 			= $("input[name='org_unit']").val();
+			basedn 				= $("input[name='basedn_ad']").val();
+			ldap_admin 			= $("input[name='ldap_admin_ad']").val();
+			ldap_pass 			= $("input[name='ldap_pass_ad']").val();
+			// ldap_create_user 	= $("input[name='ldap_create_user']").is(':checked');
+		}
+
+		if( ldap_enabled && (service_type == '1') && (server_ip.trim() == '' || org_unit.trim() == '' || basedn.trim() == '' || ldap_admin.trim() == '' || ldap_pass.trim() == '' )){
+			alert('Please enter LDAP details.');
+			return false;
+		}else if( ldap_enabled && (service_type == '2') && (server_ip.trim() == '' || basedn.trim() == '' || ldap_admin.trim() == '' || ldap_pass.trim() == '' )){
+			alert('Please enter AD details.');
+			return false;
+		}
+		console.log('proceeding...');
+
+			Mast.Socket.request('/account/changeLdapSetting', {
+				'formaction'		: 'save_ldap_info',
+				'ldap_enabled'		: ldap_enabled,
+				'service_type'		: service_type,
+				'server_ip'			: server_ip,
+				'org_unit'			: org_unit,
+				'basedn'			: basedn,
+				'ldap_admin'		: ldap_admin,
+				'ldap_pass'			: ldap_pass,
+				'ldap_create_user'	: ldap_create_user,
+			} , function(res, err){
+				// console.log(res);
+				if((typeof res.status != 'undefined') && res.status == 'ok'){
+					$('#adapter_type').html($('#adapter_type').val());
+					alert('Ldap/AD Settings Updated.')
+				}else if(typeof res.error != 'undefined'){
+					alert(res.error);
+				}else{
+					alert('Some error occurred.');
+				}
+	        });
 	},
 
 	saveAdapterInfo : function(){

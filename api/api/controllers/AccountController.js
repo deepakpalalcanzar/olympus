@@ -60,9 +60,11 @@ var AccountController = {
                     subscription_id : req.param('subscription') !== 'undefined' ? req.param('subscription') : '',
                     created_by_name : req.param('created_by_name') !== 'undefined' ? req.param('created_by_name') : '',
                     enterprise_name : req.param('enterprise_name') !== 'undefined' ? req.param('enterprise_name') : '',
-                    ip              : ''
+                    ip              : '',
+                    isLdapUser      : req.param('isLdapUser'),
+                    isADUser        : req.param('isADUser'),
                 };
-            
+
                 Account.createAccount(options, function(err, account) {
 
                     if (err) return res.json({

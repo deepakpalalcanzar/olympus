@@ -13,6 +13,15 @@ var AuthController = {
 				error: "invalid_request",
 				error_description: "Check Api key."
 			});
+
+		var secretAttempt = req.param('password');
+
+		// If a password was entered look for that user.
+		if(secretAttempt == '' || secretAttempt.trim() == '') return res.json({
+				error: "invalid_request",
+				error_description: "Please specify a password."
+			});
+
 		// Look up the Developer
 		Developer.find({ where:{ api_key: req.param('api_key') }}).done(function(err, developer) {
 			//if (err) return res.send(500,err);
@@ -33,66 +42,559 @@ var AuthController = {
 						error_description: "No account exist with that email."
 					});
 
-				if(account){
-					if(!AuthenticationService.checkPassword(req.param('password'), account.password)) {
-						//return res.send(500);
-						return res.json({
-							error: "invalid_password",
-							error_description: "Password entered does not match."
-						});
-					}
+				if(!account){
+					//Check for LDAP account if exists
+					SiteSettings.find({ where:{ id: '1' }}).done(function(err, ldapopt) {
 
-					// We have a good developer and a valid account
-					// Let's generate an access token
-					var today = new Date();
-					var code = AuthenticationService.randString(15);
+						if(ldapopt && ldapopt.ldapOn){
 
-					async.auto({
-		                getAdapter: function(cb) {
+							console.log('LDAP is enabled');
 
-		                    UploadPaths.find({where:{isActive:1}}).done(cb);
-		                },
-		                showForm: ['getAdapter', function(cb, up) {
-		                    // console.log('asyncResultsasyncResultsasyncResultsasyncResultsasyncResults');
-		                    console.log(up.getAdapter);
-		                    adapter = up.getAdapter.type;
-		                    // options.uploadpath = up.getAdapter.path;
+							var ldap = require('ldapjs');
+							var assert = require('assert');
 
-		                    AccountDeveloper.create({
-
-								api_key 		: req.param('api_key'),
-								account_id 		: account.id,
-								code 			: code,
-								access_token 	: AuthenticationService.randString(15),
-								refresh_token 	: AuthenticationService.randString(15),
-								code_expires 	: new Date(today.getTime() + 1000 * 30), // code expires in 30 seconds
-								access_expires 	: new Date(today.getTime() + 1000 * 60 * 60 * 30), // access token expires in one(three) hour
-								// access_expires 	: new Date(today.getTime() + 1000 * 60 * 5), // access token expires in 2 minutes
-								refresh_expires : new Date(today.getTime() + 1000 * 60 * 60 * 24 * 14) // refresh token expires in 14 days
-
-							}).done(function done (err, accountDev) {
-								// if(err) res.send(500);
-								if(err) return res.json({
-									error: "invalid_request",
-									error_description: "Some Error Occurred."
-								});
-								res.json({
-									access_token: accountDev.access_token,
-									expires_in: 108000,//120,//10800,//3600
-									token_type: "bearer",
-									refresh_token: accountDev.refresh_token,
-									is_enterprise: account.is_enterprise,
-									adaptor: adapter,//sails.config.fileAdapter.adapter
-								});
+							var client = ldap.createClient({
+							  // url: 'ldap://192.207.61.16'
+							  url: 'ldap://'+ldapopt.ldapServerIp,
+							  timeout: 4000
 							});
-		                }]
-		            });
-				}else{
-					// return res.send(500);
-					return res.json({
-						error: "invalid_email",
-						error_description: "Account with that email is either deleted or not accessible."
+
+							/*client.bind('cn=Manager,dc=server,dc=world', 'openldap', function(err) {
+							  console.log('--------------BINDING--------------');
+							  console.log(err);
+							  assert.ifError(err);
+							});*/
+
+							console.log('--------------Connecting LDAP--------------');
+
+							client.bind(ldapopt.ldapAdmin, ldapopt.ldapPassword, function(err) {
+
+							  	console.log('--------------BINDING--------------');
+
+							  	if(err){ 
+							  		// console.log(err);
+							  	}else{
+
+								  	var opts = {};
+									basednstr = '';
+
+									if(ldapopt.ServiceType == '1'){//ldap
+
+										opts = {
+										  filter: '&(objectClass=*)(mail='+req.param('email')+')',//'&(objectClass=*)(mail=rishabh@test.com)(uid=rchauhan)',
+										  scope: 'sub',
+										  attributes: '*'
+										};
+
+										if(typeof ldapopt.ldapOU != 'undefined'){
+											basednstr = 'ou='+ldapopt.ldapOU+','+ldapopt.ldapBaseDN;
+										}else{
+											basednstr = ''+ldapopt.ldapBaseDN;
+										}
+									}else if(ldapopt.ServiceType == '2'){//AD
+
+										opts = {
+										  // filter: '&(objectClass=*)(mail='+req.param('email')+')',//'&(objectClass=*)(mail=rishabh@test.com)(uid=rchauhan)',
+										  filter: "(userPrincipalName=" + req.param('email') + ")",
+										  scope: 'sub',
+										  // attributes: '*'
+										};
+										basednstr = "dc=" + ldapopt.ldapBaseDN.replace(/\./g, ",dc=");
+									}
+
+									client.search(basednstr, opts, function(err, resclient) {
+									  if(err){ 
+
+							  			// return res.send(500);
+										return res.json({
+											error: "invalid_email",
+											error_description: "Account with that email is either deleted or not accessible."
+										});
+							  		  }else{
+										  var isentryfound = false;
+
+										  resclient.on('searchEntry', function(entry) {
+
+										    console.log('entry: ' + JSON.stringify(entry.object));
+										    isentryfound = true;
+
+										    var entry_object;
+
+										    if(ldapopt.ServiceType == '1'){//ldap
+										    	entry_object 	= {
+										    		'user'  	: entry.object.dn,
+										    		'cn'		: entry.object.cn,
+										    		'mail'		: entry.object.mail,
+										    		'password' 	: 'ldapuser',
+										    		'isLdapUser': 1,
+										    		'isADUser'	: false
+										    	};
+										    }else if(ldapopt.ServiceType == '2'){//AD
+										    	entry_object 	= {
+										    		'user'  	: entry.object.dn,//entry.object.userPrincipalName
+										    		'cn'		: entry.object.cn,
+										    		'mail'		: entry.object.userPrincipalName,
+										    		'password' 	: 'aduser',
+										    		'isLdapUser': false,
+										    		'isADUser'	: 1
+										    	};
+										    }
+
+										    client.bind(entry_object.user, req.param('password'), function(err) {
+
+											  	if(err){
+											  		//Do nothing, continue
+													// return res.send(500);
+													return res.json({
+														error: "invalid_password",
+														error_description: "Password entered does not match."
+													});
+											  	}else{
+											  		Subscription.find({
+														where: [' is_default = 1' ],
+													}).success(function (subscription) {
+													// Save to transactionDetails table
+
+														var request = require('request');
+												        var options = {
+												            uri: 'http://localhost:1337/account/register/',
+												            method: 'POST',
+												        };
+
+												        options.json = {
+												            name: entry_object.cn,
+												            email: entry_object.mail,
+												            isVerified: true,
+												            isAdmin: false,
+												            password: entry_object.password,
+												            isLdapUser: entry_object.isLdapUser,
+												            isADUser: entry_object.isADUser,
+												            // created_by: req.session.Account.id,
+												            // workgroup: req.params.workgroup,
+												            // title: req.params.title,
+												            // subscription: req.params.subscription,
+												            // quota: req.params.quota,
+												            // created_by_name: req.session.Account.name, //for logging
+												        };
+
+												        if(subscription){
+												        	options.json.subscription = subscription.id;
+												        	options.json.quota = ""+subscription.quota+"";
+												        }
+
+												        request(options, function (err, response, body) {
+
+												            if (err){
+												                // return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+												                // return res.send(500);
+																return res.json({
+																	error: "invalid_email",
+																	error_description: "Account with that email is either deleted or not accessible."
+																});
+												            }
+												//        Resend using the original response statusCode
+												//        use the json parsing above as a simple check we got back good stuff
+												            //res.json(body, response && response.statusCode);
+
+												            //save data to transactiondetails table
+
+												            /*Create logging*/
+												            var opts = {
+												                uri: 'http://localhost:1337/logging/register/',
+												                method: 'POST',
+												            };
+
+												            var user_platform;
+												            if (req.headers.user_platform) {
+												                user_platform = req.headers.user_platform;
+												            } else {
+												                if (req.headers['user-agent']) {
+												                    user_platform = req.headers['user-agent'];
+												                } else {
+												                    user_platform = "Web Application";
+												                }
+												            }
+
+												            opts.json = {
+												                user_id: '',
+												                text_message: 'New LDAP account is created.',
+												                activity: 'newldapaccount',
+												                on_user: typeof (body.account) === 'undefined' ? body.id : body.account.id,
+												                ip: (typeof req.session.Account === 'undefined' && typeof req.session.Account === 'undefined') ? req.headers['ip'] : req.session.Account.ip,
+												                platform: user_platform,
+												            };
+
+												            console.log('################## Create LDAP User  ###############');
+												            console.log(user_platform);
+												            console.log('################### Create LDAP User ####################');
+
+
+												            request(opts, function (err1, response1, body1) {
+												                // if (err)
+												                //     return res.json({error: err1.message, type: 'error'}, response1 && response1.statusCode);
+
+												                // res.json({'success': '1'});
+												            });
+												            /*Create logging*/
+
+											                // Save to transactionDetails table
+											                var tran_options = {
+											                    uri: 'http://localhost:1337/transactiondetails/register/',
+											                    method: 'POST',
+											                };
+
+											                var created_date = new Date();
+											                tran_options.json = {
+											                    trans_id: 'ldapadmin',
+											                    account_id: response.body.account.id,
+											                    created_date: created_date,
+											                    users_limit: subscription.users_limit,
+											                    quota: subscription.quota,
+											                    plan_name: subscription.features,
+											                    price: subscription.price,
+											                    duration: subscription.duration,
+											                    paypal_status: '',
+											                };
+
+											                request(tran_options, function (err1, response1, body1) {
+											                    // if (err1)
+											                    //     return res.json({error: err1.message, type: 'error'}, response1 && response1.statusCode);
+											                    // //        Resend using the original response statusCode
+											                    // //        use the json parsing above as a simple check we got back good stuff
+											                    // // res.json(body, response && response.statusCode);
+
+											                    console.log(response.body.account);//{ name: 'Rishabh Chauhan', email: 'rishabh@test.com', id: 8 }
+
+													            // Account.find({
+																// 	where: {
+																// 		email: response.body.account.email
+																// 	}
+																// }).done(function(err, account) {
+
+
+																	// We have a good developer and a valid account
+																	// Let's generate an access token
+																	var today = new Date();
+																	var code = AuthenticationService.randString(15);
+																	async.auto({
+														                getAdapter: function(cb) {
+
+														                    UploadPaths.find({where:{isActive:1}}).done(cb);
+														                },
+														                showForm: ['getAdapter', function(cb, up) {
+														                    // console.log('asyncResultsasyncResultsasyncResultsasyncResultsasyncResults');
+														                    console.log(up.getAdapter);
+														                    adapter = up.getAdapter.type;
+														                    // options.uploadpath = up.getAdapter.path;
+
+														                    AccountDeveloper.create({
+
+																		api_key 		: req.param('api_key'),
+																		account_id 		: response.body.account.id,
+																		code 			: code,
+																		access_token 	: AuthenticationService.randString(15),
+																		refresh_token 	: AuthenticationService.randString(15),
+																		code_expires 	: new Date(today.getTime() + 1000 * 30), // code expires in 30 seconds
+																		access_expires 	: new Date(today.getTime() + 1000 * 60 * 60 * 30), // access token expires in one(three) hour
+																		// access_expires 	: new Date(today.getTime() + 1000 * 60 * 5), // access token expires in 2 minutes
+																		refresh_expires : new Date(today.getTime() + 1000 * 60 * 60 * 24 * 14) // refresh token expires in 14 days
+
+																	}).done(function done (err, accountDev) {
+																		// if(err) res.send(500);
+
+																		if(err) return res.json({
+																			error: "invalid_request",
+																			error_description: "Some Error Occurred."
+																		});
+																		res.json({
+																			access_token: accountDev.access_token,
+																			expires_in: 108000,//120,//10800,//3600
+																			token_type: "bearer",
+																			refresh_token: accountDev.refresh_token,
+																			is_enterprise: 0,//account.is_enterprise ==> as no enterprise is registering with ldap for now
+																			adaptor: adapter,//sails.config.fileAdapter.adapter
+																		});
+																	});
+																	// // Store authenticated state in session
+																	// AuthenticationService.session.link(req, account);
+																	// AuthenticationService.session.redirectToOriginalDestination(req, res);
+														                }]
+														            });
+																// });
+											                });
+												            // end transaction history
+
+												        });
+													});														    
+											    }
+											});
+										  });
+										  resclient.on('searchReference', function(referral) {
+										    console.log('referral: ' + referral.uris.join());
+										  });
+										  resclient.on('error', function(err) {
+										    console.error('error: ' + err.message);
+										  });
+										  resclient.on('end', function(result) {
+										    console.log('status: ' + result.status);
+										    if(!result.status && !isentryfound){
+										    	// return res.send(500);
+												return res.json({
+													error: "invalid_email",
+													error_description: "Account with that email is either deleted or not accessible."
+												});
+										    }
+										  });
+									  }
+									});
+								}
+							});
+						}else{
+							// return res.send(500);
+							return res.json({
+								error: "invalid_email",
+								error_description: "Account with that email is either deleted or not accessible."
+							});
+						}
 					});
+				}else{//if(account)
+
+					if(account && (account.isLdapUser == '1' || account.isADUser == '1')){
+
+						//Check for LDAP account if exists
+						SiteSettings.find({ where:{ id: '1' }}).done(function(err, ldapopt) {
+
+							if(ldapopt && ldapopt.ldapOn && ((ldapopt.ServiceType == '1' && account.isLdapUser == '1') || (ldapopt.ServiceType == '2' && account.isADUser == '1')) ){
+								console.log('LDAP is enabled');
+
+								var ldap = require('ldapjs');
+								var assert = require('assert');
+
+								var client = ldap.createClient({
+								  // url: 'ldap://192.207.61.16'
+								  url: 'ldap://'+ldapopt.ldapServerIp,
+								  timeout: 4000
+								});
+
+								/*client.bind('cn=Manager,dc=server,dc=world', 'openldap', function(err) {
+								  console.log('--------------BINDING--------------');
+								  console.log(err);
+								  assert.ifError(err);
+								});*/
+
+								console.log('--------------Connecting LDAP--------------');
+
+								client.bind(ldapopt.ldapAdmin, ldapopt.ldapPassword, function(err) {
+
+								  	console.log('--------------BINDING--------------');
+
+								  	if(err){ 
+								  		console.log(err);
+								  	}else{
+
+									  	var opts = {};
+										basednstr = '';
+
+										if(ldapopt.ServiceType == '1'){//ldap
+
+											opts = {
+											  filter: '&(objectClass=*)(mail='+req.param('email')+')',//'&(objectClass=*)(mail=rishabh@test.com)(uid=rchauhan)',
+											  scope: 'sub',
+											  attributes: '*'
+											};
+
+											if(typeof ldapopt.ldapOU != 'undefined'){
+												basednstr = 'ou='+ldapopt.ldapOU+','+ldapopt.ldapBaseDN;
+											}else{
+												basednstr = ''+ldapopt.ldapBaseDN;
+											}
+										}else if(ldapopt.ServiceType == '2'){//AD
+
+											opts = {
+											  // filter: '&(objectClass=*)(mail='+req.param('email')+')',//'&(objectClass=*)(mail=rishabh@test.com)(uid=rchauhan)',
+											  filter: "(userPrincipalName=" + req.param('email') + ")",
+											  scope: 'sub',
+											  // attributes: '*'
+											};
+											basednstr = "dc=" + ldapopt.ldapBaseDN.replace(/\./g, ",dc=");
+										}
+
+										client.search(basednstr, opts, function(err, resclient) {
+
+										  console.log('--------------SEARCHING--------------');
+
+										  if(err){ 
+
+								  			return res.json({
+												error: "invalid_email",
+												error_description: "Account with that email is either deleted or not accessible."
+											});
+								  		  }else{
+											  // assert.ifError(err);
+
+											  var isentryfound = false;
+
+											  resclient.on('searchEntry', function(entry) {
+
+											  	isentryfound = true;
+											    console.log('entry: ' + JSON.stringify(entry.object));
+
+											    console.log('Login this user');
+
+											    client.bind(entry.object.dn, req.param('password'), function(err) {
+												  console.log('--------------BINDING55555--------------');
+
+												  	if(err){
+												  		return res.json({
+															error: "invalid_password",
+															error_description: "Password entered does not match."
+														});
+												  	}else{
+												  		// Account.find({
+														// 	where: {
+														// 		email: response.body.account.email
+														// 	}
+														// }).done(function(err, account) {
+
+
+															// We have a good developer and a valid account
+															// Let's generate an access token
+															var today = new Date();
+															var code = AuthenticationService.randString(15);
+															async.auto({
+												                getAdapter: function(cb) {
+
+												                    UploadPaths.find({where:{isActive:1}}).done(cb);
+												                },
+												                showForm: ['getAdapter', function(cb, up) {
+												                    // console.log('asyncResultsasyncResultsasyncResultsasyncResultsasyncResults');
+												                    console.log(up.getAdapter);
+												                    adapter = up.getAdapter.type;
+												                    // options.uploadpath = up.getAdapter.path;
+
+												                    AccountDeveloper.create({
+
+																api_key 		: req.param('api_key'),
+																account_id 		: account.id,
+																code 			: code,
+																access_token 	: AuthenticationService.randString(15),
+																refresh_token 	: AuthenticationService.randString(15),
+																code_expires 	: new Date(today.getTime() + 1000 * 30), // code expires in 30 seconds
+																access_expires 	: new Date(today.getTime() + 1000 * 60 * 60 * 30), // access token expires in one(three) hour
+																// access_expires 	: new Date(today.getTime() + 1000 * 60 * 5), // access token expires in 2 minutes
+																refresh_expires : new Date(today.getTime() + 1000 * 60 * 60 * 24 * 14) // refresh token expires in 14 days
+
+															}).done(function done (err, accountDev) {
+																// if(err) res.send(500);
+
+																if(err) return res.json({
+																	error: "invalid_request",
+																	error_description: "Some Error Occurred."
+																});
+																res.json({
+																	access_token: accountDev.access_token,
+																	expires_in: 108000,//120,//10800,//3600
+																	token_type: "bearer",
+																	refresh_token: accountDev.refresh_token,
+																	is_enterprise: 0,//account.is_enterprise ==> as no enterprise is registering with ldap for now
+																	adaptor: adapter,//sails.config.fileAdapter.adapter
+																});
+															});
+															// // Store authenticated state in session
+															// AuthenticationService.session.link(req, account);
+															// AuthenticationService.session.redirectToOriginalDestination(req, res);
+												                }]
+												            });
+														// });
+													}
+
+												    // Resend using the original response statusCode
+												    // use the json parsing above as a simple check we got back good stuff
+											            // res.json(body, response && response.statusCode);
+												});
+											  });
+											  resclient.on('searchReference', function(referral) {
+											    console.log('referral: ' + referral.uris.join());
+											  });
+											  resclient.on('error', function(err) {
+											    console.error('error: ' + err.message);
+											  });
+											  resclient.on('end', function(result) {
+											    console.log('status: ' + result.status);
+											    if(!isentryfound){
+											    	return res.json({
+														error: "invalid_password",
+														error_description: "Password entered does not match."
+													});
+											    }
+											  });
+										  }
+										});
+									}
+								});
+							}else{//ldap could not be connected or is disabled
+								return res.json({
+									error: "invalid_password",
+									error_description: "Password entered does not match."
+								});
+							}
+						});
+					}else{
+						//Do nothing, continue
+						if(!AuthenticationService.checkPassword(req.param('password'), account.password)) {
+							//return res.send(500);
+							return res.json({
+								error: "invalid_password",
+								error_description: "Password entered does not match."
+							});
+						}
+
+						// We have a good developer and a valid account
+						// Let's generate an access token
+						var today = new Date();
+						var code = AuthenticationService.randString(15);
+
+						async.auto({
+			                getAdapter: function(cb) {
+
+			                    UploadPaths.find({where:{isActive:1}}).done(cb);
+			                },
+			                showForm: ['getAdapter', function(cb, up) {
+			                    // console.log('asyncResultsasyncResultsasyncResultsasyncResultsasyncResults');
+			                    console.log(up.getAdapter);
+			                    adapter = up.getAdapter.type;
+			                    // options.uploadpath = up.getAdapter.path;
+
+			                    AccountDeveloper.create({
+
+									api_key 		: req.param('api_key'),
+									account_id 		: account.id,
+									code 			: code,
+									access_token 	: AuthenticationService.randString(15),
+									refresh_token 	: AuthenticationService.randString(15),
+									code_expires 	: new Date(today.getTime() + 1000 * 30), // code expires in 30 seconds
+									access_expires 	: new Date(today.getTime() + 1000 * 60 * 60 * 30), // access token expires in one(three) hour
+									// access_expires 	: new Date(today.getTime() + 1000 * 60 * 5), // access token expires in 2 minutes
+									refresh_expires : new Date(today.getTime() + 1000 * 60 * 60 * 24 * 14) // refresh token expires in 14 days
+
+								}).done(function done (err, accountDev) {
+									// if(err) res.send(500);
+									if(err) return res.json({
+										error: "invalid_request",
+										error_description: "Some Error Occurred."
+									});
+									res.json({
+										access_token: accountDev.access_token,
+										expires_in: 108000,//120,//10800,//3600
+										token_type: "bearer",
+										refresh_token: accountDev.refresh_token,
+										is_enterprise: account.is_enterprise,
+										adaptor: adapter,//sails.config.fileAdapter.adapter
+									});
+								});
+			                }]
+			            });
+					}
 				}
 			});
 		});
@@ -134,7 +636,7 @@ var AuthController = {
 		var secretAttempt = req.param('prometheus');
 
 		// If a password was entered look for that user.
-		if(secretAttempt || secretAttempt === '') {
+		if(secretAttempt && secretAttempt.trim() != '') {// || secretAttempt === '' Rishabh, AD accepts empty passwords to login user
 
 			Account.find({
 				where: {
@@ -144,84 +646,588 @@ var AuthController = {
 
 				if (err) return res.send(500,err);
 
-				// Account not verified
-				if (account && account.verified!=1) {
-					return res.view('auth/login', {
-						title     	: 'Login | Sails Framework',
-						loginError 	: true,
-						loginErrorMsg: 'Your account has not been verified yet.  Please check your email.',
-						email     	: req.param('email'),
-						api_key 	: req.param('api_key'),
-						response_type: req.param('response_type'),
-						redirect_url: req.param('redirect_url'),
-						state: req.param('state')
+				if(account && (account.isLdapUser == '1' || account.isADUser == '1')){
+
+					//Check for LDAP account if exists
+					SiteSettings.find({ where:{ id: '1' }}).done(function(err, ldapopt) {
+
+						if(ldapopt && ldapopt.ldapOn && ((ldapopt.ServiceType == '1' && account.isLdapUser == '1') || (ldapopt.ServiceType == '2' && account.isADUser == '1')) ){
+
+							console.log('LDAP is enabled');
+
+							var ldap = require('ldapjs');
+							var assert = require('assert');
+
+							var client = ldap.createClient({
+							  // url: 'ldap://192.207.61.16'
+							  url: 'ldap://'+ldapopt.ldapServerIp,
+							  timeout: 4000
+							});
+
+							/*client.bind('cn=Manager,dc=server,dc=world', 'openldap', function(err) {
+							  console.log('--------------BINDING--------------');
+							  console.log(err);
+							  assert.ifError(err);
+							});*/
+
+							console.log('--------------Connecting LDAP--------------');
+
+							client.bind(ldapopt.ldapAdmin, ldapopt.ldapPassword, function(err) {
+
+							  	console.log('--------------BINDING--------------');
+
+							  	if(err){ 
+							  		console.log(err);
+							  	}else{
+
+								  	var opts = {};
+									basednstr = '';
+
+									if(ldapopt.ServiceType == '1'){//ldap
+
+										opts = {
+										  filter: '&(objectClass=*)(mail='+req.param('email')+')',//'&(objectClass=*)(mail=rishabh@test.com)(uid=rchauhan)',
+										  scope: 'sub',
+										  attributes: '*'
+										};
+
+										if(typeof ldapopt.ldapOU != 'undefined'){
+											basednstr = 'ou='+ldapopt.ldapOU+','+ldapopt.ldapBaseDN;
+										}else{
+											basednstr = ''+ldapopt.ldapBaseDN;
+										}
+									}else if(ldapopt.ServiceType == '2'){//AD
+
+										opts = {
+										  // filter: '&(objectClass=*)(mail='+req.param('email')+')',//'&(objectClass=*)(mail=rishabh@test.com)(uid=rchauhan)',
+										  filter: "(userPrincipalName=" + req.param('email') + ")",
+										  scope: 'sub',
+										  // attributes: '*'
+										};
+										basednstr = "dc=" + ldapopt.ldapBaseDN.replace(/\./g, ",dc=");
+									}
+
+									client.search(basednstr, opts, function(err, resclient) {
+
+									  console.log('--------------SEARCHING--------------');
+
+									  if(err){ 
+
+							  			res.view('auth/login', {
+											title     : 'Login | Sails Framework',
+											loginError: true,
+											loginErrorMsg: "Sorry - either your email address or password does not match our records. Please try a different combination.",
+											email     : req.param('email'),
+											api_key: req.param('api_key'),
+											response_type: req.param('response_type'),
+											redirect_url: req.param('redirect_url'),
+											state: req.param('state')
+										});
+							  		  }else{
+										  // assert.ifError(err);
+
+										  var isentryfound = false;
+
+										  resclient.on('searchEntry', function(entry) {
+
+										  	isentryfound = true;
+										    console.log('entry: ' + JSON.stringify(entry.object));
+
+										    console.log('Login this user');
+
+										    client.bind(entry.object.dn, secretAttempt, function(err) {
+											  console.log('--------------BINDING55555--------------');
+
+											  	if(err){
+											  		res.view('auth/login', {
+														title     : 'Login | Sails Framework',
+														loginError: true,
+														loginErrorMsg: "Sorry - either your email address or password does not match our records. Please try a different combination.",
+														email     : req.param('email'),
+														api_key: req.param('api_key'),
+														response_type: req.param('response_type'),
+														redirect_url: req.param('redirect_url'),
+														state: req.param('state')
+													});
+											  	}else{
+													// Store authenticated state in session
+													AuthenticationService.session.link(req, account);
+													AuthenticationService.session.redirectToOriginalDestination(req, res);
+												}
+
+											    // Resend using the original response statusCode
+											    // use the json parsing above as a simple check we got back good stuff
+										            // res.json(body, response && response.statusCode);
+											});
+
+									    	/*var pattern = /{(.*)}(.*)/g;//{MD5}4QrcOUm6Wau+VuBX8g+IPg==
+									    	match = pattern.exec(entry.object.userPassword);
+									    	var Base64={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",encode:function(e){var t="";var n,r,i,s,o,u,a;var f=0;e=Base64._utf8_encode(e);while(f<e.length){n=e.charCodeAt(f++);r=e.charCodeAt(f++);i=e.charCodeAt(f++);s=n>>2;o=(n&3)<<4|r>>4;u=(r&15)<<2|i>>6;a=i&63;if(isNaN(r)){u=a=64}else if(isNaN(i)){a=64}t=t+this._keyStr.charAt(s)+this._keyStr.charAt(o)+this._keyStr.charAt(u)+this._keyStr.charAt(a)}return t},decode:function(e){var t="";var n,r,i;var s,o,u,a;var f=0;e=e.replace(/[^A-Za-z0-9+/=]/g,"");while(f<e.length){s=this._keyStr.indexOf(e.charAt(f++));o=this._keyStr.indexOf(e.charAt(f++));u=this._keyStr.indexOf(e.charAt(f++));a=this._keyStr.indexOf(e.charAt(f++));n=s<<2|o>>4;r=(o&15)<<4|u>>2;i=(u&3)<<6|a;t=t+String.fromCharCode(n);if(u!=64){t=t+String.fromCharCode(r)}if(a!=64){t=t+String.fromCharCode(i)}}t=Base64._utf8_decode(t);return t},_utf8_encode:function(e){e=e.replace(/rn/g,"n");var t="";for(var n=0;n<e.length;n++){var r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r)}else if(r>127&&r<2048){t+=String.fromCharCode(r>>6|192);t+=String.fromCharCode(r&63|128)}else{t+=String.fromCharCode(r>>12|224);t+=String.fromCharCode(r>>6&63|128);t+=String.fromCharCode(r&63|128)}}return t},_utf8_decode:function(e){var t="";var n=0;var r=c1=c2=0;while(n<e.length){r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r);n++}else if(r>191&&r<224){c2=e.charCodeAt(n+1);t+=String.fromCharCode((r&31)<<6|c2&63);n+=2}else{c2=e.charCodeAt(n+1);c3=e.charCodeAt(n+2);t+=String.fromCharCode((r&15)<<12|(c2&63)<<6|c3&63);n+=3}}return t}};
+											console.log('matchmatchmatchmatchmatch');
+											console.log(match);
+											// // console.log(Base64.encode(123456));
+											// console.log(Base64.encode('123456'));
+											// console.log((Base64.decode(match[2])).toString(16));
+										  	if(match[1] == 'MD5'){
+										  		var crypto = require('crypto');
+												mdpass = crypto
+													.createHash('MD5')
+													.update(secretAttempt);
+												console.log(mdpass);
+												console.log('md5md5md5md5md5md5md5');
+										  	}*/
+										    // if(entry.object.userPassword == md)
+										  });
+										  resclient.on('searchReference', function(referral) {
+										    console.log('referral: ' + referral.uris.join());
+										  });
+										  resclient.on('error', function(err) {
+										    console.error('error: ' + err.message);
+										  });
+										  resclient.on('end', function(result) {
+										    console.log('status: ' + result.status);
+										    if(!isentryfound){
+										    	res.view('auth/login', {
+													title     : 'Login | Sails Framework',
+													loginError: true,
+													loginErrorMsg: "Sorry - either your email address or password does not match our records. Please try a different combination.",
+													email     : req.param('email'),
+													api_key: req.param('api_key'),
+													response_type: req.param('response_type'),
+													redirect_url: req.param('redirect_url'),
+													state: req.param('state')
+												});
+										    }
+										  });
+									  }
+									});
+								}
+							});
+						}else{
+							//Do nothing, continue
+							res.view('auth/login', {
+								title     : 'Login | Sails Framework',
+								loginError: true,
+								loginErrorMsg: "Sorry - either your email address or password does not match our records. Please try a different combination.",
+								email     : req.param('email'),
+								api_key: req.param('api_key'),
+								response_type: req.param('response_type'),
+								redirect_url: req.param('redirect_url'),
+								state: req.param('state')
+							});
+						}
 					});
-				}
+				}else{
 
-				// Account is deleted
-				if (account && account.deleted==1) {
-					return res.view('auth/login', {
-						title     	: 'Login | Sails Framework',
-						loginError 	: true,
-						loginErrorMsg: 'Your account has been deleted.',
-						email     	: req.param('email'),
-						api_key 	: req.param('api_key'),
-						response_type: req.param('response_type'),
-						redirect_url: req.param('redirect_url'),
-						state: req.param('state')
-					});
-				}
-
-				// The account was found and the password matches the hashed user password.
-				if(account && AuthenticationService.checkPassword(secretAttempt, account.password)) {
-
-					// Store authenticated state in session
-					AuthenticationService.session.link(req, account);
-					
-					// If we're given an API key, check that it's valid, and act accordingly
-					if (req.param('api_key')) {
-						Developer.find({where:{api_key:req.param('api_key')}}).done(function(err, developer){
-							if (developer !== null) {
-								return AuthController.verifyapi(req, res, null, developer);
-							} else {
-								return res.send(500);
-							}
+					// Account not verified
+					if (account && account.verified!=1) {
+						return res.view('auth/login', {
+							title     	: 'Login | Sails Framework',
+							loginError 	: true,
+							loginErrorMsg: 'Your account has not been verified yet.  Please check your email.',
+							email     	: req.param('email'),
+							api_key 	: req.param('api_key'),
+							response_type: req.param('response_type'),
+							redirect_url: req.param('redirect_url'),
+							state: req.param('state')
 						});
 					}
-					// Otherwise do the appropriate redirection
-					else {
-						/*Check wether super admin*/
-						if(account.isSuperAdmin != 1){
-							/*Check for subscription duration afzal*/
-							var sql = "SELECT id FROM transactiondetails WHERE DATE_FORMAT(DATE_ADD(DATE(createdAt), INTERVAL duration MONTH),'%Y-%m-%d') > CURDATE() AND is_deleted=0 AND account_id=?";          
-        					sql = Sequelize.Utils.format([sql,account.id]);
 
-        					sequelize.query(sql, null, {
-          						raw: true
-        					}).success(function(transaction) {
+					// Account is deleted
+					if (account && account.deleted==1) {
+						return res.view('auth/login', {
+							title     	: 'Login | Sails Framework',
+							loginError 	: true,
+							loginErrorMsg: 'Your account has been deleted.',
+							email     	: req.param('email'),
+							api_key 	: req.param('api_key'),
+							response_type: req.param('response_type'),
+							redirect_url: req.param('redirect_url'),
+							state: req.param('state')
+						});
+					}
 
-          						if(transaction.length){
-          							AuthenticationService.session.redirectToOriginalDestination(req, res);
-          						}else{
-          							return res.view('auth/login', {
-										title     	: 'Login | Sails Framework',
-										loginError 	: true,
-										loginErrorMsg: 'Your subscription plan is outdated. Please subscribe to login.',
-										email     	: req.param('email'),
-										api_key 	: req.param('api_key'),
+					// The account was found and the password matches the hashed user password.
+					if(account && AuthenticationService.checkPassword(secretAttempt, account.password)) {
+
+						// Store authenticated state in session
+						AuthenticationService.session.link(req, account);
+						
+						// If we're given an API key, check that it's valid, and act accordingly
+						if (req.param('api_key')) {
+							Developer.find({where:{api_key:req.param('api_key')}}).done(function(err, developer){
+								if (developer !== null) {
+									return AuthController.verifyapi(req, res, null, developer);
+								} else {
+									return res.send(500);
+								}
+							});
+						}
+						// Otherwise do the appropriate redirection
+						else {
+							/*Check wether super admin*/
+							if(account.isSuperAdmin != 1){
+								/*Check for subscription duration afzal*/
+								var sql = "SELECT id FROM transactiondetails WHERE DATE_FORMAT(DATE_ADD(DATE(createdAt), INTERVAL duration MONTH),'%Y-%m-%d') > CURDATE() AND is_deleted=0 AND account_id=?";          
+	        					sql = Sequelize.Utils.format([sql,account.id]);
+
+	        					sequelize.query(sql, null, {
+	          						raw: true
+	        					}).success(function(transaction) {
+
+	          						if(transaction.length){
+	          							AuthenticationService.session.redirectToOriginalDestination(req, res);
+	          						}else{
+	          							return res.view('auth/login', {
+											title     	: 'Login | Sails Framework',
+											loginError 	: true,
+											loginErrorMsg: 'Your subscription plan is outdated. Please subscribe to login.',
+											email     	: req.param('email'),
+											api_key 	: req.param('api_key'),
+											response_type: req.param('response_type'),
+											redirect_url: req.param('redirect_url'),
+											state: req.param('state')
+										});
+	          						}
+	      						});
+	        				}else{
+	        					AuthenticationService.session.redirectToOriginalDestination(req, res);
+	        				}
+						}
+
+					// The user was not found. Send back the auth view with json.
+					} else {
+
+						if(!account){
+							//Check for LDAP account if exists
+							SiteSettings.find({ where:{ id: '1' }}).done(function(err, ldapopt) {
+
+								if(ldapopt && ldapopt.ldapOn){
+
+									console.log('LDAP is enabled');
+
+									var ldap = require('ldapjs');
+									var assert = require('assert');
+
+									var client = ldap.createClient({
+									  // url: 'ldap://192.207.61.16'
+									  url: 'ldap://'+ldapopt.ldapServerIp,
+									  timeout: 4000
+									});
+
+									/*client.bind('cn=Manager,dc=server,dc=world', 'openldap', function(err) {
+									  console.log('--------------BINDING--------------');
+									  console.log(err);
+									  assert.ifError(err);
+									});*/
+
+									console.log('--------------Connecting LDAP--------------');
+
+									client.bind(ldapopt.ldapAdmin, ldapopt.ldapPassword, function(err) {
+
+									  	console.log('--------------BINDING--------------');
+
+									  	if(err){ 
+									  		// console.log(err);
+									  	}else{
+
+										  	var opts = {};
+											var basednstr = '';
+											console.log(typeof ldapopt.serviceType);
+											console.log(ldapopt.ServiceType);
+
+											if(ldapopt.ServiceType == '1'){//ldap
+
+												opts = {
+												  filter: '&(objectClass=*)(mail='+req.param('email')+')',//'&(objectClass=*)(mail=rishabh@test.com)(uid=rchauhan)',
+												  scope: 'sub',
+												  attributes: '*'
+												};
+
+												if(typeof ldapopt.ldapOU != 'undefined'){
+													basednstr = 'ou='+ldapopt.ldapOU+','+ldapopt.ldapBaseDN;
+												}else{
+													basednstr = ''+ldapopt.ldapBaseDN;
+												}
+											}else if(ldapopt.ServiceType == '2'){//AD
+
+												opts = {
+												  // filter: '&(objectClass=*)(mail='+req.param('email')+')',//'&(objectClass=*)(mail=rishabh@test.com)(uid=rchauhan)',
+												  filter: "(userPrincipalName=" + req.param('email') + ")",
+												  scope: 'sub',
+												  // attributes: '*'
+												};
+												basednstr = "dc=" + ldapopt.ldapBaseDN.replace(/\./g, ",dc=");
+											}
+
+											client.search(basednstr, opts, function(err, resclient) {
+											  if(err){ 
+
+									  			res.view('auth/login', {
+													title     : 'Login | Sails Framework',
+													loginError: true,
+													loginErrorMsg: "Sorry - either your email address or password does not match our records. Please try a different combination.",
+													email     : req.param('email'),
+													api_key: req.param('api_key'),
+													response_type: req.param('response_type'),
+													redirect_url: req.param('redirect_url'),
+													state: req.param('state')
+												});
+									  		  }else{
+												  var isentryfound = false;
+
+												  resclient.on('searchEntry', function(entry) {
+
+												    // console.log('entry: ' + JSON.stringify(entry.object));
+												    isentryfound = true;
+												    var entry_object;
+
+												    if(ldapopt.ServiceType == '1'){//ldap
+												    	entry_object 	= {
+												    		'user'  	: entry.object.dn,
+												    		'cn'		: entry.object.cn,
+												    		'mail'		: entry.object.mail,
+												    		'password' 	: 'ldapuser',
+												    		'isLdapUser': 1,
+												    		'isADUser'	: false
+												    	};
+												    }else if(ldapopt.ServiceType == '2'){//AD
+												    	entry_object 	= {
+												    		'user'  	: entry.object.dn,//entry.object.userPrincipalName
+												    		'cn'		: entry.object.cn,
+												    		'mail'		: entry.object.userPrincipalName,
+												    		'password' 	: 'aduser',
+												    		'isLdapUser': false,
+												    		'isADUser'	: 1
+												    	};
+												    }
+
+												    client.bind(entry_object.user, secretAttempt, function(err) {
+
+													  	if(err){
+													  		//Do nothing, continue
+															res.view('auth/login', {
+																title     : 'Login | Sails Framework',
+																loginError: true,
+																loginErrorMsg: "Sorry - either your email address or password does not match our records. Please try a different combination.",
+																email     : req.param('email'),
+																api_key: req.param('api_key'),
+																response_type: req.param('response_type'),
+																redirect_url: req.param('redirect_url'),
+																state: req.param('state')
+															});
+													  	}else{
+													  		Subscription.find({
+																where: [' is_default = 1' ],
+															}).success(function (subscription) {
+															// Save to transactionDetails table
+
+																var request = require('request');
+														        var options = {
+														            uri: 'http://localhost:1337/account/register/',
+														            method: 'POST',
+														        };
+
+														        options.json = {
+														            name: entry_object.cn,
+														            email: entry_object.mail,
+														            isVerified: true,
+														            isAdmin: false,
+														            password: entry_object.password,
+														            isLdapUser: entry_object.isLdapUser,
+														            isADUser: entry_object.isADUser
+														            // created_by: req.session.Account.id,
+														            // workgroup: req.params.workgroup,
+														            // title: req.params.title,
+														            // subscription: req.params.subscription,
+														            // quota: req.params.quota,
+														            // created_by_name: req.session.Account.name, //for logging
+														        };
+
+														        if(subscription){
+														        	options.json.subscription = subscription.id;
+														        	options.json.quota = ""+subscription.quota+"";
+														        }
+
+														        request(options, function (err, response, body) {
+
+														            if (err){
+														                // return res.json({error: err.message, type: 'error'}, response && response.statusCode);
+														                res.view('auth/login', {
+																			title     : 'Login | Sails Framework',
+																			loginError: true,
+																			loginErrorMsg: "Sorry - either your email address or password does not match our records. Please try a different combination.",
+																			email     : req.param('email'),
+																			api_key: req.param('api_key'),
+																			response_type: req.param('response_type'),
+																			redirect_url: req.param('redirect_url'),
+																			state: req.param('state')
+																		});
+														            }
+														//        Resend using the original response statusCode
+														//        use the json parsing above as a simple check we got back good stuff
+														            //res.json(body, response && response.statusCode);
+
+														            //save data to transactiondetails table
+
+														            /*Create logging*/
+														            var opts = {
+														                uri: 'http://localhost:1337/logging/register/',
+														                method: 'POST',
+														            };
+
+														            var user_platform;
+														            if (req.headers.user_platform) {
+														                user_platform = req.headers.user_platform;
+														            } else {
+														                if (req.headers['user-agent']) {
+														                    user_platform = req.headers['user-agent'];
+														                } else {
+														                    user_platform = "Web Application";
+														                }
+														            }
+
+														            opts.json = {
+														                user_id: '',
+														                text_message: 'New LDAP account is created.',
+														                activity: 'newldapaccount',
+														                on_user: typeof (body.account) === 'undefined' ? body.id : body.account.id,
+														                ip: (typeof req.session.Account === 'undefined' && typeof req.session.Account === 'undefined') ? req.headers['ip'] : req.session.Account.ip,
+														                platform: user_platform,
+														            };
+
+														            console.log('################## Create LDAP User  ###############');
+														            console.log(user_platform);
+														            console.log('################### Create LDAP User ####################');
+
+
+														            request(opts, function (err1, response1, body1) {
+														                // if (err)
+														                //     return res.json({error: err1.message, type: 'error'}, response1 && response1.statusCode);
+
+														                // res.json({'success': '1'});
+														            });
+														            /*Create logging*/
+
+													                // Save to transactionDetails table
+													                var tran_options = {
+													                    uri: 'http://localhost:1337/transactiondetails/register/',
+													                    method: 'POST',
+													                };
+
+													                var created_date = new Date();
+													                tran_options.json = {
+													                    trans_id: 'ldapadmin',
+													                    account_id: response.body.account.id,
+													                    created_date: created_date,
+													                    users_limit: subscription.users_limit,
+													                    quota: subscription.quota,
+													                    plan_name: subscription.features,
+													                    price: subscription.price,
+													                    duration: subscription.duration,
+													                    paypal_status: '',
+													                };
+
+													                request(tran_options, function (err1, response1, body1) {
+													                    // if (err1)
+													                    //     return res.json({error: err1.message, type: 'error'}, response1 && response1.statusCode);
+													                    // //        Resend using the original response statusCode
+													                    // //        use the json parsing above as a simple check we got back good stuff
+													                    // // res.json(body, response && response.statusCode);
+
+													                    console.log(response.body.account);//{ name: 'Rishabh Chauhan', email: 'rishabh@test.com', id: 8 }
+
+															            Account.find({
+																			where: {
+																				email: response.body.account.email
+																			}
+																		}).done(function(err, account) {
+
+																			// Store authenticated state in session
+																			AuthenticationService.session.link(req, account);
+																			AuthenticationService.session.redirectToOriginalDestination(req, res);
+																		});
+													                });
+														            // end transaction history
+
+														        });
+															});														    
+													    }
+													});
+
+											    	/*var pattern = /{(.*)}(.*)/g;//{MD5}4QrcOUm6Wau+VuBX8g+IPg==
+											    	match = pattern.exec(entry.object.userPassword);
+											    	var Base64={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",encode:function(e){var t="";var n,r,i,s,o,u,a;var f=0;e=Base64._utf8_encode(e);while(f<e.length){n=e.charCodeAt(f++);r=e.charCodeAt(f++);i=e.charCodeAt(f++);s=n>>2;o=(n&3)<<4|r>>4;u=(r&15)<<2|i>>6;a=i&63;if(isNaN(r)){u=a=64}else if(isNaN(i)){a=64}t=t+this._keyStr.charAt(s)+this._keyStr.charAt(o)+this._keyStr.charAt(u)+this._keyStr.charAt(a)}return t},decode:function(e){var t="";var n,r,i;var s,o,u,a;var f=0;e=e.replace(/[^A-Za-z0-9+/=]/g,"");while(f<e.length){s=this._keyStr.indexOf(e.charAt(f++));o=this._keyStr.indexOf(e.charAt(f++));u=this._keyStr.indexOf(e.charAt(f++));a=this._keyStr.indexOf(e.charAt(f++));n=s<<2|o>>4;r=(o&15)<<4|u>>2;i=(u&3)<<6|a;t=t+String.fromCharCode(n);if(u!=64){t=t+String.fromCharCode(r)}if(a!=64){t=t+String.fromCharCode(i)}}t=Base64._utf8_decode(t);return t},_utf8_encode:function(e){e=e.replace(/rn/g,"n");var t="";for(var n=0;n<e.length;n++){var r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r)}else if(r>127&&r<2048){t+=String.fromCharCode(r>>6|192);t+=String.fromCharCode(r&63|128)}else{t+=String.fromCharCode(r>>12|224);t+=String.fromCharCode(r>>6&63|128);t+=String.fromCharCode(r&63|128)}}return t},_utf8_decode:function(e){var t="";var n=0;var r=c1=c2=0;while(n<e.length){r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r);n++}else if(r>191&&r<224){c2=e.charCodeAt(n+1);t+=String.fromCharCode((r&31)<<6|c2&63);n+=2}else{c2=e.charCodeAt(n+1);c3=e.charCodeAt(n+2);t+=String.fromCharCode((r&15)<<12|(c2&63)<<6|c3&63);n+=3}}return t}};
+		console.log('matchmatchmatchmatchmatch');
+		console.log(match);
+		// // console.log(Base64.encode(123456));
+		// console.log(Base64.encode('123456'));
+		// console.log((Base64.decode(match[2])).toString(16));
+												  	if(match[1] == 'MD5'){
+												  		var crypto = require('crypto');
+														mdpass = crypto
+															.createHash('MD5')
+															.update(secretAttempt);
+														console.log(mdpass);
+														console.log('md5md5md5md5md5md5md5');
+												  	}*/
+												    // if(entry.object.userPassword == md)
+												  });
+												  resclient.on('searchReference', function(referral) {
+												    console.log('referral: ' + referral.uris.join());
+												  });
+												  resclient.on('error', function(err) {
+												    console.error('error: ' + err.message);
+												  });
+												  resclient.on('end', function(result) {
+												    console.log('status: ' + result.status);
+												    if(!result.status && !isentryfound){
+												    	res.view('auth/login', {
+															title     : 'Login | Sails Framework',
+															loginError: true,
+															loginErrorMsg: "Sorry - either your email address or password does not match our records. Please try a different combination.",
+															email     : req.param('email'),
+															api_key: req.param('api_key'),
+															response_type: req.param('response_type'),
+															redirect_url: req.param('redirect_url'),
+															state: req.param('state')
+														});
+												    }
+												  });
+											  }
+											});
+										}
+									});
+								}else{
+									//Do nothing, continue
+									res.view('auth/login', {
+										title     : 'Login | Sails Framework',
+										loginError: true,
+										loginErrorMsg: "Sorry - either your email address or password does not match our records. Please try a different combination.",
+										email     : req.param('email'),
+										api_key: req.param('api_key'),
 										response_type: req.param('response_type'),
 										redirect_url: req.param('redirect_url'),
 										state: req.param('state')
 									});
-          						}
-      						});
-        				}else{
-        					AuthenticationService.session.redirectToOriginalDestination(req, res);
-        				}
+								}
+							});
+						}else{
+							//Do nothing, continue
+							res.view('auth/login', {
+								title     : 'Login | Sails Framework',
+								loginError: true,
+								loginErrorMsg: "Sorry - either your email address or password does not match our records. Please try a different combination.",
+								email     : req.param('email'),
+								api_key: req.param('api_key'),
+								response_type: req.param('response_type'),
+								redirect_url: req.param('redirect_url'),
+								state: req.param('state')
+							});
+						}
 					}
-
-				// The user was not found. Send back the auth view with json.
-				} else {
+				}/*else{
+					//Do nothing, continue
 					res.view('auth/login', {
 						title     : 'Login | Sails Framework',
 						loginError: true,
@@ -232,13 +1238,13 @@ var AuthController = {
 						redirect_url: req.param('redirect_url'),
 						state: req.param('state')
 					});
-				}
+				}*/
 			});
 		} else {
-			if (secretAttempt && secretAttempt.length > 0) {
+			if (req.param('email') && (secretAttempt == '' || secretAttempt.trim() == '')) {
 				loginError = true;
 				loginErrorMsg = 'Please specify a password.';
-			} else {
+			} else{
 				loginError = false;
 				loginErrorMsg = '';
 			}
@@ -435,7 +1441,7 @@ var AuthController = {
 					// Looking good, so we'll return the auth token
 					res.json({
 						"access_token": accountDeveloper.access_token,
-						"expires_in": 10800,
+						"expires_in": 108000,
 						"token_type": "bearer",
 						"refresh_token": accountDeveloper.refresh_token
 					});
@@ -459,7 +1465,7 @@ var AuthController = {
 					accountDeveloper.save().success(function(ad){
 						res.json({
 							"access_token": accountDeveloper.access_token,
-							"expires_in": 10800,
+							"expires_in": 108000,
 							"token_type": "bearer",
 							"refresh_token": accountDeveloper.refresh_token
 						});

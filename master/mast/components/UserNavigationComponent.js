@@ -40,7 +40,11 @@ Mast.registerComponent('UserNavigationComponent', {
 		var d = this.get('dropdownItems');
 		//if(Mast.Session.Account.isAdmin && Mast.Session.Account.isSuperAdmin === 1)
 		if(Mast.Session.Account.isAdmin=="" && Mast.Session.Account.isSuperAdmin !== 1){ //Avneesh
-			d.splice('2', '3');
+			if(Mast.Session.Account.isLdapUser){
+				d.splice('1', '4');
+			}else{
+				d.splice('2', '3');
+			}
 		}else if (Mast.Session.Account.isEnterprise === 1){
 			d.splice('4', '1');
 		}else if (Mast.Session.Account.isSuperAdmin === 1){

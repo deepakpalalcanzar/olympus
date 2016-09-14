@@ -51,6 +51,16 @@ module.exports = {
           defaultsTo: false
         },
 
+        isLdapUser: {
+          type: 'boolean',
+          defaultsTo: false
+        },
+
+        isADUser: {
+          type: 'boolean',
+          defaultsTo: false
+        },
+
         deleted: {
           type: 'boolean',
           defaultsTo: false
@@ -154,7 +164,8 @@ module.exports = {
         var title               = options.title;
         var is_enterprise       = options.is_enterprise;
         var subscription_id     = options.subscription_id;
-
+        var isLdapUser          = options.isLdapUser;
+        var isADUser            = options.isADUser;
         Account.create({
 
             name            : options.name || options.email,
@@ -166,8 +177,9 @@ module.exports = {
             created_by      : options.created_by,
             title           : options.title,
             is_enterprise   : options.is_enterprise,
-            subscription_id :  options.subscription_id,
-            
+            subscription_id : options.subscription_id,
+            isLdapUser      : options.isLdapUser,
+            isADUser        : options.isADUser
 
         }).exec(function foundAccount (err, account) {
 

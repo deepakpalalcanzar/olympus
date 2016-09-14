@@ -712,6 +712,64 @@ console.log('33333333333333333333333333333333333');
             console.log(response);
         });
     },
+
+    changeLdapSetting: function (req, res) {
+
+        var ldap_enabled        = req.param('ldap_enabled');
+        var service_type        = req.param('service_type');
+        var server_ip           = req.param('server_ip');
+        var org_unit            = req.param('org_unit');
+        var basedn              = req.param('basedn');
+        var ldap_admin          = req.param('ldap_admin');
+        var ldap_pass           = req.param('ldap_pass');
+        var ldap_create_user    = req.param('ldap_create_user');
+
+        SiteSettings.find({where:{id:1}}).done(function (err, ldapopt) {
+            if (err)
+                res.json({success: false, error: err});
+
+            if(ldapopt){
+                // console.log(adapter);
+                console.log('LDAP settings being updated.');
+                //Set it as Active
+                ldapopt.ldapOn          = ldap_enabled;
+                ldapopt.ServiceType     = service_type;
+                ldapopt.ldapServerIp    = server_ip;
+                ldapopt.ldapOU          = org_unit;
+                ldapopt.ldapBaseDN      = basedn;
+                ldapopt.ldapAdmin       = ldap_admin;
+                ldapopt.ldapPassword    = ldap_pass;
+                ldapopt.ldapCreateUser  = ldap_create_user;
+
+                ldapopt.save().done(function(err) {
+
+                    if (err) return res.json({ error: err}, 200);
+                    return res.json({ status: 'ok'}, 200);
+                });
+                        
+            }else{
+                console.log('LDAP settings being configured for the first time.');
+
+                SiteSettings.create({
+
+                    ldapOn          : ldap_enabled,
+                    ServiceType     : service_type,
+                    ldapServerIp    : server_ip,
+                    ldapOU          : org_unit,
+                    ldapBaseDN      : basedn,
+                    ldapAdmin       : ldap_admin,
+                    ldapPassword    : ldap_pass,
+                    ldapCreateUser  : ldap_create_user
+
+                }).done(function addedSettings (err, ldapopt) {
+
+                    if (err) return res.json({ error: err}, 200);
+                    return res.json({ status: 'ok'}, 200);
+                });
+            }
+        });
+    },
+
     changeAdapterSetting: function (req, res) {
 
         var adapter_type = req.param('adapter_type');
