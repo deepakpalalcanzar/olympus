@@ -177,7 +177,9 @@ var Account = function(model) {
 		type 	: 'account',
 		isSuperAdmin : model.isSuperAdmin, // check for superadmin
 		isEnterprise : model.is_enterprise, 
-		avatar_image : model.avatar_image, 
+		avatar_image : model.avatar_image,
+		isLdapUser	 : model.isLdapUser,
+		isADUser	 : model.isADUser
 	};
 };
 exports.Account = apiTransform(Account);

@@ -161,7 +161,7 @@ Mast.registerComponent('AccountSettingsComponent',{
 			this.set('showSetting', false);
 			this.set('showSystemSetting', false);
 			this.set('showSubscription', true);
-			if(Mast.Session.Account.isLdapUser){
+			if(Mast.Session.Account.isLdapUser || Mast.Session.Account.isADUser){
 				this.set('showPassword', false);
 			}
 		}
