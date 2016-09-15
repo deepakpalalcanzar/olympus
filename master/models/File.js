@@ -1,7 +1,10 @@
 File = Model.extend({
     tableName: 'file',
     name: STRING,
-    size: INTEGER,
+    size: {
+        type: STRING,
+        defaultValue: 0
+    },
     fsName: TEXT,
     md5checksum: TEXT,
     deleted: BOOLEAN,

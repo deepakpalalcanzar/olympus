@@ -7,12 +7,12 @@ Directory = Model.extend({
 	},
 
 	size: {
-		type: INTEGER,
+		type: STRING,
 		defaultValue: 0
 	},
 
 	quota: {
-		type: INTEGER,
+		type: STRING,
 
 		// Default is 1GB
 		defaultValue: 1000000000
@@ -120,7 +120,8 @@ Directory = Model.extend({
 				if(workgroup.quota === null) {
 					return cb();
 				}
-				if(workgroup.quota >= (workgroup.size + size)) {
+				//Number() added by rishabh
+				if(Number(workgroup.quota) >= (Number(workgroup.size) + Number(size))) {
 					sails.log.debug('Quota check clear.');
 					cb();
 				} else {

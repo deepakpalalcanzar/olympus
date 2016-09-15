@@ -702,6 +702,12 @@ Mast.components.INodeComponent = Mast.Tree.extend({
 			return;
 		} 
 
+		var inodeName_old 	= this.$el.closest_descendant('span.inode-name').html();
+		if(inodeName.trim() == inodeName_old.trim()){
+			this.set('editing', false);
+			return;
+		} 
+
 		// only change inode model directory name if user enters one
 		else {
 			

@@ -25,7 +25,7 @@ module.exports = {
 
     name: 'string',
     size: {
-      type: 'integer',
+      type: 'string',
       defaultsTo: 0
     },
 

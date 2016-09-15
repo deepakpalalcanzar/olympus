@@ -9,7 +9,10 @@ module.exports = {
     attributes: {
 
         name: 'string',
-        size: 'integer',
+        size: {
+          type: 'string',
+          defaultsTo: 0
+        },
         fsName: 'text',
         md5checksum: 'text',
 
