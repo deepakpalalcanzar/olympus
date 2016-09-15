@@ -2,7 +2,7 @@ File = Model.extend({
     tableName: 'file',
     name: STRING,
     size: {
-        type: STRING,
+        type: BIGINT,
         defaultValue: 0
     },
     fsName: TEXT,

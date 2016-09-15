@@ -25,12 +25,12 @@ module.exports = {
 
     name: 'string',
     size: {
-      type: 'string',
+      type: 'bigint',
       defaultsTo: 0
     },
 
     quota: {
-      type: 'string',
+      type: 'bigint',
 
       // Default is 1GB
       defaultsTo: 100000000000

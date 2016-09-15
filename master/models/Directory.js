@@ -7,12 +7,12 @@ Directory = Model.extend({
 	},
 
 	size: {
-		type: STRING,
+		type: BIGINT,
 		defaultValue: 0
 	},
 
 	quota: {
-		type: STRING,
+		type: BIGINT,
 
 		// Default is 1GB
 		defaultValue: 1000000000
@@ -949,7 +949,7 @@ Directory = Model.extend({
 			}, function(err, results) {
 				if (err) {return cb(err);}
 				// Total size is files + dirs
-				var size = results.sumFiles + results.sumDirs;
+				var size = Number(results.sumFiles) + Number(results.sumDirs);
 				// If the size has changed, save it and alert subscribers
 				if (self.size != size) {
 					// Change the model's size

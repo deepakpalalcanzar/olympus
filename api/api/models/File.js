@@ -10,7 +10,7 @@ module.exports = {
 
         name: 'string',
         size: {
-          type: 'string',
+          type: 'bigint',
           defaultsTo: 0
         },
         fsName: 'text',
