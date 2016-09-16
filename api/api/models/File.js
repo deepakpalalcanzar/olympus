@@ -10,8 +10,8 @@ module.exports = {
 
         name: 'string',
         size: {
-          type: 'bigint',
-          defaultsTo: 0
+          type: 'text',
+          defaultsTo: '0'
         },
         fsName: 'text',
         md5checksum: 'text',

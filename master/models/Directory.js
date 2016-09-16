@@ -7,15 +7,15 @@ Directory = Model.extend({
 	},
 
 	size: {
-		type: BIGINT,
-		defaultValue: 0
+		type: TEXT,
+		defaultValue: '0'
 	},
 
 	quota: {
-		type: BIGINT,
+		type: TEXT,
 
 		// Default is 1GB
-		defaultValue: 1000000000
+		defaultValue: '1000000000'
 	},
 
 	public_link_enabled: {
@@ -135,7 +135,7 @@ Directory = Model.extend({
 
 		incrementSize: function(id, size, cb) {
 			Directory.find(id).success(function(directory) {
-				directory.size = directory.size + size;
+				directory.size = Number(directory.size) + Number(size);
 				if(directory.AccountId) {
 					directory.accountId = directory.AccountId;
 					delete directory.AccountId;
@@ -940,7 +940,7 @@ Directory = Model.extend({
 					async.reduce(results.dirs, 0, function(size, dir, cb) {
 						dir.recalculateSize(function(err, dir) {
 							if (err) {return cb(err);}
-							return cb(null, size + dir.size);
+							return cb(null, Number(size) + Number(dir.size));
 						}, force);
 					}, cb);
 
@@ -977,7 +977,8 @@ Directory = Model.extend({
               		deleted: null
               	}
               }).success(function(files) {
-              	return cb(null, _.reduce(files, function(memo, file) {return memo + file.size;}, 0));
+              	return cb(null, _.reduce(files, function(memo, file) {
+              		return Number(memo) + Number(file.size);}, 0));
               }).error(cb);
             }
 

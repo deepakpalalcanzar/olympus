@@ -129,7 +129,11 @@ Mast.registerComponent('UploadSearchComponent',{
 
 // create a file upload dialog component
 	createUploadDialog: function(e) {
-		var uploadDialog = new Mast.components.UploadFileDialogComponent();
+		if($('.progress-bar:visible').length){
+			alert('Please wait for the upload to complete.');
+		}else{
+			var uploadDialog = new Mast.components.UploadFileDialogComponent();
+		}
 		e.stopPropagation();
 	},
 

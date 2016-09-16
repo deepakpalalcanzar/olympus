@@ -17,34 +17,37 @@ Mast.registerComponent('AddEnterprisesComponent',{
 				if(self.validateForm()){
 					Mast.Socket.request('/enterprises/register', entData, function(res, err){
 						if(res){
-
-							if(res.id && res.error){
-                                var accData = {
-									account_id  : res.id,
-							 		subscription_id	: entData.subscription,
-								};
-								Mast.Socket.request('/enterprises/updateUserAccount', accData, function(respo, erro){
-									if(respo){
-									}
-								});
-							}
-
-							var data = {
-								name    		:  entData.owner_name,
-								error			:  res.error,
-								quota			:  entData.quota,
-								account_id 		:  res.error?res.id:res.account.id,
-							 	enterprises_name:  entData.name,
-							 	sub_id			:  entData.subscription // for transactiondetails
-							}
-                            
-                            Mast.Socket.request('/enterprises/create', data, function(response, error){
-								if(response){
-									self.clearForm();
-									alert('Account created successfully.');
-									Mast.navigate('enterprises');
+							if(res.error){
+								alert(res.error);
+							}else{
+								if(res.id){
+	                                var accData = {
+										account_id  : res.id,
+								 		subscription_id	: entData.subscription,
+									};
+									Mast.Socket.request('/enterprises/updateUserAccount', accData, function(respo, erro){
+										if(respo){
+										}
+									});
 								}
-							});	
+
+								var data = {
+									name    		:  entData.owner_name,
+									error			:  res.error,
+									quota			:  entData.quota,
+									account_id 		:  res.error?res.id:res.account.id,
+								 	enterprises_name:  entData.name,
+								 	sub_id			:  entData.subscription // for transactiondetails
+								}
+	                            
+	                            Mast.Socket.request('/enterprises/create', data, function(response, error){
+									if(response){
+										self.clearForm();
+										alert('Account created successfully.');
+										Mast.navigate('enterprises');
+									}
+								});	
+							}							
                         }
 					});	
 				}

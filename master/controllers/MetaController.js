@@ -49,7 +49,7 @@ var MetaController = {
 					Theme.find({
 						where : { account_id: req.session.Account.id  }
 					}).done(function(err, theme){
-						var sql = "SELECT (SUM(size)/1000000000) as total_space_used FROM directory";
+						var sql = "SELECT (SUM(size)/1000000000) as total_space_used FROM file";//directory: Rishabh, subfolder size(3gb)+parent folder size(3gb) makes it double the size, so better consider file
 						sql = Sequelize.Utils.format([sql]);
 						sequelize.query(sql, null, {
 							raw: true

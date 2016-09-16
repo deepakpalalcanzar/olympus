@@ -25,15 +25,15 @@ module.exports = {
 
     name: 'string',
     size: {
-      type: 'bigint',
-      defaultsTo: 0
+      type: 'text',
+      defaultsTo: '0'
     },
 
     quota: {
-      type: 'bigint',
+      type: 'text',
 
       // Default is 1GB
-      defaultsTo: 100000000000
+      defaultsTo: '100000000000'
     },
 
     public_link_enabled: {
