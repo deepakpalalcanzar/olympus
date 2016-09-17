@@ -562,6 +562,12 @@ console.log(current_receiverinfo);
                             mimetype='video/mp4';
                             break;
 
+                            case '.MOV':
+                            case '.Mov':
+                            case '.mov':
+                            mimetype='video/quicktime';
+                            break;
+
                             case '.mkv': 
                             mimetype='audio/mpeg';
                             break;

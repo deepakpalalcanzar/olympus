@@ -267,40 +267,45 @@ var TempAccountController = {
 
     getWorkgroups: function(req, res){
 
-        var sqlcheck = "SELECT dl.deleted_id, dl.directory_id, dl.account_id, d.name, d.id, d.deleted, d.DirectoryId FROM  `deletedlist` dl JOIN directory d ON dl.directory_id = d.id WHERE dl.deleted_id =? AND dl.account_id = ?"
-        sqlcheck = Sequelize.Utils.format([ sqlcheck, req.params.item_id, req.session.Account.id ]);
+        if(typeof req.session.Account != undefined){
+            var sqlcheck = "SELECT dl.deleted_id, dl.directory_id, dl.account_id, d.name, d.id, d.deleted, d.DirectoryId FROM  `deletedlist` dl JOIN directory d ON dl.directory_id = d.id WHERE dl.deleted_id =? AND dl.account_id = ?"
+            sqlcheck = Sequelize.Utils.format([ sqlcheck, req.params.item_id, req.session.Account.id ]);
 
         console.log("sqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlcheck");
         console.log(sqlcheck);
  
-        sequelize.query(sqlcheck, null, {
-            raw: true
-        }).success(function(checkFile) {
+            sequelize.query(sqlcheck, null, {
+                raw: true
+            }).success(function(checkParentDir) {
            
-            if(checkFile[0].deleted !== 1){
-                res.json(checkFile);
-            }else{
+                if(checkParentDir[0].deleted !== 1){
+                    res.json(checkParentDir);
+                }else{
 
-                if( req.params.dir_type === '0' ){
-                    var sql = "SELECT d.id, d.name, d.deleted from directory d JOIN directorypermission dp ON d.id = dp.DirectoryId where dp.AccountId = ? and deleted=0";
-                    sql     = Sequelize.Utils.format([ sql, req.session.Account.id ]);
-                }else { 
-                    var sql = "SELECT d.id, d.name, d.deleted from directory d JOIN directorypermission dp ON d.id = dp.DirectoryId where dp.AccountId = ? and d.DirectoryId=?";
-                    sql     = Sequelize.Utils.format([ sql, req.session.Account.id, req.params.dir_type ]);
-                }
+                    if( req.params.dir_type === '0' ){
+                        var sql = "SELECT d.id, d.name, d.deleted from directory d JOIN directorypermission dp ON d.id = dp.DirectoryId where dp.AccountId = ? and deleted=0";
+                        sql     = Sequelize.Utils.format([ sql, req.session.Account.id ]);
+                    }else { 
+                        var sql = "SELECT d.id, d.name, d.deleted from directory d JOIN directorypermission dp ON d.id = dp.DirectoryId where dp.AccountId = ? and d.DirectoryId=?";
+                        sql     = Sequelize.Utils.format([ sql, req.session.Account.id, req.params.dir_type ]);
+                    }
 
 
         console.log("--------------------------------------------------------------------------------");
         console.log(sql);
         console.log("sqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlchecksqlcheck");
 
-                sequelize.query(sql, null, {
-                    raw: true
-                }).success(function(deletedlist) {
-                    res.json(deletedlist);
-                });
-            }
-        });
+                    sequelize.query(sql, null, {
+                        raw: true
+                    }).success(function(deletedlist) {
+                        deletedlist[0].deleted = '1';
+                        res.json(deletedlist);
+                    });
+                }
+            });
+        }else{
+            res.json({ notAuth: 'not autorized'});
+        }
     },
 
     getWorkgroupChild: function(req, res){

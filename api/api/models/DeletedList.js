@@ -77,7 +77,7 @@ module.exports = {
     },
 
 
-    restoreParent: function(options, cb){
+    restoreParent: function(options, finalcallback){
 
         var array = [];
         var arrayFile = [];
@@ -85,11 +85,72 @@ module.exports = {
         DeletedList.find({
             directory_id : options.file_id 
         }).then(function (res) {
+              
+            if(res.length > 0){
 
-            res.forEach(function (deletedlist) {
-                if( deletedlist.type === 2 ) {
-                    if(array.length > 0){
-                        if(array.indexOf(deletedlist.deleted_id) === -1){
+
+                async.each(res,//1st array of items
+                  // 2nd param is the function that each item is passed to
+                  function(deletedlist, cb){// Call an asynchronous function, often a save() to DB
+                    
+                    if( deletedlist.type === 2 ) {
+                        if(array.length > 0){
+                            if(array.indexOf(deletedlist.deleted_id) === -1){
+                                array.push(deletedlist.deleted_id);
+                                var opt = { file_id : deletedlist.deleted_id, directory_id : deletedlist.directory_id };
+                                DeletedList.udpateDirectory(opt, function(err, file){
+                                    DeletedList.restoreParent(opt, function(err,file){
+                                        return cb && cb(null, file);
+                                    });
+                                });
+                            }
+                        }else{
+                            array.push(deletedlist.deleted_id);
+                            var opt = { file_id : deletedlist.deleted_id, directory_id : deletedlist.directory_id };
+                            DeletedList.udpateDirectory(opt, function(err, file){
+                                DeletedList.restoreParent(opt, function(err,file){
+                                    return cb && cb(null, file);
+                                });
+                            });
+                        }
+                    }else{
+
+                        var fileopt = { file_id : deletedlist.deleted_id, directory_id : deletedlist.directory_id };
+                        
+                        if(arrayFile.length > 0){
+                            if(arrayFile.indexOf(deletedlist.deleted_id) === -1){
+                                arrayFile.push(deletedlist.deleted_id);
+                                DeletedList.updateFile(fileopt, function(err, file){
+                                    return cb && cb(null, file);
+                                });
+                            }
+                        }else{
+                            arrayFile.push(deletedlist.deleted_id);
+                            DeletedList.updateFile(fileopt, function(err, file){
+                                return cb && cb(null, file);
+                            });
+                        }
+                    }
+                  },
+                  // 3rd param is the function to call when everything's done
+                  function(err){
+                    // All tasks are done now
+                    finalcallback();// doSomethingOnceAllAreDone();
+                  }
+                );
+
+                /*res.forEach(function (deletedlist) {
+                    if( deletedlist.type === 2 ) {
+                        if(array.length > 0){
+                            if(array.indexOf(deletedlist.deleted_id) === -1){
+                                array.push(deletedlist.deleted_id);
+                                var opt = { file_id : deletedlist.deleted_id, directory_id : deletedlist.directory_id };
+                                DeletedList.udpateDirectory(opt, function(err, file){
+                                    DeletedList.restoreParent(opt, function(err,file){
+                                    });
+                                });
+                            }
+                        }else{
                             array.push(deletedlist.deleted_id);
                             var opt = { file_id : deletedlist.deleted_id, directory_id : deletedlist.directory_id };
                             DeletedList.udpateDirectory(opt, function(err, file){
@@ -97,32 +158,31 @@ module.exports = {
                                 });
                             });
                         }
-                    }else{
-                        array.push(deletedlist.deleted_id);
-                        var opt = { file_id : deletedlist.deleted_id, directory_id : deletedlist.directory_id };
-                        DeletedList.udpateDirectory(opt, function(err, file){
-                            DeletedList.restoreParent(opt, function(err,file){
-                            });
-                        });
-                    }
-               }else{
+                   }else{
 
-                    var fileopt = { file_id : deletedlist.deleted_id, directory_id : deletedlist.directory_id };
-                    if(arrayFile.length > 0){
-                        if(arrayFile.indexOf(deletedlist.deleted_id) === -1){
+                        var fileopt = { file_id : deletedlist.deleted_id, directory_id : deletedlist.directory_id };
+                        console.log('fileoptDeletedListDeletedListDeletedListDeletedListDeletedList');
+                    console.log(fileopt);
+                    console.log('fileoptDeletedListDeletedListDeletedListDeletedListDeletedList');
+                        if(arrayFile.length > 0){
+                            if(arrayFile.indexOf(deletedlist.deleted_id) === -1){
+                                arrayFile.push(deletedlist.deleted_id);
+                                DeletedList.updateFile(fileopt, function(err, file){
+                                    return cb && cb(null, file);
+                                });
+                            }
+                        }else{
                             arrayFile.push(deletedlist.deleted_id);
                             DeletedList.updateFile(fileopt, function(err, file){
                                 return cb && cb(null, file);
                             });
                         }
-                    }else{
-                        arrayFile.push(deletedlist.deleted_id);
-                        DeletedList.updateFile(fileopt, function(err, file){
-                            return cb && cb(null, file);
-                        });
                     }
-                }
-            });
+                });*/
+            }else{
+                console.log('finalcallback'+ options.file_id);
+                finalcallback();
+            }
         });
 
 
@@ -135,7 +195,7 @@ module.exports = {
 
         async.auto({
 
-            fileUpdate: function(cb){
+            fileUpdate: function(cb){//Restore File
 
                 File.update({
                     id: options.file_id
@@ -146,7 +206,7 @@ module.exports = {
                 }).exec(cb);
             }, 
 
-            filePermissionUpdate:function(cb){
+            filePermissionUpdate:function(cb){//Restore File Permission
                 DeletedList.find({
                     deleted_id : options.file_id 
                 }).then(function (res) {
@@ -160,8 +220,8 @@ module.exports = {
                             FileId      : deletedlist.deleted_id
                         }).exec(cb);
 
-                        DeletedList.update({
-                            id: options.file_id
+                        DeletedList.update({//Since file is restored, Remove its entries from trash
+                            deleted_id: options.file_id
                         }, {
                             deleted_id   : null,
                             directory_id : null                    
@@ -232,7 +292,7 @@ module.exports = {
         });
     },
 
-    deleteParent: function(options, cb){
+    deleteParent: function(options, finalcallback){
 
         console.log('vgvgvgvgvgvgvgvgvgvgvgvgvgvgvgvgvgvgvgvgvgvgvgvgvgvg');
         var array = [];
@@ -242,48 +302,62 @@ module.exports = {
             directory_id : options.file_id 
         }).then(function (res) {
 
-            res.forEach(function (deletedlist) {
-                if( deletedlist.type === 2 ) {
-                    console.log('hmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhm');
-                    console.log(deletedlist);
-                    if(array.length > 0){
-                        if(array.indexOf(deletedlist.deleted_id) === -1){
+            async.each(res,//1st array of items
+                  // 2nd param is the function that each item is passed to
+                  function(deletedlist, cb){// Call an asynchronous function, often a save() to DB
+                    
+                    if( deletedlist.type === 2 ) {
+                        console.log('hmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhmhm');
+                        console.log(deletedlist);
+                        if(array.length > 0){
+                            if(array.indexOf(deletedlist.deleted_id) === -1){
+                                array.push(deletedlist.deleted_id);
+                                var opt = { file_id : deletedlist.deleted_id, directory_id : deletedlist.directory_id };
+                                DeletedList.deleteDirectory(opt, function(err, file){
+                                    DeletedList.deleteParent(opt, function(err,file){
+                                        return cb && cb(null, file);
+                                    });
+                                });
+                            }
+                        }else{
                             array.push(deletedlist.deleted_id);
                             var opt = { file_id : deletedlist.deleted_id, directory_id : deletedlist.directory_id };
                             DeletedList.deleteDirectory(opt, function(err, file){
                                 DeletedList.deleteParent(opt, function(err,file){
+                                    return cb && cb(null, file);
                                 });
                             });
                         }
-                    }else{
-                        array.push(deletedlist.deleted_id);
-                        var opt = { file_id : deletedlist.deleted_id, directory_id : deletedlist.directory_id };
-                        DeletedList.deleteDirectory(opt, function(err, file){
-                            DeletedList.deleteParent(opt, function(err,file){
-                            });
-                        });
-                    }
-               }else{
-                    console.log('hnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhn');
-                    console.log(deletedlist);
-                    var fileopt = { file_id : deletedlist.deleted_id, directory_id : deletedlist.directory_id };
-                    /*if(arrayFile.length > 0){
-                        if(arrayFile.indexOf(deletedlist.deleted_id) === -1){
+                   }else{
+                        console.log('hnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhnhn');
+                        console.log(deletedlist);
+                        var fileopt = { file_id : deletedlist.deleted_id, directory_id : deletedlist.directory_id };
+                        /*if(arrayFile.length > 0){
+                            if(arrayFile.indexOf(deletedlist.deleted_id) === -1){
+                                arrayFile.push(deletedlist.deleted_id);
+                                DeletedList.deleteFile(fileopt, function(err, file){
+                                    console.log('callback file 111: '+file);
+                                    return cb && cb(null, file);
+                                });
+                            }
+                        }else{*/
                             arrayFile.push(deletedlist.deleted_id);
                             DeletedList.deleteFile(fileopt, function(err, file){
-                                console.log('callback file 111: '+file);
+                                console.log('callback file 222: '+file);
                                 return cb && cb(null, file);
                             });
-                        }
-                    }else{*/
-                        arrayFile.push(deletedlist.deleted_id);
-                        DeletedList.deleteFile(fileopt, function(err, file){
-                            console.log('callback file 222: '+file);
-                            return cb && cb(null, file);
-                        });
-                    // }
-                }
-            });
+                        // }
+                    }
+                  },
+                  // 3rd param is the function to call when everything's done
+                  function(err){
+                    // All tasks are done now
+                    finalcallback();// doSomethingOnceAllAreDone();
+                  }
+                );
+            // res.forEach(function (deletedlist) {
+                
+            // });
         });
 
 

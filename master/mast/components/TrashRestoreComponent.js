@@ -27,7 +27,9 @@ Mast.registerComponent('TrashRestoreComponent', {
 			console.log(res);
 			console.log("resresresresresresresresresresresresresresres");
 
-			if(res[0].deleted == null){
+			if(res[0].deleted){
+				$(".popup-body li").html("<input type='radio' name='fileselected' id='item-"+res[0].id+"' /><label for='item-"+res[0].id+"' data-attr='item-"+res[0].id+"' class='class-"+res[0].id+"'>"+res[0].name+"</label>");
+			}else{
 				self.closeDialog();
 				Mast.Socket.request('/trash/restore', {
 					id 			 : file_id,
@@ -35,21 +37,21 @@ Mast.registerComponent('TrashRestoreComponent', {
 					directory_id : ''					
 				}, function(response){
 					if (response===403) {
-						alert('Permission denied. You do not have sufficient permissions to delete this item.');
+						alert('Permission denied. You do not have sufficient permissions to restore this item.');
 					} else {
 						
 						$("#content").empty();
 						var trash = new Mast.components.TrashFileSystem({ outlet : '#content'});
 					}
 				});
-			}else{
-				$(".popup-body li").html("<input type='radio' name='fileselected' id='item-"+res[0].id+"' /><label for='item-"+res[0].id+"' data-attr='item-"+res[0].id+"' class='class-"+res[0].id+"'>"+res[0].name+"</label>");
 			}
 
 		});
 	},
 
 	getWorkgroupChild: function(e){
+
+		$('.trash-dialog-template .no-submit').removeClass('no-submit');
 
 		var file_id = this.get('id');
 
@@ -86,7 +88,7 @@ Mast.registerComponent('TrashRestoreComponent', {
 		Mast.Socket.request('/trash/restore', {
 			id 	 			: this.get('id'),
 			directory_id 	: element_id,
-			type 			: 'file'
+			type 			: this.get('type')//'file'
 		}, function(response){
 			if (response===403) {
 				alert('Permission denied. You do not have sufficient permissions to delete this item.');

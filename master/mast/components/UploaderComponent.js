@@ -73,6 +73,8 @@ Mast.registerComponent('Uploader',{
             		alert('File you are trying to uplaod already exists.');
 				}else if(msg == 'adapter_error'){
 					alert('Adapter settings are not correct, please contact administrator.');
+				}else if(msg == 'empty_file_error'){//Rishabh: Server Side Fix, if Client Side check bypassed
+					alert('Can not upload empty Files.');
 				}else{
 					alert('Sorry, an error occurred. Please try again.');
 				}
@@ -109,6 +111,11 @@ Mast.registerComponent('Uploader',{
 			
 // If no files have been added, do nothing
 		if (this.files) {
+			if(this.files[0].size == 0){//Rishabh: Client Side Fix
+				alert('Can not upload empty Files.');
+				return false;
+			}
+
 			this.$("input").fileupload("send",{
 				files: this.files,
 // Pass the parent directory

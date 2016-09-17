@@ -102,7 +102,7 @@ Mast.registerComponent('UploadSearchComponent',{
 			function(res, other) {
 
 				// Add to collection
-				// currentInode.collection.add([res]);
+				// currentInode.collection.add([res]);//if commented: create duplicate folders when clicking quickly on create folder button
 
 				currentInode.collection.where({
 					id: res.id

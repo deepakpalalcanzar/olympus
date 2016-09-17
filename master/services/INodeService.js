@@ -1,6 +1,7 @@
 // In lieu of true relational inheritance, herein lies shared logic for
 // DirectoryController and FileController
 var UUIDGenerator = require('node-uuid');
+var async = require('async');
 
 exports.rename = function (req, res, cb) {
     var request = require('request');
@@ -440,14 +441,34 @@ exports.rename = function (req, res, cb) {
                             }).success(function (directory) {
                                 if(directory.length === 0){
                                 }else{
-                                    INodeService.insertDirectoryData({
+                                    /*INodeService.insertDirectoryData({
                                         directory   : directory,
                                         datetime    : datetime,
                                         account_id  : options.accountId,
                                         add         : 0,
-                                    });
+                                    });*/
+
+                                    async.each(directory,//1st array of items
+                                      // 2nd param is the function that each item is passed to
+                                      function(directoryitem, recursivedeletecallback){// Call an asynchronous function, often a save() to DB
+
+                                        INodeService.deletedFileInfo({
+                                            id: directoryitem.id,
+                                            model: Directory,
+                                            // replaceFileId: req.param('replaceFileId'),
+                                            accountId: options.accountId,
+                                            accountName: options.accountName
+                                        });
+                                      },
+                                      // 3rd param is the function to call when everything's done
+                                      function(err){
+                                        // All tasks are done now
+                                        cb();// doSomethingOnceAllAreDone();
+                                      }
+                                    );
+                                    
                                 }
-                            }, cb);
+                            });
                         }
 
                     }, function(err, response){
@@ -489,7 +510,7 @@ exports.insertDirectoryData = function(options, cb){
     directoryData.forEach(function (directorylist) {
 
 	console.log("directorylistdirectorylistdirectorylistdirectorylistdirectorylistdirectorylistdirectorylist");
-	console.log(directorylist);
+	console.log(directorylist.id);
 	console.log("directorylistdirectorylistdirectorylistdirectorylistdirectorylistdirectorylistdirectorylist");
 
         if(checkInsert === 0){
@@ -498,18 +519,20 @@ exports.insertDirectoryData = function(options, cb){
                 where: { DirectoryId : directorylist.id }
             }).success(function (directorypermission) {
 
-		console.log("directorypermissiondirectorypermissiondirectorypermissiondirectorypermission");
-		console.log(directorypermission);
-		console.log("directorypermissiondirectorypermissiondirectorypermissiondirectorypermission");
+        		console.log("directorypermissiondirectorypermissiondirectorypermissiondirectorypermission");
+        		console.log(directorypermission[0].AccountId);
+        		console.log("directorypermissiondirectorypermissiondirectorypermissiondirectorypermission");
 
-                var sql = "Insert into deletedlist ( type, deleted_id, createdAt, updatedAt, user_id, account_id, directory_id, permission) VALUES ( '" + 2 + "', '" + directorylist.id + "', '" + datetime + "', '" + datetime + "',  '" + account_id + "', '" + directorypermission[0].AccountId + "', '"+ directorylist.DirectoryId +"', '"+directorypermission[0].type+"')";
+                if(directorypermission.length > 0){
+                    var sql = "Insert into deletedlist ( type, deleted_id, createdAt, updatedAt, user_id, account_id, directory_id, permission) VALUES ( '" + 2 + "', '" + directorylist.id + "', '" + datetime + "', '" + datetime + "',  '" + account_id + "', '" + directorypermission[0].AccountId + "', '"+ directorylist.DirectoryId +"', '"+directorypermission[0].type+"')";
 
-                sql = Sequelize.Utils.format([sql]);
+                    sql = Sequelize.Utils.format([sql]);
 
-		console.log("sqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsql");
-		console.log(sql);
-		console.log("sqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsql");
-                sequelize.query(sql, null, {raw: true});
+            		console.log("sqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsql");
+            		console.log(sql);
+            		console.log("sqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsql");
+                    sequelize.query(sql, null, {raw: true});
+                }
             });
 
         }

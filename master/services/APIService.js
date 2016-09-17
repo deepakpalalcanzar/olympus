@@ -10,6 +10,7 @@
  */
 
 var mime = require('mime');
+var moment = require('moment');
 
 var API = function(model) { // Smart detection of model type, returns appropriate API object
 		model = (model && model.getModelName) ? model : {};
@@ -48,6 +49,7 @@ var File = function(model) { // File
 			name: model.name,
 			num_comments: model.num_comments || 0,
 			num_active: (model.getNumActiveUsers && model.getNumActiveUsers()) || 0,
+			modifiedAt: model.modifiedAt,
 			modified_at: model.updatedAt,
 			modified_by: {
 				id: model.AccountId,

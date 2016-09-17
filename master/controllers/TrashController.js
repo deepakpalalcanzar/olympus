@@ -55,7 +55,7 @@ var TrashController = {
         // console.log('deleting file from '+sails.config.uploadPath);
         // console.log(req.param('file_id'));
 
-        console.log(sails.config.fileAdapter.adapter);
+        // console.log(sails.config.fileAdapter.adapter);
 
         if (req.param('type') === 'file'){
             File.find(req.param('id')).success(function (fileModel) {
@@ -180,18 +180,18 @@ var TrashController = {
         console.log("optionsoptionsoptionsoptionsoptionsoptionsoptionsoptionsoptionsoptions");
 
         request(options, function (err, response, body) {
-            if(typeof body === 'undefined'){
-                return res.json(err);
-            }else{
-            	Deletedlist.restore({
-    	            file_id : options.json.file_id,
-    	            type 	: options.json.type,
-                }, function(err, result){
+            // if(typeof body === 'undefined'){
+            //     return res.json(err);
+            // }else{
+            // 	Deletedlist.restore({
+    	       //      file_id : options.json.file_id,
+    	       //      type 	: options.json.type,
+            //     }, function(err, result){
     	        	if (err)
         	            return res.json({error: err.message, type: 'error'}, response && response.statusCode);
                 	res.json(body, response && response.statusCode);
-                });
-            }
+            //     });
+            // }
         });
 
 	},

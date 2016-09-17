@@ -20,18 +20,18 @@ var TrashController = {
 			DeletedList.find({
                 deleted_id  : req.param('file_id'), 
                 type        : 2 
-            }).then(function (res) {
+            }).then(function (deletedlist) {
             	
 				Directory.update({
-	                id: res[0].deleted_id
+	                id: deletedlist[0].deleted_id
 	            }, {
 	                deleted         : null,
 	                deleteDate      : null,
-	                DirectoryId     : res[0].directory_id                   
+	                DirectoryId     : options.directory_id,//deletedlist[0].directory_id                   
 				}).exec(function(err, dir){
 
-					res.forEach(function (deletedlist) {
-						console.log(deletedlist);
+					deletedlist.forEach(function (deletedlist) {
+						//console.log(deletedlist);
                         DirectoryPermission.create({
                             type        : deletedlist.permission,
                             orphan      : null,
@@ -54,8 +54,8 @@ var TrashController = {
                     });
 
 					DeletedList.restoreParent(options, function(err, account){
-						// if(err) return;
-						// return res.send(200);
+						if(err) return;
+						return res.send(200);
 					});
 				});
 

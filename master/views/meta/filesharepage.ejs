@@ -50,10 +50,10 @@
     <!-- FILE SHARE TEMPLATE -->
     <div class="fileshare-page portal-only" style="display:inline-block; width:100%;">
         <!-- <a href="/"><img src="/images/logo_loginScreen.png"/></a> -->
-        <% if( (["text/html", "image/jpeg", "image/png", "video/mp4", "video/3gpp", "audio/mp3", "audio/mpeg", "video/ogg", "video/webm", "video/x-ms-wmv", "video/quicktime", "application/pdf"]).indexOf(mimetype) != -1 ){ %>
+        <% if( (["text/html", "image/jpeg", "image/png", "image/tif", "image/tiff", "video/mp4", "video/3gpp", "audio/mp3", "audio/mpeg", "video/ogg", "video/webm", "video/x-ms-wmv", "video/quicktime", "application/pdf"]).indexOf(mimetype) != -1 ){ %>
                 <div id="testLoad" style="width:auto;height:auto;max-width:100%;max-height:100%;"></div>
         <% }else{ %>
-            <div class="file-sharepage-outlet" fsname="<%- fsName %>" fileid="<%- fileid %>" filename="<%- name %>" dtoken="<%- dtoken %>" style="width: <% if( mimetype == "text/html" || mimetype == "image/jpeg" || mimetype == "video/mp4" || mimetype == "video/3gpp" || mimetype == "audio/mp3" || mimetype == "audio/mpeg" || mimetype == "application/pdf" ){ %>26<% }else{ %>96<% } %>% ! important; padding: 2%; overflow: auto; float: right; display: inline-block;">
+            <div class="file-sharepage-outlet" fsname="<%- fsName %>" fileid="<%- fileid %>" filename="<%- name %>" dtoken="<%- dtoken %>" style="width: <% if( mimetype == "text/html" || mimetype == "image/jpeg" || mimetype == "image/png" || mimetype == "image/tif" || mimetype == "image/tiff" || mimetype == "video/mp4" || mimetype == "video/3gpp" || mimetype == "audio/mp3" || mimetype == "audio/mpeg" || mimetype == "application/pdf" ){ %>26<% }else{ %>96<% } %>% ! important; padding: 2%; overflow: auto; float: right; display: inline-block;">
 
                 <div class="file-sharepage-template" style="display: block; text-align: center;">
                     <!-- <fieldset class="footer clearfix"> -->

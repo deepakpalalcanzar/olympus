@@ -719,6 +719,12 @@ console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
                 });
                 /*Create logging*/
 
+                if(apiResponse['modifiedAt']){
+
+                }else{
+                    apiResponse['modifiedAt'] = 'a few seconds ago';
+                }
+
                 // Respond with new directory
                 res.json(apiResponse);
             });
