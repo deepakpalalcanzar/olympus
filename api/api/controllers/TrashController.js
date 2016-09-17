@@ -27,7 +27,7 @@ var TrashController = {
 	            }, {
 	                deleted         : null,
 	                deleteDate      : null,
-	                DirectoryId     : options.directory_id,//deletedlist[0].directory_id                   
+	                DirectoryId     : (options.directory_id)?options.directory_id:deletedlist[0].directory_id
 				}).exec(function(err, dir){
 
 					deletedlist.forEach(function (deletedlist) {
