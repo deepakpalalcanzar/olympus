@@ -69,7 +69,7 @@ var MetaController = {
 									body_background  : '#f9f9f9',
 									footer_background: '#f9f9f9',
 									font_family 	 : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif',
-									font_color 	 	 : '#547aa4',
+									font_color 	 	 : '#585858',
 									total_space_used : dir[0].total_space_used
 								});
 
@@ -87,7 +87,7 @@ var MetaController = {
 									body_background  : theme.body_background 	!== '' ? (theme.body_background).replace(/^#*/g, "#") : '#f9f9f9',
 									footer_background: theme.footer_background 	!== '' ? (theme.footer_background).replace(/^#*/g, "#") : '#f9f9f9',
 									font_family 	 : theme.font_family 		!== '' ? theme.font_family : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif',
-									font_color 	 	 : theme.font_color 		!== '' ? (theme.font_color).replace(/^#*/g, "#") : '#547aa4',
+									font_color 	 	 : theme.font_color 		!== '' ? (theme.font_color).replace(/^#*/g, "#") : '#585858',
 	 								total_space_used : dir[0].total_space_used
 								});
 							}
@@ -115,7 +115,7 @@ var MetaController = {
 								body_background  : '#f9f9f9',
 								footer_background: '#f9f9f9',
 								font_family 	 : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif',
-								font_color 	 	 : '#547aa4'
+								font_color 	 	 : '#585858'
 							});
 	
 							}else{
@@ -131,7 +131,7 @@ var MetaController = {
 									body_background  : theme.body_background 	!== '' ? (theme.body_background).replace(/^#*/g, "#") : '#f9f9f9',
 									footer_background: theme.footer_background 	!== '' ? (theme.footer_background).replace(/^#*/g, "#") : '#f9f9f9',
 									font_family 	 : theme.font_family 		!== '' ? theme.font_family : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif',
-									font_color 	 	 : theme.font_color 		!== '' ? (theme.font_color).replace(/^#*/g, "#") : '#547aa4'
+									font_color 	 	 : theme.font_color 		!== '' ? (theme.font_color).replace(/^#*/g, "#") : '#585858'
 								});
 							}
 						});
@@ -166,7 +166,7 @@ var MetaController = {
 										body_background  : '#f9f9f9',
 										footer_background: '#f9f9f9',
 										font_family 	 : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif',
-										font_color 	 	 : '#547aa4'
+										font_color 	 	 : '#585858'
 									});
 	
 								}else{
@@ -184,7 +184,7 @@ var MetaController = {
 										body_background  : theme.body_background 	!== '' ? (theme.body_background).replace(/^#*/g, "#") : '#f9f9f9',
 										footer_background: theme.footer_background 	!== '' ? (theme.footer_background).replace(/^#*/g, "#") : '#f9f9f9',
 										font_family 	 : theme.font_family 		!== '' ? theme.font_family : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif',
-										font_color 	 	 : theme.font_color 		!== '' ? (theme.font_color).replace(/^#*/g, "#") : '#547aa4'
+										font_color 	 	 : theme.font_color 		!== '' ? (theme.font_color).replace(/^#*/g, "#") : '#585858'
 									});
 								}
 							});

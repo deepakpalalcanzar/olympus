@@ -13,7 +13,7 @@ Mast.registerComponent('AppearanceComponent',{
 		navigation_color	: '#4f7ba9',
 		body_background		: '#f9f9f9',
 		footer_background	: '#f9f9f9',
-		font_color			: '#547aa4',
+		font_color			: '#585858',
 		font_family			: 'ProzimanovaRegular, Helvetica, Ariel, sans-serif'
 	},
 
@@ -66,7 +66,7 @@ Mast.registerComponent('AppearanceComponent',{
 	            }
 	        });
 	        $('.olympusFont').colpick({
-	        	color: (typeof res.theme != 'undefined')?res.theme.font_color:'#547aa4',
+	        	color: (typeof res.theme != 'undefined')?res.theme.font_color:'#585858',
 	            flat: true,
 	            layout: 'hex',
 	            submit: 0,
@@ -92,7 +92,7 @@ Mast.registerComponent('AppearanceComponent',{
 	        }else{
 	        	this.$('select[name="fontFamily"] option[value="Arial, Helvetica, sans-serif"]').prop('selected', true);
 	        	$("body, p, a, h1, h2, h3, h4, h5, h6, label").css({ 'font-family' : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif' });
-	        	$("body, p, a, h1, h2, h3, h4, h5, h6, label").css({ 'color' : '#547aa4' });
+	        	$("body, p, a, h1, h2, h3, h4, h5, h6, label").css({ 'color' : '#585858' });
 	        	$("p.ajax-loader,p.ajax-loader b,.selected .inode-name,.selected .modified-date").css({ 'color' : '#EFEFEF' });//exception
 	        }
 		});
@@ -131,7 +131,7 @@ Mast.registerComponent('AppearanceComponent',{
         $('.olympusBody').colpickSetColor('#f9f9f9');
         $('.olympusFooter').colpickSetColor('#f9f9f9');
         $('.olympusNav').colpickSetColor('#4f7ba9');
-        $('.olympusFont').colpickSetColor('#547aa4');
+        $('.olympusFont').colpickSetColor('#585858');
        
         this.$('select[name="fontFamily"] option[value="Arial, Helvetica, sans-serif"]').prop('selected', true);
         $("body, p, a, h1, h2, h3, h4, h5, h6, label").css({ 'font-family' : 'ProzimanovaRegular, Helvetica, Ariel, sans-serif' });
@@ -141,7 +141,7 @@ Mast.registerComponent('AppearanceComponent',{
 			nav 		: '#4f7ba9',
 			body 		: '#f9f9f9',
 			footer 		: '#f9f9f9',
-			fontColor 	: '#547aa4',
+			fontColor 	: '#585858',
 			fontFamily 	: 'ProzimanovaRegular, Helvetica, Ariel, sans-serif'
 		};
 

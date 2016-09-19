@@ -30,11 +30,11 @@ module.exports = {
 			type: 'string',
 			defaultsTo: '#f9f9f9'
 		},
-		font_family : {
-			type: 'string',
-			defaultsTo: '#547aa4'
-		},
 		font_color : {
+			type: 'string',
+			defaultsTo: '#585858'
+		},
+		font_family : {
 			type: 'string',
 			defaultsTo: 'ProzimanovaRegular, Helvetica, Ariel, sans-serif'
 		},
