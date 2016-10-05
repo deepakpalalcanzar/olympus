@@ -70,7 +70,7 @@ Mast.registerComponent('Uploader',{
 					$('.uploading').remove();
 					$('.information-stats').show();
             		$('.progress').hide();
-            		alert('File you are trying to uplaod already exists.');
+            		alert('File you are trying to upload already exists.');
 				}else if(msg == 'adapter_error'){
 					alert('Adapter settings are not correct, please contact administrator.');
 				}else if(msg == 'empty_file_error'){//Rishabh: Server Side Fix, if Client Side check bypassed
