@@ -311,14 +311,14 @@ Mast.components.SystemSettingsComponent  = Mast.Component.extend({
 					//alert(res.currcommit.trim()+'hi'+res.avcommit.trim()+'hi1');
 					if(res.currcommit.trim() == res.avcommit.trim())
 	                {
-	                    alert('No updates Available.');
+	                    alert('No updates Available1.');
 	                    //return res.json({ status: 'noupdates'}, 200);
 	                }
 	                else
 	                {
 	                    //alert('updates Available.');
 	                    //return res.json({ status: 'updatesavailable'}, 200);
-	                    if(confirm('updates Available. Do you want to update the source code?')){
+	                    if(confirm('updates Available1. Do you want to update the source code?')){
 							console.log('sending request to update the code.');
 							Mast.Socket.request('/account/updateCode', {
 								'formaction'		: 'update-code'
