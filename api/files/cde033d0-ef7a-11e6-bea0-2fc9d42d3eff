@@ -1,0 +1,140 @@
+Features which are in benchprep portal but will not be in our study room:
+
+1. Flashcards
+2. Study Tasks
+3. Passages
+4. Lesson Categories
+5. Find and Replace
+6. Marketing Info
+7. Tools
+8. Activities
+9. User Feedback
+10. Automated
+11. Discussion
+12. Content Report
+
+Note:Question feature is included in Test Management System.
+
+
+
+Student
+
+List Students - Name, Email, Status, View Profile
+View Profile
+
+Company
+List Companies - Name,  Email, Address, Status, Company Details
+Company details
+HR details
+
+
+
+# - void
+Login Page middle
+login page container
+
+
+admin panel color hide
+
+
+
+
+
+
+
+
+
+
+
+Brand Activity - 3 days
+Brand Survey - 6 days
+Brand Events - displayed to customer, attending or not attending - 3 days
+Tab view - 5 days
+Store Activity - 1 day
+Loyality Points for users - 3 days
+Offerzworld Reward Shop items to buy with loyality Points - 10 days
+Price variation for country to country and brand to store - 5 days
+possibility for offer popup and redirect to detail page - 1/2 day
+image function on homepage - 3 days
+Subscribe for offer alert : message not recieved on email - 1 day
+
+total 40 days
+
+
+
+brand - 
+
+offer
+product
+events
+stores
+forum
+
+
+
+Admin requirements - User
+Superadmin (studyroom) - 8
+
+1) The super admin will be able to create an suborganisation admin  - 2
+2) The super admin will be able assign courses, tests to suborganisation admin - 3
+3) The super admin will be able to cap the number of users in sub organisation - 1
+4) The super admin should be able to assign the privilege to sub organisation admin with regards to creating courses, creating tests and managing courses etc - 1
+5) The super admin will be able to cap the number of messages, emails, notfiications that he can send to the suborganisation team - 1
+
+
+Suborganisation - 21
+
+1) The suborganisation admins can be able to manage, approve users  - 5
+2) The suborganisation admins will be able to create courses, use allocated courses from studyroom and manage it for their students - 5
+3) the suborganisation admin should have the capability to interact with students, groups, sms, emails - 3
+4) the suborganisation admin should be able to share an attachment for their students and ask them to download - 2
+5) the suborganisation admin should be able to check the course status of each student and interact with the student accordingly - 3
+6) The courses, test added by the sub admin - if needed should be visible only to the respective group user group. - 3
+
+
+User search and communications - 7
+1) Should search user details based on – Location, Institution, skill mentioned in profile,  courses (payed and free), domain, only registered, active, Inactive, tests, practice test and score.(basically - 5
+2) For the filtered user list, admin should be able to send sms and email. -2
+
+
+Total - 1.5 Months
+
+
+
+
+fare estimate request 3
+find ride request 3
+confirm booking 3
+fare request for current booking 3
+order deatils 3
+
+Api Authoriation Setup - 2
+Design - 2
+Deatils - 10
+
+testing and fixing
+1.5 months
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

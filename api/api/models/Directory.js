@@ -70,6 +70,36 @@ module.exports = {
     // (must be a workgroup, i.e. !DirectoryId)
     OwnerId: 'integer',
 
+    isDriveDir: {//google drive
+        type: 'boolean',
+        defaultsTo: false
+    },
+    isOlympusDriveDir: {//is this the 'GOOGLE DRIVE' directory of olympus
+        type: 'boolean',
+        defaultsTo: false
+    },
+
+    isDropboxDir: {//Dropbox
+        type: 'boolean',
+        defaultsTo: false
+    },
+    isOlympusDropboxDir: {//is this the 'DROPBOX' directory of olympus
+        type: 'boolean',
+        defaultsTo: false
+    },
+
+    isBoxDir: {//Dropbox
+        type: 'boolean',
+        defaultsTo: false
+    },
+    isOlympusBoxDir: {//is this the 'DROPBOX' directory of olympus
+        type: 'boolean',
+        defaultsTo: false
+    },
+
+    driveFsName: 'text',
+    uploadPathId: 'integer',//Paths IDs(Drive, Dropbox, Box.net etc.)
+
 
     /****************************************************
      * Instance Methods

@@ -35,7 +35,13 @@ var Directory = function(model) { // Directory
 					model.size > 1000 ? (Math.round((model.size/10))/100) + " KB":
 					model.size + " bytes",
 		quota: model.quota,
-		public_sublinks_enabled: model.public_sublinks_enabled
+		public_sublinks_enabled: model.public_sublinks_enabled,
+		isDriveDir: false,
+		isOlympusDriveDir: false,
+		isDropboxDir: false,
+		isOlympusDropboxDir: false,
+		isBoxDir: model.isBoxDir,
+		isOlympusBoxDir: model.isOlympusBoxDir
 	});
 };
 exports.Directory = apiTransform(Directory);
@@ -87,7 +93,15 @@ var File = function(model) { // File
 						model.size > 1000000 ? (Math.round((model.size/10000))/100)  + " MB":
 						model.size > 1000 ? (Math.round((model.size/10))/100) + " KB":
 						model.size + " bytes",
-			type: 'file'
+			type: 'file',
+			isOnDrive: false,
+			viewLink: model.viewLink,
+			iconLink: model.iconLink,
+			isOlympusDriveDir: false,//added to avoid error in case of file row in inode.ejs
+			isOnDropbox: false,
+			isOlympusDropboxDir: false,//added to avoid error in case of file row in inode.ejs
+			isOnBox: model.isOnBox,
+			isOlympusBoxDir: false,//added to avoid error in case of file row in inode.ejs
 		};
 	};
 exports.File = apiTransform(File);

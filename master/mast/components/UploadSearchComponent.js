@@ -16,7 +16,8 @@ Mast.registerComponent('UploadSearchComponent',{
 		'click .upload-file'  	: 'createUploadDialog',
 		'click .search-users'  	: 'searchUsers',
 		// 'click .thumbnail'  	: 'thumbnailView',
-		'click .detail-list'  	: 'dafaultView'
+		'click .detail-list'  	: 'dafaultView',
+		'click .sync-box'  	: 'createSyncBoxDialog',
 	},
 
 	dafaultView: function(){
@@ -135,6 +136,25 @@ Mast.registerComponent('UploadSearchComponent',{
 			var uploadDialog = new Mast.components.UploadFileDialogComponent();
 		}
 		e.stopPropagation();
+	},
+
+// create a file upload dialog component
+	createSyncBoxDialog: function(e) {
+
+		//alert('hi');
+		
+
+		//url = "https://www.dropbox.com/1/oauth2/authorize?client_id=u4uh85nra00t22o&response_type=code&redirect_uri=https://nov.olympus.io/syncdbox";
+		url = "https://app.box.com/api/oauth2/authorize?response_type=code&client_id=cbev0e1mrb9jrmvc90gdvwmyworca1nx&state=abc-xyz";
+		// // var win = window.open(url, '_blank');
+		// // var win = window.open(url);
+		window.location.href = url;
+  // 		/*if (win) {
+		//    //Browser has allowed it to be opened
+		//    win.focus();
+		// }*/
+		// // var uploadDialog = new Mast.components.SyncDboxDialogComponent();
+		 e.stopPropagation();
 	},
 
 // When the session data is available

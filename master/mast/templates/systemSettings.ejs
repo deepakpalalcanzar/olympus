@@ -11,11 +11,53 @@
 		</div>
 	</div> -->
 
+	<!--site database setting -->
+	<div class="database-mod">
+		<label>Change Database Connections</label>
+		<label> Database Host: </label>
+		<input id="database_host" type="text" name="database_host" value="localhost" placeholder="Enter Database Host (i.e. localhost or IP address)" /><br>
+
+		<label> Database Name: </label>
+		<input id="database_name" type="text" name="database_name" value="" placeholder="Enter Database Name" /><br>
+
+		<label> Database User Name: </label>
+		<input id="database_user" type="text" name="database_user" value="" placeholder="Enter Database User Name" /><br>
+
+		<label> Database User Password: </label>
+		<input id="database_pass" type="password" name="database_pass" value="" placeholder="Enter Database User Password" /><br>
+	    <input type="button" id="checkDatabase" value="Save">
+	    <input type="button" id="saveDatabase" value="Save" style="display:none;">
+		<br><br>
+	</div>
+	<!-- -->
+
+	<!--site database setting -->
+	<div class="ssl-mod">
+		<label>Upload SSL Configuration File</label>
+		<label> GD Bundle Crt: </label>
+		<input id="ssl_gd" type="file" name="ssl_gd" /><br>
+		<label><i>Upload your GD Bundle Crt file as <b>gd_bundle.crt</b> </i></label><br>
+
+		<label> Olympus Crt: </label>
+		<input id="ssl_olympus" type="file" name="ssl_olympus" /><br>
+		<label><i>Upload your Olympus Crt file as <b>olympus.crt</b> </i></label><br>
+
+		<label> Olympus Key: </label>
+		<input id="ssl_key" type="file" name="ssl_key"  /><br>
+		<label><i>Upload your Olympus key file as <b>olympus.key</b> </i></label><br>
+
+	    <input type="button" id="uploadSSL" value="Upload">
+		<br><br>
+	</div>
+	<!-- -->
+
 	<!--site domain setting -->
 	<div class="domain-mod">
 		<label>Change Domain name</label>
 		<input id="domainname" type="text" name="domainname" value="test" placeholder="Enter domain (i.e. www.domain.com -no http:// or https://)" /><br>
 	    <input type="button" id="saveDomain" value="Save">
+	    <input type="button" class="restart-server" value="Restart Server">
+	    <!-- input type="button" class="update-code" value="Update Code" -->
 		<br><br>
 	</div>
 	<!-- -->
@@ -156,6 +198,18 @@
 			<input type="hidden" class="ldap-create-user" placeholder="" value="" id="ldap_create_user_ad" name="ldap_create_user_ad"><br>
 		</div>
 	    <input type="button" id="saveldapsettings" value="Save">
+		<br><br>
+	</div>
+	<!-- -->
+
+	<!--Code Update Settings -->
+	<div class="update-mod">
+		<label>Check for Updates</label>
+		
+	    <input type="button" id="checkforupdates" value="Click Here to check any updates">
+
+	    <input type="button" class="restart-server" value="Restart Server">
+	    
 		<br><br>
 	</div>
 	<!-- -->

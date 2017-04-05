@@ -114,7 +114,8 @@ var TrashController = {
 			console.log('dvdvdvdvdvdvdvdvdvdvdvdvdvdvdvdvdvdvdvdvdvdvdvdvdvdvdvdvdvdv');
 			DeletedList.find({
                 deleted_id  : req.param('file_id'), 
-                type        : 2 
+                type        : 2 ,
+                permission 	: 'admin'
             }).then(function (response) {
             	
 				Directory.update({
@@ -160,6 +161,155 @@ var TrashController = {
 			});
 
 		}
+	},
+
+	emptyTrash: function(req, res){
+
+		var options = {
+			// file_id 	 : req.param('file_id'),
+			// type 		 : req.param('type'),
+			// directory_id : req.param('directory_id'),
+		};
+		account = req.param('account');
+		// console.log(account);
+
+		console.log('--------------------------Empty Trash in api--------------------------');
+
+		async.auto({
+
+            deletefiles: function(cb){
+
+            	console.log('--------------Deleting All Files of Account '+account.id+'-------------------');
+
+                DeletedList.query("SELECT file.uploadPathId,up.type,up.path,up.accessKeyId,up.secretAccessKey,up.bucket,up.region,GROUP_CONCAT( file.id \
+					SEPARATOR ',' ) AS fileids, GROUP_CONCAT( file.fsName \
+					SEPARATOR ',' ) AS filefsnames \
+					FROM deletedlist AS dl \
+					INNER JOIN file ON dl.deleted_id = file.id \
+					INNER JOIN uploadpaths AS up ON file.uploadPathId = up.id \
+					WHERE dl.account_id="+account.id+" and dl.type =1 and dl.permission = 'admin' \
+					GROUP BY file.uploadPathId", function(err, results) {
+					
+					if (err){
+						console.log('TRASHLOG: Some error occured in trash CRON: '+err);
+						cb();
+						return;
+					}
+
+					if(typeof results != 'undefined' && results.length){
+					  	// console.log(results);
+
+					  	async.forEach(results, function (adapterdetails, callback){ 
+
+					  		console.log('adapterdetails.fileids & filefsnames: '+adapterdetails.type);
+					  		console.log(adapterdetails);
+					  		// console.log(adapterdetails.filefsnames);
+
+					  		var current_receiver        = adapterdetails.type;
+			                var current_receiverinfo    = {
+			                	id 				: adapterdetails.uploadPathId,
+							    type 			: adapterdetails.type,
+							    path 			: adapterdetails.path,
+							    accessKeyId		: adapterdetails.accessKeyId,
+							    secretAccessKey	: adapterdetails.secretAccessKey,
+							    bucket			: adapterdetails.bucket,
+							    region			: adapterdetails.region,
+			                };
+			                
+			                console.log('File ReceiverTrash: '+current_receiver);
+
+						  	var receiver = global[current_receiver + 'Receiver'].deleteAll({
+				                ids: adapterdetails.filefsnames,
+				                receiverinfo: current_receiverinfo
+				            },function(err,data){
+
+				            	if(err)
+				            		callback();
+
+				            	DeletedList.destroy({
+			                        deleted_id: adapterdetails.fileids.split(',')
+			                    }).then(function(per){
+									console.log('current_receiver '+current_receiver+' DeletedList.destroy');
+									callback();
+			                    });
+				            	console.log(err);
+				            	console.log(data);
+				            });
+
+						}, function(err) {
+						    console.log('iterating done');
+						    cb();
+						});  
+					}else{
+						cb();
+					}
+				});
+            }, 
+
+            deletedirs:function(cb){
+
+                console.log('--------------Deleting All Folders of Account '+account.id+'-------------------');
+				DeletedList.find({
+	                // deleted_id  : req.param('file_id'), 
+	                type        : 2, 
+	                account_id	: account.id,//req.session.Account && req.session.Account.id,
+	                permission 	: 'admin'
+	            }).then(function (response) {
+
+	            	var deletelistids = [];
+	            	var deldirlistids = [];
+					response.forEach(function (deletedlist) {
+						// console.log(deletedlist);
+						deletelistids.push(deletedlist.id);
+						deldirlistids.push(deletedlist.deleted_id);
+
+						// DeletedList.destroy({
+						//     id: deletedlist.id
+						// }).then(function(per){
+						// 	console.log('//////////////////1111')
+						// });
+
+						// Directory.destroy({
+						//     id: deletedlist.deleted_id
+						// }).then(function(per2){
+						// 	console.log('//////////////////2222')
+						// });
+	                    
+	                });
+
+	                console.log('//////////////////4444');
+	                console.log(deletelistids);
+	                console.log(deldirlistids);
+
+	                async.auto({
+
+            			destroydl: function(cbdeldirs){
+            				DeletedList.destroy({
+			                    id: deletelistids
+			                }).then(function(per){
+								console.log('//////////////////1111');
+								cbdeldirs();
+			                });
+            			},
+            			destroydr: function(cbdeldirs){
+            				Directory.destroy({
+			                    id: deldirlistids
+			                }).then(function(per2){
+			                	console.log('//////////////////2222');
+			                	cbdeldirs();
+			                });
+            			}
+            		}, cb);
+				});
+            }
+        }, function(err, result){
+        	if(err){
+        		console.log(err);
+        		return res.end(JSON.stringify({success: false}), 'utf8');
+        	}
+
+            return res.end(JSON.stringify({success: true}), 'utf8');
+        });
 	},
 
 	demo: function(req, res){

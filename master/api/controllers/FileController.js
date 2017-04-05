@@ -29,6 +29,8 @@ var FileController = {
     // Direct, Box.net-style file upload
     content: function (req, res) {
 
+        console.log('deepak1 deepak1 deepak1 deepak1 deepak1 deepak1 deepak1 deepak1 deepak1 deepak1 deepak1 deepak1 deepak1 deepak1 deepak1 deepak1 deepak1 deepak1 deepak1 deepak1 deepak1');
+
         var file, filename;
         if (!req.param('parent_id'))
             return res.send('No parent directory specified!', 500);

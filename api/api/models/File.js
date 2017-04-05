@@ -44,9 +44,27 @@ module.exports = {
 
         replaceFileId: 'integer',
 
+        isOnDrive: {//google drive
+            type: 'boolean',
+            defaultsTo: false
+        },
+
+        isOnDropbox: {//dropbox
+            type: 'boolean',
+            defaultsTo: false
+        },
+
+        isOnBox: {//dropbox
+            type: 'boolean',
+            defaultsTo: false
+        },
+
         DirectoryId: 'integer',
         thumbnail: 'integer',
         uploadPathId: 'integer',
+        viewLink: 'string',
+        downloadLink: 'string',
+        iconLink: 'string',
 
 /****************************************************
 * Instance Methods

@@ -20,6 +20,8 @@ var RedirectController = {
             Account: req.session.Account
         };
 
+        //console.log(req.body);
+
 // Strip original headers of host and connection status
         var headers = req.headers;
         delete headers.host;
@@ -156,33 +158,224 @@ console.log('IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIIIIIII=IIII
                         });
                     }
 
+                    if(fileModel.isOnDrive){
+
+                        fs.readFile( sails.config.appPath + "/public/drive_secret/" + 'client_secret.json', function processClientSecrets(err, content) {
+                          if (err) {
+                            console.log('Error loading client secret file: ' + err);
+                            return;
+                          }
+                          // Authorize a client with the loaded credentials, then call the
+                          // Drive API.
+
+                          console.log('========================================================================');
+                          console.log(req.param('drive_action'));
+                          // console.log('========================================================================');
+                          // console.log(JSON.parse(content));
+                          // console.log(sails);
+                          sails.controllers.directory.authorize('file_open', req.session.Account.id, req.param('refresh_token'), JSON.parse(content), function (auth, driveUploadPathId) {
+
+                            console.log('HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH');
+                            console.log(auth);
+                            console.log(driveUploadPathId);
+
+                            var google = require('googleapis');
+
+                            var drive = google.drive({
+                              version: 'v2',
+                              auth: auth
+                            });
+
+                            var fileId = fileModel.fsName;
+                            // res.setHeader('Content-Type', fileModel.mimetype);
+                            console.log('fileId fileModel', fileId, fileModel.mimetype);
+                            /*var dest = fs.createWriteStream('/tmp/'+fileModel.name);
+                            drive.files.get({
+                              fileId: fileId,
+                              alt: 'media'
+                            }, {
+                              encoding: null // Make sure we get the binary data
+                            }, function (err, buffer) {
+                              // Nice, the buffer is actually a Buffer!
+                              buffer.pipe(res);
+                            });*/
+                            /*drive.files.get({
+                               fileId: fileId,
+                               // mimeType: fileModel.mimetype,//'application/pdf'
+                               alt: 'media'
+                            })
+                            .on('end', function() {
+                              console.log('Done');
+                            })
+                            .on('error', function(err) {
+                              console.log('Error during download', err);
+                            })
+                            .pipe(res);*/
+                            var doc_mimes = [
+                                // 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',//Export only supports Google Docs.
+                                'application/vnd.google-apps.document',
+                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                'application/vnd.google-apps.spreadsheet'
+                            ];
+                            if(_.contains( doc_mimes, fileModel.mimetype)){
+                                console.log('Downloading DOCS');
+                                var proxyReq_temp = drive.files.export({
+                                   fileId: fileId,
+                                   mimeType: fileModel.mimetype,//'application/pdf'
+                                   // alt: 'media'
+                                })
+                                .on('end', function() {
+                                  console.log('Done');
+                                })
+                                .on('error', function(err) {
+                                  console.log('Error during doc download', err);
+                                });
+                                proxyReq_temp.pipe(
+                                    new stream.PassThrough().pipe(
+                                        fs.createWriteStream( "./copy_" + fileModel.fsName )
+                                    )
+                                );
+
+                                var proxyReq = proxyReq_temp.pipe(res);
+                            }else{
+                                console.log('Downloading FILES');
+                                var proxyReq_temp = drive.files.get({
+                                   fileId: fileId,
+                                   // mimeType: fileModel.mimetype,//'application/pdf'
+                                   alt: 'media'
+                                })
+                                .on('end', function() {
+                                  console.log('Done');
+                                })
+                                .on('error', function(err) {
+                                  console.log('Error during media download', err);
+                                }).pipe(res);
+                                // proxyReq_temp.pipe(
+                                //     new stream.PassThrough().pipe(
+                                //         fs.createWriteStream( "./copy_" + fileModel.fsName )
+                                //     )
+                                // );
+
+                                // var proxyReq = proxyReq_temp.pipe(res);
+                            }
+                          });
+                        });
+
+                    }else if(fileModel.isOnDropbox){
+                        // && fileModel.downloadLink
+                        SyncDbox.find({where:{account_id: req.session.Account.id}}).done(function (err, tokenrow) {
+                            if (err)
+                                res.send(404);
+                            if(!err && tokenrow){
+                                res.setHeader('Content-Type', fileModel.mimetype);
+                                var dest = fs.createWriteStream(sails.config.appPath + "/public/drive_secret/" + fileModel.fsName );
+                                //curl -X POST https://content.dropboxapi.com/2/files/download --header "Authorization: Bearer y1Y8Lyc_ARAAAAAAAAAA_fEOHcRkiwqxc5Nw9zN3xmugf8JyrX2gGS3XjZQn5nl6" --header "Dropbox-API-Arg: {\"path\": \"/logo_square.png\"}" -o "./logosquares222.png"
+                                var https = require('https');
+                                var apiUrl = 'content.dropboxapi.com';
+                                var options = {
+                                  host: apiUrl,
+                                  port: 443,
+                                  path: '/2/files/download',
+                                  method: 'POST',
+                                  headers: {
+                                    'Authorization': 'Bearer '+tokenrow.access_token,
+                                    'Dropbox-API-Arg': '{\"path\": \"'+fileModel.downloadLink+'\"}'
+                                  },
+                                  rejectUnauthorized: false
+                                };
+                                https.request(options, function(apiRes) {
+                                    // apiRes.pipe(dest);//Save to local disk
+                                    apiRes.pipe(res);//Pipe to reponse
+                                }).end();
+                            }
+                        });
+                    }else if(fileModel.isOnBox){
+                        // && fileModel.downloadLink
+                        SyncBox.find({where:{account_id: req.session.Account.id}}).done(function (err, tokenrow) {
+                            if (err)
+                                res.send(404);
+                            if(!err && tokenrow){
+                                //res.setHeader('Content-Type', fileModel.mimetype);
+                                console.log('hi');
+                                var dest = fs.createWriteStream(sails.config.appPath + "/public/drive_secret/" + fileModel.fsName );
+                                //curl -X POST https://content.dropboxapi.com/2/files/download --header "Authorization: Bearer y1Y8Lyc_ARAAAAAAAAAA_fEOHcRkiwqxc5Nw9zN3xmugf8JyrX2gGS3XjZQn5nl6" --header "Dropbox-API-Arg: {\"path\": \"/logo_square.png\"}" -o "./logosquares222.png"
+                                // var https = require('https');
+
+
+                                // var apiUrl = 'content.dropboxapi.com';
+                                // var options = {
+                                //   host: apiUrl,
+                                //   port: 443,
+                                //   path: '/2/files/download',
+                                //   method: 'POST',
+                                //   headers: {
+                                //     'Authorization': 'Bearer '+tokenrow.access_token,
+                                //     'Dropbox-API-Arg': '{\"path\": \"'+fileModel.downloadLink+'\"}'
+                                //   },
+                                //   rejectUnauthorized: false
+                                // };
+                                // https.request(options, function(apiRes) {
+                                //     // apiRes.pipe(dest);//Save to local disk
+                                //     apiRes.pipe(res);//Pipe to reponse
+                                // }).end();
+
+
+
+                                var Box3 = require('nodejs-box');
+ 
+                                var box3 = new Box3({
+                                  access_token: tokenrow.access_token_2,
+                                  //refreh_token: 'tSblEF9inGuvfcdfBRSDKRS0Jm5pf7bPIP9HSoUfyDhgxP4OroVZFEvLVVjsBVfl'
+                                });
+
+                                box3.files.download(fileModel.downloadLink, function(err, res1, tokens) { 
+                                  console.log(err); console.log(res1);
+
+                                  var https = require('https');
+                                  //var fs = require('fs');
+
+                                  //var file = fs.createWriteStream("10434240_750083801719895_7703617608028781310_n.gif");
+                                  var request = https.get(res1, function(response) {
+                                    console.log('downloading');
+                                    response.pipe(res);
+                                  });
+
+
+
+
+                                });
+                            }
+                        });
+                    }else{
+
 //                    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&  FS name  &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
 //                    console.log(req.url);
 //                    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&& FS name &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
 
 
-                    // set content-type header
-                    res.setHeader('Content-Type', fileModel.mimetype);
-                    options.uri = "http://localhost:1337/file/download/" + fileModel.fsName + "?_session=" + JSON.stringify(_session);
+                        // set content-type header
+                        res.setHeader('Content-Type', fileModel.mimetype);
+                        options.uri = "http://localhost:1337/file/download/" + fileModel.fsName + "?_session=" + JSON.stringify(_session);
 
-                    // var proxyReq = request.get(options).pipe(res);
-                    // if (req.url.match(/^\/file\/open\//)) {//open
-                        //Rishabh: Backpressure issue reolved
-                        // http://www.bennadel.com/blog/2817-the-affect-of-back-pressure-when-piping-data-into-multiple-writable-streams-in-node-js.htm
-                        var proxyReq_temp = request.get(options);
-                        proxyReq_temp.pipe(
-                            new stream.PassThrough().pipe(
-                                fileSystem.createWriteStream( "./copy_" + fileModel.fsName )
-                            )
-                        );
+                        // var proxyReq = request.get(options).pipe(res);
+                        // if (req.url.match(/^\/file\/open\//)) {//open
+                            //Rishabh: Backpressure issue reolved
+                            // http://www.bennadel.com/blog/2817-the-affect-of-back-pressure-when-piping-data-into-multiple-writable-streams-in-node-js.htm
+                            var proxyReq_temp = request.get(options);
+                            proxyReq_temp.pipe(
+                                new stream.PassThrough().pipe(
+                                    fs.createWriteStream( "./copy_" + fileModel.fsName )
+                                )
+                            );
 
-                        var proxyReq = proxyReq_temp.pipe(res);
-                    // }else{//download
-                    //     var proxyReq = request.get(options).pipe(res);
-                    // }
-                    proxyReq.on('error', function (err) {
-                        res.send(err, 500)
-                    });
+                            var proxyReq = proxyReq_temp.pipe(res);
+                        // }else{//download
+                        //     var proxyReq = request.get(options).pipe(res);
+                        // }
+                        proxyReq.on('error', function (err) {
+                            res.send(err, 500)
+                        });
+                    }
                 }
 
             }).error(function (err) {

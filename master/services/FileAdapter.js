@@ -16,7 +16,7 @@ var adapter = getAdapterByKey();
 function getAdapterByKey () {
 
 	console.log(":as;kdalkas;ldas;lkasl;kasl;asl;poewpoopqwop");
-	// console.log(key);
+	 //console.log(UploadPaths);
 	
 	var adapter;
 	UploadPaths.find({where:{isActive:1}}).done(function(err, res){

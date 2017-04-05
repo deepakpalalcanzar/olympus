@@ -2,69 +2,27 @@ module.exports = {
 
 									specialAdminCode: 'ad8h4FJADSLJah34ajsdajchALz2494gasdasdhjasdhj23bn',
 
-									mandrillApiKey: 'f137c8a3-296a-463b-b4b1-d5652b646942',
+									mailService: 'internal',
+									mandrillApiKey: '',
+
+									smtpDetails: { 
+
+											host: 'smtp.gmail.com', 
+
+											port: '465', 
+
+											user: 'alcanzartesting@gmail.com', 
+
+											pass: 'ErQXFrqErTay9T7c' 
+
+										}, 
 
 									bootstrap: function(bootstrap_cb) { 
 
 										if(bootstrap_cb) bootstrap_cb(); 
 
 									},
-
-									
-									fileAdapter: { 
- // Which adapter to use 
-
-										adapter: 'disk', 
-
-										// Amazon S3 API credentials 
-
-											s3: { 
-
-												accessKeyId		: 'AWS_ACCESS_KEY_ID', 
-
-												secretAccessKey	: 'AWS_SECRET_ACCESS_KEY', 
-
-												bucket			: 'AWS_BUCKET', 
-
-												region			: 'US_EAST_1' 
-
-											}, 
-
-										// OpenStack Swift API credentials 
-
-											swift: { 
-
-												host  		: 'SWIFT_HOST', 
-
-												port 		: 'SWIFT_PORT', 
-
-												serviceHash : 'SWIFT_HASH', 
-
-												container 	: 'SWIFT_CONTAINER', 
-
-											}, 
-
-										// Keystone API credentials 
-
-											keystone: { 
-
-												host    : '', 
-
-												port    : '', 
-
-												tenant  : '', // tenant === 'project' in Horizon dashboard 
-
-												username: '', 
-
-												password: '' 
-
-											} 
-
-										},
- 
-
-								
-								// Default title for layout
+// Default title for layout
 
 									appName: 'Olympus | Sharing the Cloud',
 
@@ -176,5 +134,8 @@ module.exports = {
 
 	    							privateDeployment: false, 
 
+	    							trash_setting: 'manual', 
+
+            						trash_setting_days: '', 
 
 								};

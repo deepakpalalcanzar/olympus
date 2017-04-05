@@ -5,6 +5,8 @@ Mast.components.SystemSettingsComponent  = Mast.Component.extend({
 	events: {
 		// 'click .setting-save-button' : 'saveCompanyInfo',
 		'click #saveDomain' : 'saveDomainInfo',
+		'click #checkDatabase' : 'checkDatabase',
+		'click #uploadSSL' : 'uploadSSL',
 		'click #saveAdapter': 'saveAdapterInfo',
 		'click #saveEmail'  : 'saveEmailInfo',
 		'click #saveTrashSetting' : 'saveTrashSetting',
@@ -15,6 +17,9 @@ Mast.components.SystemSettingsComponent  = Mast.Component.extend({
 		'change input[name="mail_service"]' : 'toggleMailService',
 		'change input[name="trash_setting"]' : 'toggleTrashSetting',
 		'change input[name="disk_path"]' : 'checkdiskpath',
+		'click .restart-server'					: 'restartServer',
+		'click .update-code'					: 'updateCode',
+		'click #checkforupdates' : 'checkForUpdates',
 	},
 
 	// saveCompanyInfo : function(){
@@ -67,6 +72,150 @@ Mast.components.SystemSettingsComponent  = Mast.Component.extend({
 		}
 	},
 
+	uploadSSL : function(){
+		//console.log($('#ssl_gd').prop('files')[0]);
+		//alert('hi'+$('#ssl_gd').prop('files')[0]);
+
+		if(!$('#ssl_gd').prop('files')[0])
+		{
+			alert('Select GD Bundle Crt file');
+		}
+		else if($('#ssl_gd').prop('files')[0].name != 'gd_bundle.crt')
+		{
+			alert('GD Bundle File Crt is invalid');
+		}
+		else if(!$('#ssl_olympus').prop('files')[0])
+		{
+			alert('Select Olympus Crt file');
+		}
+		else if($('#ssl_olympus').prop('files')[0].name != 'olympus.crt')
+		{
+			alert('Olympus Crt File is invalid');
+		}
+		else if(!$('#ssl_key').prop('files')[0])
+		{
+			alert('Select Olympus Key file');
+		}
+		else if($('#ssl_key').prop('files')[0].name != 'olympus.key')
+		{
+			alert('Olympus Key file is invalid');
+		}
+		else
+		{
+			var reader = new FileReader();
+			var fileData;
+
+			reader.onload = function(e) {
+		    	Mast.Socket.request('/account/uploadSSL', {
+					'formaction'		: 'uploadSSL',
+					'uploadfile'		: 'uploadSSLGD',
+					'ssl_gd'     : reader.result
+
+				} , function(res, err){
+					 if(err) alert(err);
+					 else
+					 {
+					 	var reader1 = new FileReader();
+						var fileData1;
+						 reader1.onload = function(e) {
+					    	Mast.Socket.request('/account/uploadSSL', {
+								'formaction'		: 'uploadSSL',
+								'uploadfile'		: 'uploadSSLOLYMPUS',
+								'ssl_olympus'     : reader1.result
+
+							} , function(res, err){
+								 if(err) alert(err);
+								 else
+								 {
+								 	var reader2 = new FileReader();
+									var fileData2;
+
+									 reader2.onload = function(e) {
+									 	//console.log(reader2);
+								    	Mast.Socket.request('/account/uploadSSL', {
+											'formaction'		: 'uploadSSL',
+											'uploadfile'		: 'uploadSSLKEY',
+											'ssl_key'     : reader2.result
+
+										} , function(res, err){
+											 if(err) alert(err);
+											 else
+											 {
+											 	alert('Successfully Uploaded');
+											 }
+
+
+
+								        });
+								    }
+
+								    reader2.readAsDataURL($('#ssl_key').prop('files')[0]);
+								 }
+
+								 
+
+					        });
+					    }
+
+					    reader1.readAsDataURL($('#ssl_olympus').prop('files')[0]);
+					 }
+					 
+
+		        });
+		    }
+
+		    reader.readAsDataURL($('#ssl_gd').prop('files')[0]);
+
+			
+
+		}
+
+
+		
+
+
+		
+	},
+
+	checkDatabase : function(){
+		//console.log('hi');
+		//alert('hi');
+
+		Mast.Socket.request('/account/checkDatabase', {
+				'formaction'		: 'checkDatabase',
+				'host'     : $('#database_host').val(),
+				'user'     : $('#database_user').val(),
+				'password' : $('#database_pass').val(),
+				'database' : $('#database_name').val()
+
+			} , function(res, err){
+				 console.log(res);
+				 if(err) alert(err);
+				 //else
+				 $('#saveDatabase').hide();
+				 if(res.error)
+				 	alert('Connection Not ready. Error : '+res.error);
+				 else if(res == 200)
+				 {
+				 	alert('Database Settings Successfully changed');
+				 	//$('#saveDatabase').show();
+				 }				 	
+				 else
+				 	alert('Some Error');
+				// if((typeof res.status != 'undefined') && res.status == 'ok'){
+				// 	$('#adapter_type').html($('#adapter_type').val());
+				// 	alert('Ldap/AD Settings Updated.')
+				// }else if(typeof res.error != 'undefined'){
+				// 	alert(res.error);
+				// }else{
+				// 	alert('Some error occurred.');
+				// }
+	        });
+
+
+		
+	},
+
 	saveDomainInfo : function(){
 
 		//Regex for domain without any protocol(http:// or https://)
@@ -94,6 +243,120 @@ Mast.components.SystemSettingsComponent  = Mast.Component.extend({
 	    }else{
 	    	alert('Domain should be like www.domain.com or \'localhost\'.');
 	    }
+	},
+
+	restartServer: function(){
+		if(confirm('Are you sure you want to restart the olympus server?')){
+			console.log('sending request to restart the server.');
+			Mast.Socket.request('/account/restartServer', {
+				'formaction'		: 'restart-server'
+			} , function(res, err){
+				alert(err);
+				// console.log(res);
+				if( (typeof res.status != 'undefined') ){
+					if( res.status == 'ok'){
+						//Server would have restarted successfully
+					}else if (res.status == 'restarterror'){
+						console.log(res.message);
+						alert('Some error occurred in restarting the server.');
+					}
+				}else if(typeof res.error != 'undefined'){
+					console.log(res.error);
+					alert('Some error occurred in restarting the server.');
+				}else{
+					alert('Some error occurred in restarting the server.');
+				}
+	        });
+	        setTimeout(function(){
+	         window.location.href = "https://"+$('#domaininfo').html(); }, 6000);
+	    }
+	},
+
+	updateCode: function(){
+		if(confirm('Are you sure you want to update the olympus code?')){
+			console.log('sending request to update the code.');
+			Mast.Socket.request('/account/updateCode', {
+				'formaction'		: 'update-code'
+			} , function(res, err){
+				alert(err);
+				// console.log(res);
+				if( (typeof res.status != 'undefined') ){
+					if( res.status == 'ok'){
+						//Server would have restarted successfully
+					}else if (res.status == 'githuberror'){
+						console.log(res.message);
+						alert('Some error occurred in updating the code.');
+					}
+				}else if(typeof res.error != 'undefined'){
+					console.log(res.error);
+					alert('Some error occurred in updating the code.');
+				}else{
+					alert('Some error occurred in updating the code.');
+				}
+	        });
+	        // setTimeout(function(){
+	        //  window.location.href = "https://"+$('#domaininfo').html(); }, 6000);
+	    }
+	},
+
+	checkForUpdates: function(){
+
+		Mast.Socket.request('/account/checkForUpdates', {
+			'formaction'		: 'check-for-updates'
+		} , function(res, err){
+			//alert(err);
+			// console.log(res);
+			if( (typeof res.status != 'undefined') ){
+				if( res.status == 'ok'){
+					//alert(res.currcommit.trim()+'hi'+res.avcommit.trim()+'hi1');
+					if(res.currcommit.trim() == res.avcommit.trim())
+	                {
+	                    alert('No updates Available.');
+	                    //return res.json({ status: 'noupdates'}, 200);
+	                }
+	                else
+	                {
+	                    //alert('updates Available.');
+	                    //return res.json({ status: 'updatesavailable'}, 200);
+	                    if(confirm('updates Available. Do you want to update the source code?')){
+							console.log('sending request to update the code.');
+							Mast.Socket.request('/account/updateCode', {
+								'formaction'		: 'update-code'
+							} , function(res, err){
+								//alert(err);
+								// console.log(res);
+								if( (typeof res.status != 'undefined') ){
+									if( res.status == 'ok'){
+										//Server would have restarted successfully
+										alert('Code Updated Successfully. Please restart the server to apply changes');
+									}else if (res.status == 'githuberror'){
+										console.log(res.message);
+										alert('Some error occurred in updating the code.');
+									}
+								}else if(typeof res.error != 'undefined'){
+									console.log(res.error);
+									alert('Some error occurred in updating the code.');
+								}else{
+									alert('Some error occurred in updating the code.');
+								}
+					        });
+					        // setTimeout(function(){
+					        //  window.location.href = "https://"+$('#domaininfo').html(); }, 6000);
+					    }
+	                }
+					//Server would have restarted successfully
+				}else if (res.status == 'githuberror'){
+					console.log(res.message);
+					alert('Some error occurred.');
+				}
+			}else if(typeof res.error != 'undefined'){
+				console.log(res.error);
+				alert('Some error occurred.');
+			}else{
+				alert('Some error occurred.');
+			}
+        });
+		
 	},
 
 	saveLdapSettings: function(){

@@ -24,10 +24,23 @@ module.exports = {
 
   // TODO: make this an adapter config
 
+  mailService: 'internal',
   mandrill: {
 
-    token: 'justtestin.......................................................................'
+    token: ''
 
-  }
+  }, 
+
+  smtpDetails: { 
+
+	host: 'smtp.gmail.com', 
+
+	port: '465', 
+
+	user: 'alcanzartesting@gmail.com', 
+
+	pass: 'ErQXFrqErTay9T7c' 
+
+  },
 
 };

@@ -125,12 +125,6 @@ module.exports = {
 		return receiver__;
 	},
 
-	/**
-	 * Build a mock readable stream that emits incoming files.
-	 * (used for file downloads)
-	 * 
-	 * @return {Stream.Readable}
-	 */
 	deleteobject: function newEmitterStream (options,cb) {
 
 		sails.log('Deleting '+options.id+' using from Disk.');
@@ -154,6 +148,60 @@ module.exports = {
         });
 
 		cb();
+	},
+
+	deleteAll: function newEmitterStream (options,cb) {
+
+		function deleteFiles(files, callback){
+		   if (files.length==0) callback();
+		   else {
+		   	  // console.log(files);
+		      var f = files.pop();
+		      // console.log(f);
+		      // fs.unlink(f, function(err){
+		      //    if (err) callback(err);
+		      //    else {
+		      //       console.log(f + ' deleted.');
+		      //       deleteFiles(files, callback);
+		      //    }
+		      // });
+				sails.log('Deleting '+f+' using from Disk.');
+
+		      	fsx.unlink((options.receiverinfo.path||'/var/www/html/olympus/api/files/')+'' + f, function(err){
+		          	// if (err) console.log(err);
+
+		          	fsx.unlink((options.receiverinfo.path||'/var/www/html/olympus/api/files/')+'thumbnail-' + f, function(err){
+			          // if (err) console.log(err);
+			        });
+			        fsx.unlink((options.receiverinfo.path||'/var/www/html/olympus/api/files/')+'thumbnail-thumbnail-' + f, function(err){
+			          // if (err) console.log(err);
+			        });
+			        // fs.unlink(sails.config.linuxPath+'master/public/images/thumbnail/'+fileModel.name, function(err){
+			          // if (err) console.log(err);
+			        // });
+			        fsx.unlink('/var/www/html/master/public/images/thumbnail-thumbnail-'+f, function(err){
+			          // if (err) console.log(err);
+			        });
+
+			        if (err){ 
+			        	console.log('DiskReceiver err');
+			        	callback(err);
+			        }
+			        else {
+			            console.log(f + ' deleted.');
+			            deleteFiles(files, callback);
+			        }
+		        });
+		   }
+		}
+
+		// sails.log(options);
+		if(options.ids != ''){
+			deleteFiles(options.ids.split(','), cb);	
+		}else{
+			cb();
+		}
+		
 	}
 };
 

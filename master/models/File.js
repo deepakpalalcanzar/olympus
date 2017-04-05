@@ -12,6 +12,9 @@ File = Model.extend({
     public_link_enabled: BOOLEAN,
     deleteDate: DATE,
     replaceFileId: INTEGER,
+    isOnDrive: BOOLEAN,
+    isOnDropbox: BOOLEAN,
+    isOnBox: BOOLEAN,
     thumbnail: INTEGER,
     uploadPathId: INTEGER,
     // Add a reference to Pet
@@ -21,6 +24,9 @@ File = Model.extend({
     // Save the name and identifying info of the adapter used for the upload
     // adapterName: STRING,
     // adapterId: STRING,
+    viewLink: TEXT,
+    downloadLink: TEXT,
+    iconLink: TEXT,
 
     hasMany: ['FilePermission', 'Comment'],
     belongsTo: ['Directory'],
@@ -207,8 +213,14 @@ File = Model.extend({
                             replaceFileId: options.replaceId || null,
                             public_link_enabled: (sails.config.publicLinksEnabledByDefault?true:false),
                             thumbnail: (r.getAdapter.type == "Disk")?"1":"0",
-                            uploadPathId: r.getAdapter.id,
-                            md5checksum: options.md5checksum
+                            uploadPathId: options.uploadPathId?options.uploadPathId:r.getAdapter.id,
+                            md5checksum: options.md5checksum,
+                            isOnDrive: options.isOnDrive || null,
+                            isOnDropbox: options.isOnDropbox || null,
+                            isOnBox: options.isOnBox || null,
+                            viewLink: options.viewLink || null,
+                            downloadLink: options.downloadLink || null,
+                            iconLink: options.iconLink || null,
                         }).done(function (err, result) {
 
                             if (err) return cb(err);

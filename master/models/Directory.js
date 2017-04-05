@@ -32,6 +32,15 @@ Directory = Model.extend({
 	isLocked: BOOLEAN,
 	deleted: BOOLEAN,
 
+	isDriveDir: BOOLEAN,
+	isOlympusDriveDir: BOOLEAN,//is this the 'GOOGLE DRIVE' directory of olympus
+	isDropboxDir: BOOLEAN,
+	isOlympusDropboxDir: BOOLEAN,//is this the 'DROPBOX' directory of olympus
+	isBoxDir: BOOLEAN,
+	isOlympusBoxDir: BOOLEAN,//is this the 'DROPBOX' directory of olympus
+	driveFsName: TEXT,
+	uploadPathId: INTEGER,//Stores Paths IDs(Drive, Dropbox, Box.net etc.)
+
 	hasMany: ['DirectoryPermission', 'File', 'Comment'],
 
 	// If a directory has no parent, it is a workgroup

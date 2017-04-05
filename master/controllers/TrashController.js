@@ -276,5 +276,42 @@ var TrashController = {
 
     },
 
+    emptyTrash : function(req, res){
+
+        console.log('emptyTrashemptyTrashemptyTrashemptyTrashemptyTrashemptyTrashemptyTrash');
+
+        // console.log('deleting file from '+sails.config.uploadPath);
+        // console.log(req.param('file_id'));
+
+        // console.log(sails.config.fileAdapter.adapter);
+
+        var request = require('request');
+        var options = {
+            uri: 'http://localhost:1337/trash/emptyTrash/',
+            method: 'POST',
+        };
+
+        options.json = {
+            account            : req.session.Account
+            // file_id         : req.param('id'),
+            // type            : req.param('type'),
+            // directory_id    : req.param('directory_id')
+        };
+
+        // console.log("optionsoptionsoptionsoptionsoptionsoptionsoptionsoptionsoptionsoptions");
+        // console.log(options);
+        console.log("optionsoptionsoptionsoptionsoptionsoptionsoptionsoptionsoptionsoptions");
+
+        request(options, function (err, response, body) {
+            console.log('CVCVCVCVCVCVCVCVCVCVCVCVCVCVCVCVCV');
+            console.log(err);
+            console.log(response);
+            console.log(body);
+
+            res.json(200);
+        });
+
+    },
+
 };
 _.extend(exports, TrashController);

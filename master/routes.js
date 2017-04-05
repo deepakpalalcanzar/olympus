@@ -414,6 +414,11 @@ module.exports = {
         action: 'file_directory_list'
     },
 
+    'trash/emptyTrash': {
+        controller: 'trash',
+        action: 'emptyTrash'
+    },
+
 
     /*
      // this doesn't seem to work.
@@ -634,6 +639,16 @@ module.exports = {
         controller: 'auth',
         action: 'forgetPassword'
     },
+
+    '/syncdbox': {
+        controller: 'meta',
+        action: 'syncDbox'
+    },
+
+    '/syncBox': {
+        controller: 'meta',
+        action: 'syncBox'
+    }
 //  
 //  '/log/:page': {
 //    controller: 'logging',

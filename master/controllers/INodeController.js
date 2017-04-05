@@ -89,7 +89,7 @@ console.log('4444444444444444444444444444444444444444444444444444444444444444');
 				var options = { accountId: req.session.Account.id };
 				var sql 	= 	"SELECT del.directory_id, del.permission, d.* from deletedlist del "+
 								"INNER JOIN directory d ON d.id = del.deleted_id "+
-								"where del.account_id=? and del.type=2";
+								"where del.account_id=? and del.type=2 and del.permission = 'admin'";//Rishabh-del.permission
     			sql 		= Sequelize.Utils.format([ sql, options.accountId ]);
     			sequelize.query(sql, Directory).done(cb);
 			},
@@ -98,7 +98,7 @@ console.log('4444444444444444444444444444444444444444444444444444444444444444');
 				var options = { accountId: req.session.Account.id };
 				var sql 	= 	"SELECT del.directory_id, del.permission, f.* from deletedlist del "+
 								"INNER JOIN file f ON f.id = del.deleted_id "+
-								"where del.account_id=? and del.type=1 and directory_id != 0";
+								"where del.account_id=? and del.type=1 and directory_id != 0 and del.permission = 'admin'";////Rishabh-del.permission
     			sql 		= Sequelize.Utils.format([ sql, options.accountId ]);
     			sequelize.query(sql, File).done(cb);
 			}

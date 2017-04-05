@@ -18,10 +18,13 @@ Mast.registerComponent('AccountSettingsComponent',{
 		'click a.account-subscription' : 'displaySubscribedPlan',
 		'click a.system-settings' 	   : 'displaySystemSettingsDomain',//'displaySystemSettings',
 		'click a.system-domain' 	   : 'displaySystemSettingsDomain',
+		'click a.system-database' 	   : 'displaySystemSettingsDatabase',
+		'click a.system-ssl' 	   	   : 'displaySystemSettingsSSL',
 		'click a.system-adapter' 	   : 'displaySystemSettingsAdapter',
 		'click a.system-email' 	   	   : 'displaySystemSettingsEmail',
 		'click a.system-trash' 	   	   : 'displaySystemSettingsTrash',
-		'click a.system-ldap' 	   	   : 'displaySystemSettingsLdap'
+		'click a.system-ldap' 	   	   : 'displaySystemSettingsLdap',
+		'click a.system-update' 	   : 'displaySystemSettingsUpdates'
 	},
 
 	bindings: {
@@ -107,6 +110,20 @@ Mast.registerComponent('AccountSettingsComponent',{
 				}
 				// $('.adapter-mod').show();
 			});
+
+			Mast.Socket.request('/account/getCurrentDatabase', {}, function (res, err) {
+				if(err || res.success == false){
+					console.log(err || res.error);
+					return;
+				}
+
+				console.log(res);
+				$('#database_host').val(res.host);
+				$('#database_name').val(res.database);
+				$('#database_user').val(res.user);
+				$('#database_pass').val(res.password);
+			});
+
 
 			Mast.Socket.request('/sitesettings/getLdapSettings', {}, function (res, err) {
 				if(err || res.success == false){
@@ -216,6 +233,28 @@ Mast.registerComponent('AccountSettingsComponent',{
 		// this.set('selectedTab', 'systemSettings');
 	},
 
+	displaySystemSettingsDatabase: function() {
+
+		$('.upload-file').hide();
+		$('.system-settings-template > div').hide();
+
+		$('.database-mod').show();
+
+		// this.attach('.account-settings-page', 'SystemSettingsComponent');
+		// this.set('selectedTab', 'systemSettings');
+	},
+
+	displaySystemSettingsSSL: function() {
+
+		$('.upload-file').hide();
+		$('.system-settings-template > div').hide();
+
+		$('.ssl-mod').show();
+
+		// this.attach('.account-settings-page', 'SystemSettingsComponent');
+		// this.set('selectedTab', 'systemSettings');
+	},
+
 	displaySystemSettingsAdapter: function() {
 
 		$('.upload-file').hide();
@@ -255,6 +294,17 @@ Mast.registerComponent('AccountSettingsComponent',{
 		$('.system-settings-template > div').hide();
 
 		$('.ldap-mod').show();
+
+		// this.attach('.account-settings-page', 'SystemSettingsComponent');
+		// this.set('selectedTab', 'systemSettings');
+	},
+
+	displaySystemSettingsUpdates: function() {
+
+		$('.upload-file').hide();
+		$('.system-settings-template > div').hide();
+
+		$('.update-mod').show();
 
 		// this.attach('.account-settings-page', 'SystemSettingsComponent');
 		// this.set('selectedTab', 'systemSettings');

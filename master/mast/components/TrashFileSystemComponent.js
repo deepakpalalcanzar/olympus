@@ -22,6 +22,10 @@ Mast.registerTree('TrashFileSystem',{
 		renaming     : false,
 		loading      : true
 	},
+
+	events: {
+		'click .empty-trash-link'    : 'emptyTrash'
+	},
 	
 	currentHighlightedBranch: null,
 
@@ -114,6 +118,29 @@ Mast.registerTree('TrashFileSystem',{
 		
 		// Trigger cd event on permission-sensitive buttons
 		Olympus.ui.fileSystem.trigger('cd');
+	},
+
+	emptyTrash: function () {
+		if(confirm('Delete all items permanently from trash ?')){
+			var self = this;
+	        // var id = this.get('id');
+	        // var type =this.get('type');
+			Mast.Socket.request('/trash/emptyTrash',{
+				// id 	 :  id,
+				// type : type,
+			}, function(response){
+				if (response===403) {
+					alert('Permission denied. You do not have sufficient permissions to delete this item.');
+				} else {
+
+					$("#content").empty();
+					var trash = new Mast.components.TrashFileSystem({ outlet : '#content'});
+					console.log('callback called');
+				}
+			});
+		}else{
+			return false;
+		}
 	},
 
 	subscriptions: {

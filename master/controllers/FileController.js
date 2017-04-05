@@ -31,6 +31,9 @@ var FileController = {
     // Direct, Box.net-style file upload
     content: function (req, res) {
 
+
+        console.log('deepak deepak deepak deepak deepak deepak deepak deepak deepak deepak deepak deepak deepak deepak deepak');
+
         var file, filename;
         if (!req.param('parent_id'))
             return res.send('No parent directory specified!', 500);
@@ -43,6 +46,8 @@ var FileController = {
         }
 
         sails.log.info('Upload new file into ' + req.param('parent_id') + ' [User:' + req.session.Account.id + ']');
+
+        
         // Perform upload
         File.upload({
             file: {

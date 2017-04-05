@@ -310,6 +310,133 @@ var AccountController = {
         });
     },
 
+    checkDatabase: function (req, res) {
+
+        if(typeof req.param('formaction') != 'undefined' && req.param('formaction') )
+        {
+            if(req.param('formaction') == 'checkDatabase'){
+
+                var mysql      = require('mysql');
+                var connection = mysql.createConnection({           
+                  host     : req.param('host'),
+                  user     : req.param('user'),
+                  password : req.param('password')
+                });
+                 
+                connection.connect(function(err) {
+                  if (err) {
+                    console.error('error connecting: ' , err.code);
+                    return res.json({
+                            error: err.code,
+                            type: 'error'
+                         }, 400);
+                  }
+                  else
+                  {
+                    fsx = require('fs-extra');
+                    localjs = __dirname + '/../../config/local.js';
+                    fsx.readFile(localjs, 'utf8', function (err,data) {
+                          if (err){
+                            return res.json({
+                                    error: err,
+                                    type: 'error'
+                                }, 400);
+                        }
+                    });
+
+                    // localjs_html = '\
+                    //     var path = require(\'path\'); \r\n\
+                    //     var fsx = require(\'fs-extra\'); \r\n\
+                    //     var UUIDGenerator = require(\'node-uuid\'); \r\n\
+                    //      \r\n\
+                    //     module.exports.crontab = { \r\n\
+                    //      \r\n\
+                    //       /* \r\n\
+                    //        * The asterisks in the key are equivalent to the \r\n\
+                    //        * schedule setting in crontab, i.e. \r\n\
+                    //        * minute hour day month day-of-week year \r\n\
+                    //        * so in the example below it will run every minute \r\n\
+                    //        */ \r\n\
+                    //     \''+cron_asterisk_str+'\'\: function(){ \r\n\
+                    //      \r\n\
+                    //         // require(\'../crontab/mycooljob.js\').run(); \r\n\
+                    //         sails.controllers.trash.deleteTrashContent(); \r\n\
+                    //       } \r\n\
+                    //     };';
+
+                    //console.log(sails.config.s3);
+                    //console.log(sails.config.s3.API_KEY);
+                    //console.log(sails.config.MYSQL.PASS);
+
+                    localjs_html = '\
+                        module.exports = { \r\n\
+                                s3: { \r\n\
+                                    API_KEY   : \''+sails.config.s3.API_KEY+'\',  \r\n\
+                                    \r\n\
+                                    API_SECRET: \''+sails.config.s3.API_SECRET+'\',  \r\n\
+                                    \r\n\
+                                    BUCKET    : \''+sails.config.s3.BUCKET+'\',  \r\n\
+                                    \r\n\
+                                }, \r\n\
+                                \r\n\
+                                MYSQL: { \r\n\
+                                    \r\n\
+                                    HOST : \''+req.param('host')+'\', \r\n\
+                                    \r\n\
+                                    USER : \''+req.param('user')+'\', \r\n\
+                                    \r\n\
+                                    PASS : \''+req.param('password')+'\', \r\n\
+                                    \r\n\
+                                    DB   : \''+req.param('database')+'\' \r\n\
+                                    \r\n\
+                                }, \r\n\
+                                \r\n\
+                                receiver: \'Disk\' \r\n\
+                                \r\n\
+                            };';
+
+                    fsx.writeFile(localjs, localjs_html, 'utf8', function (err) {
+                         if (err) return res.json({
+                            error: err,
+                            type: 'error'
+                         }, 400);
+
+                        sails.config.MYSQL.HOST = req.param('host');
+                        sails.config.MYSQL.USER = req.param('user');
+                        sails.config.MYSQL.PASS = req.param('password');
+                        sails.config.MYSQL.DB = req.param('database');
+
+
+                        return res.json({ status: 'ok'}, 200);
+                    });
+
+
+                 
+                    //console.log('connected as id ' + connection.threadId);
+                  }
+
+                  
+                });
+
+            }
+            else
+            {
+                return res.json({
+                    error: new Error('Some Error.'),
+                    type: 'error'
+                  }, 400);
+            }
+        }
+        else
+        {
+            return res.json({
+                error: new Error('Some Error.'),
+                type: 'error'
+              }, 400);
+        }
+
+    },
+
     /**
    * PUT /account/:id/lock
    *
@@ -319,6 +446,8 @@ var AccountController = {
    * ACL should be done at the policy level before getting here
    * so we can just use the id param in the Account Query
    */
+
+
 
     changeDomainname: function (req, res) {
 

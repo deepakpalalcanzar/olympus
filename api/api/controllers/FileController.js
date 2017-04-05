@@ -406,14 +406,19 @@ var FileController = {
 
     upload: function (req, res) {
 
+
+
         NA.trackEvent('Upload File', 'Upload File', function (err, resp) {});
         res.setTimeout(0);
+
 
         if (req.param('Filename')) {
             var uploadStream = req.file('Filedata');
         } else {
             var uploadStream = req.file('files[]');
         }
+
+        console.log(uploadStream);
 
         if(uploadStream._files[0].stream.byteCount == 0){//Rishabh: Server Side Fix, if Client Side check bypassed
             // console.log(uploadStream._files[0].stream.byteCount);
@@ -447,14 +452,83 @@ var FileController = {
             var user_platform = req.headers['user-agent'];
         }
         console.log(user_platform);
+
+        console.log('checking...');
+        //return res.end(JSON.stringify({error: 'empty_file_error'}), 'utf8');
         //Rishabh: START async.auto
         async.auto({
             getAdapter: function(cb) {
+                //Check if it is Drive Synced Directory
+                Directory.findOne({
+                    id: data.parent.id//dir.DirectoryId
+                }).then(function (dir) {
+                    
+                    if (dir && ( dir.isOlympusDriveDir || dir.isDriveDir) ) {//Do Drive Upload
 
-                uploadPaths.findOne({where:{isActive:1}}).done(cb);
+                        console.log('sails.configsails.configsails.configsails.configsails.configsails.configsails.configsails.config');
+                        fsx.readFile( sails.config.appPath + "/../master/public/drive_secret/" + 'client_secret.json', function processClientSecrets(err, content) {
+                        
+                            if (err) {
+                                console.log('Error loading client secret file: ' + err);
+                                return;
+                            }
+
+                            sails.controllers.directory.authorize('file_upload_by_pathID', dir.uploadPathId, null, JSON.parse(content), function (auth, driveUploadPathId) {
+
+                                cb(null, { type: 'Drive',
+                                    auth: auth,
+                                    drivepathid: dir.uploadPathId,
+                                    driveFsName: dir.driveFsName,
+                                    isOlympusDriveDir: dir.isOlympusDriveDir,
+                                });
+                            });
+                        });
+                    }else if (dir && ( dir.isOlympusDropboxDir || dir.isDropboxDir) ) {//Do Dropbox Upload
+
+                        SyncDbox.findOne({where:{id: dir.uploadPathId}}).done( function (err, tokenrow) {
+                            if (err) {
+                                console.log('Error loading client secret file: ' + err);
+                                return;
+                            }
+
+                            if( tokenrow ){
+                                cb(null, { type: 'Dropbox',
+                                    auth: tokenrow,
+                                    dbxpath: dir.driveFsName,
+                                    isOlympusDropboxDir: dir.isOlympusDropboxDir,
+                                });
+                            }
+                        });
+
+                    }
+                    else if (dir && ( dir.isOlympusBoxDir || dir.isBoxDir) ) {//Do Box Upload
+
+                        SyncBox.findOne({where:{id: dir.uploadPathId}}).done( function (err, tokenrow) {
+                            if (err) {
+                                console.log('Error loading client secret file: ' + err);
+                                return;
+                            }
+
+                            if( tokenrow ){
+                                cb(null, { type: 'Box',
+                                    auth: tokenrow,
+                                    dbxpath: dir.driveFsName,
+                                    isOlympusBoxDir: dir.isOlympusBoxDir,
+                                });
+                            }
+                        });
+
+                    }
+                    else{//Do normal Disk/S3/Ormuco upload
+                        uploadPaths.findOne({where:{isActive:1}}).done(cb);
+                    }
+                });
             },
             uploadFileTask: ['getAdapter', function(cb, up) {
         console.log('user-agent');
+        //console.log(up);console.log(req.param('data'));
+        //return res.end(JSON.stringify({error: 'adapter_error'}), 'utf8');
+        
                 var current_receiver        = up.getAdapter.type;
                 var current_receiverinfo    = up.getAdapter;
 
@@ -479,12 +553,14 @@ var FileController = {
                         });
                     }*/
 
+
 console.log(current_receiverinfo);
                     var receiver = global[ current_receiver+ 'Receiver'].newReceiverStream({
                         maxBytes: workgroup.quota - workgroup.size,
                         totalUploadSize: req.headers['content-length'],
                         receiverinfo: current_receiverinfo
                     });
+
 
                     receiver.on('progress', function (progressData) {
                         console.log('22222222222222222222222222222222222222222222');
@@ -495,8 +571,13 @@ console.log(current_receiverinfo);
                         console.log('hththththhthththththththhthththththththhthththththththhththt');
                         return res.end(JSON.stringify({error: 'adapter_error'}), 'utf8');
                     });
+                    
 
         console.log('kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk');
+        //return res.end(JSON.stringify({error: 'adapter_error'}), 'utf8');
+
+
+
 
         //Rishabh
         // In a FileController.js or similar controller...
@@ -513,6 +594,8 @@ console.log(current_receiverinfo);
         d.run(function safelyUpload () {*/ //Rishabh
                     uploadStream.upload(receiver, function (err, files) {
                         console.log('333333333333333333333333333333333333333333');
+                        //return res.end(JSON.stringify({error: 'adapter_error'}), 'utf8');
+
                         if (err) {
                             console.log('jhonjhonjhonjhonjhonjhonjhonjhonjhonjhonjhonjhonjhonjhon');
                             console.log(err);
@@ -529,10 +612,11 @@ console.log(current_receiverinfo);
                             return res.end(JSON.stringify({error: 'dashgdjashgdjsajdg3'}), 'utf8');
                         }
 
-                        if( (typeof file.extra.Code == 'undefined') && file.extra.Code == 'MalformedXML' ){
-                            console.log('MalformedXMLHandledMalformedXMLHandledMalformedXMLHandled');
-                            return res.end(JSON.stringify({error: 'MalformedXML'}), 'utf8');   
-                        }
+                        // if( (typeof file.extra.Code == 'undefined') && file.extra.Code == 'MalformedXML' ){
+                        //     console.log('MalformedXMLHandledMalformedXMLHandledMalformedXMLHandled');
+                        //     return res.end(JSON.stringify({error: 'MalformedXML'}), 'utf8');   
+                        // }
+
 
                         var mimetype = 'application/octet-stream';
                         var ext = (file.filename).split(".").slice(1).pop();
@@ -704,6 +788,8 @@ console.log(current_receiverinfo);
                         console.log('Mimetype to be used: '+mimetype);
 
 
+
+
                         // Find the file with the same name in a database             
                         File.findOne({
                             name: file.filename,
@@ -711,7 +797,9 @@ console.log(current_receiverinfo);
                         }).exec(function (err, fileData) {
                             // If File exist in a database then find the maximum version of that file 
         console.log('44444444444444444444444444444444444444');
+
                             if (fileData) {
+
 
                                 var versionData = new Array();
                                 var fileVersionData = new Array();
@@ -861,11 +949,11 @@ console.log(current_receiverinfo);
                                                                 console.log(hashresp);
                                                                 cb(null, hashresp);
                                                             });
-                                                        }else{//Disk
+                                                        }else if(current_receiver == 'Disk'){//Disk
                                                             var hash = crypto.createHash('md5');
                                                             console.log('cbfirstcbfirstcbfirstcbfirstcbfirstcbfirst');
                                                             console.log(cb);
-                                                            var s = fsx.createReadStream(('/var/www/html/olympus/api/files/' || 'files/')+'' + file.extra.fsName);
+                                                            var s = fsx.createReadStream((sails.config.appPath + '/files/' || 'files/')+'' + file.extra.fsName);
                                                             s.on('readable', function () {
                                                                 console.log('firstFileReadable');
                                                                 var chunk;
@@ -883,6 +971,26 @@ console.log(current_receiverinfo);
                                                                 console.log(e);
                                                                 cb(null, 'ENOENT');
                                                             });
+                                                        }else if(current_receiver == 'Ormuco'){
+                                                            var hash = crypto.createHash('md5');
+                                                            console.log('cbfirstcbfirstcbfirstcbfirstcbfirstcbfirst');
+                                                            // console.log(file.extra)
+                                                            // console.log(cb);
+                                                            if(file.extra){
+                                                                cb(null, file.extra.hash);
+                                                            }else{
+                                                                cb(null, 'ENOENT');
+                                                            }
+                                                        }else if(current_receiver == 'Drive'){
+                                                            // var hash = crypto.createHash('md5');
+                                                            console.log('cbfirstcbfirstcbfirstcbfirstcbfirstcbfirst');
+                                                            // console.log(file.extra)
+                                                            // console.log(cb);
+                                                            if(file.extra){
+                                                                cb(null, file.extra.md5Checksum);//md5Checksum != md5checksum
+                                                            }else{
+                                                                cb(null, 'ENOENT');
+                                                            }
                                                         }
                                                     },
                                                     comparefiles: ['first','second', function(cb, response) {
@@ -1011,6 +1119,7 @@ return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
 
                             } else {
                                 console.log('apiFILEapiFILEapiFILEapiFILEapiFILEapiFILEapiFILEapiFILEapiFILE');
+                                return res.end(JSON.stringify({error: 'adapter_error'}), 'utf8');
                                 async.auto({
                                     first: function(cb) {
                                         if(current_receiver == 'S3'){
@@ -1053,8 +1162,34 @@ return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
                                         console.log(response);
                                         console.log('upupupupupupupupupupupupupupupupupupup');
 
-                                        if(response.first !== 'ENOENT'){//Rishabh: check for error
-                                                    
+                                        if(current_receiver == 'Box'){
+
+                                            console.log('ifHERE ifHERE ifHERE ifHERE ifHERE ifHERE ');
+                                            //Do not pick file.filename as new file can be versioned
+                                            var dropboxnode_name = file.extra.path.split("/").pop();//.replace(/\//g,'');
+
+                                            res.end(JSON.stringify({
+                                                origParams: req.params.all(),
+                                                name: dropboxnode_name,
+                                                size: file.extra.bytes,
+                                                fsName: file.extra.rev,
+                                                mimetype: file.extra.mime_type,//file.type,
+                                                version: 0,
+                                                oldFile: 0,
+                                                thumbnail: file.extra.thumb_exists,//"1",
+
+                                                //extra drive attributes
+                                                md5checksum: null,//md5Checksum != md5checksum
+                                                parentId: data.parent.id,//parsedFormData.parent.id,
+                                                uploadPathId: current_receiverinfo.auth.id,//SyncDbox.id
+                                                isOnBox: "1",
+                                                // viewLink: file.extra.webViewLink,
+                                                downloadLink: file.extra.path,
+                                                iconLink: file.extra.icon,
+                                            }), 'utf8');
+
+                                        }else if(response.first !== 'ENOENT'){//Rishabh: check for error
+
                                             res.end(JSON.stringify({
                                                 origParams: req.params.all(),
                                                 name: file.filename,
@@ -1067,6 +1202,7 @@ return res.end(JSON.stringify({error: "FileExist"}), 'utf8');
                                                 md5checksum: response.first
                                             }), 'utf8');
                                         }else{
+
                                             res.end(JSON.stringify({
                                                 origParams: req.params.all(),
                                                 name: file.filename,

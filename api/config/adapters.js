@@ -24,8 +24,10 @@ module.exports.adapters = {
   // Learn more: http://en.wikipedia.org/wiki/MySQL
   mysql: {
     module: 'sails-mysql',
-    host: 'localhost',
-    user: 'root',
+    // host: 'localhost',
+    // user: 'root',
+    host: localConf.MYSQL && localConf.MYSQL.HOST || 'localhost',
+    user: localConf.MYSQL && localConf.MYSQL.USER || 'root',
     password: (localConf.MYSQL && (typeof(localConf.MYSQL.PASS) !== 'undefined')) ? localConf.MYSQL.PASS : 'refico',
     database: localConf.MYSQL && localConf.MYSQL.DB || 'olympus-blackops'
   },

@@ -180,7 +180,65 @@ module.exports = {
                         console.log('firstFileEnd');
                         // console.log(cb);
                         // encryptedData["first"] = hash.digest('hex');
-                        fileHash = hash.digest('hex')
+                        fileHash = hash.digest('hex');
+
+
+                        console.log('deepakdeepakdeepakdeepakdeepakdeepakdeepakdeepakdeepakdeepakdeepakdeepakdeepak');
+
+                        //condole.log(s);
+
+                        easyimg.resize({
+							src: ('files/')+''+options.id, 
+							dst: ('files/')+'thumbnail-'+options.id, width: 150, height: 150
+						}).then(
+							
+							function(image) {
+
+								var Writable = require('stream').Writable;
+								var receiver__ = Writable({objectMode: true});
+								var client = knox.createClient({
+									key: options.receiverinfo.accessKeyId,//sails.config.adapters.s3.apiKey, 
+									secret: options.receiverinfo.secretAccessKey,//sails.config.adapters.s3.apiSecret,
+									bucket: options.receiverinfo.bucket,//sails.config.adapters.s3.bucket
+								});
+
+								var mpu = new MultiPartUpload({
+									client: client,
+									objectName: 'thumbnail-'+options.id,
+									//stream: __newFile,
+									//maxUploadSize: options.maxBytes,
+									//totalUploadSize: options.totalUploadSize
+								}, function(err, body) {
+									if (err) {
+										//log(('Receiver: Error writing `'+__newFile.filename+'`:: '+ require('util').inspect(err)+' :: Cancelling upload and cleaning up already-written bytes...').red);
+										//receiver__.emit('error', err);
+										return;
+									}
+									//__newFile.extra = body;
+									//__newFile.extra.fsName = fsName;
+
+									//log(('Receiver: Finished writing `'+__newFile.filename+'`').grey);
+									//next();
+								});
+
+								mpu.on('progress', function(data) {
+									receiver__.emit('progress', {
+										name: 'thumbnail-'+options.id,
+										written: data.written,
+										total: data.total,
+										percent: data.percent
+									});
+								});
+								
+
+				                fsx.unlink(('files/')+"thumbnail-"+options.id);
+				            },
+				            function (err) {
+				                console.log(err);
+				            }
+				        );
+
+                        console.log('deepak1deepak1deepakdeepakdeepakdeepakdeepakdeepakdeepakdeepakdeepakdeepakdeepak');
 
                         //Unlink the file now
 						fsx.unlink(('files/')+""+options.id);
@@ -289,5 +347,68 @@ cb();
 			
         });
 	},
+
+	deleteAll: function newEmitterStream (options,cb) {
+
+		sails.log('Deleting '+options.id+' using from S3.');
+
+		// sails.log(options);
+
+		var client = knox.createClient({
+			key: options.receiverinfo.accessKeyId, 
+			secret: options.receiverinfo.secretAccessKey,
+			bucket: options.receiverinfo.bucket
+		});
+
+		function deleteFiles(files, callback){
+		   	if (files.length==0) callback();
+		   	else {
+		   	  	// console.log(files);
+		      	var f = files.pop();
+
+		      	// fsx.unlink((options.receiverinfo.path||'/var/www/html/olympus/api/files/')+'' + f, function(err){
+		          	// if (err) console.log(err);
+
+		          	fsx.unlink((options.receiverinfo.path||'/var/www/html/olympus/api/files/')+'thumbnail-' + f, function(err){
+			          // if (err) console.log(err);
+			        });
+			        fsx.unlink((options.receiverinfo.path||'/var/www/html/olympus/api/files/')+'thumbnail-thumbnail-' + f, function(err){
+			          // if (err) console.log(err);
+			        });
+			        // fs.unlink(sails.config.linuxPath+'master/public/images/thumbnail/'+fileModel.name, function(err){
+			          // if (err) console.log(err);
+			        // });
+			        fsx.unlink('/var/www/html/master/public/images/thumbnail-thumbnail-'+f, function(err){
+			          // if (err) console.log(err);
+			        });
+
+			        // if (err) callback(err);
+			        // else {
+			            console.log(f + ' thumbnails deleted from disk.');
+			            deleteFiles(files, callback);
+			        // }
+		        // });
+		   	}
+		}
+
+		// sails.log(options);
+		if(options.ids != ''){
+			deleteFiles(options.ids.split(','), function(){//delete thumbs from local
+
+				sails.log('Deleting '+options.ids+' using from S3.');
+				
+				client.deleteMultiple(options.ids.split(','),function (err, res) {//delete files from s3
+					if(err){
+						console.log(err);
+						cb();
+					}
+
+			    	cb();
+			    });
+			});	
+		}else{
+			cb();
+		}
+	}
 
 };

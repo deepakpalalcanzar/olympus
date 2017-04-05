@@ -367,6 +367,227 @@ listUsers: function (req, res) {
         });
 
     },
+
+    uploadSSL: function (req, res) {
+        if( req.param('formaction') == 'uploadSSL' ){
+
+            console.log(req.param('ssl_gd'));
+
+            if(req.param('uploadfile') && req.param('uploadfile')=='uploadSSLGD')
+            {
+                var binaryData = req.param('ssl_gd');
+                var old_ssl_gd = __dirname + '/../../ssl/gd_bundle.crt';
+
+                var base64Data = binaryData.replace(/^data:application\/(pkix-cert|key);base64,/, "");
+                    base64Data = base64Data.replace('+', ' ');
+                var binaryData1 = new Buffer(base64Data, 'base64').toString('binary');
+
+                fsx.writeFile(old_ssl_gd, '', 'binary', function (err) {
+                    console.log('hello');
+                            if (err) return console.log(err);
+
+                           fsx.writeFile(old_ssl_gd, binaryData1, 'binary', function (err) {
+                                console.log('hello');
+                                        if (err) return console.log(err);
+
+                                        //console.log(response);
+                                        // sails.config.datasource.host = req.param('host');
+                                        // sails.config.datasource.database = req.param('database');
+                                        // sails.config.datasource.username = req.param('user');
+                                        // sails.config.datasource.password = req.param('password');
+                                        return res.json(200, 200);
+
+                            });
+
+
+                        });
+            }
+            else if(req.param('uploadfile') && req.param('uploadfile')=='uploadSSLOLYMPUS')
+            {
+                var binaryData = req.param('ssl_olympus');
+                var old_ssl_gd = __dirname + '/../../ssl/olympus.crt';
+
+                var base64Data = binaryData.replace(/^data:application\/(pkix-cert|key);base64,/, "");
+                    base64Data = base64Data.replace('+', ' ');
+                var binaryData1 = new Buffer(base64Data, 'base64').toString('binary');
+
+                fsx.writeFile(old_ssl_gd, '', 'binary', function (err) {
+                    console.log('hello');
+                            if (err) return console.log(err);
+
+                           fsx.writeFile(old_ssl_gd, binaryData1, 'binary', function (err) {
+                                console.log('hello');
+                                        if (err) return console.log(err);
+
+                                        //console.log(response);
+                                        // sails.config.datasource.host = req.param('host');
+                                        // sails.config.datasource.database = req.param('database');
+                                        // sails.config.datasource.username = req.param('user');
+                                        // sails.config.datasource.password = req.param('password');
+                                        return res.json(200, 200);
+
+                            });
+
+
+                        });
+            }
+            else if(req.param('uploadfile') && req.param('uploadfile')=='uploadSSLKEY')
+            {
+                var binaryData = req.param('ssl_key');
+                var old_ssl_gd = __dirname + '/../../ssl/olympus.key';
+
+                var base64Data = binaryData.replace(/^data:application\/(pkix-cert|pgp-keys);base64,/, "");
+                    base64Data = base64Data.replace('+', ' ');
+                var binaryData1 = new Buffer(base64Data, 'base64').toString('binary');
+
+                fsx.writeFile(old_ssl_gd, '', 'binary', function (err) {
+                    console.log('hello');
+                            if (err) return console.log(err);
+
+                           fsx.writeFile(old_ssl_gd, binaryData1, 'binary', function (err) {
+                                console.log('hello');
+                                        if (err) return console.log(err);
+
+                                        //console.log(response);
+                                        // sails.config.datasource.host = req.param('host');
+                                        // sails.config.datasource.database = req.param('database');
+                                        // sails.config.datasource.username = req.param('user');
+                                        // sails.config.datasource.password = req.param('password');
+                                        return res.json(200, 200);
+
+                            });
+
+
+                        });
+            }
+            else
+            {
+                return res.json({
+                                    error: 'Please select all files.',
+                                    type: 'error'
+                                }, 400);
+            }
+
+            
+
+        }
+        else
+        {
+            return res.json({
+                                    error: 'Some Error',
+                                    type: 'error'
+                                }, 400);
+        }
+
+    },
+
+    checkDatabase: function (req, res) {
+        if( req.param('formaction') == 'checkDatabase' ){
+
+            var request = require('request');
+            /*Create logging*/
+            var opts = {
+                uri: 'http://localhost:1337/account/checkDatabase/',
+                method: 'POST',
+            };
+
+            opts.json = {
+                formaction   : req.param('formaction'),
+                host     : req.param('host'),
+                user     : req.param('user'),
+                password : req.param('password'),
+                database : req.param('database')
+            };
+
+            console.log(opts);
+
+            request(opts, function (err, response, body) {
+                //console.log(err);
+                //console.log(response);
+                if (err){
+                    console.log(err);
+                    return res.json({error: err.error, type: 'error'}, response && response.statusCode);
+                }
+
+                if(response.statusCode == 400)
+                {
+                    return res.json({
+                                    error: response.body.error,
+                                    type: 'error'
+                                }, 400);
+                }
+
+                if(response.statusCode == 200)
+                {
+                    localconfigjs = __dirname + '/../config/localConfig.js';
+                    fsx.readFile(localconfigjs, 'utf8', function (err,data) {
+                          if (err){
+                            return res.json({
+                                    error: err,
+                                    type: 'error'
+                                }, 400);
+                        }
+                    });
+
+                    //console.log(sails.config);return res.json(response.statusCode, 200);
+
+                    master_config_localConfig = '\
+                        exports.datasource = { \r\n\
+                            host: \''+req.param('host')+'\', \r\n\
+                            database: \''+req.param('database')+'\', \r\n\
+                            username: \''+req.param('user')+'\', \r\n\
+                            password: \''+req.param('password')+'\' \r\n\
+                        // Choose a SQL dialect, one of sqlite, postgres, or mysql (default mysql) \r\n\
+                        // dialect:  \'mysql\', \r\n\
+                        // Choose a file storage location (sqlite only) \r\n\
+                        //storage:  \':memory:\', \r\n\
+                        // mySQL only \r\n\
+                        // pool: { maxConnections: 5, maxIdleTime: 30} \r\n\
+                        }; \r\n\r\n\
+                        // Self-awareness of hostname \r\n\
+                        exports.host = \''+sails.config.host+'\';';
+
+                    fsx.writeFile(localconfigjs, master_config_localConfig, 'utf8', function (err) {
+                        if (err) return console.log(err);
+
+                        console.log(response.statusCode);
+                        sails.config.datasource.host = req.param('host');
+                        sails.config.datasource.database = req.param('database');
+                        sails.config.datasource.username = req.param('user');
+                        sails.config.datasource.password = req.param('password');
+                        return res.json(response.statusCode, 200);
+
+                    });
+
+
+                    
+                }
+                else
+                {
+                    console.log(response.statusCode);
+                    return res.json(response.statusCode, 200);
+                }
+                
+                
+            });
+
+        }
+
+    },
+
+    getCurrentDatabase: function (req, res) {
+
+        var opts = {
+                host     : sails.config.datasource.host || 'localhost',
+                user     : sails.config.datasource.username || 'root',
+                password : sails.config.datasource.password,
+                database : sails.config.datasource.database || 'olympus'
+            };
+
+        return res.json(opts, 200);
+
+    },
+
     changeDomainname: function (req, res) {
 
     var domainname;
@@ -710,6 +931,120 @@ console.log('33333333333333333333333333333333333');
 
             res.json(body, response && response.statusCode);
             console.log(response);
+        });
+    },
+
+    restartServer: function (req, res) {
+        console.log('###########################################################');
+        console.log('## Olympus restarted by Superadmin');
+        console.log('###########################################################');
+        var exec                = require('child_process').exec;
+        var restartapp          = 'sudo pm2 restart app';
+        var restartolympus       = 'sudo pm2 restart olympus';
+        // console.log(cdapi);
+        exec( restartapp , function(error, stdout, stderr) {
+          // command output is in stdout
+          console.log('hi2');console.log(error,'error');console.log('hi3');
+          if(error){
+            console.log('hi');console.log(stderr);console.log('hi1');
+            return res.json({ status: 'restarterror', 'message': stderr}, 200);
+          }
+          else{//app restarted, now restart olympus
+            exec( restartolympus , function(error, stdout, stderr) {
+              console.log(error,'error');
+              if(error){
+                console.log(stderr);
+                return res.json({ status: 'restarterror', 'message': stderr}, 200);
+              }
+              else{
+                console.log('Mounted/Unmounted Successfully.');
+                return res.json({ status: 'ok'}, 200);
+              }
+            });
+          }
+        });
+    },
+
+    updateCode: function (req, res) {
+        console.log('###########################################################');
+        console.log('## Olympus code updation by Superadmin');
+        console.log('###########################################################');
+        var exec                = require('child_process').exec;
+        //var gitpull       = 'git pull https://github.com/deepakpalalcanzar/gt.git';
+        var gitpull       = 'https://github.com/deepakpalalcanzar/olympus.git';
+
+        //var cdpath = '/var/www/html/gt1/gt';
+        var cdpath = '/var/www/html/olympus';
+
+        exec( gitpull, {cwd: cdpath} , function(error, stdout, stderr) {
+          console.log('hi8');console.log(error,'error',stdout, stderr);console.log('hi9');
+          if(error){
+            console.log(stderr);
+            return res.json({ status: 'githuberror', 'message': stderr}, 200);
+          }
+          else{
+            console.log('Code Updated Successfully.');
+            return res.json({ status: 'ok'}, 200);
+          }
+        });
+    },
+
+    checkForUpdates: function (req, res) {
+        console.log('###########################################################');
+        console.log('## Olympus check for updates updation by Superadmin');
+        console.log('###########################################################');
+        var exec                = require('child_process').exec;
+        var getcurrentcommit       = 'git rev-parse HEAD';
+        //var getavailablecommit       = 'git ls-remote https://github.com/deepakpalalcanzar/gt.git';
+        var getavailablecommit       = 'git ls-remote https://github.com/deepakpalalcanzar/olympus.git';
+
+        //var cdpath = '/var/www/html/gt1/gt';
+        var cdpath = '/var/www/html/olympus';
+
+        exec( getcurrentcommit, {cwd: cdpath} , function(error, stdout, stderr) {
+          console.log('hi8');console.log(error,'error',stdout, stderr);console.log('hi9');
+          if(error){
+            console.log(stderr);
+            return res.json({ status: 'githuberror', 'message': stderr}, 200);
+          }
+          else{
+            var splitcurrcommit = stdout.split('/');
+            var currcommit =  splitcurrcommit[0];
+            currcommit = currcommit.toString();
+            console.log(currcommit);
+            exec( getavailablecommit, {cwd: cdpath} , function(error, stdout, stderr) {
+              console.log('hi5');console.log(error,'error',stdout, stderr);console.log('hi6');
+              if(error){
+                console.log(stderr);
+                return res.json({ status: 'githuberror', 'message': stderr}, 200);
+              }
+              else{
+                var splitavcommit = stdout.split("HEAD");
+                var avcommit =  splitavcommit[0];
+                avcommit = avcommit.toString();
+                console.log(avcommit);
+
+                //console.log(trim(currcommit)+'hi'+trim(avcommit)+'hi1');
+
+                console.log('No updates Available.');
+                return res.json({ status: 'ok', currcommit: currcommit, avcommit: avcommit}, 200);
+
+
+
+                // if(currcommit == avcommit)
+                // {
+                //     console.log('No updates Available.');
+                //     return res.json({ status: 'noupdates'}, 200);
+                // }
+                // else
+                // {
+                //     console.log('updates Available.');
+                //     return res.json({ status: 'updatesavailable'}, 200);
+                // }
+
+              }
+            });
+          }
         });
     },
 
@@ -1394,6 +1729,48 @@ console.log(opts);
                     });
 
                     account.avatar_image = enterpriseName;
+
+                    // UploadPaths.find({where:{isActive:1}}).done(function(cb){
+                    //     console.log(cb);
+                    // });
+
+                    async.auto({
+                        getAdapter: function(cb) {
+
+                            UploadPaths.find({where:{isActive:1}}).done(cb);
+                            console.log('deepakdeepak');
+                            //console.log(cb);
+                        },
+                        uploadFileTask: ['getAdapter', function(cb, up) {
+                            console.log('user-agent');
+                            var current_receiver        = up.getAdapter.type;
+                            var current_receiverinfo    = up.getAdapter;
+
+                            if (current_receiver == 'Disk') {
+
+                            }
+                            else{
+                                // S3APIService.download({
+                                //     name: fileModel.fsName,
+                                //     current_receiverinfo: current_receiverinfo
+                                // }, function (err, data, contentLength, stream) {
+
+                                // });
+                            }
+
+                            //console.log(current_receiverinfo);
+
+                            // uploadStream.upload(receiver, function (err, files) {
+
+
+                        }]
+
+
+                    });
+
+
+
+
                 }
 
                 account.save().done(function (err) {
