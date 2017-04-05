@@ -971,7 +971,7 @@ console.log('33333333333333333333333333333333333');
         console.log('###########################################################');
         var exec                = require('child_process').exec;
         //var gitpull       = 'git pull https://github.com/deepakpalalcanzar/gt.git';
-        var gitpull       = 'https://github.com/deepakpalalcanzar/olympus.git';
+        var gitpull       = 'git pull https://github.com/deepakpalalcanzar/olympus.git';
 
         //var cdpath = '/var/www/html/gt1/gt';
         var cdpath = '/var/www/html/olympus';
