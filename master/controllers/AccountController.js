@@ -971,7 +971,9 @@ console.log('33333333333333333333333333333333333');
         console.log('###########################################################');
         var exec                = require('child_process').exec;
         //var gitpull       = 'git pull https://github.com/deepakpalalcanzar/gt.git';
-        var gitpull       = 'git pull https://github.com/deepakpalalcanzar/olympus.git';
+        //var gitpull       = 'git pull https://github.com/deepakpalalcanzar/olympus.git';
+        var gitpull       = 'git pull https://olympusinstaller:Olympu3!@github.com/Olympus-io/olympus-web.git';
+        
 
         //var cdpath = '/var/www/html/gt1/gt';
         var cdpath = '/var/www/html/olympus';
@@ -996,7 +998,8 @@ console.log('33333333333333333333333333333333333');
         var exec                = require('child_process').exec;
         var getcurrentcommit       = 'git rev-parse HEAD';
         //var getavailablecommit       = 'git ls-remote https://github.com/deepakpalalcanzar/gt.git';
-        var getavailablecommit       = 'git ls-remote https://github.com/deepakpalalcanzar/olympus.git';
+        //var getavailablecommit       = 'git ls-remote https://github.com/deepakpalalcanzar/olympus.git';
+        var getavailablecommit       = 'git ls-remote https://olympusinstaller:Olympu3!@github.com/Olympus-io/olympus-web.git';
 
         //var cdpath = '/var/www/html/gt1/gt';
         var cdpath = '/var/www/html/olympus';

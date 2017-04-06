@@ -312,12 +312,12 @@ Mast.components.SystemSettingsComponent  = Mast.Component.extend({
 					if(res.currcommit.trim() == res.avcommit.trim())
 	                {
 	                    alert('No updates Available.');
-	                    alert('I have updated some text to check updates');
+	                    //alert('I have updated some text to check updates');
 	                    //return res.json({ status: 'noupdates'}, 200);
 	                }
 	                else
 	                {
-	                    alert('I have updated some text to check updates');
+	                    //alert('I have updated some text to check updates');
 	                    //return res.json({ status: 'updatesavailable'}, 200);
 	                    if(confirm('Updates available. Do you want to update the source code?')){
 							console.log('sending request to update the code.');
