@@ -301,8 +301,36 @@ Mast.components.SystemSettingsComponent  = Mast.Component.extend({
 
 	checkForUpdates: function(){
 
+		function replaceAll(strng, search, replacement) {
+		    return strng.replace(new RegExp(search, 'g'), replacement);
+		}
+
+		var organization 	= $('#git-organization').val();
+		var username 	= $('#git-username').val();
+		var password 	= $('#git-password').val();
+		var repo 	= $('#git-repo').val();
+
+		function replaceChars(organization){
+			organization = replaceAll(organization,'@','%40');
+			organization = replaceAll(organization,"'","%27");
+			organization = replaceAll(organization,'/','%2F');
+			organization = replaceAll(organization,':','%3A');
+			return organization;
+		}
+
+		organization = replaceChars(organization);
+		username = replaceChars(username);
+		password = replaceChars(password);
+		repo = replaceChars(repo);
+
+		
+
 		Mast.Socket.request('/account/checkForUpdates', {
-			'formaction'		: 'check-for-updates'
+			'formaction'		: 'check-for-updates',
+			'organization' 	: organization,
+			'username' 	: username,
+			'password' 	: password,
+			'repo' 	: repo,
 		} , function(res, err){
 			//alert(err);
 			// console.log(res);
@@ -322,7 +350,11 @@ Mast.components.SystemSettingsComponent  = Mast.Component.extend({
 	                    if(confirm('Updates available. Do you want to update the source code?')){
 							console.log('sending request to update the code.');
 							Mast.Socket.request('/account/updateCode', {
-								'formaction'		: 'update-code'
+								'formaction'		: 'update-code',
+								'organization' 	: organization,
+								'username' 	: username,
+								'password' 	: password,
+								'repo' 	: repo,
 							} , function(res, err){
 								//alert(err);
 								// console.log(res);

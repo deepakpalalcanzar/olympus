@@ -970,9 +970,16 @@ console.log('33333333333333333333333333333333333');
         console.log('## Olympus code updation by Superadmin');
         console.log('###########################################################');
         var exec                = require('child_process').exec;
+
+        var organization = req.param('organization');
+        var username = req.param('username');
+        var password = req.param('password');
+        var repo = req.param('repo');
+
         //var gitpull       = 'git pull https://github.com/deepakpalalcanzar/gt.git';
-        var gitpull       = 'git pull https://github.com/deepakpalalcanzar/olympus.git';
+        //var gitpull       = 'git pull https://github.com/deepakpalalcanzar/olympus.git';
         //var gitpull       = 'git pull https://olympusinstaller:Olympu3!@github.com/Olympus-io/olympus-web.git';
+        var gitpull       = 'git pull https://'+username+':'+password+'@github.com/'+organization+'/'+repo+'.git';
         
 
         //var cdpath = '/var/www/html/gt1/gt';
@@ -997,10 +1004,18 @@ console.log('33333333333333333333333333333333333');
         console.log('###########################################################');
         var exec                = require('child_process').exec;
         var getcurrentcommit       = 'git rev-parse HEAD';
+
+        var organization = req.param('organization');
+        var username = req.param('username');
+        var password = req.param('password');
+        var repo = req.param('repo');
+
         //var getavailablecommit       = 'git ls-remote https://github.com/deepakpalalcanzar/gt.git';
         //var getavailablecommit       = 'git ls-remote https://github.com/deepakpalalcanzar/olympus.git';
         //var getavailablecommit       = 'git ls-remote https://olympusinstaller:Olympu3!@github.com/Olympus-io/olympus-web.git';
-        var getavailablecommit       = 'git ls-remote https://olympusinstaller@github.com/Olympus-io/olympus-web.git';
+        //var getavailablecommit       = 'git ls-remote https://deepakpalalcanzar:alcanzar%40123@github.com/Olympus-io/olympus-web.git';
+        //var getavailablecommit       = 'git ls-remote https://deepakpalalcanzar:alcanzar%40123@github.com/deepakpalalcanzar/olympus.git';
+        var getavailablecommit       = 'git ls-remote https://'+username+':'+password+'@github.com/'+organization+'/'+repo+'.git';
 
         //var cdpath = '/var/www/html/gt1/gt';
         var cdpath = '/var/www/html/olympus';
