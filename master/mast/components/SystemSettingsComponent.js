@@ -340,7 +340,7 @@ Mast.components.SystemSettingsComponent  = Mast.Component.extend({
 					if(res.currcommit.trim() == res.avcommit.trim())
 	                {
 	                    alert('No updates Available.');
-	                    //alert('I have updated some text to check updates');
+	                    alert('I have updated some text to check updates');
 	                    //return res.json({ status: 'noupdates'}, 200);
 	                }
 	                else
