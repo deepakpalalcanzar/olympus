@@ -9,3 +9,6 @@ deepak
 
 
 ok
+
+
+remote setting
