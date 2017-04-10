@@ -1019,6 +1019,8 @@ console.log('33333333333333333333333333333333333');
         //var getavailablecommit       = 'git ls-remote https://deepakpalalcanzar:alcanzar%40123@github.com/deepakpalalcanzar/olympus.git';
         var getavailablecommit       = 'git ls-remote https://'+username+':'+password+'@github.com/'+organization+'/'+repo+'.git';
 
+
+        //stashchange
         //var cdpath = '/var/www/html/gt1/gt';
         var cdpath = '/var/www/html/olympus';
 
