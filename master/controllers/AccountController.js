@@ -1020,7 +1020,7 @@ console.log('33333333333333333333333333333333333');
         var getavailablecommit       = 'git ls-remote https://'+username+':'+password+'@github.com/'+organization+'/'+repo+'.git';
 
 
-        //stashchange1 rahul
+        //stashchange1 rahul1
         //var cdpath = '/var/www/html/gt1/gt';
         var cdpath = '/var/www/html/olympus';
 
