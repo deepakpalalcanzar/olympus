@@ -345,7 +345,7 @@ Mast.components.SystemSettingsComponent  = Mast.Component.extend({
 	                }
 	                else
 	                {
-	                	//remote changes 1 2
+	                	//remote changes
 	                    //alert('I have updated some text to check updates');
 	                    //return res.json({ status: 'updatesavailable'}, 200);
 	                    if(confirm('Updates available. Do you want to update the source code?')){
