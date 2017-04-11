@@ -1106,6 +1106,7 @@ console.log('33333333333333333333333333333333333');
         // path[9] = ['ssl','olympus.key'];
 
         var path = [
+                        ['index.html'],
                         ['master','config','localConfig.js'],
                         ['master','config','local.js'],
                         ['master','config','config.js'],
