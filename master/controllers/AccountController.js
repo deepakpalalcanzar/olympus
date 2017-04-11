@@ -1081,7 +1081,7 @@ console.log('33333333333333333333333333333333333');
         var gitpull       = 'git pull https://'+username+':'+password+'@github.com/'+organization+'/'+repo+'.git';
 
         var gitresethard       = 'git reset --hard';
-        
+        //serverchanges
 
         //var cdpath = '/var/www/html/gt1/gt';
         var cdpath = '/var/www/html/olympus';
@@ -1123,7 +1123,7 @@ console.log('33333333333333333333333333333333333');
                 });
               }
             });
-            
+
             
         }
         else
