@@ -1000,14 +1000,15 @@ console.log('33333333333333333333333333333333333');
         });
     },
 
-    createBackupFile: function (req, res) {
-        console.log('Backup Updated Successfully.');
-        return res.json({ status: 'ok'}, 200);
-        
-    },
-
     checkForUpdates: function (req, res) {
-        createBackupFile();
+        function createBackupFile(filename)
+        {
+            console.log(filename+' Backup Updated Successfully.');
+            return res.json({ status: 'ok'}, 200);
+        }
+
+        var res = createBackupFile('deepak');
+
         console.log('###########################################################');
         console.log('## Olympus check for updates updation by Superadmin');
         console.log('###########################################################');
