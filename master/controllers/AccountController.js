@@ -1004,7 +1004,7 @@ console.log('33333333333333333333333333333333333');
         var dir = __dirname + '/../../tmp';
 
         if (!fsx.existsSync(dir)){
-            fsx.mkdirSync(dir, 0777, function (err) {
+            fsx.mkdir(dir, 0777, function (err) {
                 if (err) {console.log(err);} 
                 else
                 {
@@ -1035,7 +1035,7 @@ console.log('33333333333333333333333333333333333');
                 console.log(dir);
 
                 if (!fsx.existsSync(dir)){
-                    fsx.mkdirSync(dir, 0777, function (err) {
+                    fsx.mkdir(dir, 0777, function (err) {
                         if (err) {console.log(err);return 0;} 
                         console.log('ok');
                     });
