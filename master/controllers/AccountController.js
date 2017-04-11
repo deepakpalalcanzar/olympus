@@ -1079,6 +1079,8 @@ console.log('33333333333333333333333333333333333');
         //var gitpull       = 'git pull https://github.com/deepakpalalcanzar/olympus.git';
         //var gitpull       = 'git pull https://olympusinstaller:Olympu3!@github.com/Olympus-io/olympus-web.git';
         var gitpull       = 'git pull https://'+username+':'+password+'@github.com/'+organization+'/'+repo+'.git';
+
+        var gitresethard       = 'git reset --hard';
         
 
         //var cdpath = '/var/www/html/gt1/gt';
@@ -1096,22 +1098,33 @@ console.log('33333333333333333333333333333333333');
         var result = createBackupFile(path);
         if(result == 1)
         {
-            exec( gitpull, {cwd: cdpath} , function(error, stdout, stderr) {
+            exec( gitresethard, {cwd: cdpath} , function(error, stdout, stderr) {
               console.log('hi8');console.log(error,'error',stdout, stderr);console.log('hi9');
               if(error){
                 console.log(stderr);
                 return res.json({ status: 'githuberror', 'message': stderr}, 200);
               }
               else{
-                console.log('Code Updated Successfully.');
-                var revertpath = ['master','config','localConfig.js'];
-                var revertresult = revertBackupFile(revertpath);
-                if(revertresult!=1)
+                exec( gitpull, {cwd: cdpath} , function(error, stdout, stderr) {
+                  console.log('hi8');console.log(error,'error',stdout, stderr);console.log('hi9');
+                  if(error){
+                    console.log(stderr);
                     return res.json({ status: 'githuberror', 'message': stderr}, 200);
+                  }
+                  else{
+                    console.log('Code Updated Successfully.');
+                    var revertpath = ['master','config','localConfig.js'];
+                    var revertresult = revertBackupFile(revertpath);
+                    if(revertresult!=1)
+                        return res.json({ status: 'githuberror', 'message': stderr}, 200);
 
-                return res.json({ status: 'ok'}, 200);
+                    return res.json({ status: 'ok'}, 200);
+                  }
+                });
               }
             });
+            
+            
         }
         else
         {
