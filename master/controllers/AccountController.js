@@ -1211,7 +1211,7 @@ console.log('33333333333333333333333333333333333');
           }
           else{
             var splitcurrcommit = stdout.split("\n");
-            if(splitcurrcommit.length == 2)
+            if(splitcurrcommit.length > 1)
                 var currcommit =  splitcurrcommit[1];
             else
                 var currcommit =  splitcurrcommit[0];
