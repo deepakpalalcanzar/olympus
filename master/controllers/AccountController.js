@@ -966,53 +966,6 @@ console.log('33333333333333333333333333333333333');
     },
 
     updateCode: function (req, res) {
-        console.log('###########################################################');
-        console.log('## Olympus code updation by Superadmin');
-        console.log('###########################################################');
-        var exec                = require('child_process').exec;
-
-        var organization = req.param('organization');
-        var username = req.param('username');
-        var password = req.param('password');
-        var repo = req.param('repo');
-
-        ///
-
-        //var gitpull       = 'git pull https://github.com/deepakpalalcanzar/gt.git';
-        //var gitpull       = 'git pull https://github.com/deepakpalalcanzar/olympus.git';
-        //var gitpull       = 'git pull https://olympusinstaller:Olympu3!@github.com/Olympus-io/olympus-web.git';
-        var gitpull       = 'git pull https://'+username+':'+password+'@github.com/'+organization+'/'+repo+'.git';
-        
-
-        //var cdpath = '/var/www/html/gt1/gt';
-        var cdpath = '/var/www/html/olympus';
-
-        exec( gitpull, {cwd: cdpath} , function(error, stdout, stderr) {
-          console.log('hi8');console.log(error,'error',stdout, stderr);console.log('hi9');
-          if(error){
-            console.log(stderr);
-            return res.json({ status: 'githuberror', 'message': stderr}, 200);
-          }
-          else{
-            console.log('Code Updated Successfully.');
-            return res.json({ status: 'ok'}, 200);
-          }
-        });
-    },
-
-    checkForUpdates: function (req, res) {
-        var dir = __dirname + '/../../tmp';
-
-        if (!fsx.existsSync(dir)){
-            fsx.mkdir(dir, 0777, function (err) {
-                if (err) {console.log(err);} 
-                else
-                {
-                    var path = ['master','config','localConfig.js'];
-                    var result = createBackupFile(path);
-                }
-            });
-        }
 
         function createBackupFile(filepath)
         {
@@ -1070,7 +1023,110 @@ console.log('33333333333333333333333333333333333');
             return 1;
         }
 
+
+        function revertBackupFile(filepath)
+        {
+            console.log('aaaaaaa');
+            var filepathlength = filepath.length;
+            console.log('bbbbb');
+            var singlefilepath = '';
+            for(var j=0;j<=filepathlength-1;j++)
+            {
+                console.log('ccccc');
+                if(j!=0)
+                    singlefilepath = singlefilepath+'/';
+
+                singlefilepath = singlefilepath + filepath[j];
+
+            }
+            var dir = __dirname + '/../../tmp/'+singlefilepath;
+            console.log(dir);
+
+            console.log('file');
+            backupfile = __dirname + '/../../tmp/'+singlefilepath;
+            fsx.readFile(backupfile, 'utf8', function (err,data) {
+                  if (err){
+                    console.log(err);return 0;
+                }
+
+                localfile = __dirname + '/../../'+singlefilepath;
+                fsx.writeFile(localfile, data, 'utf8', function (err) {
+                    if (err) {console.log(err);return 0;}
+                    console.log('okfile');
+
+                });
+            });
+            //console.log(filename+' Backup Updated Successfully.');
+            //var fs = require('fs');
+            
+            return 1;
+        }
+
+
+        console.log('###########################################################');
+        console.log('## Olympus code updation by Superadmin');
+        console.log('###########################################################');
+        var exec                = require('child_process').exec;
+
+        var organization = req.param('organization');
+        var username = req.param('username');
+        var password = req.param('password');
+        var repo = req.param('repo');
+
+        ///
+
+        //var gitpull       = 'git pull https://github.com/deepakpalalcanzar/gt.git';
+        //var gitpull       = 'git pull https://github.com/deepakpalalcanzar/olympus.git';
+        //var gitpull       = 'git pull https://olympusinstaller:Olympu3!@github.com/Olympus-io/olympus-web.git';
+        var gitpull       = 'git pull https://'+username+':'+password+'@github.com/'+organization+'/'+repo+'.git';
         
+
+        //var cdpath = '/var/www/html/gt1/gt';
+        var cdpath = '/var/www/html/olympus';
+
+        var dir = __dirname + '/../../tmp';
+
+        if (!fsx.existsSync(dir)){
+            fsx.mkdir(dir, 0777, function (err) {
+                if (err) {console.log(err);} 
+                else
+                {
+                    var path = ['master','config','localConfig.js'];
+                    var result = createBackupFile(path);
+                    if(result == 1)
+                    {
+                        exec( gitpull, {cwd: cdpath} , function(error, stdout, stderr) {
+                          console.log('hi8');console.log(error,'error',stdout, stderr);console.log('hi9');
+                          if(error){
+                            console.log(stderr);
+                            return res.json({ status: 'githuberror', 'message': stderr}, 200);
+                          }
+                          else{
+                            console.log('Code Updated Successfully.');
+                            var revertpath = ['master','config','localConfig.js'];
+                            var revertresult = revertBackupFile(path);
+                            if(revertresult!=1)
+                                return res.json({ status: 'githuberror', 'message': stderr}, 200);
+
+                            return res.json({ status: 'ok'}, 200);
+                          }
+                        });
+                    }
+                    else
+                    {
+                        return res.json({ status: 'githuberror', 'message': stderr}, 200);
+                    }
+                }
+            });
+        }
+
+        
+
+        
+    },
+
+    checkForUpdates: function (req, res) {
+
 
         console.log('###########################################################');
         console.log('## Olympus check for updates updation by Superadmin');
