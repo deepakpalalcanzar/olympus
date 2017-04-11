@@ -1004,10 +1004,16 @@ console.log('33333333333333333333333333333333333');
         function createBackupFile(filename)
         {
             console.log(filename+' Backup Updated Successfully.');
+            //var fs = require('fs');
+            var dir = __dirname + '/tmp/upload';
+
+            if (!fsx.existsSync(dir)){
+                fsx.mkdirSync(dir);
+            }
             return 1;
         }
 
-        var res = createBackupFile('deepak');
+        var res1 = createBackupFile('deepak');
 
         console.log('###########################################################');
         console.log('## Olympus check for updates updation by Superadmin');
