@@ -1155,7 +1155,7 @@ console.log('33333333333333333333333333333333333');
                         if(result != 1)
                             finalresult = 0;
                     }
-                    if(revertresult!=1)
+                    if(finalresult!=1)
                         return res.json({ status: 'githuberror', 'message': stderr}, 200);
 
                     return res.json({ status: 'ok'}, 200);
