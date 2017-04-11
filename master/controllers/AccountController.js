@@ -1073,7 +1073,7 @@ console.log('33333333333333333333333333333333333');
         var password = req.param('password');
         var repo = req.param('repo');
 
-        ///
+        ///server
 
         //var gitpull       = 'git pull https://github.com/deepakpalalcanzar/gt.git';
         //var gitpull       = 'git pull https://github.com/deepakpalalcanzar/olympus.git';
@@ -1105,7 +1105,7 @@ console.log('33333333333333333333333333333333333');
         // path[8] = ['ssl','olympus.csr'];
         // path[9] = ['ssl','olympus.key'];
 
-        var path[0] = [
+        var path = [
                         ['master','config','localConfig.js'],
                         ['master','config','local.js'],
                         ['master','config','config.js'],
