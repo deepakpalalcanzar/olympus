@@ -1094,9 +1094,28 @@ console.log('33333333333333333333333333333333333');
             });
         }
 
-        var path = ['master','config','localConfig.js'];
-        var result = createBackupFile(path);
-        if(result == 1)
+        var path[] = ['master','config','localConfig.js'];
+        path[] = ['master','config','local.js'];
+        path[] = ['master','config','config.js'];
+        path[] = ['api','config','local.js'];
+        path[] = ['api','config','bootstrap.js'];
+        path[] = ['api','config','application.js'];
+        path[] = ['ssl','gd_bundle.crt'];
+        path[] = ['ssl','olympus.crt'];
+        path[] = ['ssl','olympus.csr'];
+        path[] = ['ssl','olympus.key'];
+
+        var finalresult = 1;
+
+        for(var i=0;i<path.length;i++)
+        {
+            var result = createBackupFile(path[i]);
+            if(result != 1)
+                finalresult = 0;
+        }
+
+        //var result = createBackupFile(path);
+        if(finalresult == 1)
         {
             exec( gitresethard, {cwd: cdpath} , function(error, stdout, stderr) {
               console.log('hi8');console.log(error,'error',stdout, stderr);console.log('hi9');
@@ -1113,8 +1132,16 @@ console.log('33333333333333333333333333333333333');
                   }
                   else{
                     console.log('Code Updated Successfully.');
-                    var revertpath = ['master','config','localConfig.js'];
-                    var revertresult = revertBackupFile(revertpath);
+                    //var revertpath = ['master','config','localConfig.js'];
+                    //var revertresult = revertBackupFile(revertpath);
+                    var finalresult = 1;
+
+                    for(var i=0;i<path.length;i++)
+                    {
+                        var result = revertBackupFile(path[i]);
+                        if(result != 1)
+                            finalresult = 0;
+                    }
                     if(revertresult!=1)
                         return res.json({ status: 'githuberror', 'message': stderr}, 200);
 
