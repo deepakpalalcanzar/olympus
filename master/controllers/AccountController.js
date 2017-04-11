@@ -1185,7 +1185,8 @@ console.log('33333333333333333333333333333333333');
         console.log('## Olympus check for updates updation by Superadmin');
         console.log('###########################################################');
         var exec                = require('child_process').exec;
-        var getcurrentcommit       = 'git rev-parse HEAD';
+        //var getcurrentcommit       = 'git rev-parse HEAD';
+        var getcurrentcommit       = 'git rev-list --all';
 
         var organization = req.param('organization');
         var username = req.param('username');
@@ -1209,8 +1210,11 @@ console.log('33333333333333333333333333333333333');
             return res.json({ status: 'githuberror', 'message': stderr}, 200);
           }
           else{
-            var splitcurrcommit = stdout.split('/');
-            var currcommit =  splitcurrcommit[0];
+            var splitcurrcommit = stdout.split("\n");
+            if(splitcurrcommit.length == 2)
+                var currcommit =  splitcurrcommit[1];
+            else
+                var currcommit =  splitcurrcommit[0];
             currcommit = currcommit.toString();
             console.log(currcommit);
             exec( getavailablecommit, {cwd: cdpath} , function(error, stdout, stderr) {
