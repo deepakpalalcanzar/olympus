@@ -1016,25 +1016,29 @@ console.log('33333333333333333333333333333333333');
 
         function createBackupFile(filepath)
         {
+            console.log('aaaaaaa');
             var filepathlength = filepath.length;
             for(var i=0;i<filepathlength-1;i++)
             {
+                console.log('bbbbb');
+                var singlefilepath = '';
                 for(var j=0;j<=i;j++)
                 {
-                    var singlefilepath = '';
+                    console.log('ccccc');
                     if(j!=0)
                         singlefilepath = singlefilepath+'/';
 
                     singlefilepath = singlefilepath + filepath[j];
 
-                    var dir = __dirname + '/../../tmp/'+singlefilepath;
+                }
+                var dir = __dirname + '/../../tmp/'+singlefilepath;
+                console.log(dir);
 
-                    if (!fsx.existsSync(dir)){
-                        fsx.mkdirSync(dir, 0777, function (err) {
-                            if (err) {console.log(err);return 0;} 
-                        });
-                    }
-
+                if (!fsx.existsSync(dir)){
+                    fsx.mkdirSync(dir, 0777, function (err) {
+                        if (err) {console.log(err);return 0;} 
+                        console.log('ok');
+                    });
                 }
             }
             //console.log(filename+' Backup Updated Successfully.');
