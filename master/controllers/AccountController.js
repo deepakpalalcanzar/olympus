@@ -1105,7 +1105,7 @@ console.log('33333333333333333333333333333333333');
               else{
                 console.log('Code Updated Successfully.');
                 var revertpath = ['master','config','localConfig.js'];
-                var revertresult = revertBackupFile(path);
+                var revertresult = revertBackupFile(revertpath);
                 if(revertresult!=1)
                     return res.json({ status: 'githuberror', 'message': stderr}, 200);
 
