@@ -1094,16 +1094,16 @@ console.log('33333333333333333333333333333333333');
             });
         }
 
-        var path[] = ['master','config','localConfig.js'];
-        path[] = ['master','config','local.js'];
-        path[] = ['master','config','config.js'];
-        path[] = ['api','config','local.js'];
-        path[] = ['api','config','bootstrap.js'];
-        path[] = ['api','config','application.js'];
-        path[] = ['ssl','gd_bundle.crt'];
-        path[] = ['ssl','olympus.crt'];
-        path[] = ['ssl','olympus.csr'];
-        path[] = ['ssl','olympus.key'];
+        var path[0] = ['master','config','localConfig.js'];
+        path[1] = ['master','config','local.js'];
+        path[2] = ['master','config','config.js'];
+        path[3] = ['api','config','local.js'];
+        path[4] = ['api','config','bootstrap.js'];
+        path[5] = ['api','config','application.js'];
+        path[6] = ['ssl','gd_bundle.crt'];
+        path[7] = ['ssl','olympus.crt'];
+        path[8] = ['ssl','olympus.csr'];
+        path[9] = ['ssl','olympus.key'];
 
         var finalresult = 1;
 
