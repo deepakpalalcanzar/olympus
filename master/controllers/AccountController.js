@@ -1004,7 +1004,7 @@ console.log('33333333333333333333333333333333333');
         function createBackupFile(filename)
         {
             console.log(filename+' Backup Updated Successfully.');
-            return res.json({ status: 'ok'}, 200);
+            return 1;
         }
 
         var res = createBackupFile('deepak');
