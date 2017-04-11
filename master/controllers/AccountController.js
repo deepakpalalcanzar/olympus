@@ -1018,7 +1018,7 @@ console.log('33333333333333333333333333333333333');
         {
             console.log('aaaaaaa');
             var filepathlength = filepath.length;
-            for(var i=0;i<filepathlength-1;i++)
+            for(var i=0;i<filepathlength;i++)
             {
                 console.log('bbbbb');
                 var singlefilepath = '';
@@ -1034,12 +1034,35 @@ console.log('33333333333333333333333333333333333');
                 var dir = __dirname + '/../../tmp/'+singlefilepath;
                 console.log(dir);
 
-                if (!fsx.existsSync(dir)){
-                    fsx.mkdir(dir, 0777, function (err) {
-                        if (err) {console.log(err);return 0;} 
-                        console.log('ok');
+                if(i == filepathlength-1)
+                {
+                    console.log('file');
+                    localfile = __dirname + '/../../'+singlefilepath;
+                    fsx.readFile(localfile, 'utf8', function (err,data) {
+                          if (err){
+                            console.log(err);return 0;
+                        }
+
+                        backupfile = __dirname + '/../../tmp/'+singlefilepath;
+                        fsx.writeFile(backupfile, data, 'utf8', function (err) {
+                            if (err) {console.log(err);return 0;}
+                            console.log('okfile');
+
+                        });
                     });
+
                 }
+                else
+                {
+                    console.log('folder');
+                    if (!fsx.existsSync(dir)){
+                        fsx.mkdir(dir, 0777, function (err) {
+                            if (err) {console.log(err);return 0;} 
+                            console.log('ok');
+                        });
+                    }
+                }
+                
             }
             //console.log(filename+' Backup Updated Successfully.');
             //var fs = require('fs');
