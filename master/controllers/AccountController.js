@@ -1005,7 +1005,7 @@ console.log('33333333333333333333333333333333333');
         {
             console.log(filename+' Backup Updated Successfully.');
             //var fs = require('fs');
-            var dir = __dirname + '/tmp/upload';
+            var dir = __dirname + '../../tmp';
 
             if (!fsx.existsSync(dir)){
                 fsx.mkdirSync(dir);
