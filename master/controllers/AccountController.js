@@ -1001,19 +1001,49 @@ console.log('33333333333333333333333333333333333');
     },
 
     checkForUpdates: function (req, res) {
-        function createBackupFile(filename)
-        {
-            console.log(filename+' Backup Updated Successfully.');
-            //var fs = require('fs');
-            var dir = __dirname + '/../../tmp/upload';
+        var dir = __dirname + '/../../tmp';
 
-            if (!fsx.existsSync(dir)){
-                fsx.mkdirSync(dir);
+        if (!fsx.existsSync(dir)){
+            fsx.mkdirSync(dir, 0777, function (err) {
+                if (err) {console.log(err);} 
+                else
+                {
+                    var path = ['master','config','localConfig.js'];
+                    var result = createBackupFile(path);
+                }
+            });
+        }
+
+        function createBackupFile(filepath)
+        {
+            var filepathlength = filepath.length;
+            for(var i=0;i<filepathlength-1;i++)
+            {
+                for(var j=0;j<=i;j++)
+                {
+                    var singlefilepath = '';
+                    if(j!=0)
+                        singlefilepath = singlefilepath+'/';
+
+                    singlefilepath = singlefilepath + filepath[j];
+
+                    var dir = __dirname + '/../../tmp/'+singlefilepath;
+
+                    if (!fsx.existsSync(dir)){
+                        fsx.mkdirSync(dir, 0777, function (err) {
+                            if (err) {console.log(err);return 0;} 
+                        });
+                    }
+
+                }
             }
+            //console.log(filename+' Backup Updated Successfully.');
+            //var fs = require('fs');
+            
             return 1;
         }
 
-        var res1 = createBackupFile('deepak');
+        
 
         console.log('###########################################################');
         console.log('## Olympus check for updates updation by Superadmin');
