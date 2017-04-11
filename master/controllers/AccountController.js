@@ -1089,34 +1089,35 @@ console.log('33333333333333333333333333333333333');
         if (!fsx.existsSync(dir)){
             fsx.mkdir(dir, 0777, function (err) {
                 if (err) {console.log(err);return res.json({ status: 'githuberror', 'message': stderr}, 200);} 
-                
-                var path = ['master','config','localConfig.js'];
-                var result = createBackupFile(path);
-                if(result == 1)
-                {
-                    exec( gitpull, {cwd: cdpath} , function(error, stdout, stderr) {
-                      console.log('hi8');console.log(error,'error',stdout, stderr);console.log('hi9');
-                      if(error){
-                        console.log(stderr);
-                        return res.json({ status: 'githuberror', 'message': stderr}, 200);
-                      }
-                      else{
-                        console.log('Code Updated Successfully.');
-                        var revertpath = ['master','config','localConfig.js'];
-                        var revertresult = revertBackupFile(path);
-                        if(revertresult!=1)
-                            return res.json({ status: 'githuberror', 'message': stderr}, 200);
-
-                        return res.json({ status: 'ok'}, 200);
-                      }
-                    });
-                }
-                else
-                {
-                    return res.json({ status: 'githuberror', 'message': stderr}, 200);
-                }
             });
         }
+
+        var path = ['master','config','localConfig.js'];
+        var result = createBackupFile(path);
+        if(result == 1)
+        {
+            exec( gitpull, {cwd: cdpath} , function(error, stdout, stderr) {
+              console.log('hi8');console.log(error,'error',stdout, stderr);console.log('hi9');
+              if(error){
+                console.log(stderr);
+                return res.json({ status: 'githuberror', 'message': stderr}, 200);
+              }
+              else{
+                console.log('Code Updated Successfully.');
+                var revertpath = ['master','config','localConfig.js'];
+                var revertresult = revertBackupFile(path);
+                if(revertresult!=1)
+                    return res.json({ status: 'githuberror', 'message': stderr}, 200);
+
+                return res.json({ status: 'ok'}, 200);
+              }
+            });
+        }
+        else
+        {
+            return res.json({ status: 'githuberror', 'message': stderr}, 200);
+        }
+
 
         
 
