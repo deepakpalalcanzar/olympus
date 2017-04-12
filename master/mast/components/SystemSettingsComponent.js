@@ -324,7 +324,7 @@ Mast.components.SystemSettingsComponent  = Mast.Component.extend({
 		repo = replaceChars(repo);
 
 		
-
+		$('body').append('<div id="loader" style="background:rgba(0,0,0,0.7);width:100%;height:100%;position:fixed;top:0;left:0;z-index:9999;color:#fff;font-size:25px;padding-top:'+($(window).height()-15)/2+'px;"><center>Please Wait...</center></div>');
 		Mast.Socket.request('/account/checkForUpdates', {
 			'formaction'		: 'check-for-updates',
 			'organization' 	: organization,
@@ -332,6 +332,7 @@ Mast.components.SystemSettingsComponent  = Mast.Component.extend({
 			'password' 	: password,
 			'repo' 	: repo,
 		} , function(res, err){
+			$('#loader').remove();
 			//alert(err);
 			// console.log(res);
 			if( (typeof res.status != 'undefined') ){
@@ -349,6 +350,7 @@ Mast.components.SystemSettingsComponent  = Mast.Component.extend({
 	                    //return res.json({ status: 'updatesavailable'}, 200);
 	                    if(confirm('Updates available. Do you want to update the source code?')){
 							console.log('sending request to update the code.');
+							$('body').append('<div id="loader" style="background:rgba(0,0,0,0.7);width:100%;height:100%;position:fixed;top:0;left:0;z-index:9999;color:#fff;font-size:25px;padding-top:'+($(window).height()-15)/2+'px;"><center>Please Wait...</center></div>');
 							Mast.Socket.request('/account/updateCode', {
 								'formaction'		: 'update-code',
 								'organization' 	: organization,
@@ -356,6 +358,7 @@ Mast.components.SystemSettingsComponent  = Mast.Component.extend({
 								'password' 	: password,
 								'repo' 	: repo,
 							} , function(res, err){
+								$('#loader').remove();
 								//alert(err);
 								// console.log(res);
 								if( (typeof res.status != 'undefined') ){
